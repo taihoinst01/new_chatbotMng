@@ -20,6 +20,8 @@ var auth = require('./routes/auth/auth');
 var menu = require('./routes/menu/menu');
 var user = require('./routes/user/user');
 var boardMng = require('./routes/board/boardMng');
+var bannedWordMng = require('./routes/chatbot/bannedWordMng');
+var autoCompleteMng = require('./routes/chatbot/autoCompleteMng');
 
 var app = express();
 
@@ -166,6 +168,8 @@ app.use('/auth', auth);
 app.use('/menu', menu);
 app.use('/user', user);
 app.use('/boardMng', boardMng);
+app.use('/bannedWordMng', bannedWordMng);
+app.use('/autoCompleteMng', autoCompleteMng);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

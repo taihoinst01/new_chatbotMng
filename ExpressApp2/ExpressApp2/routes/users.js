@@ -18,6 +18,7 @@ basePW = cipher.final('base64');
 const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
 router.get('/', function (req, res) {
+    
     res.send('respond with a resource');
 });
 

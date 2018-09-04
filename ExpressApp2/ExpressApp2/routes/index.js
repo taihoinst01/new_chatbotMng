@@ -21,7 +21,7 @@ router.get('/', function (req, res) {
         try{
             //등록된 앱 있는지 조회
             var UserAppListStr = "SELECT COUNT(*) AS COUNT FROM TBL_USER_RELATION_APP WHERE USER_ID = '" + userId + "';";
-                  
+            
             (async () => {
                 try {
                     let pool = await dbConnect.getConnection(sql);

@@ -3642,7 +3642,7 @@ router.post('/ContextList', function (req, res) {
             context_ListQueryString += "AND DLG_API_DEFINE like '%" + sourceType + "%') tbp \n" +
                 "WHERE PAGEIDX = @currentPage";
 
-            console.log("context_ListQueryString===" + context_ListQueryString);
+            //console.log("context_ListQueryString===" + context_ListQueryString);
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(context_ListQueryString);
             let rows = result1.recordset;
