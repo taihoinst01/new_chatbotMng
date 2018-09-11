@@ -195,7 +195,25 @@ router.get('/', function (req, res) {
                             })
                         }
 
-                        res.redirect('/list');
+                        var chatRelationApp = "";
+                        chatRelationApp += " SELECT CHAT_ID, APP_ID \n";
+                        chatRelationApp += "   FROM TBL_CHAT_RELATION_APP;";
+                        
+                        dbConnect.getConnection(sql).then(pool => { 
+                            return pool.request().query(chatRelationApp) 
+                        }).then(result => {
+                            
+                            var rows = result.recordset;
+                            req.session.ChatRelationAppList = rows;
+
+                            sql.close();
+                            
+                            res.redirect('/list');
+
+                        }).catch(err => {
+                            console.log(err);
+                            sql.close();
+                        });
                     } 
                     
                 } catch (err) {

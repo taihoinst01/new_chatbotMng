@@ -20,7 +20,38 @@ router.get('/', function (req, res) {
     if (typeof req.query.appName !== 'undefined') {
         req.session.appName = req.query.appName;
         req.session.subKey = luisConfig.subKey;
+
+        //챗봇에 속한 앱리스트 새션 저장
+        var selChatInfo = new Object();
+        var chatList = req.session.leftList;
+        var appList = req.session.ChatRelationAppList;
+        for (var kk=0; kk<chatList.length; kk++) {
+            if (req.query.appName == chatList[kk].CHATBOT_NAME) {
+                var tmpObj = new Object();
+                tmpObj.chatId = chatList[kk].CHATBOT_NUM;
+                tmpObj.chatName = chatList[kk].CHATBOT_NAME;
+
+                var tmpArr = [];    
+                for (var jj=0; jj<appList.length; jj++) {
+                    if (tmpObj.chatId == appList[jj].CHAT_ID) {
+                        tmpArr.push(appList[jj]);
+                    }
+                }
+                tmpObj.appList = tmpArr;
+                selChatInfo.chatbot = tmpObj;
+                //selAppList.push(tmpObj);
+            }
+        }
+        
+        req.session.selChatAppLength = selChatInfo.chatbot.appList.length;
+        req.session.selChatInfo = selChatInfo;
     }
+
+    res.redirect('/luis/synchronizeLuis');
+});
+
+router.get('/dashBoard', function (req, res) {
+    
     var selectChannel = "";
     selectChannel += "  SELECT ISNULL(CHANNEL,'') AS CHANNEL FROM TBL_HISTORY_QUERY \n";
     selectChannel += "   WHERE 1=1 \n";
@@ -29,22 +60,22 @@ router.get('/', function (req, res) {
     //selectChannel += "           AND		 CONVERT(DATE,CONVERT(DATETIME,'" + endDate + "'), 112) \n";
     selectChannel += "GROUP BY CHANNEL \n";
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
+        //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectChannel)
-        }).then(result => {
-            let rows = result.recordset
-            req.session.save(function(){
-                res.render('board_new', {   
-                    selMenu: req.session.menu,
-                    appName: req.session.appName,
-                    subKey: req.session.subKey,
-                    channelList : rows
-                });   
-            });
-            sql.close();
-        }).catch(err => {
-            res.status(500).send({ message: "${err}"})
-            sql.close();
+    }).then(result => {
+        let rows = result.recordset
+        req.session.save(function(){
+            res.render('board_new', {   
+                //selMenu: req.session.menu,
+                //appName: req.session.appName,
+                //subKey: req.session.subKey,
+                channelList : rows
+            });   
+        });
+        sql.close();
+    }).catch(err => {
+        res.status(500).send({ message: "${err}"})
+        sql.close();
     });
 });
 

@@ -1,51 +1,58 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 
 <head>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        error
+        ERROR
     </title>
 
-    <!-- 
-        <link rel="stylesheet" href="./common/css/css_common.html" />
-        -->
-    
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="/common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/common/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/common/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/common/css/skin-blue.min.css">
+    <link rel="stylesheet" href="/common/css/default.css">
+    <!--[if lt IE 9]>
+    <script src="common/js/html5shiv.min.js"></script>
+    <script src="common/js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="/common/js/jquery.min.js"></script>
+    <script src="/common/js/bootstrap.min.js"></script>
+    <script src="/common/js/adminlte.min.js"></script>
+    <script src="/common/js/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="/common/js/icheck.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/css/ext/plugin/jquery_ui/jquery-ui-1.11.4.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="/js/treeview/jquery.treeview.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="/js/freejqgrid/css/ui.jqgrid.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="/js/freejqgrid/css/jqGrid.bootstrap.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="/js/ext/ax/AXJ.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="/css/sub.css" />
-    <link rel="stylesheet" type="text/css" href="/js/jqcloud/jqcloud.css" />
-    
-    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="/javascript/login.js"></script>
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> test-->
 </head>
     
 
-<body>
-    <h1><%= message %></h1>
-    <table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
+<body style="background: #f1f4f8;">
+    
+    <table width="40%" height="100%" border="0" cellpadding="0" cellspacing="0" style="float:left; margin:7% 0 0 30%;">
         <tr>
-            <td width="100%" height="100%" align="center" valign="middle" style="padding-top:150px;"><%= error.status %></td>
+            <td width="100%" height="100%" align="center" valign="middle" style="padding-top:150px;">
+                <h2>에러가 발생했습니다. <br/> 관리자에게 문의해 주세요.</h2>
+                
+            <li><a  href="/users/logout" class="btn_log_out" style="margin-left: 5px;"> <%= __('SIGN_OUT') %></a></li>
+            </td>
         </tr>
         <tr>
-            <td><span style="font-family:Tahoma; font-weight:bold; color:#000000; line-height:150%; width:440px; height:70px;"><pre><%= error.stack %></pre></span></td>
+            <td>
+                <span style="font-family:Tahoma; font-weight:bold; color:#000000; line-height:150%; width:100%; height:70px;">
+                    <h3 style="text-align:center;"><a href="/">메인페이지</a></h3>
+                </span>
+            </td>
         </tr>
-      </table>
+        <tr>
+            <td width="100%" height="100%" align="center" valign="middle" style="margin-top:5px;">담당자 : ㅇㅇㅇ</td>
+        </tr>
+        <tr>
+            <td width="100%" height="100%" align="center" valign="middle" style="margin-top:5px;">HP : 010-1111-1111</td>
+            
+        </tr>
+        <tr>
+            <td width="100%" height="100%" align="center" valign="middle" style="margin-top:5px;">e-mail : aaa@aaa.aaa</td>
+        </tr>
+    </table>
 </body>
 </html>
 

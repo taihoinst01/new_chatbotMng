@@ -23,6 +23,9 @@ var boardMng = require('./routes/board/boardMng');
 var bannedWordMng = require('./routes/chatbot/bannedWordMng');
 var autoCompleteMng = require('./routes/chatbot/autoCompleteMng');
 
+var Logger = require("./config/logConfig");
+var logger = Logger.CreateLogger();
+
 var app = express();
 
 process.setMaxListeners(0);
@@ -35,9 +38,9 @@ app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -99,20 +102,59 @@ app.use(function(req, res, next) {
         res.locals.selMenu = null;
     }
 
-    if(req.session.selMenus) {
-        res.locals.selMenus = req.session.selMenus;
-    } else { 
-        res.locals.selMenus = null;
-    }
-
-    if (!req.session.selMenus)  {
-        res.locals.selLeftMenu = null;
-    }
 
     next();
 });
 app.use(function(req, res, next) {
+
+    if (req.session.ChatRelationAppList) {
+        res.locals.ChatRelationAppList = req.session.ChatRelationAppList;
+    } else {
+        res.locals.ChatRelationAppList = null;
+    }
+
+    if (req.session.intentList) {
+        res.locals.intentList = req.session.intentList;
+    } else {
+        res.locals.intentList = null;
+    }
+
+    if (req.session.utterList) {
+        res.locals.utterList = req.session.utterList;
+    } else {
+        res.locals.utterList = null;
+    }
+
+    if (req.session.entityList) {
+        res.locals.entityList = req.session.entityList;
+    } else {
+        res.locals.entityList = null;
+    }
+
+    if (req.session.entityChildList) {
+        res.locals.entityChildList = req.session.entityChildList;
+    } else {
+        res.locals.entityChildList = null;
+    }
     
+    if (req.session.selChatInfo) {
+        res.locals.selChatInfo = req.session.selChatInfo;
+    } else {
+        res.locals.selChatInfo = null;
+    }
+
+    if (req.session.selChatAppLength) {
+        res.locals.selChatAppLength = req.session.selChatAppLength;
+    } else {
+        res.locals.selChatAppLength = null;
+    }
+
+    if (req.session.selAppId)  {
+        res.locals.selAppId = req.session.selAppId;
+    } else { 
+        res.locals.selAppId = null;
+    }
+
     if (req.session.leftList)  {
         res.locals.leftList = req.session.leftList;
     } else { 
@@ -180,15 +222,17 @@ app.use(function (req, res, next) {
 
 // error handlers
 
-// development error handler
-// will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+        if (req.session.sid) {
+            logger.info('[에러페이지] [message : %s] ', err);
+            res.render('error');
+        } else {
+            var userId = req.session.sid;
+            logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
+            res.render('error');
+        }
     });
 }
 
@@ -196,11 +240,16 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+    if (req.session.sid) {
+        logger.info('[에러페이지] [message : %s] ', err);
+        res.render('error');
+    } else {
+        var userId = req.session.sid;
+        logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
+        res.render('error');
+    }
 });
+
 
 app.set('port', process.env.PORT || 3000);
 console.log("app.js port : " + app.get('port')) ;

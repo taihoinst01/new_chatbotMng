@@ -1059,4 +1059,13 @@ router.post('/', function (req, res) {
 */
 
 
+router.get('/error', function (req, res) {
+    if (req.session.sid) {
+        res.render('error');
+    } else {
+        var userId = req.session.sid;
+        res.render('error');
+    }
+});
+
 module.exports = router;

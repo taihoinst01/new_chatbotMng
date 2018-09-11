@@ -24,6 +24,10 @@
     "mssql": "4.1.0",
     "crypto": "1.0.1",
     "i18n": "~0.8.3",
-    "sync-rest-client": "1.0.3"
+    "sync-rest-client": "1.0.3",
+    "fs": "0.0.1-security",
+    "moment": "^2.22.2",
+    "winston": "^2.4.2",
+    "winston-daily-rotate-file": "^3.3.0"
   }
 }

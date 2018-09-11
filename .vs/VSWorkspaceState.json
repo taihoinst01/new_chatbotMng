@@ -1,3 +1,15 @@
 {
+  "ExpandedNodes": [
+    "",
+    "\\ExpressApp2",
+    "\\ExpressApp2\\ExpressApp2",
+    "\\ExpressApp2\\ExpressApp2\\config",
+    "\\ExpressApp2\\ExpressApp2\\obj",
+    "\\ExpressApp2\\ExpressApp2\\public",
+    "\\ExpressApp2\\ExpressApp2\\routes",
+    "\\ExpressApp2\\ExpressApp2\\routes\\board",
+    "\\ExpressApp2\\ExpressApp2\\views"
+  ],
+  "SelectedNode": "\\ExpressApp2\\ExpressApp2\\views\\leftSideBar.html",
   "PreviewInSolutionExplorer": false
 }
