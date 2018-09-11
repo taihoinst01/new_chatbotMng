@@ -42,10 +42,10 @@ $(document).ready(function() {
          
         if(del_count > 0){
             $('#del_content').html('정말로 삭제하시겠습니까? 복구할 수 없습니다.');
-            $('#delete_footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteAutoCompleteBtn"><i class="fa fa-edit"></i> Delete</button>');
+            $('#delete_autocomplete_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteAutoCompleteBtn"><i class="fa fa-edit"></i> Delete</button>');
         }else{
             $('#del_content').html('삭제할 대상은 한 개 이상이어야 합니다.');
-            $('#delete_footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#delete_autocomplete_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
         }
         $('#autoCompleteDeleteModal').modal('show');
     });
