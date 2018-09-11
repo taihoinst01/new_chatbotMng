@@ -3635,7 +3635,7 @@ router.post('/ContextList', function (req, res) {
             if (req.body.searchGroupM !== '') {
                 context_ListQueryString += "AND a.GroupM = '" + req.body.searchGroupM + "' \n";
             }
-            if (req.body.searchGroupS !== '') {
+            if (req.body.searchGroupS !== '') {3
                 context_ListQueryString += "AND a.GroupS = '" + req.body.searchGroupS + "' \n";
             }
 

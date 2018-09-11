@@ -17,7 +17,19 @@
             <li class="header">Menu</li>
             <li class="treeview" id="userMngClick"> <a href="/users/userMng"><i class="fa fa-edit"></i> <span><%= __('USER_MNG') %></span></a> </li>
             <!--<li class="treeview" id="userAugthClick"> <a href="/users/userAuthMng"><i class="fa fa-lock"></i> <span><%= __('USER_AUTH_MNG') %></span></a> </li>-->
-            <li class="treeview" id="chatAugthClick"> <a href="/users/chatBotMng"><i class="fa fa-lock"></i> <span><%= __('CHATBOT_MNG') %></span></a> </li>
+            <!--<li class="treeview" id="chatAugthClick"> <a href="/users/chatBotMng"><i class="fa fa-lock"></i> <span><%= __('CHATBOT_MNG') %></span></a> </li>-->
+            <li class=" treeview"><!--<li class="active treeview">-->  
+                <a href="#">
+                  <i class="fa fa-desktop"></i> <span><%= __('CHATBOT_MNG') %></span>
+                  <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                  </span>
+                </a>
+                <ul class="treeview-menu" >
+                  <li><a href="/users/chatBotMng"><i class="fa  fa-circle-o"></i>챗봇 앱관리</a></li>
+                  <li><a href="#"><i class="fa fa-circle-o"></i>챗봇 상태</a></li>
+                </ul>
+              </li>
             <!-- 추후 사용 예정 -->
             <!-- <li class="treeview" id="apiMngClick"> <a href="/users/apiSetting"><i class="fa  fa-file-text-o"></i> <span><%= __('API_MNG') %></span></a> </li> -->
             <li class=" treeview"><!--<li class="active treeview">-->  

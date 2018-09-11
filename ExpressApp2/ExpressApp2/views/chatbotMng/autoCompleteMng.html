@@ -11,7 +11,7 @@
         <script src="/common/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/js/common/autoCompleteMng.js"></script>
         <script>
-           
+
         </script>
 
 </head>
@@ -39,8 +39,8 @@
                         <div class="box  color-palette-box">
                             <div class="box-body">
                                 <div class="mt20">
-                                    <div class="col-lg-6" style="padding-left:0px !important">
-                                        <h4 class=" col-lg-4">
+                                    <div class="col-lg-12" style="padding-left:0px !important">
+                                        <h4 class=" col-lg-12">
                                             AutoComplete Form
                                         </h4>
 
@@ -48,48 +48,39 @@
                                             <p>
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">
-                                                        <form class="form-horizontal" name="authMasterForm" id="authMasterForm">
+                                                        <form class="form-horizontal" name="autoCompleteForm" id="autoCompleteForm">
                                                             <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-3 control-label">
-                                                                    <i class="fa fa-asterisk"></i> BANNED_WORD</label>
-                                                                <div class="col-sm-9">
-                                                                    <input type="text" class="form-control" id="BANNED_WORD" name="BANNED_WORD" placeholder="BANNED_WORD">
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-3 control-label">
-                                                                    <i class="fa fa-asterisk"></i> TYPE</label>
-                                                                <div class="col-sm-9">
-                                                                    <select name="BANNED_WORD_TYPE" id="BANNED_WORD_TYPE" class="form-control">
-                                                                        <option value="3" selected>비속어</option>
-                                                                        <option value="4">금칙어</option>
-                                                                    </select>
+                                                                <label for="inputEmail3" class="col-sm-2 control-label">
+                                                                    <i class="fa fa-asterisk"></i> Content</label>
+                                                                <div class="col-sm-10">
+                                                                    <input type="text" class="form-control" id="CONTENT" name="CONTENT" placeholder="CONTENT">
                                                                 </div>
                                                             </div>
                                                         </form>
                                                     </div>
                                                     <div class="panel-footer text-right">
-                                                        <button type="button" class="btn btn-default" id="addBannedWordBtn">
+                                                        <button type="button" class="btn btn-default" id="addAutoCompleteBtn">
                                                             <i class="fa fa-edit"></i> Save</button>
                                                     </div>
                                                 </div>
 
                                         </div>
                                     </div>
-                                    <div class="col-lg-8" style="padding:0px !important">
-                                        <h4 class=" col-lg-6">Banned List</h4>
+                                    <div class="col-lg-12" style="padding:0px !important">
+                                        <h4 class=" col-lg-6">AutoComplete List</h4>
                                         <div class=" col-lg-6" style="text-align:right; padding:0px !important">
-                                            <button type="button" class="btn btn-default" id="deleteBannedWordBtnModal">
+                                            <button type="button" class="btn btn-default" id="deleteAutoCompleteBtnModal">
                                                 <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </div>
                                         <div class="Tbl_wrap">
                                             <table class="Tbl" summary="banned word list">
                                                 <colgroup>
-                                                    <col width="10%" />
                                                     <col width="5%" />
-                                                    <col width="30%" />
-                                                    <col width="30%" />
+                                                    <col width="5%" />
+                                                    <col width="70%" />
+                                                    <col width="10%" />
+                                                    <col width="10%" />
                                                 </colgroup>
                                                 <thead>
                                                     <tr>
@@ -97,16 +88,17 @@
                                                         <th>
                                                             <input type="checkbox" class="flat-red" id="check-all">
                                                         </th>
-                                                        <th>Banned Word</th>
-                                                        <th>Banned Type</th>
+                                                        <th>AutoComplete Content</th>
+                                                        <th>Use</th>
+                                                        <th>...</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="bannedWordTableBodyId">
-                                                   
+                                                <tbody id="autoCompleteTableBodyId">
+
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="pagination_wrap" id="bannedWordTablePaging">
+                                        <div class="pagination_wrap" id="autoCompleteTablePaging">
                                             <ul class="pagination pagination-sm no-margin">
 
                                             </ul>
@@ -127,21 +119,60 @@
                 <%include  ../footer.html%>
                     <!-- // Footer -->
                     <!-- Modal -->
-                    
-                    <div class="modal fade" id="bannedWordDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal fade" id="autoCompleteFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">BannedWord</h4>
+                                    <h4 class="modal-title" id="myModalLabel">권한그룹</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form-horizontal" name="autoCompleteUpdateForm" id="autoCompleteUpdateForm">
+                                        <input type="hidden" name="UPDATE_SEQ" id="UPDATE_SEQ">
+                                        <div class="form-group">
+                                            <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i>
+                                                Content</label>
+                                            <div class="col-sm-9">
+                                                <textarea class="form-control" name="UPDATE_CONTENT" id="UPDATE_CONTENT" rows="5"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i>
+                                                Content</label>
+                                            <div class="col-sm-9">
+                                                <select name="UPDATE_USE_YN" id="UPDATE_USE_YN" class="form-control">
+                                                    <option value="Y">사용</option>
+                                                    <option value="N">미사용</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer" id="footer_button">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>
+                                        Close</button>
+                                    <button type="button" class="btn btn-primary" id="updateAutoCompleteBtn"><i class="fa fa-edit"></i>
+                                        Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="autoCompleteDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">AutoComplete</h4>
                                 </div>
                                 <div class="modal-body">
                                     <p id="del_content"></p>
                                 </div>
-                                <div class="modal-footer" id="delete_footer_button">
-                                    <p id="footer_button"></p>
+                                <div class="modal-footer">
+                                    <p id="delete_footer_button"></p>
                                 </div>
                             </div>
                         </div>
