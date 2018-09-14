@@ -174,6 +174,32 @@ app.use(function(req, res, next) {
         res.locals.appId = null;
     }
 
+    // bwj -------------------------------------------------------
+    if (req.session.publishsettings) {
+        res.locals.publishsettings = req.session.publishsettings;
+    } else {
+        res.locals.publishsettings = null;
+    }
+
+    if (req.session.endpoint) {
+        res.locals.endpoint = req.session.endpoint;
+    } else {
+        res.locals.endpoint = null;
+    }
+
+    if (req.session.subscriptions) {
+        res.locals.subscriptions = req.session.subscriptions;
+    } else {
+        res.locals.subscriptions = null;
+    }
+
+    if (req.session.version) {
+        res.locals.version = req.session.version;
+    } else {
+        res.locals.version = null;
+    }
+    // -----------------------------------------------------------
+
     if (req.session.subKey)  {
         res.locals.subKey = req.session.subKey;
     } else { 
@@ -223,10 +249,8 @@ app.use(function (req, res, next) {
 });
 
 // error handlers
-
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
-        /*
         res.status(err.status || 500);
         if (req.session.sid) {
             logger.info('[에러페이지] [message : %s] ', err);
@@ -236,19 +260,12 @@ if (app.get('env') === 'development') {
             logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
             res.render('error');
         }
-        */
-       res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
     });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-    /*
     res.status(err.status || 500);
     if (req.session.sid) {
         logger.info('[에러페이지] [message : %s] ', err);
@@ -258,12 +275,6 @@ app.use(function (err, req, res, next) {
         logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
         res.render('error');
     }
-    */
-   res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
 });
 
 
