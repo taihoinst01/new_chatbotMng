@@ -78,7 +78,7 @@ $(document).on("click", "a[name=delIntentBtn]", function(e){
 });
 
 
-//엔티티 리스트 출력
+//인텐트 리스트 출력
 function makeIntentTable() {
     var params = {
         'searchIntent' : $('#searchStr').val(),
@@ -129,6 +129,28 @@ function createIntent() {
 
         $.ajax({
             type: 'POST',
+            timeout: 0,
+            beforeSend: function () {
+    
+                var width = 0;
+                var height = 0;
+                var left = 0;
+                var top = 0;
+    
+                width = 50;
+                height = 50;
+    
+                top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+                left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+    
+                $("#loadingBar").addClass("in");
+                $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+                $("#loadingBar").css("display","block");
+            },
+            complete: function () {
+                $("#loadingBar").removeClass("in");
+                $("#loadingBar").css("display","none");      
+            },
             data: params,
             url: '/luis/createIntent',
             success: function(data) {
@@ -155,7 +177,7 @@ function createIntent() {
 
 
 
-//엔티티 삭제
+//인텐트 삭제
 function deleteIntent(intentHiddenName, hId) {
     var params = {
         'deleteIntentName' : intentHiddenName,
@@ -164,6 +186,28 @@ function deleteIntent(intentHiddenName, hId) {
     
     $.ajax({
         type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
         data: params,
         url: '/luis/deleteIntent',
         success: function(data) {
@@ -204,6 +248,28 @@ function intentDetail(intentName, intentId, labelCnt) {
 
     $.ajax({
         type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
         data: params,
         url: '/luis/getUtterInIntent',
         success: function(data) {

@@ -43,6 +43,7 @@ $(document).ready(function() {
             $(this).children().eq(0).removeClass('fa-arrow-down')
             $(this).children().eq(0).addClass('fa-arrow-up')
             $('tr[name=utterSubTr]').show( "fast", function() {
+
             });
         }
     });
@@ -60,6 +61,24 @@ $(document).on("keypress", "input[name=matchUtterText]", function(e){
         }
     }
 });
+
+
+// tr클릭
+$(document).on("click", "tr[name=utterMainTr]", function(e){ 
+    if (e.target.className.indexOf('fa-plus') != -1 || e.target.className.indexOf('fa-trash') != -1 ) {
+        return false;
+    } else {
+        if( $(this).next().css('display') != 'none') {
+            $(this).next().hide( 150 );
+        } else {
+
+            $(this).next().show( "fast", function() {
+
+            });
+        }
+    }
+});
+
 
 function chkDulpleSelBox(trIndex, chkIndexStr) {
     
@@ -131,11 +150,42 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             }
         }
         if (isEngNum) {
-            $(this).parents('tr').prev().find('input[name=tokenVal]').each(function(){
-                
+            var indexArr = [];
+            var inputVal = $(this).val();
+            $(this).parents('tr').prev().find('input[name=tokenVal]').each(function(index, item){
+                var strVal = '';
+                var isMatch = false;
+
+                var innerIndex = 0;
+                while (1) {
+                    var hasClass = $(item).parent().find('#utterText_' + index).attr('class');
+                    hasClass = hasClass == undefined? '' : hasClass;
+                    if (hasClass.indexOf('span_color') != -1) {
+                        break;
+                    }
+                    strVal += $(item).parent().find('input[name=tokenVal]').eq(index+innerIndex).val();
+                    var subInput = inputVal.substr(0, strVal.length);
+                    if (inputVal == strVal) {
+                        isMatch = true
+                        break;
+                    } else if (strVal == subInput) {
+                        innerIndex++
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+                if (isMatch) {
+                    var matchObj = new Object();
+                    matchObj.startIndex = index;
+                    matchObj.endIndex = innerIndex;
+                    indexArr.push(matchObj);
+                    //
+                    chkMatch.push(inputStr);
+                    var tmpIndex = index + ',' + innerIndex;
+                    chkMatchIndex.push(tmpIndex);
+                }
             });
-
-
         } else {
             for (var i=0; i<=utterLength-inputLength; i++) {
                 var strTmp = '';
@@ -161,7 +211,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             }
         }
         
-        
+
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
         var utterBodyHtml = '';
         if (chkMatch.length > 1) {
             rememberUtterInput = $(this).val();
@@ -254,7 +306,8 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         } else {
             console.log("매칭되는것 없음 ");
         }
-        
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
     }
 });
 
@@ -344,6 +397,14 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
     for (var i=startIndex; i<=endIndex; i++) {
         $(this).parents('tr').prev().find('#utterText_' + i).removeClass();//.removeAttr('class');
     }
+    while(1) {
+        if ($(this).parents('div').next().find('div[name=indentDiv]').length > 0) {
+            $(this).parents('div').next().remove();
+        } else {
+            break;
+        }
+    }
+    
 
     var utterBodyHtml = '';
     switch($(this).val()*1) {
@@ -393,7 +454,21 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             $(this).parent().append(utterBodyHtml);
             break;
         case 5:
-            
+            utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            for (var j=0; j<closedList.length; j++) {
+                utterBodyHtml += "<option value='" + closedList[j].ENTITY_NAME + "'>" + closedList[j].ENTITY_NAME + "</option>";
+            }
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<select name='entityChildSelBox' class='form-control' style='display:none' >";
+            utterBodyHtml += "<option value=''></option>";
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+            utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+            utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+            $(this).parent().append(utterBodyHtml);
             break;
         default:
             break;
@@ -476,6 +551,16 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
             }
             break;
         case 5:
+            makeChildSelBox ($(this), entityType);
+            $(this).parent().find('select[name=entityChildSelBox]').show();
+            $(this).parent().find('select[name=entityChildSelBox]').children('option').each(function() {
+                if ($(this).is(':selected'))
+                { 
+                    $(this).removeAttr('selected');
+                    return false;
+                }
+            });
+            $(this).parent().find('select[name=entityChildSelBox]').children().eq(0).prop('selected', 'selected');
             break;
     }
 });
@@ -502,6 +587,15 @@ function makeChildSelBox (selObj, entityType) {
 
             break;
         case 5:
+            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            for (var j=0; j<closedList.length; j++) {
+                if (selEntity == closedList[j].ENTITY_NAME) {
+                    for (var k=0; k<closedList[j].CHILD_ENTITY_LIST.length; k++) {
+                        utterBodyHtml += "<option value='" + closedList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "'> " + closedList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
+                    }
+                    break;
+                }
+            }
             break;
     }
 
@@ -597,7 +691,7 @@ $(document).on("keypress", "#utterInputText", function(e){
             }
             
             utterBodyHtml += "<tr name='utterMainTr'>";
-            utterBodyHtml += "<td ><input type='checkbox' class='flat-red' name='tableCheckBox'></td>";
+            utterBodyHtml += "<td ></td>";
             utterBodyHtml += "<td style='text-align: left; padding-left:1%;'>";
             utterBodyHtml += makeTokenizedText(tokenArr, 'SPAN'); 
             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
@@ -606,6 +700,7 @@ $(document).on("keypress", "#utterInputText", function(e){
             utterBodyHtml += "<td></td>";
             utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;' >";
             utterBodyHtml += makeTokenizedText(tokenArr, 'INPUT');
+            utterBodyHtml += makeTokenizedText(tokenArr, 'INDEX', inputText);
             utterBodyHtml += "<input type='hidden' id='intentHiddenName' name='intentHiddenName' value='" + inputText + "' />";
             utterBodyHtml += "<input type='hidden' id='utterHiddenId' name='intentHiddenId' value='NEW' />";
             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
@@ -680,11 +775,11 @@ $(document).on("click", "a[name=delLabelBtn]", function(e){
 });
 
 //intent 삭제 버튼
-$(document).on("click", "button[name=deleteIntentBtn]", function(e){
+$(document).on("click", "#deleteIntentBtn", function(e){
     var intentName = $('#hiddenIntentName').val();
     if (confirm("["+ intentName + "] 삭제하시겠습니까?")) {
         var hId = $('#hiddenIntentId').val();
-        deleteIntent(intentHiddenName, hId);
+        deleteIntent(intentName, hId);
     }
 });
 
@@ -773,7 +868,7 @@ function makeUtteranceTable() {
     
                         for(var i = 0; i < utterList.length; i++){
                             utterBodyHtml += "<tr name='utterMainTr'>";
-                            utterBodyHtml += "<td ><input type='checkbox' class='flat-red' name='tableCheckBox'></td>";
+                            utterBodyHtml += "<td ></td>";
                             utterBodyHtml += "<td style='text-align: left; padding-left:1%;'>";
                             utterBodyHtml += makeTokenizedText(utterList[i].tokenizedText, 'SPAN');
                             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
@@ -807,12 +902,19 @@ function makeTokenizedText(token, chk, text) {
     var tokenHtml = '';
     if (chk == 'INPUT') {
         for (var i=0; i<token.length; i++) {
-            tokenHtml += "<input type='hidden' id='tokenVal_" + i + "' name='tokenVal' value='" + token[i] + "' />"
+            if (token[i]=="'") {
+                tokenHtml += '<input type="hidden" id="tokenVal_' + i + '" name="tokenVal" value="' + token[i] + '" />';
+            } else {
+                tokenHtml += "<input type='hidden' id='tokenVal_" + i + "' name='tokenVal' value='" + token[i] + "' />";
+            }
         }
     }
     else if (chk == 'SPAN') {
         for (var i=0; i<token.length; i++) {
             tokenHtml += "<span id='utterText_" + i + "' name='utterText' style='' >" + token[i] + "</span>";
+            if (i != token.length-1) {
+                tokenHtml += "<span class='barClass' style='' >|</span>";
+            }
         }
     }
     else if (chk == 'INDEX') {
@@ -980,10 +1082,15 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<option value='5' selected>closed list</option>";
                             utterBodyHtml += "</select>";
     
-                            
+
                             utterBodyHtml += "<select name='entitySelBox' class='form-control' >";
                             utterBodyHtml += "<option value='" + entityLabel[i].id + "'></option>";
                             utterBodyHtml += "</select>";
+                            
+                            utterBodyHtml += "<select name='entityChildSelBox' class='form-control' >";
+                            utterBodyHtml += "<option value='" + entityLabel[i].phrase + "'></option>";
+                            utterBodyHtml += "</select>";
+
                             utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
@@ -1149,8 +1256,11 @@ function changeEntitySel() {
                 $(this).html(optionHtml);
                 break;
             case '5':
+                var childHtml = '';
+                var rememberId = -1;
                 for (var i=0; i<closedList.length; i++) {
                     if (closedList[i].ENTITY_ID == $(this).val()) {
+                        rememberId = i; //closedList[i].ENTITY_ID;
                         optionHtml += "<option value='" + closedList[i].ENTITY_NAME + "' selected>" + closedList[i].ENTITY_NAME + "</option>";
                     }
                     else {
@@ -1158,6 +1268,28 @@ function changeEntitySel() {
                     }
                 }
                 $(this).html(optionHtml);
+
+                childHtml += "<option value='NONE' >선택안함</option>";
+                for (var k=0; k<closedList[rememberId].CHILD_ENTITY_LIST.length; k++) {
+                    var chilObj = closedList[rememberId].CHILD_ENTITY_LIST[k];
+                    var childText = $(this).parent().find('select[name=entityChildSelBox]').val();
+                    var isIn = false;
+                    var subArr = chilObj.SUB_LIST.split(',');
+                    for (var q=0; q<subArr.length; q++) {
+                        if (subArr[q] == childText) {
+                            isIn = true;
+                            break;
+                        }
+                    }
+                    if (isIn ) {
+                        childHtml += "<option value='" + closedList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "' selected>" + closedList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
+                    }
+                    else {
+                        childHtml += "<option value='" + closedList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "' >" + closedList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
+                    }
+                }
+                $(this).next().css('display', 'inline');
+                $(this).next().html(childHtml);
                 break;
             case '6':
             /*
@@ -1236,6 +1368,28 @@ function deleteIntent(intentHiddenName, hId) {
     
     $.ajax({
         type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
         data: params,
         url: '/luis/deleteIntent',
         success: function(data) {
@@ -1254,7 +1408,7 @@ function deleteIntent(intentHiddenName, hId) {
 }
 
 
-//인텐트 선택
+//엔티티 가져오기
 function getEntityList(intentName, intentId) {
 
     $.ajax({
@@ -1288,6 +1442,9 @@ function saveUtterance() {
     var utterArr = [];
     var trIndex = 0;
     var uterObj;
+    var newArr = []
+    var addClosedList = [];
+    var isOk = false;
     $('tr').each(function(){
         if (trIndex == 0) {
             trIndex++;
@@ -1296,6 +1453,11 @@ function saveUtterance() {
         if (trIndex++%2 == 1) {
             uterObj = new Object();
             var utterText = $(this).find('input[name=intentHiddenName]').val();
+            if ($(this).find('input[name=intentHiddenId]').val() == 'NEW') {
+                var tmpNewObj = new Object();
+                tmpNewObj.text = utterText;
+                newArr.push(tmpNewObj);
+            }
             uterObj.text = utterText;
             uterObj.intentName = intentName;
             return true;
@@ -1309,6 +1471,7 @@ function saveUtterance() {
                 var selEntity;
                 var startIndex;
                 var endIndex;
+                var childName = '';
                 var utterEntityType = $(this).find('select[name=entityTypeForLabel]').val();
                 switch (utterEntityType) {
                     case '1':
@@ -1323,7 +1486,7 @@ function saveUtterance() {
                         endIndex = $(this).find('input[name=endIndex]').val();
                         
                         if ($(this).find('select[name=entityChildSelBox]').val() != "NONE") {
-                            selEntity = selEntity + "::" +$(this).find('select[name=entityChildSelBox]').val();
+                            selEntity = selEntity + "::" + $(this).find('select[name=entityChildSelBox]').val();
                         }
                         break;
 
@@ -1334,11 +1497,84 @@ function saveUtterance() {
                         break;
 
                     case '5':
+                        selEntity = $(this).find('select[name=entitySelBox]').val();
+                        startIndex = $(this).find('input[name=startIndex]').val();
+                        endIndex = $(this).find('input[name=endIndex]').val();
+                        var canonical;
+                        if ($(this).find('select[name=entityChildSelBox]').val() != "NONE") {
+                            childName = $(this).find('input[name=matchUtterText]').val();
+                            canonical = $(this).find('select[name=entityChildSelBox]').val();
 
+                        } else {
+                            isOk = true;
+                        }
+                        var listObj = new Object();
+                        listObj.selEntity = selEntity;
+                        listObj.childName = childName;
+                        listObj.canonical = canonical;
+
+                        for (var q=0; q<closedList.length; q++) {
+                            if (closedList[q].ENTITY_NAME == selEntity) {
+                                listObj.entityId = closedList[q].ENTITY_ID;
+                                listObj.entityId = closedList[q].ENTITY_ID;
+                                break;
+                            }
+                        }
+                        var childArr = [];
+                        var isNew = false;
+                        for (var q=0; q<closedList.length; q++) {
+                            if (closedList[q].ENTITY_NAME == selEntity) {
+                                for (var w=0; w<closedList[q].CHILD_ENTITY_LIST.length; w++) {
+                                    var childObj = closedList[q].CHILD_ENTITY_LIST[w];
+                                    if (canonical == childObj.CHILDREN_NAME) {
+                                        listObj.childId = childObj.CHILDREN_ID;
+                                        childArr = childObj.SUB_LIST.split(',');
+                                        for (var d=0; d<childArr.length; d++) {
+                                            if (childName == childArr[d]) {
+                                                isNew = true;
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        }
+                        for (var q=0; q<addClosedList.length; q++) {
+                            if (addClosedList[q].selEntity == listObj.selEntity && addClosedList[q].canonical == listObj.canonical) {
+                                for (var w=0; w<addClosedList[q].list.length; w++) {
+                                    if (addClosedList[q].list[w] == childName) {
+                                        isNew = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!isNew) {
+                            childArr.push(childName);
+                            listObj.list = childArr;
+                            var isExist1 = false;
+                            for (var q=0; q<addClosedList.length; q++) {
+                                if (addClosedList[q].selEntity == listObj.selEntity && addClosedList[q].canonical == listObj.canonical) {
+                                    isExist1 = true;
+                                    var isExist2 = false;
+                                    for (var w=0; w<addClosedList[q].list.length; w++) {
+                                        if (addClosedList[q].list[w] == listObj.childName) {
+                                            isExist2 == true;
+                                        }
+                                    }
+                                    if (!isExist2) {
+                                        addClosedList[q].list.push(listObj.childName);
+                                    }
+                                }
+                            }
+                            if (!isExist1) {
+                                addClosedList.push(listObj);
+                            }
+                        }
                         break;
                 }
                 labelObj.entityName = selEntity;
-
+                labelObj.childName = childName;
                 //var selStr = '';
                 //for (var k=startIndex; k<=endIndex; k++) {
                 //    selStr += $(this).parents('tr').prev().find('#tokenVal_' + k).val();
@@ -1357,30 +1593,57 @@ function saveUtterance() {
             utterArr.push(uterObj);
         }
     });
-
+    if (isOk) {
+        alert('list type의 child Entity를 선택해 주세요.');
+        return false;
+    }
     var params = {
-        'labelArr' : utterArr
+        'labelArr' : utterArr,
+        'newUtterArr' : newArr,
+        'addClosedList' : addClosedList,
     };
 
     $.ajax({
         type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
         data: params,
         url: '/luis/saveUtterance',
         success: function(data) {
             if (data.error) {
                 alert(data.message);
+                updateUtter();
             }
             else if (!data.success) {
                 alert(data.message);
+                updateUtter();
             }
             else 
             {
                 alert(data.message);
+                updateUtter();
             }
         }
-    })
-    .always(function(){
-        updateUtter();
     });
 }
 
@@ -1398,6 +1661,7 @@ function updateUtter() {
 
     $.ajax({
         type: 'POST',
+        timeout: 0,
         data: params,
         url: '/luis/getUtterInIntent',
         success: function(data) {
