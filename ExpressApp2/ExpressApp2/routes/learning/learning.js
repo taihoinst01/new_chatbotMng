@@ -2433,7 +2433,8 @@ router.post('/searchDialog', function (req, res) {
 
 router.post('/addDialog', function (req, res) {
 
-    var data = req.body['data[]'];
+    //var data = req.body['data[]'];
+    var data = req.body.data;
     //var luisEntities = req.body['entities[]'];
     var array = [];
     var queryText = "";

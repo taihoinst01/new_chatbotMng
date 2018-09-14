@@ -22,6 +22,7 @@ var user = require('./routes/user/user');
 var boardMng = require('./routes/board/boardMng');
 var bannedWordMng = require('./routes/chatbot/bannedWordMng');
 var autoCompleteMng = require('./routes/chatbot/autoCompleteMng');
+var smallTalkMng = require('./routes/learning/smallTalkMng');
 
 var Logger = require("./config/logConfig");
 var logger = Logger.CreateLogger();
@@ -212,6 +213,7 @@ app.use('/user', user);
 app.use('/boardMng', boardMng);
 app.use('/bannedWordMng', bannedWordMng);
 app.use('/autoCompleteMng', autoCompleteMng);
+app.use('/smallTalkMng', smallTalkMng);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -224,6 +226,7 @@ app.use(function (req, res, next) {
 
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
+        /*
         res.status(err.status || 500);
         if (req.session.sid) {
             logger.info('[에러페이지] [message : %s] ', err);
@@ -233,12 +236,19 @@ if (app.get('env') === 'development') {
             logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
             res.render('error');
         }
+        */
+       res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
+    /*
     res.status(err.status || 500);
     if (req.session.sid) {
         logger.info('[에러페이지] [message : %s] ', err);
@@ -248,6 +258,12 @@ app.use(function (err, req, res, next) {
         logger.info('[에러페이지] [id : %s] [message : %s] ', userId, err);
         res.render('error');
     }
+    */
+   res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 
