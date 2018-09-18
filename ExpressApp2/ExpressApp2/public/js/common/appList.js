@@ -25,6 +25,25 @@ $(document).ready(function(){
         $('#layoutBackground').hide();
     });
 
+    
+
+    $('.box-body.tc').click(function() { 
+        var width = 0;
+        var height = 0;
+        var left = 0;
+        var top = 0;
+
+        width = 50;
+        height = 50;
+
+        top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+        left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+        $("#loadingBar").addClass("in");
+        $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+        $("#loadingBar").css("display","block");
+    });
+
     $(document).mousedown(function(e){
 
         $('.appLayout').each(function(){
@@ -144,3 +163,4 @@ function itemClick(e, object, deleteAppId, appName){
     }
     //ex_obj.style.display = ex_obj.style.display=='none'?'block':'none';
 }
+

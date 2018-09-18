@@ -100,8 +100,10 @@
                                                <ul class="treeview-menu">
                                                     <li><a href="/luis/intentList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Intent List</a></li>
                                                     <li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Entity List</a></li>
-                                                    <li><a href="/luis/publish?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Publish</a></li>
-                                                    <li class="active"><a href="#" class="spmenu" id="">학습</a></li>
+                                                    <!--<li><a href="/luis/publish?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Publish</a></li>-->
+                                                    <!--<li class="active"><a href="#" class="spmenu" id="">학습</a></li>-->
+                                                    <li class="active"><a href="#" class="spmenu" id="trainBtn"><%= __('TRAIN') %></a></li>
+                                                    <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
                                                </ul>
                                            </li>
                                        </ul>
@@ -123,8 +125,8 @@
                                        <li><a href="/learning/dialog"><i class="fa fa-circle-o"></i> <%= __('DIALOG_SETTING') %></a></li>
                                        <li><a href="/smallTalkMng/smallTalkMng"><i class="fa fa-circle-o"></i> SmallTalk 설정</a></li>
                                        <li><a href="/learning/entities"><i class="fa fa-circle-o"></i> <%= __('ENTITY_SETTING') %></a></li>
-                                       <li class="active"><a href="#" class="spmenu" id="trainBtn"><%= __('TRAIN') %></a></li>
-                                       <li class="active"><a href="#" class="spmenu" id="simulBtn" data-toggle="control-sidebar"><%= __('SIMULATION') %></a></li>
+                                       <!--<li class="active"><a href="#" class="spmenu" id="trainBtn"><%= __('TRAIN') %></a></li>
+                                       <li class="active"><a href="#" class="spmenu" id="simulBtn" data-toggle="control-sidebar"><%= __('SIMULATION') %></a></li>-->
                                    </ul>
                                </li>
 
@@ -266,6 +268,21 @@
         });
 
         $('#dashboardClick').click(function() {
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+            
             var url = "/board"; 
             $(location).attr('href',url);
         });
@@ -290,9 +307,14 @@
         //train --start
         $('#trainBtn').click(function() {
 
+            var appIndex = $(this).parents('ul').find('input[name=hiddenAppIndex]').val();
+            var params = {
+                'appIndex' : appIndex
+            };
             $.ajax({
-                url: "/admin/trainApp",
-                type: "post"
+                url: "/luis/trainApp",
+                type: "post",
+                data: params
                 , timeout: 0
                 , beforeSend: function () {
 
@@ -325,7 +347,7 @@
                 } else if (data.result === 402) {
                     $('#trainResultTag').text("Luis App의 공간이 없습니다. 관리자에게 문의하여 Luis App을 만들어야 합니다.");
                 } else { //200
-                    var result = data.resultValue;
+                    //var result = data.resultValue;
                     //alert("학습을 완료하였습니다.");
                     //$('#trainResultTag').text($('#successHidden').val() + " : " + result.sucCnt + "  " + $('#failHidden').val() + " : " + result.failCnt);
                     //alert("성공 : " + result.sucCnt + "실패 : " + result.failCnt);

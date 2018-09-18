@@ -1690,9 +1690,10 @@ router.post('/saveChangedEntity', function (req, res) {
 
 
 router.post('/saveUtterance', function (req, res) {
+    var userId = req.session.sid;
     var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
     var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
-    var addClosedList = req.body.addClosedList;//req.body['labelArr[]'];
+    var addClosedList = req.body.addClosedList==undefined? []:req.body.addClosedList;//req.body['labelArr[]'];
     var tmpLuisObj;
     var luisResult = [];
     try {
@@ -1759,6 +1760,7 @@ router.post('/saveUtterance', function (req, res) {
 });
 
 router.post('/deleteUtterance', function (req, res) {
+    var userId = req.session.sid;
     var utterId = req.body.utterId;//req.body['labelArr[]'];intentId
     var intentId = req.body.intentId;//req.body['labelArr[]'];
     var tmpLuisObj;
@@ -1966,7 +1968,79 @@ router.post('/publishExecution', function (req, res){
     })()
 });
 
+router.post('/trainApp', function (req, res){
 
+    var userId = req.session.sid;
+    var publishCount = 0;
+    
+    var selAppList = req.session.selChatInfo.chatbot.appList;
+    if (typeof req.body.appIndex != 'undefined') {
+        var appNumber = req.body.appIndex;
+        var selApp = selAppList[appNumber];
+        req.session.selAppId = selApp.APP_ID;
+    }
+
+    (async () => {
+        try {
+            var repeat = setInterval(function(){
+                var trainCount = 0;
+                var count = 0;
+
+                var pubOption = {
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': luisConfig.subKey,
+                        'Content-Type':'application/json'
+                    },
+                    payload:{
+                        'versionId': '0.1',
+                        'isStaging': false,
+                        'region': 'westus'
+                    }
+                }
+
+
+                var traninResultGet = syncClient.get(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/0.1/train' , options);
+                for(var trNum = 0; trNum < traninResultGet.body.length; trNum++) {
+                    if(traninResultGet.body[trNum].details.status == "Fail") {
+                        var failureReason = traninResultGet.body[trNum].details.failureReason;
+                        logger.info('[에러] train app   [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', failureReason);
+                        res.send({result:400, message:failureReason});
+                    } else if(traninResultGet.body[trNum].details.status == "InProgress") {
+                        break;
+                    } else {
+                        count++;
+                    }
+                    //if(traninResultGet.body[trNum].details.status == "Success") {
+                    //    count++;
+                    //}
+                }
+
+                trainCount = traninResultGet.body.length;
+
+                if(count != 0 && trainCount == count) {
+                    var publishResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/publish' , pubOption);
+                    publishCount++;
+                    if (publishResult.statusCode == 201) {
+                        clearInterval(repeat);
+                        res.send({result:200});
+                    }
+                    if (publishCount >= 3) {
+                        logger.info('[에러] publish app  3회 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', '실패');
+                        res.send({result:publishResult.statusCode, message:'publish 실패했습니다. 관리자에게 문의해주세요.'});
+                    }
+                }
+            },1000);
+
+
+        } catch (err) {
+            logger.info('[에러] publish & train err  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', err.message);
+            res.send({result:400, message:'publish 실패했습니다. 관리자에게 문의해주세요.'});
+        } finally {
+            sql.close();
+        }
+    })()
+
+});
 
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
