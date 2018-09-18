@@ -63,9 +63,10 @@ $(document).on("keypress", "input[name=matchUtterText]", function(e){
 });
 
 
-// tr클릭
+// tr클릭 scoreSelTd
 $(document).on("click", "tr[name=utterMainTr]", function(e){ 
-    if (e.target.className.indexOf('fa-plus') != -1 || e.target.className.indexOf('fa-trash') != -1 ) {
+    if (e.target.className.indexOf('fa-plus') != -1 || e.target.className.indexOf('fa-trash') != -1 
+        || e.target.className.indexOf('scoreSel') != -1 || e.target.className.indexOf('scoreSelTd') != -1) {
         return false;
     } else {
         if( $(this).next().css('display') != 'none') {
@@ -874,7 +875,14 @@ function makeUtteranceTable() {
                             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
                             utterBodyHtml += "</td>";
                             //utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;'>" + utterList.tokenizedText + "</td>";
-                            utterBodyHtml += "<td></td>";
+                            utterBodyHtml += "<td class='scoreSelTd'>";
+                            utterBodyHtml += "<select name='scoreSel' class='form-control scoreSel'  >";
+                            for (var k=0; k<utterList[i].intentScore.length; k++) {
+                                var tmpStr = utterList[i].intentScore[k].name + "::" + utterList[i].intentScore[k].score;
+                                utterBodyHtml += "<option value='" + utterList[i].intentScore[k].id + "'> " + tmpStr + "</option>";
+                            }
+                            utterBodyHtml += "</select>";
+                            utterBodyHtml += "";
                             utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;' >";
                             utterBodyHtml += makeTokenizedText(utterList[i].tokenizedText, 'INPUT');
                             utterBodyHtml += makeTokenizedText(utterList[i].tokenizedText, 'INDEX', utterList[i].text);

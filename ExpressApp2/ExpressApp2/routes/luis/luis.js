@@ -734,6 +734,7 @@ router.post('/getUtterInIntent', function (req, res) {
                         } 
                         */
                         utterObj2.entityLabels = utterPrediction.body[jk].entityPredictions;
+                        utterObj2.intentScore = utterPrediction.body[jk].intentPredictions;
                         utterListInIntent.push(utterObj2);
                     }
                     var updateIndex = -1;
