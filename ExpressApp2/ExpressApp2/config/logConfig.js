@@ -10,11 +10,11 @@ module.exports.CreateLogger = function () {
     var appenders = [];
 
     appenders.push(new winston.transports.DailyRotateFile({
-        //prepend: true,  //ÇöÀç ¹öÀü¿¡¼­ Á¦°ø¾ÈÇÔ.
+        //prepend: true,  
         datePattern: 'YYYY-MM-DD',
         json: false,
         filename: _logDir,
-        timestamp: function () {    //·Î±× ÀÛ¼º½Ã ³¯Â¥ Æ÷¸Ë
+        timestamp: function () {    
             return moment().format('YYYY-MM-DD HH:mm:ss.SSS ZZ')
         },
         formatter: function (options) {
@@ -24,7 +24,7 @@ module.exports.CreateLogger = function () {
     /*
     appenders.push(new winston.transports.Console({
         json: false,
-        timestamp: function () {    //·Î±× ÀÛ¼º½Ã ³¯Â¥ Æ÷¸Ë
+        timestamp: function () {    //ï¿½Î±ï¿½ ï¿½Û¼ï¿½ï¿½ï¿½ ï¿½ï¿½Â¥ ï¿½ï¿½ï¿½ï¿½
             return new Date().toFormat('YYYY-MM-DD HH24:MI:SS')
         },
         formatter: function (options) {

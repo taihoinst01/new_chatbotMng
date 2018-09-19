@@ -878,7 +878,7 @@ function makeUtteranceTable() {
                             utterBodyHtml += "<td class='scoreSelTd'>";
                             utterBodyHtml += "<select name='scoreSel' class='form-control scoreSel'  >";
                             for (var k=0; k<utterList[i].intentScore.length; k++) {
-                                var tmpStr = utterList[i].intentScore[k].name + "::" + utterList[i].intentScore[k].score;
+                                var tmpStr = utterList[i].intentScore[k].name + "::" + utterList[i].intentScore[k].score.toFixed(2);
                                 utterBodyHtml += "<option value='" + utterList[i].intentScore[k].id + "'> " + tmpStr + "</option>";
                             }
                             utterBodyHtml += "</select>";
