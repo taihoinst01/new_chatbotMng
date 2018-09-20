@@ -16,6 +16,25 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
+    //삭제 버튼 confirm
+    $('#cancelSmallTalkBtnModal').click(function() {
+        var del_count = $("#CANCEL_ST_SEQ:checked").length;
+         
+        if(del_count > 0){
+            $('#cancel_content').html(' 정말로 취소하시겠습니까? 복구할 수 없습니다.');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="cancelSmallTalkBtn"><i class="fa fa-edit"></i> SmallTalk Cancel</button>');
+        }else{
+            $('#cancel_content').html('취소할 대상은 한 개 이상이어야 합니다.');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+        }
+        $('#cancelSmallTalkModal').modal('show');
+    });
+
+    //삭제 버튼
+    $(document).on("click", "#cancelSmallTalkBtn", function () {
+        cancelSmallTalkProc('DEL');
+    });
+
     $('#searchDlgBtn').click(function (e) {
         makeSmallTalkTable(1);
     });
@@ -1260,3 +1279,35 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         }
     }
 });
+
+function cancelSmallTalkProc(procType) {
+    var saveArr = new Array();
+    var data = new Object();
+    data.statusFlag = procType;
+    //data.DEL_SEQ = $('#DEL_SEQ').val();
+    $("input[name=CANCEL_ST_SEQ]:checked").each(function() {
+        var test = $(this).val();
+        console.log(test);
+        data.CANCEL_ST_SEQ = test;
+    });
+    saveArr.push(data);
+ 
+    var jsonData = JSON.stringify(saveArr);
+    var params = {
+        'saveArr': jsonData
+    };
+    $.ajax({
+        type: 'POST',
+        datatype: "JSON",
+        data: params,
+        url: '/smallTalkMng/cancelSmallTalkProc',
+        success: function (data) {
+            if (data.status === 200) {
+                alert(language['REGIST_SUCC']);
+                window.location.reload();
+            } else {
+                alert(language['It_failed']);
+            }
+        }
+    });
+}

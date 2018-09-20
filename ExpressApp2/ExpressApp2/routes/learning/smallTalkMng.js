@@ -494,4 +494,35 @@ router.post('/updateDialog', function (req, res) {
 
     })
 });
+
+
+router.post('/cancelSmallTalkProc', function (req, res) {
+    var menuArr = JSON.parse(req.body.saveArr);
+    var updateStr = "";
+    var userId = req.session.sid;
+
+    for (var i = 0; i < menuArr.length; i++) {
+        updateStr += "UPDATE TBL_DLG_RELATION_LUIS SET ST_FLAG='F' WHERE RELATION_ID = '" + menuArr[i].CANCEL_ST_SEQ + "'; ";
+    }
+
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            if (updateStr !== "") {
+                let updateSmallTalk= await pool.request().query(updateStr);
+            }
+            res.send({ status: 200, message: 'Save Success' });
+
+        } catch (err) {
+            console.log(err);
+            res.send({ status: 500, message: 'Save Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
 module.exports = router;
