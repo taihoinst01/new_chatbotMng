@@ -535,7 +535,30 @@ router.post('/createIntent', function (req, res) {
                         let getDBIntent_result = await pool.request()
                                                         .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT ORDER BY CASE WHEN INTENT  LIKE '[0-9]%' THEN 3 WHEN INTENT like '[A-Za-z]%' THEN 1 ELSE 2 END, INTENT;");   
                         req.session.intentList = getDBIntent_result.recordset;
-                   
+                        
+                        var utterCntObj;
+                        var saveAppId = '';
+                        var intentList = req.session.intentList;
+                        for (var iu=0; iu<intentList.length; iu++) {
+                            if (saveAppId != intentList[iu].APP_ID) {
+                                saveAppId = intentList[iu].APP_ID;
+                                utterCntObj = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + saveAppId + '/versions/0.1/stats/labelsperintent', options);
+                            }
+                            
+                            for( var key in utterCntObj.body ) {
+                                //console.log( key + '=>' + utterCntObj.body[key] );
+                                if (key == intentList[iu].INTENT_ID) {
+                                    intentList[iu].UTTER_COUNT = utterCntObj.body[key];
+                                    break;
+                                }
+                            }
+                            if (typeof intentList[iu].UTTER_COUNT=='undefined') {
+                                intentList[iu].UTTER_COUNT = 0;
+                            }
+                            //intentList[iu].UTTER_CNT = utterCntObj.body.intentList[iu].INTENT_ID;
+                        }
+
+
                         logger.info('[알림]Intent 생성  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/createIntent', '[' + intentName + '] 생성');
                         res.send({success : true});
                         
@@ -575,16 +598,16 @@ router.post('/deleteIntent', function (req, res) {
     var userId = req.session.sid;
     var deleteIntentName = req.body.deleteIntentName;
     var deleteIntentId = req.body.deleteIntentId;
-
+    var intentList = req.session.intentList;
     var deleteIntentQry = "";
     var tmpLuisObj;
     try {
 
-        tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/intents/' + deleteEntityId, options);
+        tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/intents/' + deleteIntentId, options);
             
         if (tmpLuisObj.statusCode == 200) {
-            deleteEntityQry = " DELETE FROM TBL_LUIS_INTENT \n";
-            deleteEntityQry += " WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @deleteIntentId; ";
+            deleteIntentQry = " DELETE FROM TBL_LUIS_INTENT \n";
+            deleteIntentQry += " WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @deleteIntentId; ";
 
             try {
                 (async () => {
@@ -592,12 +615,12 @@ router.post('/deleteIntent', function (req, res) {
                     let deleteEntityRst = await pool.request()
                                                         .input('appId', sql.NVarChar, req.session.selAppId)
                                                         .input('deleteIntentId', sql.NVarChar, deleteIntentId)
-                                                        .query(deleteEntityQry);
+                                                        .query(deleteIntentQry);
 
                     //session삭제
-                    for (var q=0; q<entityList.length; q++) {
-                        if (entityList[q].APP_ID == req.session.selAppId && entityList[q].ENTITY_ID == deleteEntityId) {
-                            entityList.splice(q--, 1);
+                    for (var q=0; q<intentList.length; q++) {
+                        if (intentList[q].APP_ID == req.session.selAppId && intentList[q].INTENT_ID == deleteIntentId) {
+                            intentList.splice(q--, 1);
                             break;
                         }
                     } 
@@ -637,13 +660,13 @@ router.post('/deleteIntent', function (req, res) {
             if (tmpLuisObj.body.error) {
                 var resultCode = tmpLuisObj.body.error.code;
                 var resultStr = tmpLuisObj.body.error.message;
-                logger.info('[에러]루이스 엔티티 삭제 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/deleteEntity',  resultCode + ' : ' + resultStr);
-                res.send({success : false, message : '엔티티 생성에 문제가 발생했습니다. 관리자에게 문의해주세요.'});
+                logger.info('[에러]루이스 인텐트 삭제 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/deleteEntity',  resultCode + ' : ' + resultStr);
+                res.send({success : false, message : '인텐트 삭제중 문제가 발생했습니다. 관리자에게 문의해주세요.'});
             }
         }
     } catch(e) {
-        logger.info('[에러]루이스 엔티티 삭제 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/deleteIntent', e.message);
-        res.send({error : true, message : '루이스 엔티티 삭제 실패 중 이상이 생겼습니다. 관리자에게 문의 해주세요.'});
+        logger.info('[에러]루이스 인텐트 삭제 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/deleteIntent', e.message);
+        res.send({error : true, message : '루이스 인텐트 삭제 실패 중 이상이 생겼습니다. 관리자에게 문의 해주세요.'});
     } 
 });
 
@@ -660,6 +683,7 @@ router.post('/getUtterInIntent', function (req, res) {
     var intentList = req.session.intentList;
 
     var utterInfo;
+    var utterPrediction;
 
     try {
         //https://westus.api.cognitive.microsoft.com/luis/webapi/v2.0/apps/0a66734d-690a-4877-9b4c-28ada8098751/versions/0.1/models/a8162515-d965-4d0c-9644-f77955a2b776/reviewLabels
@@ -673,8 +697,10 @@ router.post('/getUtterInIntent', function (req, res) {
             if (intentList[iu].INTENT_ID == intentId) {
                 var utterObj1 = new Object();
                 var utterListInIntent = [];
-                utterInfo = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + intentList[iu].APP_ID + '/versions/0.1/models/' + intentList[iu].INTENT_ID + '/reviewLabels?skip=0&take=' + lebelCnt , options)
+                utterInfo = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + intentList[iu].APP_ID + '/versions/0.1/models/' + intentList[iu].INTENT_ID + '/reviewLabels?skip=0&take=' + lebelCnt , options);
                 if (utterInfo.statusCode == 200) {
+                    utterPrediction = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + intentList[iu].APP_ID + '/versions/0.1/models/' + intentList[iu].INTENT_ID + '/reviewPredictions?skip=0&take=' + lebelCnt , options);
+                
                     chkSuccess = true;
                     for (var jk=0; jk<utterInfo.body.length; jk++) {
                         var utterObj2 = new Object();
@@ -683,7 +709,32 @@ router.post('/getUtterInIntent', function (req, res) {
                         utterObj2.tokenizedText = utterInfo.body[jk].tokenizedText;
                         utterObj2.intentId = utterInfo.body[jk].intentId;
                         utterObj2.intentLabel = utterInfo.body[jk].intentLabel;
-                        utterObj2.entityLabels = utterInfo.body[jk].entityLabels;
+                        /*
+                        var entityLabels = [];
+                        for (var yu=0; yu<utterInfo.body[jk].entityLabels.length; yu++) {
+                            var tmpObj = new Object();
+                            tmpObj.id = utterInfo.body[jk].entityLabels[yu].id;
+                            tmpObj.entityName = utterInfo.body[jk].entityLabels[yu].entityName;
+                            tmpObj.startTokenIndex = utterInfo.body[jk].entityLabels[yu].startTokenIndex;
+                            tmpObj.endTokenIndex = utterInfo.body[jk].entityLabels[yu].endTokenIndex;
+                            tmpObj.entityType = utterInfo.body[jk].entityLabels[yu].entityType;
+                            entityLabels.push(tmpObj);
+                        }
+                        if (utterPrediction.body[jk].entityPredictions.length > 0) {
+                            for (var yu=0; yu<utterPrediction.body[jk].entityPredictions.length; yu++) {
+                                var tmpObj = new Object();
+                                tmpObj.id = utterPrediction.body[jk].entityPredictions[yu].id;
+                                tmpObj.entityName = utterPrediction.body[jk].entityPredictions[yu].entityName;
+                                tmpObj.startTokenIndex = utterPrediction.body[jk].entityPredictions[yu].startTokenIndex;
+                                tmpObj.endTokenIndex = utterPrediction.body[jk].entityPredictions[yu].endTokenIndex;
+                                tmpObj.entityType = utterPrediction.body[jk].entityPredictions[yu].entityType;
+                                tmpObj.phrase = utterPrediction.body[jk].entityPredictions[yu].phrase;
+                                entityLabels.push(tmpObj);
+                            }
+                        } 
+                        */
+                        utterObj2.entityLabels = utterPrediction.body[jk].entityPredictions;
+                        utterObj2.intentScore = utterPrediction.body[jk].intentPredictions;
                         utterListInIntent.push(utterObj2);
                     }
                     var updateIndex = -1;
@@ -1460,7 +1511,7 @@ router.post('/saveChangedEntity', function (req, res) {
     var entityType = req.body.entityType;
     var chilEntityList;
     if (entityType != "5") {
-        chilEntityList = req.body['chilEntityList[]']==undefined?req.body.chilEntityList:req.body['chilEntityList[]'];
+        chilEntityList = req.body.chilEntityList; //req.body['chilEntityList[]']==undefined?req.body.chilEntityList:req.body['chilEntityList[]'];
     } else {
         chilEntityList = JSON.parse(req.body.chilEntityList);
     }
@@ -1640,7 +1691,10 @@ router.post('/saveChangedEntity', function (req, res) {
 
 
 router.post('/saveUtterance', function (req, res) {
+    var userId = req.session.sid;
     var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
+    var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
+    var addClosedList = req.body.addClosedList==undefined? []:req.body.addClosedList;//req.body['labelArr[]'];
     var tmpLuisObj;
     var luisResult = [];
     try {
@@ -1659,7 +1713,21 @@ router.post('/saveUtterance', function (req, res) {
                 console.log(options.payload);
                 tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
                 console.log(tmpLuisObj.statusCode);
+                if (newUtterArr != undefined) {
+                    for (var j=0; j<newUtterArr.length; j++) {
+                        if (newUtterArr[j].text == labeledUtterArr[i].text) {
+                            newUtterArr[j].id = tmpLuisObj.body;
+                        }
+                    }
+                }
                 luisResult.push(tmpLuisObj);
+            }
+            for (var i=0; i<addClosedList.length; i++) {
+                options.payload = { 
+                    "canonicalForm": addClosedList[i].canonical,
+                    "list": addClosedList[i].list
+                };
+                var tmpLuisListObj = syncClient.put(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/closedlists/' + addClosedList[i].entityId + '/sublists/' + addClosedList[i].childId, options);
             }
     
         }
@@ -1668,11 +1736,18 @@ router.post('/saveUtterance', function (req, res) {
             console.log(luisResult[tmp]);
             if (luisResult[tmp].statusCode != 201) {
                 rstChk = true;
-                var resultCode = luisResult[tmp].error.code;
-                var resultStr = luisResult[tmp].error.message;
+                var resultCode = luisResult[tmp].body.error.code;
+                var resultStr = luisResult[tmp].body.error.message;
                 logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [코드 : %s] [내용 : %s]', userId, 'luis/saveUtterance', luisResult[tmp].statusCode, resultCode + ':' + resultStr);
             } 
         }
+
+        options = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Subscription-Key': subKey
+            }
+        };
         if (!rstChk) {
             res.send({success : true, message : '성공'});
         } else {
@@ -1686,21 +1761,21 @@ router.post('/saveUtterance', function (req, res) {
 });
 
 router.post('/deleteUtterance', function (req, res) {
+    var userId = req.session.sid;
     var utterId = req.body.utterId;//req.body['labelArr[]'];intentId
     var intentId = req.body.intentId;//req.body['labelArr[]'];
     var tmpLuisObj;
     try {
         
-        console.log(options.payload);
         tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/examples/' + utterId, options);
         console.log();
         if (tmpLuisObj.statusCode == 200) { 
             var utterList = req.session.utterList;
             for (var tmpObj in utterList) {
-                if (tmpObj.INTENT_ID == intentId) {
-                    for (var i=0; i<tmpObj.UTTER_LIST.length; i++) {
-                        if (tmpObj.UTTER_LIST[i].id == utterId) {
-                            tmpObj.UTTER_LIST.splice(i, 1);
+                if (utterList[tmpObj].INTENT_ID == intentId) {
+                    for (var i=0; i<utterList[tmpObj].UTTER_LIST.length; i++) {
+                        if (utterList[tmpObj].UTTER_LIST[i].id == utterId) {
+                            utterList[tmpObj].UTTER_LIST.splice(i, 1);
                             break;
                         }
                     }
@@ -1781,9 +1856,192 @@ function getEntityType(typeVal) {
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
+/* GET users listing. */
+router.get('/publish', function (req, res) {
+
+    var selAppId = req.session.selAppId;
+    var userId = req.session.sid;
+    
+    var publishSettings = req.session.publishsettings;
+    var endpoint = req.session.endpoint;
+    var subscriptions = req.session.subscriptions;
+
+    var selectIntentQry = "";
+    var selectedAppList = [];
+    var selectedIntentList = [];
+    
+    var leftList = req.session.leftList;
+    var chatNum = -1;
+
+    var selAppList = req.session.selChatInfo.chatbot.appList;
+    if (typeof req.query.appIndex != 'undefined') {
+        var appNumber = req.query.appIndex;
+        var selApp = selAppList[appNumber];
+        req.session.selAppId = selApp.APP_ID;
+        selAppId = req.session.selAppId;
+    }
+
+    if (typeof req.session.publishsettings == 'undefined') {
+        
+        var tmpLuisObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selAppId + '/publishsettings', options);
+
+        var sentimentAnalysis = tmpLuisObj.body.sentimentAnalysis;
+        var speech = tmpLuisObj.body.speech;
+        var spellChecker = tmpLuisObj.body.spellChecker;
+
+        
+    } else {
+        
+    }
+
+    // if (typeof req.session.endpoint == 'undefined') {
+    //     var tmpLuisObj2 = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selAppId + '/endpoints', options);
+    // }
+
+    // if (typeof req.session.subscriptions == 'undefined') {
+    //     var tmpLuisObj3 = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + selAppId + '/subscriptions', options);
+    // }
+ 
+    res.render('luis/publish',{
+        'HOST' : HOST,
+        'subscriptionkey' : options.headers["Ocp-Apim-Subscription-Key"],
+        'appid' : selAppId,
+        'spellChecker' : spellChecker
+         });
+ 
+});
+
+router.post('/publishExecution', function (req, res){
+    var appName = req.session.appName;
+    var subsKey = req.session.subsKey;
+
+    var options = {
+        headers: {
+            'Ocp-Apim-Subscription-Key': subsKey
+        }
+    };
+
+    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
+    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
+    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME=@chatName)\n";
+
+    (async () => {
+        try {
+            let pool = await dbConnect.getConnection(sql);
+            let selectAppId = await pool.request()
+                .input('chatName', sql.NVarChar, appName)
+                .query(selectAppIdQuery);
+
+                var repeat = setInterval(function(){
+                    var trainCount = 0;
+                    var count = 0;
+    
+                    var pubOption = {
+                        headers: {
+                            'Ocp-Apim-Subscription-Key': subsKey,
+                            'Content-Type':'application/json'
+                        },
+                        payload:{
+                            'versionId': '0.1',
+                            'isStaging': false,
+                            'region': 'westus'
+                        }
+                    }
+    
+                    for(var i = 0; i < selectAppId.recordset.length; i++) {
+                        var luisAppId = selectAppId.recordset[i].APP_ID;
+                        var publishResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + luisAppId + '/publish' , pubOption);
+                        console.log("publishResult : " + publishResult);
+                    }
+
+                    clearInterval(repeat);
+                    console.log("Test")
+                    res.send({result:200});
+
+                },1000);
+
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+});
+
+router.post('/trainApp', function (req, res){
+
+    var userId = req.session.sid;
+    var publishCount = 0;
+    
+    var selAppList = req.session.selChatInfo.chatbot.appList;
+    if (typeof req.body.appIndex != 'undefined') {
+        var appNumber = req.body.appIndex;
+        var selApp = selAppList[appNumber];
+        req.session.selAppId = selApp.APP_ID;
+    }
+
+    (async () => {
+        try {
+            var repeat = setInterval(function(){
+                var trainCount = 0;
+                var count = 0;
+
+                var pubOption = {
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': luisConfig.subKey,
+                        'Content-Type':'application/json'
+                    },
+                    payload:{
+                        'versionId': '0.1',
+                        'isStaging': false,
+                        'region': 'westus'
+                    }
+                }
 
 
+                var traninResultGet = syncClient.get(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/0.1/train' , options);
+                for(var trNum = 0; trNum < traninResultGet.body.length; trNum++) {
+                    if(traninResultGet.body[trNum].details.status == "Fail") {
+                        var failureReason = traninResultGet.body[trNum].details.failureReason;
+                        logger.info('[에러] train app   [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', failureReason);
+                        res.send({result:400, message:failureReason});
+                    } else if(traninResultGet.body[trNum].details.status == "InProgress") {
+                        break;
+                    } else {
+                        count++;
+                    }
+                    //if(traninResultGet.body[trNum].details.status == "Success") {
+                    //    count++;
+                    //}
+                }
 
+                trainCount = traninResultGet.body.length;
+
+                if(count != 0 && trainCount == count) {
+                    var publishResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/publish' , pubOption);
+                    publishCount++;
+                    if (publishResult.statusCode == 201) {
+                        clearInterval(repeat);
+                        res.send({result:200});
+                    }
+                    if (publishCount >= 3) {
+                        logger.info('[에러] publish app  3회 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', '실패');
+                        res.send({result:publishResult.statusCode, message:'publish 실패했습니다. 관리자에게 문의해주세요.'});
+                    }
+                }
+            },1000);
+
+
+        } catch (err) {
+            logger.info('[에러] publish & train err  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', err.message);
+            res.send({result:400, message:'publish 실패했습니다. 관리자에게 문의해주세요.'});
+        } finally {
+            sql.close();
+        }
+    })()
+
+});
 
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
