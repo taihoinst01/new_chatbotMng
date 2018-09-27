@@ -7,7 +7,7 @@ var simpleList = [];
 var hierarchyList = [];
 var compositeList = [];
 var closedList = [];
-
+var isFirst = true;
 ;(function($) {
     $.ajax({
         url: '/jsLang',
@@ -298,6 +298,24 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                     $(this).parent().find('input[name=startIndex]').val(matchStartIndex);
                     $(this).parent().find('input[name=endIndex]').val(matchEndIndex);
 
+                    if ($(this).parent().find('div[name=indentDiv]').length>0) {
+                        var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+                        for (var k=nowIndex-1; k >= 0; k--) {
+                            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                startInx = startInx==""?matchStartIndex:startInx*1;
+                                endInx = endInx==""?matchEndIndex:endInx*1;
+                                if (startInx <= matchStartIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
+                                }
+                                if (endInx >= matchEndIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                                }
+                            }
+                        }
+                    }
+
                     
                     var trIndex = $("tr[name=utterMainTr]").index($(this).parents('tr').prev());
                     
@@ -382,6 +400,25 @@ $(document).on("change", "select[name=multiMatchUtterSel]", function(e){
     //$(this).parent().find('input[name=endIndex]').val(matchEndIndex);
     var trIndex = $("tr[name=utterMainTr]").index($(this).parents('tr').prev());
     var divIndex = $("tr[name=utterMainTr]").eq(trIndex).find('div[name=labelInfoDiv]').index($(this).parents('div[name=labelInfoDiv]'));
+
+    if ($(this).parent().find('div[name=indentDiv]').length>0) {
+        var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+        for (var k=nowIndex-1; k >= 0; k--) {
+            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                startInx = startInx==""?matchStartIndex:startInx*1;
+                endInx = endInx==""?matchEndIndex:endInx*1;
+                if (startInx <= matchStartIndex) {
+                    $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
+                }
+                if (endInx >= matchEndIndex) {
+                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                }
+            }
+        }
+    }
+
 
     changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex);
 });
@@ -899,6 +936,10 @@ function makeUtteranceTable() {
                         $('#pagination').html('').append(data.pageList);
 
                         changeEntitySel();
+                        if (isFirst) {
+                            isFirst = false;
+                            $('#scrollUpDownBtn').trigger('click');
+                        }
                     }
                 }
             }
@@ -1453,6 +1494,7 @@ function saveUtterance() {
     var newArr = []
     var addClosedList = [];
     var isOk = false;
+    var isNew = false;
     $('tr').each(function(){
         if (trIndex == 0) {
             trIndex++;
@@ -1520,6 +1562,27 @@ function saveUtterance() {
                         listObj.selEntity = selEntity;
                         listObj.childName = childName;
                         listObj.canonical = canonical;
+                        for (var q=0; q<closedList.length; q++) {
+                            if (closedList[q].ENTITY_NAME == selEntity) {
+                                for (var w=0; w<closedList[q].CHILD_ENTITY_LIST.length; w++) {
+                                    if (closedList[q].ENTITY_NAME == selEntity) {
+                                        for (var w=0; w<closedList[q].CHILD_ENTITY_LIST.length; w++) {
+                                            var childObj = closedList[q].CHILD_ENTITY_LIST[w];
+                                            if (canonical == childObj.CHILDREN_NAME) {
+                                                listObj.childId = childObj.CHILDREN_ID;
+                                                childArr = childObj.SUB_LIST.split(',');
+                                                for (var d=0; d<childArr.length; d++) {
+                                                    if (childName == childArr[d]) {
+                                                        isNew = true;
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         for (var q=0; q<closedList.length; q++) {
                             if (closedList[q].ENTITY_NAME == selEntity) {
@@ -1581,21 +1644,18 @@ function saveUtterance() {
                         }
                         break;
                 }
-                labelObj.entityName = selEntity;
-                labelObj.childName = childName;
-                //var selStr = '';
-                //for (var k=startIndex; k<=endIndex; k++) {
-                //    selStr += $(this).parents('tr').prev().find('#tokenVal_' + k).val();
-                //}
-                //var startInx = uterObj.text.indexOf(selStr);
-                //var endInx = startInx*1 + selStr.length;
-
-                var startInx = $(this).parents('tr').prev().find('#indexVal_' + startIndex).val().split(',')[1];
-                var endInx = $(this).parents('tr').prev().find('#indexVal_' + endIndex).val().split(',')[2];
-
-                labelObj.startCharIndex = startInx;
-                labelObj.endCharIndex = endInx;
-                entityLabels.push(labelObj)
+                
+                if (!isNew) {
+                    labelObj.entityName = selEntity;
+                    labelObj.childName = childName;
+    
+                    var startInx = $(this).parents('tr').prev().find('#indexVal_' + startIndex).val().split(',')[1];
+                    var endInx = $(this).parents('tr').prev().find('#indexVal_' + endIndex).val().split(',')[2];
+    
+                    labelObj.startCharIndex = startInx;
+                    labelObj.endCharIndex = endInx;
+                    entityLabels.push(labelObj)
+                }
             });
             uterObj.entityLabels = entityLabels;
             utterArr.push(uterObj);
@@ -1632,8 +1692,7 @@ function saveUtterance() {
             $("#loadingBar").css("display","block");
         },
         complete: function () {
-            $("#loadingBar").removeClass("in");
-            $("#loadingBar").css("display","none");      
+            
         },
         data: params,
         url: '/luis/saveUtterance',
@@ -1672,7 +1731,11 @@ function updateUtter() {
         timeout: 0,
         data: params,
         url: '/luis/getUtterInIntent',
-        success: function(data) {
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");   
+        },
+        success: function(data) {   
             if (!data.success) 
             {
                 alert(data.message);

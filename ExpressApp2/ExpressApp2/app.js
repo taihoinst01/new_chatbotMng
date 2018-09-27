@@ -13,6 +13,7 @@ var session = require('express-session');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var luis = require('./routes/luis/luis');
+var apiServer = require('./routes/apiServer/apiServer');
 var board = require('./routes/board/board');
 var learning = require('./routes/learning/learning');
 var code = require('./routes/code/code');
@@ -230,6 +231,7 @@ console.log("app.js 들어옴") ;
 app.use('/', routes);
 app.use('/users', users);
 app.use('/luis', luis);
+app.use('/apiServer', apiServer);
 app.use('/learning', learning);
 app.use('/board', board);
 app.use('/code', code);
@@ -240,6 +242,7 @@ app.use('/boardMng', boardMng);
 app.use('/bannedWordMng', bannedWordMng);
 app.use('/autoCompleteMng', autoCompleteMng);
 app.use('/smallTalkMng', smallTalkMng);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

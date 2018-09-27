@@ -6,7 +6,7 @@ var dbConfig = require('../../config/dbConfig');
 var dbConnect = require('../../config/dbConnect');
 var paging = require('../../config/paging');
 var util = require('../../config/util');
-var Client = require('node-rest-client').Client;
+
 var i18n = require("i18n");
 
 var paging = require('../../config/paging');
