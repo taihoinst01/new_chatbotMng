@@ -8,12 +8,20 @@ var dbConnect = require('../config/dbConnect');
 var paging = require('../config/paging');
 var router = express.Router();
 
+
+/*
 var key = 'taiho123!@#$';
 var initPW = '1234';
-/*기본 암호화 pw */
+//기본 암호화 pw 
 const cipher = crypto.createCipher('aes192', key);
 let basePW = cipher.update(initPW, 'utf8', 'base64'); 
 basePW = cipher.final('base64'); 
+*/
+
+
+//암호화
+var pwConfig = require('../config/passConfig');
+
 
 const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
@@ -35,22 +43,34 @@ router.post('/login', function (req, res) {
     var cipheredOutput = cipher.final('base64');
     console.log(cipheredOutput);
     */
+
+    var loginSelQry = "";
+    loginSelQry = "SELECT USER_ID, SCRT_NUM, SCRT_SALT, USER_AUTH \n";
+    loginSelQry += " FROM TB_USER_M \n WHERE USER_ID = @userId; ";
+
     dbConnect.getConnection(sql).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
-        return pool.request().query("SELECT USER_ID, SCRT_NUM, USER_AUTH FROM TB_USER_M WHERE USER_ID = '" + userId +"'")
+        return pool.request()
+                    .input('userId', sql.NVarChar, userId)
+                    .query(loginSelQry)
         }).then(result => {
             let rows = result.recordset;
             console.log(rows);
 
             if(rows.length > 0 && rows[0].USER_ID != null && rows[0].USER_ID == userId) {
+
+                
+                var userPwConverted = pwConfig.getPassWord(userPw, rows[0].SCRT_SALT);
+                /*
                 //암호화 해제
                 var decipher = crypto.createDecipher('aes192', key);
                 decipher.update(rows[0].SCRT_NUM, 'base64', 'utf8');
                 var decipheredOutput = decipher.final('utf8');
 
                 console.log(decipheredOutput);
-
-                if(decipheredOutput == userPw) {
+                */
+                if (rows[0].SCRT_NUM == userPwConverted) {
+                //if(decipheredOutput == userPw) {
                     req.session.sid = req.body.mLoginId;
                     req.session.sAuth = rows[0].USER_AUTH;
 
@@ -58,6 +78,9 @@ router.post('/login', function (req, res) {
                     dbConnect.getConnection(sql).then(pool => { 
                         return pool.request().query( "SELECT CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION'; " ) 
                     }).then(result => {
+
+
+
                         let subsList = result.recordset;
                         req.session.subsKeyList = subsList;
 
