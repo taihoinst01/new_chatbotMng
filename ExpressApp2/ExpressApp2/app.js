@@ -24,6 +24,7 @@ var boardMng = require('./routes/board/boardMng');
 var bannedWordMng = require('./routes/chatbot/bannedWordMng');
 var autoCompleteMng = require('./routes/chatbot/autoCompleteMng');
 var smallTalkMng = require('./routes/learning/smallTalkMng');
+var qna = require('./routes/qna/qnaMng');
 
 var Logger = require("./config/logConfig");
 var logger = Logger.CreateLogger();
@@ -242,6 +243,7 @@ app.use('/boardMng', boardMng);
 app.use('/bannedWordMng', bannedWordMng);
 app.use('/autoCompleteMng', autoCompleteMng);
 app.use('/smallTalkMng', smallTalkMng);
+app.use('/qna', qna);
 
 
 // catch 404 and forward to error handler
