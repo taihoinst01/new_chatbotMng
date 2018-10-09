@@ -491,7 +491,7 @@ router.post('/dialogs2', function (req, res) {
                 "  a.DLG_ID AS DLG_ID, \n" +
                 "  COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n" +
                 "  CEILING((ROW_NUMBER() OVER(ORDER BY LUIS_ENTITIES DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                "  DLG_DESCRIPTION, DLG_API_DEFINE ,LUIS_ENTITIES, LUIS_INTENT, GroupL, GroupM, GroupS, MissingEntities \n" +
+                "  DLG_NAME, DLG_DESCRIPTION, DLG_API_DEFINE ,LUIS_ENTITIES, LUIS_INTENT, GroupL, GroupM, GroupS, MissingEntities \n" +
                 "  from TBL_DLG a, TBL_DLG_RELATION_LUIS b where a.DLG_ID = b.DLG_ID \n";
             if (req.body.searchText && !req.body.upperGroupL) {
                 //dlg_desQueryString += "AND b.LUIS_ENTITIES like '%" + req.body.searchText + "%' \n";
@@ -597,7 +597,7 @@ router.post('/dialogs', function (req, res) {
                 "      a.DLG_ID AS DLG_ID, \n" +
                 "COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n" +
                 "CEILING((ROW_NUMBER() OVER(ORDER BY LUIS_ENTITIES DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                "DLG_DESCRIPTION, DLG_API_DEFINE ,LUIS_ENTITIES, LUIS_INTENT, GroupL, GroupM, GroupS, ContextLabel,MissingEntities \n" +
+                "DLG_NAME, DLG_DESCRIPTION, DLG_API_DEFINE ,LUIS_ENTITIES, LUIS_INTENT, GroupL, GroupM, GroupS, ContextLabel,MissingEntities \n" +
                 "FROM TBL_DLG a, TBL_DLG_RELATION_LUIS b \n" +
                 "WHERE a.DLG_ID = b.DLG_ID \n";
             if (req.body.searchTxt !== '') {

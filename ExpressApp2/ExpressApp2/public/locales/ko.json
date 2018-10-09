@@ -251,5 +251,6 @@
 	"Up_to_10_cards_can_be_added": "카드는 10개까지 추가 가능합니다",
 	"You_must_have_one_dialog_by_default": "다이얼로그는 기본으로 1개 가지고 있어야합니다",
 	"You_must_have_at_least_one_card": "카드는 1개 이상 가지고 있어야 합니다. 카드를 완전히 삭제 하고 싶으신 경우에는 다이얼로그 삭제 버튼을 눌러주세요",
-	"UPDATE": "UPDATE"
+	"UPDATE": "UPDATE",
+	"TITLE": "TITLE"
 }

@@ -24,6 +24,11 @@ router.get('/noAnswerQList', function (req, res) {
     res.render('qna/noAnswerQList');
 });
 
+//대화상자 설정
+router.get('/dialogMng', function (req, res) {
+    res.render('qna/dialogMng');
+});
+
 router.post('/selectQnaList', function (req, res) {
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
@@ -112,7 +117,7 @@ router.post('/getDlgAjax', function (req, res) {
     var dlgID = req.body.dlgID;
    
     var selectDlgType = " SELECT DLG_TYPE \n" +
-        " , DLG_DESCRIPTION , GROUPL , GROUPM, GROUPS, '' as MissingEntities \n" +
+        " , DLG_NAME, DLG_DESCRIPTION , GROUPL , GROUPM, GROUPS, '' as MissingEntities \n" +
         " FROM TBL_DLG \n" +
         " WHERE DLG_ID=" + dlgID + " \n";
 
@@ -172,6 +177,7 @@ router.post('/getDlgAjax', function (req, res) {
             for (var i = 0; i < rows.length; i++) {
                 var row = {};
                 row.DLG_TYPE = rows[i].DLG_TYPE;
+                row.DLG_NAME = rows[i].DLG_NAME;
                 row.DLG_DESCRIPTION = rows[i].DLG_DESCRIPTION;
                 row.GROUPL = rows[i].GROUPL;
                 row.GROUPM = rows[i].GROUPM;
@@ -244,12 +250,12 @@ router.post('/updateDialog', function (req, res) {
         }
 
     } else {
-        console.log("data is object");
+        console.log("data is object======");
 
         //array = JSON.parse(data);
 
         var dataIdx = data.length;
-
+        console.log("dataIdx==="+dataIdx);
         for (var i = 0; i < dataIdx; i++) {
             array[i] = JSON.parse(data[i]);
         }
@@ -283,7 +289,7 @@ router.post('/updateDialog', function (req, res) {
 
             var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
             var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN,GROUPL,GROUPM,GROUPS,DLG_GROUP) VALUES ' +
-                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2)';
+                '(@dlgId,@dialogTitle,@dialogDesc,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN) VALUES ' +
@@ -296,6 +302,7 @@ router.post('/updateDialog', function (req, res) {
             var luisId = array[array.length - 1]["largeGroup"];
             var luisIntent = array[array.length - 1]["middleGroup"];
             var sourceType = array[array.length - 1]["sourceType"];
+            var title = array[array.length - 1]["title"];
             var description = array[array.length - 1]["description"];
             var dlgQuestion = array[array.length - 1]["dlgQuestion"];
 
@@ -306,7 +313,7 @@ router.post('/updateDialog', function (req, res) {
                 .query(selDlgQuery);
 
             let selDlg = selDlgRes.recordset;
-
+/*
             let selDlgGroupS = await pool.request()
                 .input('groupS', sql.NVarChar, selDlg[0].GROUPS)
                 .query(selDlgGroupSQuery);
@@ -314,7 +321,7 @@ router.post('/updateDialog', function (req, res) {
             for (var gNum = 0; gNum < selDlgGroupS.recordset.length; gNum++) {
                 order.push(selDlgGroupS.recordset[gNum].DLG_ID);
             }
-
+*/
             //selDlg[0].DLG_ID
             //tbl_dlg 삭제
             let delDlg = await pool.request()
@@ -344,7 +351,8 @@ router.post('/updateDialog', function (req, res) {
 
                 let result2 = await pool.request()
                     .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID)
-                    .input('dialogText', sql.NVarChar, description)
+                    .input('dialogTitle', sql.NVarChar, title)
+                    .input('dialogDesc', sql.NVarChar, description)
                     .input('dlgType', sql.NVarChar, array[i]["dlgType"])
                     .input('dialogOrderNo', sql.Int, (i + 1))
                     .input('groupl', sql.NVarChar, luisId)
@@ -479,6 +487,72 @@ router.post('/updateDialog', function (req, res) {
 
     sql.on('error', err => {
 
+    })
+});
+
+router.post('/dialogList', function (req, res) {
+    var searchTitleTxt = req.body.searchTitleTxt;
+    var searchDescTxt = req.body.searchDescTxt;
+    var currentPage = req.body.currentPage;
+
+    (async () => {
+        try {
+            var sourceType = req.body.sourceType;
+            var groupType = req.body.groupType;
+            var dlg_desQueryString = "select tbp.* from \n" +
+                "(select ROW_NUMBER() OVER(ORDER BY DLG_ID DESC) AS NUM, \n" +
+                "      DLG_ID, \n" +
+                "COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n" +
+                "CEILING((ROW_NUMBER() OVER(ORDER BY DLG_ID DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
+                "DLG_NAME, DLG_DESCRIPTION, DLG_TYPE \n" +
+                "FROM TBL_DLG \n" +
+                "WHERE 1=1 \n";
+            if (req.body.searchTitleTxt !== '') {
+                dlg_desQueryString += "AND DLG_NAME like '%" + req.body.searchTitleTxt + "%' \n";
+            }
+            if (req.body.searchDescTxt !== '') {
+                dlg_desQueryString += "AND DLG_DESCRIPTION like '%" + req.body.searchDescTxt + "%' \n";
+            }
+            dlg_desQueryString += ") tbp \n" +
+                "WHERE PAGEIDX = @currentPage";
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(dlg_desQueryString);
+            let rows = result1.recordset;
+
+            var result = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+
+                var num = rows[i].NUM;
+                var dlgName = rows[i].DLG_NAME;
+                var description = rows[i].DLG_DESCRIPTION;
+                var dlgType = rows[i].DLG_TYPE;
+                var dialogueId = rows[i].DLG_ID;
+
+                item.NUM = num;
+                item.DLG_ID = dialogueId;
+                item.DLG_NAME = dlgName;
+                item.DLG_DESCRIPTION = description;
+                item.DLG_TYPE = dlgType;
+
+                result.push(item);
+            }
+            
+            if (rows.length > 0) {
+                res.send({ list: result, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
+            } else {
+                res.send({ list: result });
+            }
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
     })
 });
 
