@@ -252,5 +252,19 @@
 	"You_must_have_one_dialog_by_default": "다이얼로그는 기본으로 1개 가지고 있어야합니다",
 	"You_must_have_at_least_one_card": "카드는 1개 이상 가지고 있어야 합니다. 카드를 완전히 삭제 하고 싶으신 경우에는 다이얼로그 삭제 버튼을 눌러주세요",
 	"UPDATE": "UPDATE",
-	"TITLE": "TITLE"
+	"TITLE": "TITLE",
+	"============== scenario ==============": "",
+	"SCENARIO_NAME": "시나리오명",
+	"SCENARIO_LIST": "시나리오 목록",
+	"DLG_COUNT": "대화상자 수",
+	"SCENARIO_NUM": "No",
+	"SCENARIO_BTN_CNT_VALIDATION": "버튼은 4개까지 생성할 수 있습니다.",
+	"CARD_DIVISION": "카드 구분",
+	"CARD_DIVISION_DEFAULT": "기본",
+	"CARD_DIVISION_IMG": "이미지",
+	"CARD_DIVISION_PLAY": "영상",
+	"Edited": "수정되었습니다.",
+	"Deleted": "삭제되었습니다.",
+	"ADD_DIALOG_BOX": "(자식) 다이얼로그 추가",
+	"USE_YN": "사용여부"	
 }

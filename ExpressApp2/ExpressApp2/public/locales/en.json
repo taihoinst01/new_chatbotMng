@@ -247,5 +247,19 @@
 	"Up_to_4_buttons_can_be_added" : "Up to 4 buttons can be added",
 	"Up_to_10_cards_can_be_added": "Up to 10 cards can be added",
 	"You_must_have_one_dialog_by_default": "You must have one dialog by default",
-	"You_must_have_at_least_one_card": "You must have at least one card. If you want to delete the card completely, press the Delete Dialog button"
+	"You_must_have_at_least_one_card": "You must have at least one card. If you want to delete the card completely, press the Delete Dialog button",
+	"============== scenario ==============": "",
+	"SCENARIO_NAME": "sceanario name",
+	"SCENARIO_LIST": "sceanario list",
+	"DLG_COUNT": "Dialog count",
+	"SCENARIO_NUM": "No",
+	"SCENARIO_BTN_CNT_VALIDATION": "You can create up to four buttons.",
+	"CARD_DIVISION": "card division",
+	"CARD_DIVISION_DEFAULT": "division default card",
+	"CARD_DIVISION_IMG": "division img card",
+	"CARD_DIVISION_PLAY": "division play card",
+	"Edited": "Edit completed.",
+	"Deleted": "Delete completed.",
+	"ADD_DIALOG_BOX": "ADD DIALOG BOX",
+	"USE_YN": "USE STATUS"
 }
