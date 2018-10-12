@@ -394,6 +394,45 @@
         </div>
     </div> 
     <!-- // 신규 대화상자 생성 -->
+
+    <!-- 유사질문 등록 -->
+    <div class="modal fade" id="similarQform" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="similarQTitle">유사질문 등록</h4>
+                </div>
+                <div class="modal-body">
+                    <form name="sQinsertForm" id="sQinsertForm">
+                        <input type="hidden" name="sq_dlgId" id="sq_dlgId">s
+                        <input type="hidden" name="sq_qSeq" id="sq_qSeq">
+                        <div class="form-group" >
+                            <label>Question</label>
+                            <p class="form-control-static" id="mother_q"></p>
+                        </div>
+                        <div class="clear-both"></div>
+                        <div class="form-group" >
+                            <label>Intent</label>
+                            <!--<p class="form-control-static" id="mother_intent"></p>-->
+                            <input type="text" id="mother_intent" class="form-control" readonly>
+                        </div>
+                        <div class="clear-both"></div>
+                        <div class="form-group" >
+                            <label>유사질문</label>
+                            <input type="text" name="s_question" id="s_question" class="form-control">
+                        </div>  
+                    </form>
+                </div>        
+                <div class="modal-footer">
+                    <div class="btn_wrap">
+                        <button type="button" class="btn btn_01" data-dismiss="modal" id="similarQBtn"><%= __('OK') %></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+<!-- //유사질문 등록 -->
 </body>
 
 </html>

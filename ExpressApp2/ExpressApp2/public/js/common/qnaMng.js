@@ -475,13 +475,27 @@ function makeQnaListTable(page) {
 
                 var tableHtml = "";
                 for (var i = 0; i < data.rows.length; i++) {
-                    tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
+                    tableHtml += '<tr><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td class="txt_left">' + data.rows[i].DLG_QUESTION + '</td>';
                     tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
                     tableHtml += '<td class="txt_left">' + data.rows[i].ENTITY + '</td>';
-                    //tableHtml += '<td class="tex01"><a href="#"  data-toggle="modal" data-target="#myModal2"  onclick="getDlgInfo(' + data.rows[i].DLG_ID+ ');return false;">' + data.rows[i].DLG_ID + '</a></td>';
                     tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> Show DLG</button></td>';
-                    tableHtml += '<td>...</td>';
+                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> 유사질문 등록</button></td>';
+                    tableHtml += '</tr>';
+                    tableHtml += '<tr>';
+                    tableHtml += '<td></td>';
+                    tableHtml += '<td colspan="4" class="txt_left">';
+                    
+                    if(data.rows[i].subQryList.length==0){
+                        tableHtml += "유사질문이 없습니다.";
+                    }else{
+                        for (var j = 0; j< data.rows[i].subQryList.length; j++){
+                            tableHtml += data.rows[i].subQryList[j].DLG_QUESTION +'<br>';
+                        }
+                    }
+                    
+                    tableHtml += '</td>';
+                    tableHtml += '<td></td>';
                     tableHtml += '</tr>';
                 }
 
@@ -980,7 +994,7 @@ function updateDialog() {
     array[array.length] = JSON.stringify($("form[name=appInsertForm]").serializeObject());//JSON.stringify($("form[name=appInsertForm]"));
 
     $.ajax({
-        url: '/smallTalkMng/updateDialog',                //주소
+        url: '/qna/updateDialog',                //주소
         dataType: 'json',                  //데이터 형식
         type: 'POST',                      //전송 타입
         data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
@@ -999,7 +1013,7 @@ function updateDialog() {
 
 function deleteDialog(dlgId) {
     $.ajax({
-        url: '/learning/deleteDialog',                //주소
+        url: '/qna/deleteDialog',                //주소
         dataType: 'json',                  //데이터 형식
         type: 'POST',                      //전송 타입
         data: { 'dlgId': dlgId },      //데이터를 json 형식, 객체형식으로 전송
@@ -1287,28 +1301,57 @@ $(document).on('click', '.addCarouselBtn', function (e) {
     }
 });
 
-function cancelSmallTalkProc(procType) {
+
+$(document).on("click", "#insert_similarQ_dlg", function () {
+    var dlgID = $(this).attr("dlg_id");
+    var qSeq = $(this).attr("q_seq");
+  
+    var tr = $(this).parent().parent();
+    var td = tr.children();
+    var show_question = td.eq(1).text();
+    var show_intent = td.eq(2).text();
+    //var show_entity = td.eq(3).text();
+
+    $('#mother_q').text(show_question);
+    //$('#mother_intent').text(show_intent);
+
+    $('#mother_intent').val(show_intent);
+    $('#sq_dlgId').val(dlgID);
+    $('#sq_qSeq').val(qSeq);
+
+    
+    $('#similarQform').modal('show');
+});
+
+$(document).on("click", "#similarQBtn", function () {
+    /*
+    * relation table insert
+    * qnamng table insert
+    * 
+    * */
     var saveArr = new Array();
-    var data = new Object();
-    data.statusFlag = procType;
-    //data.DEL_SEQ = $('#DEL_SEQ').val();
-    $("input[name=CANCEL_ST_SEQ]:checked").each(function() {
-        var test = $(this).val();
-        console.log(test);
-        data.CANCEL_ST_SEQ = test;
-    });
+    var data = new Object() ;
+
+    data.LUIS_INTENT = $('#mother_intent').val();
+    data.LUIS_ENTITIES = "TEST"; //새로 설정한 값이 들어가야 함.
+    data.DLG_ID = $('#sq_dlgId').val();
+    data.DLG_QUESTION = $('#s_question').val();
+    data.GROUP_ID = $('#sq_qSeq').val();
+
+
     saveArr.push(data);
- 
     var jsonData = JSON.stringify(saveArr);
     var params = {
-        'saveArr': jsonData
+        'saveArr' : jsonData
     };
+
     $.ajax({
         type: 'POST',
         datatype: "JSON",
         data: params,
-        url: '/smallTalkMng/cancelSmallTalkProc',
-        success: function (data) {
+        url: '/qna/procSimilarQuestion',
+        success: function(data) {
+            console.log(data);
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
                 window.location.reload();
@@ -1317,4 +1360,4 @@ function cancelSmallTalkProc(procType) {
             }
         }
     });
-}
+});
