@@ -16,24 +16,6 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    //삭제 버튼 confirm
-    $('#cancelSmallTalkBtnModal').click(function() {
-        var del_count = $("#CANCEL_ST_SEQ:checked").length;
-         
-        if(del_count > 0){
-            $('#cancel_content').html(' 정말로 취소하시겠습니까? 복구할 수 없습니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="cancelSmallTalkBtn"><i class="fa fa-edit"></i> SmallTalk Cancel</button>');
-        }else{
-            $('#cancel_content').html('취소할 대상은 한 개 이상이어야 합니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-        }
-        $('#cancelSmallTalkModal').modal('show');
-    });
-
-    //삭제 버튼
-    $(document).on("click", "#cancelSmallTalkBtn", function () {
-        cancelSmallTalkProc('DEL');
-    });
 
     $('#searchDlgBtn').click(function (e) {
         makeQnaListTable(1);
@@ -474,33 +456,36 @@ function makeQnaListTable(page) {
             if (data.rows) {
 
                 var tableHtml = "";
+                var saveTableHtml = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     tableHtml += '<tr><td>' + data.rows[i].NUM + '</td>';
+                    
                     tableHtml += '<td class="txt_left">' + data.rows[i].DLG_QUESTION + '</td>';
+                    
                     tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
                     tableHtml += '<td class="txt_left">' + data.rows[i].ENTITY + '</td>';
                     tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> Show DLG</button></td>';
                     tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> 유사질문 등록</button></td>';
                     tableHtml += '</tr>';
-                    tableHtml += '<tr>';
-                    tableHtml += '<td></td>';
-                    tableHtml += '<td colspan="4" class="txt_left">';
+                   
                     
                     if(data.rows[i].subQryList.length==0){
-                        tableHtml += "유사질문이 없습니다.";
+                        tableHtml += "";
                     }else{
+                        
                         for (var j = 0; j< data.rows[i].subQryList.length; j++){
-                            tableHtml += data.rows[i].subQryList[j].DLG_QUESTION +'<br>';
+                            tableHtml += '<tr>';
+                            tableHtml += '<td></td>';
+                            tableHtml += '<td colspan="4" class="txt_left"><i class="fa fa-caret-right" aria-hidden="true"></i> '+data.rows[i].subQryList[j].DLG_QUESTION +'</td>';
+                            tableHtml += '<td></td>';
+                            tableHtml += '</tr>';
                         }
                     }
-                    
-                    tableHtml += '</td>';
-                    tableHtml += '<td></td>';
-                    tableHtml += '</tr>';
                 }
-
+                //tableHtml += '</tr>';
                 saveTableHtml = tableHtml;
-                $('#qnaListbody').html(tableHtml);
+                
+                $('#qnaListbody').html(saveTableHtml);
 
                 //사용자의 appList 출력
                 $('#qnaListbody').find('tr').eq(0).children().eq(0).trigger('click');
