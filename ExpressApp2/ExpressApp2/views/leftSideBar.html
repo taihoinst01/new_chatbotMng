@@ -86,30 +86,39 @@
                                            <i class="fa fa-angle-left pull-right"></i>
                                        </span>
                                    </a>
-                                   <%
-                                   for(var k=0; k<selChatAppLength; k++) {
-                                                                    %>
-                                       <ul class="treeview-menu">
-                                           <li class=" treeview">
-                                               <a href="#">
-                                                   <i class="fa fa-book"></i> <span><%=appName %> <%=k+1 %></span>
-                                                   <span class="pull-right-container">
-                                                       <i class="fa fa-angle-left pull-right"></i>
-                                                   </span>
-                                               </a>
-                                               <ul class="treeview-menu">
-                                                    <li><a href="/luis/intentList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Intent List</a></li>
-                                                    <li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Entity List</a></li>
-                                                    <!--<li><a href="/luis/publish?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Publish</a></li>-->
-                                                    <!--<li class="active"><a href="#" class="spmenu" id="">학습</a></li>-->
-                                                    <li class="active"><a href="#" class="spmenu" id="trainBtn"><%= __('TRAIN') %></a></li>
-                                                    <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
-                                               </ul>
-                                           </li>
-                                       </ul>
-                                       <%
-                                       }
-                                       %>
+                                   
+                                <%
+                                for(var k=0; k<selChatAppLength; k++) {
+                                                                %>
+                                    <ul class="treeview-menu">
+                                        <li class=" treeview">
+                                            <a href="#">
+                                                <i class="fa fa-book"></i> <span><%=appName %> <%=k+1 %></span>
+                                                <span class="pull-right-container">
+                                                    <i class="fa fa-angle-left pull-right"></i>
+                                                </span>
+                                            </a>
+                                            <ul class="treeview-menu">
+                                                <li><a href="/luis/intentList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Intent List</a></li>
+                                                <li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Entity List</a></li>
+                                                <li><a href="/luis/newUtterList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>New Utter List</a></li>
+                                                <!--<li><a href="/luis/publish?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Publish</a></li>-->
+                                                <!--<li class="active"><a href="#" class="spmenu" id="">학습</a></li>-->
+                                                <li class="active"><a href="#" class="spmenu" id="trainBtn"><%= __('TRAIN') %></a></li>
+                                                <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <%
+                                    }
+                                    %>
+
+                                <li class="treeview" id="newUtterClick">
+                                <a href="/luis/newUtterList">
+                                    <i class="fa fa-dashboard"></i> <span>New Utter List</span>
+                                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i> </span>
+                                </a>
+                                </li>
 <!--
                                <li class=" treeview">
                                    <a href="#">
@@ -369,7 +378,29 @@
             })
 
         });
-        
+
+        $('#newUtterClick').click(function() {
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+            
+            var url = "/luis/newUtterList"; 
+            $(location).attr('href',url);
+        });
+    
+
+
         //train --end
 
         $("a[name=batchTest]").click(function() {
