@@ -15,7 +15,16 @@ $(document).ready(function() {
     makeQnaListTable();    
 });
 
+var del_similar_id;
 $(document).ready(function() {
+    //삭제 버튼 confirm
+    //로직은 끝 부분에
+    //$('#delete_similar').click(function() {
+    $(document).on("click", "#delete_similar", function () {
+    //$(document).on("click", "a[name=delete_similar]", function(e){
+        del_similar_id = $(this).attr("del_similar_id");
+        $('#deleteSimilarBtnModal').modal('show');
+    });
 
     $('#searchDlgBtn').click(function (e) {
         makeQnaListTable(1);
@@ -476,8 +485,11 @@ function makeQnaListTable(page) {
                         for (var j = 0; j< data.rows[i].subQryList.length; j++){
                             tableHtml += '<tr>';
                             tableHtml += '<td></td>';
-                            tableHtml += '<td colspan="4" class="txt_left"><i class="fa fa-caret-right" aria-hidden="true"></i> '+data.rows[i].subQryList[j].DLG_QUESTION +'</td>';
+                            tableHtml += '<td colspan="2" class="txt_left"><i class="fa fa-caret-right" aria-hidden="true"></i> '+data.rows[i].subQryList[j].DLG_QUESTION +'</td>';
+                            tableHtml += '<td class="txt_left">'+data.rows[i].subQryList[j].ENTITY +'</td>';
                             tableHtml += '<td></td>';
+                            //tableHtml += '<td><i class="fa fa-trash" id="delete_similar" del_similar_id="' + data.rows[i].subQryList[j].SEQ + '"></i></td>';
+                            tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="delete_similar" del_similar_id="' + data.rows[i].subQryList[j].SEQ + '"><i class="fa fa-trash"></i></button></td>';
                             tableHtml += '</tr>';
                         }
                     }
@@ -1317,12 +1329,45 @@ $(document).on("click", "#similarQBtn", function () {
     var saveArr = new Array();
     var data = new Object() ;
 
+    data.PROC_TYPE = "INSERT";
     data.LUIS_INTENT = $('#mother_intent').val();
     data.LUIS_ENTITIES = "TEST"; //새로 설정한 값이 들어가야 함.
     data.DLG_ID = $('#sq_dlgId').val();
     data.DLG_QUESTION = $('#s_question').val();
     data.GROUP_ID = $('#sq_qSeq').val();
 
+
+    saveArr.push(data);
+    var jsonData = JSON.stringify(saveArr);
+    var params = {
+        'saveArr' : jsonData
+    };
+
+    $.ajax({
+        type: 'POST',
+        datatype: "JSON",
+        data: params,
+        url: '/qna/procSimilarQuestion',
+        success: function(data) {
+            console.log(data);
+            if (data.status === 200) {
+                alert(language['REGIST_SUCC']);
+                window.location.reload();
+            } else {
+                alert(language['It_failed']);
+            }
+        }
+    });
+});
+
+//유사질문 삭제
+$(document).on("click", "#deleteSimilarBtn", function () {
+    
+    var saveArr = new Array();
+    var data = new Object() ;
+
+    data.PROC_TYPE = "DELETE";
+    data.DEL_SEQ = del_similar_id;
 
     saveArr.push(data);
     var jsonData = JSON.stringify(saveArr);

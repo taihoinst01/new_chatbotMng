@@ -52,7 +52,7 @@ router.post('/selectQnaList', function (req, res) {
                         }
                         QueryStr +="  ) tbp WHERE PAGEIDX = " + currentPage + "; \n";
 
-            var subQryStr = "SELECT SEQ, DLG_QUESTION FROM TBL_QNAMNG WHERE GROUP_ID = @motherSeq";
+            var subQryStr = "SELECT SEQ, ENTITY, DLG_QUESTION FROM TBL_QNAMNG WHERE GROUP_ID = @motherSeq";
 
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().query(QueryStr);
@@ -78,6 +78,7 @@ router.post('/selectQnaList', function (req, res) {
                     var subQryItem = {};
                     subQryItem.SEQ = subQryRows[j].SEQ;
                     subQryItem.DLG_QUESTION = subQryRows[j].DLG_QUESTION;
+                    subQryItem.ENTITY = subQryRows[j].ENTITY;
                     
                     item.subQryList.push(subQryItem);
                 }
@@ -580,28 +581,42 @@ router.post('/procSimilarQuestion', function (req, res) {
     var dataArr = JSON.parse(req.body.saveArr);
     var saveRelation = "";
     var saveQna = "";
-    var deleteStr = "";
-
+    var deleteQna = "";
+    var deleteRelation = "";
     
-
     for (var i=0; i<dataArr.length; i++) {
-        saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION) " + 
-                       "VALUES ( ";
-        saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "')";
+        if (dataArr[i].PROC_TYPE === 'INSERT') {
+            saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION, SIMILAR_ID) " + 
+                        "VALUES ( ";
+            saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "',(SELECT ISNULL(MAX(SEQ),1) AS SIMILAR_ID FROM TBL_QNAMNG))";
 
-        saveQna += "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT) " + 
-                       "VALUES ( ";
-        saveQna += " '" + dataArr[i].DLG_QUESTION  + "', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].GROUP_ID  + "', '" + dataArr[i].DLG_ID  + "', GETDATE()); ";
+            saveQna += "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT) " + 
+                        "VALUES ( ";
+            saveQna += " '" + dataArr[i].DLG_QUESTION  + "', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].GROUP_ID  + "', '" + dataArr[i].DLG_ID  + "', GETDATE()); ";
+        }else{//삭제
+            deleteQna += "DELETE FROM TBL_QNAMNG WHERE SEQ = '" + dataArr[i].DEL_SEQ + "'; ";
+            deleteRelation += "DELETE FROM TBL_DLG_RELATION_LUIS WHERE SIMILAR_ID = '" + dataArr[i].DEL_SEQ + "'; ";
+        }
     }
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            if (saveQna !== "") {
+                let insertQna = await pool.request().query(saveQna);
+            }
+
             if (saveRelation !== "") {
                 let insertRelation = await pool.request().query(saveRelation);
             }
-            if (saveQna !== "") {
-                let insertQna = await pool.request().query(saveQna);
+
+            if (deleteRelation !== "") {
+                let deleteRelationLet = await pool.request().query(deleteRelation);
+            }
+
+            if (deleteQna !== "") {
+                let deleteQnaLet = await pool.request().query(deleteQna);
             }
             res.send({status:200 , message:'Save Success'});
             
