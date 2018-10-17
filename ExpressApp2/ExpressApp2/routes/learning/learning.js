@@ -3896,4 +3896,235 @@ router.post('/ContextList', function (req, res) {
 });
 
 
+router.post('/relationUtterAjax', function (req, res) {
+    var luisId = req.body.luisId;
+    var luisIntent = req.body.luisIntent;
+    var selectUtterSeq = req.body.selectUtterSeq;
+    
+    var entities = req.body.entities;
+    var predictIntent = req.body.predictIntent;
+
+    var dlgId = [];
+    dlgId = req.body['dlgId[]'];
+
+    var contextData = [];
+    contextData = req.body['contextData[]'];
+
+    if (contextData == undefined) {
+        contextData = [];
+    }
+
+    var contextDataLength;
+    if (typeof contextData === "string") {
+        contextDataLength = 1;
+    } else {
+        contextDataLength = contextData.length
+    }
+
+    var queryText = "";
+    if (contextDataLength == 0) {
+        queryText = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL) "
+            + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'F' ); \n";
+    } else {
+        queryText = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL) "
+            + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'T'); \n";
+    }
+
+
+    var updateQueryText = "";
+    var utterArry;
+    if (req.body['utters[]']) {
+        utterArry = req.body['utters[]'];
+        utterArry = utterArry.replace("'", "''");
+        for (var i = 0; i < (typeof utterArry === "string" ? 1 : utterArry.length); i++) {
+            updateQueryText += "UPDATE TBL_QUERY_ANALYSIS_RESULT SET TRAIN_FLAG = 'Y' WHERE QUERY = '" + (typeof utterArry === "string" ? utterArry.replace(" ", "") : utterArry[i]) + "'; \n";
+        }
+    }
+
+
+    var updateTblDlg = "UPDATE TBL_DLG SET GroupS = @entities WHERE DLG_ID = @dlgId; \n";
+
+    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
+    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
+    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME='" + req.session.appName + "')\n";
+
+    var upQuery = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET LUIS_ID = @luisID, LUIS_INTENT = @intetID, LUIS_INTENT_SCORE = '1', RESULT = 'H' "
+        + "WHERE QUERY = @Query";
+
+    var inCacheQuery = "INSERT INTO TBL_QUERY_INTENT(QUERY, LUIS_ID, LUIS_INTENT, DLG_ID)\n"
+        + "VALUES(@query,@luisId, @intent, @dlgId)";
+
+    var selCacheQuery = "SELECT QUERY, LUIS_ID, LUIS_INTENT, DLG_ID\n"
+        + "FROM TBL_QUERY_INTENT\n"
+        + "WHERE QUERY = @query\n"
+        + "AND LUIS_ID = @luisId\n"
+        + "AND LUIS_INTENT = @intent\n"
+        + "AND DLG_ID = @dlgID";
+
+    var checkQuery = "SELECT RELATION_ID FROM TBL_DLG_RELATION_LUIS WHERE LUIS_INTENT = @luisIntent AND DLG_ID = @dlgId AND LUIS_ID = @luisId";
+
+    var contextQuery = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL, MISSINGENTITIES) "
+        + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'T', @missing_entity ); \n";
+
+    var contextDefineQuery = "INSERT INTO TBL_CONTEXT_DEFINE(INTENT, ENTITIES) "
+        + "VALUES( @contextIntent, @contextEntity ); \n";
+
+    var updateTblDlgQuery = "UPDATE TBL_DLG SET GROUPM=@luisIntent WHERE DLG_ID=@dlgId";
+
+    var updateNewUtter = "UPDATE TBL_QNAMNG SET USE_YN = N WHERE SEQ = @selectUtterSeq";
+
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1;
+            let result2;
+            let checkResult;
+
+            /*
+            * 이미 학습되어서 디비에 들어간 내용을 다시 학습시키는 것을 방지함.
+            * 
+            *   
+            for(var jjj = 0 ; jjj < (typeof dlgId ==="string" ? 1:dlgId.length); jjj++){
+             checkResult = await pool.request()
+                 .input('luisId', sql.NVarChar, luisId)
+                 .input('luisIntent', sql.NVarChar, luisIntent)
+                 .input('dlgId', sql.NVarChar, (typeof dlgId ==="string" ? dlgId:dlgId[jjj]))
+                 .query(checkQuery);
+ 
+                 if(checkResult.recordset.length > 0) {
+                     return res.send({result:"learned"});
+                 }else{
+                     //nothing
+                 }
+            }
+          */
+
+
+            for (var j = 0; j < (typeof dlgId === "string" ? 1 : dlgId.length); j++) {
+                if (j === ((typeof dlgId === "string" ? 1 : dlgId.length) - 1)) {
+                    queryText += updateQueryText
+                }
+
+                if (entities != "" && entities != null) {
+                    result1 = await pool.request()
+                        .input('luisId', sql.NVarChar, luisId)
+                        .input('luisIntent', sql.NVarChar, luisIntent)
+                        .input('entities', sql.NVarChar, entities)
+                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                        .query(queryText);
+
+
+                    result2 = await pool.request()
+                        .input('entities', sql.NVarChar, entities)
+                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                        .query(updateTblDlg);
+                } else {
+
+                    var selCacheResult = await pool.request()
+                        .input('query', sql.NVarChar, req.body['utters[]'].replace(" ", ""))
+                        .input('luisId', sql.NVarChar, luisId)
+                        .input('intent', sql.NVarChar, luisIntent)
+                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                        .query(selCacheQuery)
+
+                    if (selCacheResult.recordset.length == 0) {
+                        /*
+                        * entity 가 없어도 TBL_DLG_RELATION_LUIS 에는 insert
+                        * entity 가 없으면 TBL_DLG_RELATION_LUIS table 을 보지 않고 TBL_QUERY_INTENT table 에서 정보를 빼온다.
+                        * entity 가 없으니까 tbl_dlg 의 groups 를 update 할 필요는 없다.
+                        */
+                        var regExpData = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;//특수문자
+                        var query_ori_data = req.body['utters[]'];
+                        var query_data = query_ori_data.replace(regExpData, "");//특수문자 제거
+                        query_data = query_data.replace(/(\s*)/g, "");//공백제거
+                        var relationLuisResult = await pool.request()
+                            .input('luisId', sql.NVarChar, luisId)
+                            .input('luisIntent', sql.NVarChar, luisIntent)
+                            .input('entities', sql.NVarChar, entities)
+                            .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                            .query(queryText);
+                        var inCacheResult = await pool.request()
+                            //.input('query', sql.NVarChar, req.body['utters[]'].replace(" ",""))
+                            .input('query', sql.NVarChar, query_data)
+                            .input('luisId', sql.NVarChar, luisId)
+                            .input('intent', sql.NVarChar, luisIntent)
+                            .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                            .query(inCacheQuery);
+                    }
+                }
+            }
+            //context 데이터에 따라서 db insert
+            if (contextDataLength == 0) {
+
+            } else {
+                var context_dlgid;
+                var context_missingEntity;
+                var context_defineEntity = "";
+                var temp_context;
+                var check_array;
+                for (var a = 0; a < contextDataLength; a++) {
+                    if (typeof contextData === "string") {
+                        temp_context = contextData;
+                    } else {
+                        temp_context = contextData[a];
+                    }
+
+                    check_array = temp_context.split('||');
+                    context_dlgid = check_array[0];
+                    context_missingEntity = check_array[1];
+
+                    context_defineEntity = context_defineEntity + check_array[1] + ":,";
+
+                    var contextResult = await pool.request()
+                        .input('luisId', sql.NVarChar, luisId)
+                        .input('luisIntent', sql.NVarChar, luisIntent)
+                        .input('entities', sql.NVarChar, entities)
+                        .input('dlgId', sql.NVarChar, context_dlgid)
+                        .input('missing_entity', sql.NVarChar, context_missingEntity)
+                        .query(contextQuery);
+
+                    var updateTblDlgResult = await pool.request()
+                        .input('luisIntent', sql.NVarChar, luisIntent)
+                        .input('dlgId', context_dlgid)
+                        .query(updateTblDlgQuery);
+
+                }
+                context_defineEntity = context_defineEntity.slice(0, -1);
+                var contextDefineResult = await pool.request()
+                    .input('contextIntent', sql.NVarChar, luisIntent)
+                    .input('contextEntity', context_defineEntity)
+                    .query(contextDefineQuery);
+                    
+                var updateQQ = await pool.request()
+                    .input('contextEntity', selectUtterSeq)
+                    .query(updateNewUtter);
+            }
+
+            return res.send({ result: true });
+            /********************************************* */
+            //console.log(result1);
+            //console.log(result2);
+
+            /*
+            let rows = result1.rowsAffected;
+
+            if(rows[0] == 1) {
+                res.send({result:true});
+            } else {
+                res.send({result:false});
+            }
+            */
+
+        } catch (err) {
+            // ... error checks
+            console.log(err);
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
 module.exports = router;

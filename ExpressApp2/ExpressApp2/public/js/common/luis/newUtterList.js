@@ -95,6 +95,10 @@ $(document).on('click','.li_paging',function(e){
 
 //dlg검색 클릭
 $(document).on('click','a[name=addReplyBtn]',function(e){
+    var utterSeq = $(this).parent().find('#hiddenSeq').val();
+    $('#selectUtterSeq').val(utterSeq);
+    var utterEntities = $(this).parent().find('#hiddenEntity').val();
+    $('#selectUtterEntities').val(utterEntities);
 
     var contextEntity = $(this).parent().find('input[name=hiddenEntity]').val();
     openModalBox(contextEntity);
@@ -478,37 +482,6 @@ function searchDialog(contextEntityData) {
 }
 
 
-function selectDialog() {
-    
-    var successFlagg = false;
-    $("input[name=searchDlgChk]").each(function (n) {
-        var chk = $(this).parent().hasClass('checked');
-        if (chk == true) {
-            var cloneDlg = $(this).parent().parent().next().children().clone();
-            if (contextEntityData == '') {
-                $('#dlgViewDiv').html('');
-                $('#dlgViewDiv').append(cloneDlg);
-            } else {
-                $('#dlgViewDiv_' + contextEntityData).html('');
-                $('#dlgViewDiv_' + contextEntityData).append(cloneDlg);
-            }
-
-            $('.previous').hide();
-            $('.next').show();
-            $('.searchDialogClose').click();
-            successFlagg = true;
-            return false;
-        }
-    });
-
-    if (successFlagg == false) {
-
-        alert(language.Please_select_a_dialogue);
-    }
-
-
-}
-
 
 //오른쪽 버튼 클릭시 슬라이드
 function nextBtn(botChatNum, e) {
@@ -538,4 +511,167 @@ function prevBtn(botChatNum, e) {
     });
 
     $("#nextBtn" + botChatNum).show();
+}
+
+
+
+function selectDialog() {
+    
+    var successFlagg = false;
+    $("input[name=searchDlgChk]").each(function (n) {
+        var chk = $(this).parent().hasClass('checked');
+        if (chk == true) {
+            var cloneDlg = $(this).parent().parent().next().children().clone();
+            if (contextEntityData == '') {
+                $('#dlgViewDiv').html('');
+                $('#dlgViewDiv').append(cloneDlg);
+            } else {
+                $('#dlgViewDiv_' + contextEntityData).html('');
+                $('#dlgViewDiv_' + contextEntityData).append(cloneDlg);
+            }
+
+            $('.previous').hide();
+            $('.next').show();
+            $('.searchDialogClose').click();
+            successFlagg = true;
+            return false;
+        }
+    });
+
+    if (successFlagg == false) {
+
+        alert(language.Please_select_a_dialogue);
+    } else {
+        makeRelation();
+    }
+}
+
+
+
+// Utterance Learn
+function makeRelation() {
+
+    var selectUtterSeq = $('#selectUtterSeq').val();
+    
+    //var entities = $('input[name=entity]').val();
+    var entities = $('#selectUtterEntities').val();
+
+    //var inputDlgId = $('input[name=dlgId]');
+
+    var dlgId = new Array();
+    var contextData = new Array();
+
+    /*
+    * inputDlgId 에서 12||entity 양식이 아니면 기존 로직
+    * 맞으면 context 이므로 데이터를 넣는다.
+    */
+    /*
+    var check_array;
+    for (var t = 0; t < inputDlgId.length; t++) {
+        //alert("inputDlgId for==="+inputDlgId[t].value);
+        check_array = inputDlgId[t].value.split('||');
+        if (check_array[1] == "" || check_array[1] == null) {
+            dlgId.push(check_array[0]);
+        } else {
+            contextData.push(inputDlgId[t].value);
+        }
+    }
+    */
+    $('input[name=dlgId]').each(function (n) {
+        var chk = $(this).parents('.chat_box').find('input[name=searchDlgChk]').hasClass('checked');
+        if (chk == true) {
+            dlgId.push($(this).val());
+        }
+    });
+
+    var inputUtterArray = new Array();
+    $('#qnaListBody tr').each(function () {
+        var tmpSeq = $(this).find('#hiddenSeq').val()
+        if (tmpSeq == selectUtterSeq) {
+            inputUtterArray.push($(this).find('a[name=selEntity]').text());
+        }
+        /*
+        if ($(this).find('div').hasClass('checked')) {
+            inputUtterArray.push($(this).find('input[name=hiddenUtter]').val());
+        }
+        */
+    });
+
+    var utterQuery = $('');
+    var luisId = $('#dlgViewDiv').find($('input[name=luisId]'))[0].value;
+    //var luisIntent = $('#dlgViewDiv').find($('input[name=luisIntent]'))[0].value; 기존에는 middle group
+    var luisIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;
+    var predictIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;//안 쓰겠지만 지우면 고칠게 많아질듯...차후 변경
+
+    $.ajax({
+        url: '/learning/relationUtterAjax',
+        dataType: 'json',
+        type: 'POST',
+        data: { 'entities': entities, 'dlgId': dlgId, 'luisId': luisId, 'luisIntent': luisIntent, 'utters': inputUtterArray, 'predictIntent': predictIntent, 'contextData': contextData, 'selectUtterSeq' : selectUtterSeq },
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ($(window).height() - height) / 2 + $(window).scrollTop();
+            left = ($(window).width() - width) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({ position: 'absolute' }).css({ left: left, top: top });
+            $("#loadingBar").css("display", "block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display", "none");
+        },
+        success: function (result) {
+            if (result['result'] == "learned") {
+                alert(language.Learned);
+                $('input[name=tableAllChk]').parent().iCheck('uncheck');
+
+                $('.recommendTbl tbody').html('');
+                $('#dlgViewDiv').html('');
+
+                $('input[name=dlgBoxChk]').parent().iCheck('uncheck');
+
+                $('select[name=predictIntent] :first-child').nextAll().remove();
+                $('.pagination').html('');
+
+                $('#contextDataListBody').html('<tr><td colspan=3>No Context Data</td></tr>');
+                $('#contextDetailHtmlDiv').html('Please Select Entity');
+                contextEntityData = "";
+
+            } else {
+                if (result['result'] == true) {
+                    alert(language.Added);
+
+                    $('input[name=tableAllChk]').parent().iCheck('uncheck');
+
+                    $('.recommendTbl tbody').html('');
+                    $('#dlgViewDiv').html('');
+
+                    $('input[name=dlgBoxChk]').parent().iCheck('uncheck');
+
+                    $('select[name=predictIntent] :first-child').nextAll().remove();
+                    $('.pagination').html('');
+
+                    $('#contextDataListBody').html('<tr><td colspan=3>No Context Data</td></tr>');
+                    $('#contextDetailHtmlDiv').html('Please Select Entity');
+                    contextEntityData = "";
+
+                } else {
+                    alert(language.It_failed);
+                }
+            }
+
+        }
+    });
+    
+
+    
 }
