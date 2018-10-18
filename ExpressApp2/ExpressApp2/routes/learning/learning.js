@@ -928,148 +928,17 @@ router.post('/addEntityValue', function (req, res) {
 router.post('/deleteEntity', function (req, res) {
 
     var delEntityDefine = req.body.delEntityDefine;
-    var appName = req.session.appName;
-
-    var delUtterId;
-    var delEntityId;
-    var delChildId;
-
-    var saveLuisVerId;
-    var findEntityName = '';
-    //var client = new Client();
-
-    var options = {
-        headers: {
-            'Ocp-Apim-Subscription-Key': req.session.subsKey
-        }
-    };
-
-    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
-    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
-    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME=@chatName)\n";
-
+    
     (async () => {
         try {
 
-            let pool = await dbConnect.getConnection(sql);
-            let selectAppId = await pool.request()
-                .input('chatName', sql.NVarChar, appName)
-                .query(selectAppIdQuery);
+            var deleteAppStr = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            var appCount = false;
-            var useLuisAppId;
+            let result1 = await pool.request().query(deleteAppStr);
 
-            for (var i = 0; i < selectAppId.recordset.length; i++) {
-                var luisAppId = selectAppId.recordset[i].APP_ID;
-                var luisVerId = selectAppId.recordset[i].VERSION;
-                //luis intent count check
-                var intentCountRes = syncClient.get(HOST + '/luis/api/v2.0/apps/' + luisAppId + '/versions/' + luisVerId + '/examples?take=500', options);
-
-                for (var k = 0; k < intentCountRes.body.length; k++) {
-                    //text
-
-                    if (intentCountRes.body[k].text.trim() === delEntityDefine) {
-                        useLuisAppId = luisAppId;
-                        delUtterId = intentCountRes.body[k].id;
-                        saveLuisVerId = luisVerId;
-                        appCount = true;
-
-                        var compareEntity = intentCountRes.body[k].entityLabels[0].entityName.split('::');
-                        if (delEntityDefine == compareEntity[1]) {
-                            findEntityName = compareEntity[0];
-                        }
-                    }
-                }
-            }
-
-            if (appCount == false) {
-                //create luis app 
-                console.log("res 402");
-                return res.send({ result: 402 });
-            } else {
-
-                var entityListRes = syncClient.get(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId + '/hierarchicalentities?take=500', options);
-                appCount = false;
-                for (var k = 0; k < entityListRes.body.length; k++) {
-                    if (entityListRes.body[k].name == findEntityName) {
-
-                        for (var j = 0; j < entityListRes.body[k].children.length; j++) {
-                            if (entityListRes.body[k].children[j].name == delEntityDefine) {
-                                delEntityId = entityListRes.body[k].id;
-                                delChildId = entityListRes.body[k].children[j].id;
-                                appCount = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (appCount) {
-                        break;
-                    }
-                }
-
-            }
-
-            if (appCount == false) {
-                //create luis app 
-                console.log("res 403");
-                return res.send({ result: 403 });
-            } else {
-                //삭제
-                var delUtterRes = syncClient.del(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId + '/examples/' + delUtterId, options);
-
-                if (delUtterRes.statusCode > 200) {
-                    console.log("res 406");
-                    res.send({ result: 406 });
-                } else {
-                    var delHierarChyChild = '';
-                    delHierarChyChild += HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId;
-                    delHierarChyChild += '/hierarchicalentities/' + delEntityId + '/children/' + delChildId;
-
-                    var delUtterRes = syncClient.del(delHierarChyChild, options);
-
-                    if (delUtterRes.statusCode > 200) {
-                        console.log("res 407");
-                        res.send({ result: 407 });
-                    } else {
-
-
-                        var client = new Client();
-
-                        syncClient.post(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/0.1/train', options, function (data, response) {
-
-                            /*
-                                var repeat = setInterval(function(){
-                                    var count = 0;
-                                    var traninResultGet = syncClient.get(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/0.1/train' , options);
-    
-                                    for(var trNum = 0; trNum < traninResultGet.body.length; trNum++) {
-                                        if(traninResultGet.body[trNum].details.status == "Fail") {
-                                            res.send({result:400});
-                                        }
-                                        if(traninResultGet.body[trNum].details.status == "InProgress") {
-                                            break;
-                                        }
-                                        count++;
-                                        if(traninResultGet.body.length == count) {
-                                            clearInterval(repeat);
-    
-                                            res.send({status:200 , message:'delete Success'});
-                                        }
-                                    }
-                                },1000);
-                            */
-
-                        });
-
-                        var deleteAppStr = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
-                        let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-
-                        let result1 = await pool.request().query(deleteAppStr);
-
-                    }
-                }
-
-            }
+            res.send({ status: 200, message: 'delete Entity Success' });
+            
         } catch (err) {
             console.log(err);
             console.log("res 500");
@@ -1187,10 +1056,6 @@ router.post('/updateEntity', function (req, res) {
     selEntityQuery += "FROM TBL_COMMON_ENTITY_DEFINE\n";
     selEntityQuery += "WHERE ENTITY = @entity";
 
-    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
-    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
-    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME=@chatName)\n";
-
     var delEntityQuery = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY_VALUE = @entityValue";
 
     var insertEntityQuery = "INSERT INTO TBL_COMMON_ENTITY_DEFINE(ENTITY_VALUE,ENTITY,API_GROUP,TRAIN_FLAG)\n";
@@ -1223,115 +1088,28 @@ router.post('/updateEntity', function (req, res) {
                 }
             }
 
-            //console.log(deleteValue);
-            //console.log(insertValue);
+            //console.log("deleteValue===="+deleteValue);
+            //console.log("insertValue===="+insertValue);
 
             if (insertValue.length > 0 || deleteValue.length > 0) {
-                let pool = await dbConnect.getConnection(sql);
-                let selectAppId = await pool.request()
-                    .input('chatName', sql.NVarChar, appName)
-                    .query(selectAppIdQuery);
-
-                console.log(intentInfo);
-
-                for (var i = 0; i < selectAppId.recordset.length; i++) {
-                    intentInfo[i] = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectAppId.recordset[i].APP_ID + '/versions/0.1/examples?take=500', options);
-                    intentInfo[i].appId = selectAppId.recordset[i].APP_ID;
-                }
-
                 for (var i = 0; i < insertValue.length; i++) {
-                    for (var appNum = 0; appNum < intentInfo.length; appNum++) {
-                        if (intentInfo[appNum].body.length < 280) {
-                            var getEntity = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities', options);
 
-                            for (var eNum = 0; eNum < getEntity.body.length; eNum++) {
-                                for (var cNum = 0; cNum < getEntity.body[eNum].children.length; cNum++) {
-                                    if (entity == getEntity.body[eNum].children[cNum].name) {
-                                        entityCheck = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (entityCheck == false) {
-                                var entityId = getEntity.body[getEntity.body.length - 1].id;
-
-                                var entityResult = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities/' + entityId, options);
-
-                                if (entityResult.body.children.length < 10) {
-                                    options.payload = { "name": entity };
-                                    // add hierarchicalentities
-                                    var entityCreateResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities/' + entityId + '/children', options);
-                                } else {
-                                    options.payload = {
-                                        "name": "entity" + (getEntity.body.length + 1),
-                                        "children": [entity]
-                                    };
-                                    // add hierarchicalentities list, entity
-                                    var entityListResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities', options);
-                                }
-                            }
-
-                            var getEntityName = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities?take=500', options);
-                            var addEntity;
-                            for (var k = 0; k < getEntityName.body.length; k++) {
-                                for (var j = 0; j < getEntityName.body[k].children.length; j++) {
-                                    if (getEntityName.body[k].children[j].name == entity) {
-                                        addEntity = getEntityName.body[k].name + "::" + entity;
-                                    }
-                                }
-                            }
-
-                            options.payload = {
-                                "text": insertValue[i],
-                                "intentName": "intent",
-                                "entityLabels":
-                                    [
-                                        {
-                                            "entityName": addEntity,
-                                            "startCharIndex": 0,
-                                            "endCharIndex": insertValue[i].length - 1
-                                        }
-                                    ]
-                            }
-
-                            // add luis label
-                            var addIntentLabel = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/example', options);
-
-                            let insertEntity = await appPool.request()
+                    let insertEntity = await appPool.request()
                                 .input('entityValue', sql.NVarChar, insertValue[i])
                                 .input('entity', sql.NVarChar, entity)
-                                .input('apiGroup', sql.NVarChar, apiGroup)
+                                //.input('apiGroup', sql.NVarChar, apiGroup)
+                                .input('apiGroup', sql.NVarChar, "COMMON")
                                 .query(insertEntityQuery);
+                                //console.log("insertEntityQuery===="+insertEntityQuery);
 
                             break;
-                        }
-                    }
                 }
 
                 for (var delNum = 0; delNum < deleteValue.length; delNum++) {
-                    for (var appNum = 0; appNum < intentInfo.length; appNum++) {
-                        for (var utterNum = 0; utterNum < intentInfo[appNum].body.length; utterNum++) {
-                            if (deleteValue[delNum] == intentInfo[appNum].body[utterNum].text) {
-                                var delInfo = syncClient.del(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/examples/' + intentInfo[appNum].body[utterNum].id, options)
-
-                                let delEntity = await appPool.request()
+                    let delEntity = await appPool.request()
                                     .input('entityValue', sql.NVarChar, deleteValue[delNum])
                                     .query(delEntityQuery);
-
-                                //console.log(delInfo);
-
-                            }
-                        }
-                    }
-                }
-
-                for (var i = 0; i < selectAppId.recordset.length; i++) {
-                    var trainAppId = selectAppId.recordset[i].APP_ID;
-                    client.post(HOST + '/luis/api/v2.0/apps/' + selectAppId.recordset[i].APP_ID + '/versions/0.1/train', options, function (data, response) {
-                        client.get(HOST + '/luis/api/v2.0/apps/' + trainAppId + '/versions/0.1/train', options, function (data, response) {
-                        });
-                    });
+                                    //console.log("delEntityQuery===="+delEntityQuery);
                 }
             }
             res.send({ status: 200 });
