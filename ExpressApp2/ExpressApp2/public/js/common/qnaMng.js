@@ -19,9 +19,7 @@ var del_similar_id;
 $(document).ready(function() {
     //삭제 버튼 confirm
     //로직은 끝 부분에
-    //$('#delete_similar').click(function() {
     $(document).on("click", "#delete_similar", function () {
-    //$(document).on("click", "a[name=delete_similar]", function(e){
         del_similar_id = $(this).attr("del_similar_id");
         $('#deleteSimilarBtnModal').modal('show');
     });
@@ -433,7 +431,7 @@ $(document).ready(function() {
     
 });
 
-//Banned Word List 테이블 페이지 버튼 클릭
+//테이블 페이지 버튼 클릭
 $(document).on('click', '#qnaListTablePaging .li_paging', function (e) {
     if (!$(this).hasClass('active')) {
         makeQnaListTable($(this).text());
@@ -488,7 +486,6 @@ function makeQnaListTable(page) {
                             tableHtml += '<td colspan="2" class="txt_left"><i class="fa fa-caret-right" aria-hidden="true"></i> '+data.rows[i].subQryList[j].DLG_QUESTION +'</td>';
                             tableHtml += '<td class="txt_left">'+data.rows[i].subQryList[j].ENTITY +'</td>';
                             tableHtml += '<td></td>';
-                            //tableHtml += '<td><i class="fa fa-trash" id="delete_similar" del_similar_id="' + data.rows[i].subQryList[j].SEQ + '"></i></td>';
                             tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="delete_similar" del_similar_id="' + data.rows[i].subQryList[j].SEQ + '"><i class="fa fa-trash"></i></button></td>';
                             tableHtml += '</tr>';
                         }
@@ -674,6 +671,7 @@ $(document).on("click", "#show_dlg", function () {
                             inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
                             inputUttrHtml += '<p>';
                             inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            inputUttrHtml += '<h1 class="textTitle">' + tmp.dlg[j].CARD_TITLE + '</h1>';
                             inputUttrHtml += tmp.dlg[j].CARD_TEXT;
                             inputUttrHtml += '</p>';
                             inputUttrHtml += '</div></div></div></div></div>';

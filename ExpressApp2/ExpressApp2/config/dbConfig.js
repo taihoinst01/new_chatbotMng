@@ -14,7 +14,7 @@ var dbConfig = {
         encrypt: true
     }
 };
-
+/*
 var autowayDbConfig = {
     user: 'taihoinst',
     password: 'taiho9788!',
@@ -28,5 +28,7 @@ var autowayDbConfig = {
 }
 
 module.exports = { dbConfig, autowayDbConfig }
+*/
+module.exports = { dbConfig }
 
 

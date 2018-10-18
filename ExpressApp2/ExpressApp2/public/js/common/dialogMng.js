@@ -1701,6 +1701,7 @@ function searchDialog(dlgID) {
                             inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
                             inputUttrHtml += '<p>';
                             inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            inputUttrHtml += '<h1 class="textTitle">' + tmp.dlg[j].CARD_TITLE + '</h1>';
                             inputUttrHtml += tmp.dlg[j].CARD_TEXT;
                             inputUttrHtml += '</p>';
                             inputUttrHtml += '</div></div></div></div></div>';
