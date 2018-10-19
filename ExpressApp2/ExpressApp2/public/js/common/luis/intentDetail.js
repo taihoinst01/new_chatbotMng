@@ -43,11 +43,17 @@ $(document).ready(function() {
             $(this).children().eq(0).removeClass('fa-arrow-down')
             $(this).children().eq(0).addClass('fa-arrow-up')
             $('tr[name=utterSubTr]').show( "fast", function() {
-
+                
             });
         }
     });
     
+    $('#backToList').click(function() {
+        var pageNum = $('#hiddenListPageNum').val();
+        location.href = "/luis/intentList?rememberPageNum=" + pageNum;
+    });
+
+
 });
 
 // input 엔터 감지

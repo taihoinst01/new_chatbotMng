@@ -3675,18 +3675,30 @@ router.post('/ContextList', function (req, res) {
 
 
 router.post('/relationUtterAjax', function (req, res) {
-    var luisId = req.body.luisId;
+    //var luisId = req.body.luisId;
+    
+
+    var luisId;
+
+    var selAppId = req.body.selAppId;
+    var selAppList = req.session.selChatInfo.chatbot.appList;
+    for (var i=0; i<selAppList.length; i++) {
+        if (selAppList[i].APP_ID == selAppId) {
+            luisId = selAppList[i].APP_NAME;
+        }
+    }
+
     var luisIntent = req.body.luisIntent;
     var selectUtterSeq = req.body.selectUtterSeq;
     
     var entities = req.body.entities;
-    var predictIntent = req.body.predictIntent;
+    //var predictIntent = req.body.predictIntent;
 
     var dlgId = [];
-    dlgId = req.body['dlgId[]'];
+    dlgId = req.body.dlgId;
 
     var contextData = [];
-    contextData = req.body['contextData[]'];
+    contextData = req.body.contextData;
 
     if (contextData == undefined) {
         contextData = [];
@@ -3711,8 +3723,8 @@ router.post('/relationUtterAjax', function (req, res) {
 
     var updateQueryText = "";
     var utterArry;
-    if (req.body['utters[]']) {
-        utterArry = req.body['utters[]'];
+    if (req.body.utters) {
+        utterArry = req.body.utters[0];
         utterArry = utterArry.replace("'", "''");
         for (var i = 0; i < (typeof utterArry === "string" ? 1 : utterArry.length); i++) {
             updateQueryText += "UPDATE TBL_QUERY_ANALYSIS_RESULT SET TRAIN_FLAG = 'Y' WHERE QUERY = '" + (typeof utterArry === "string" ? utterArry.replace(" ", "") : utterArry[i]) + "'; \n";
@@ -3873,11 +3885,12 @@ router.post('/relationUtterAjax', function (req, res) {
                     .input('contextEntity', context_defineEntity)
                     .query(contextDefineQuery);
                     
-                var updateQQ = await pool.request()
-                    .input('contextEntity', selectUtterSeq)
-                    .query(updateNewUtter);
+               
             }
 
+            var updateQQ = await pool.request()
+                .input('contextEntity', selectUtterSeq)
+                .query(updateNewUtter);
             return res.send({ result: true });
             /********************************************* */
             //console.log(result1);
