@@ -371,9 +371,14 @@ router.get('/intentList', function (req, res) {
         var appNumber = req.query.appIndex;
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
+        req.session.selAppName = selApp.APP_NAME;
     }
 
-    res.render('luis/intentList');
+    if (req.query.rememberPageNum) {
+        res.render('luis/intentList', { pageNumber: req.query.rememberPageNum });
+    } else {
+        res.render('luis/intentList', { pageNumber: '-1' });
+    }
     /*
     var selectIntentQry = "";
     var selectedAppId = "";
@@ -794,9 +799,10 @@ router.get('/intentDetail', function (req, res) {
     var intentName = req.query.intentName;
     var intentId = req.query.intentId;
     var labelCnt = req.query.labelCnt;
+    var pageNum = req.query.pageNum;
 
 
-    res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt});
+    res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt, 'pageNum' : pageNum});
     
 });
 
@@ -934,6 +940,7 @@ router.get('/entityList', function (req, res) {
         var appNumber = req.query.appIndex;
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
+        req.session.selAppName = selApp.APP_NAME;
     }
 
     /*
@@ -1905,6 +1912,7 @@ router.get('/publish', function (req, res) {
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
         selAppId = req.session.selAppId;
+        req.session.selAppName = selApp.APP_NAME;
     }
 
     if (typeof req.session.publishsettings == 'undefined') {

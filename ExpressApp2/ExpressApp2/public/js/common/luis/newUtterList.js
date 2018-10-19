@@ -22,6 +22,7 @@ var childCompositeList = [];
 
 $(document).ready(function() {
     makeQnaTable();
+    selectGroup('searchIntentGroup');
 
     //검색 버튼 클릭
     $('#searchBtn').click(function(){
@@ -81,6 +82,16 @@ $(document).ready(function() {
         $('input[name=serachDlg]').val('');
         $('#searchDlgResultDiv').html('');
         $('.dialog_result strong').html(' 0 ');
+
+        $('select[name=searchIntentGroup]').children('option').each(function() {
+            if ($(this).is(':selected'))
+            { 
+                $(this).removeAttr('selected');
+                return false;
+            }
+        });
+        $('select[name=searchIntentGroup]').children().eq(0).prop('selected', 'selected');
+
     });
 
 });
@@ -95,6 +106,10 @@ $(document).on('click','.li_paging',function(e){
 
 //dlg검색 클릭
 $(document).on('click','a[name=addReplyBtn]',function(e){
+    var utterAppId = $(this).parent().find('#hiddenappId').val();
+    $('#selectUtterAppId').val(utterAppId);
+    var utterIntent = $(this).parent().find('#hiddenIntent').val();
+    $('#selectUtterIntent').val(utterIntent);
     var utterSeq = $(this).parent().find('#hiddenSeq').val();
     $('#selectUtterSeq').val(utterSeq);
     var utterEntities = $(this).parent().find('#hiddenEntity').val();
@@ -163,6 +178,8 @@ function makeQnaTable() {
                     entityBodyHtml += "<td style='text-align: right; padding-right:1.5%;'>";
                     entityBodyHtml += "<input type='hidden' id='hiddenSeq' name='hiddenSeq' value='" + data.qnaList[i].SEQ + "' />";
                     entityBodyHtml += "<input type='hidden' id='hiddenEntity' name='hiddenEntity' value='" + data.qnaList[i].ENTITY + "' />";
+                    entityBodyHtml += "<input type='hidden' id='hiddenIntent' name='hiddenIntent' value='" + data.qnaList[i].INTENT + "' />";
+                    entityBodyHtml += "<input type='hidden' id='hiddenappId' name='hiddenappId' value='" + data.qnaList[i].APP_ID + "' />";
                     //entityBodyHtml += "<input type='hidden' id='entityHiddenId' name='entityHiddenId' value='" + data.qnaList[i].Q_ID + "' />";
                     entityBodyHtml += "<a href='#' id='addReplyBtn' name='addReplyBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-edit' style='font-size: 25px;'></span></a>";
                     entityBodyHtml += "</td>";
@@ -265,8 +282,8 @@ function openModalBox(contextEntity) {
         '<button type="button" class="btn btn-default deleteInsertForm">' + language.DELETE_DIALOG + '</button>' +
         '</div>'
 
-    selectGroup('searchIntentGroup');
     
+    //selectGroup('searchIntentGroup');
     $('#searchDlgModalBtn').trigger('click');
 }
 
@@ -530,9 +547,6 @@ function selectDialog() {
                 $('#dlgViewDiv_' + contextEntityData).append(cloneDlg);
             }
 
-            $('.previous').hide();
-            $('.next').show();
-            $('.searchDialogClose').click();
             successFlagg = true;
             return false;
         }
@@ -543,6 +557,10 @@ function selectDialog() {
         alert(language.Please_select_a_dialogue);
     } else {
         makeRelation();
+        
+        $('.previous').hide();
+        $('.next').show();
+        $('.searchDialogClose').click();
     }
 }
 
@@ -578,9 +596,9 @@ function makeRelation() {
     }
     */
     $('input[name=dlgId]').each(function (n) {
-        var chk = $(this).parents('.chat_box').find('input[name=searchDlgChk]').hasClass('checked');
+        var chk = $(this).parents('.chat_box').find('input[name=searchDlgChk]').parent().hasClass('checked');
         if (chk == true) {
-            dlgId.push($(this).val());
+            dlgId.push($(this).val().split('||')[0]);
         }
     });
 
@@ -598,16 +616,20 @@ function makeRelation() {
     });
 
     var utterQuery = $('');
-    var luisId = $('#dlgViewDiv').find($('input[name=luisId]'))[0].value;
+    //var luisId = $('#dlgViewDiv').find($('input[name=luisId]'))[0].value;
     //var luisIntent = $('#dlgViewDiv').find($('input[name=luisIntent]'))[0].value; 기존에는 middle group
-    var luisIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;
-    var predictIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;//안 쓰겠지만 지우면 고칠게 많아질듯...차후 변경
+    var luisIntent = $('#selectUtterIntent').val();
+    var selAppId = $('#selectUtterAppId').val();
+    //var predictIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;//안 쓰겠지만 지우면 고칠게 많아질듯...차후 변경
+
+    //console.log('d');
+    //return false;
 
     $.ajax({
         url: '/learning/relationUtterAjax',
         dataType: 'json',
         type: 'POST',
-        data: { 'entities': entities, 'dlgId': dlgId, 'luisId': luisId, 'luisIntent': luisIntent, 'utters': inputUtterArray, 'predictIntent': predictIntent, 'contextData': contextData, 'selectUtterSeq' : selectUtterSeq },
+        data: { 'entities': entities, 'dlgId': dlgId, 'utters': inputUtterArray,  'luisIntent': luisIntent, 'contextData': contextData, 'selectUtterSeq' : selectUtterSeq, 'selAppId': selAppId },
         beforeSend: function () {
 
             var width = 0;
@@ -630,45 +652,14 @@ function makeRelation() {
             $("#loadingBar").css("display", "none");
         },
         success: function (result) {
-            if (result['result'] == "learned") {
-                alert(language.Learned);
-                $('input[name=tableAllChk]').parent().iCheck('uncheck');
-
-                $('.recommendTbl tbody').html('');
-                $('#dlgViewDiv').html('');
-
-                $('input[name=dlgBoxChk]').parent().iCheck('uncheck');
-
-                $('select[name=predictIntent] :first-child').nextAll().remove();
-                $('.pagination').html('');
-
-                $('#contextDataListBody').html('<tr><td colspan=3>No Context Data</td></tr>');
-                $('#contextDetailHtmlDiv').html('Please Select Entity');
-                contextEntityData = "";
-
-            } else {
-                if (result['result'] == true) {
-                    alert(language.Added);
-
-                    $('input[name=tableAllChk]').parent().iCheck('uncheck');
-
-                    $('.recommendTbl tbody').html('');
-                    $('#dlgViewDiv').html('');
-
-                    $('input[name=dlgBoxChk]').parent().iCheck('uncheck');
-
-                    $('select[name=predictIntent] :first-child').nextAll().remove();
-                    $('.pagination').html('');
-
-                    $('#contextDataListBody').html('<tr><td colspan=3>No Context Data</td></tr>');
-                    $('#contextDetailHtmlDiv').html('Please Select Entity');
-                    contextEntityData = "";
-
-                } else {
-                    alert(language.It_failed);
-                }
+            if (!result) {
+                alert("failed");
+                return false;
             }
-
+            else {
+                alert(language.Added);
+                location.reload();
+            }
         }
     });
     
