@@ -63,8 +63,8 @@
                                         </div>        
                                                                
                                         <div class="form-group col-lg-4 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
-                                            <button type="button" id="searchDlgBtn" class="btn btn_01 "><%= __('SEARCH') %></button> 
-                                            <button type="button" id="dialog" class="btn btn-default"  data-toggle="modal" data-target="#myModal2" onclick="openModalBox('#create_dlg')"><%= __('CREATE') %></button>
+                                            <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
+                                            <button type="button" id="dialog" class="btn btn-default"  data-toggle="modal" data-target="#myModal2" onclick="openModalBox('#create_dlg')"><i class="fa fa-edit"></i> <%= __('CREATE') %></button>
                                         </div>
                                      </div>
                                      
@@ -390,7 +390,24 @@
                                 </div>
                     </div>
             </div>
-    </div>    
+    </div>
+    <div class="modal fade" id="procDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">대화상자설정</h4>
+                </div>
+                <div class="modal-body"><p id="proc_content"></p></div>
+                <div class="modal-footer" id="footer_button">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- //팝업_미리보기 -->
 
 
