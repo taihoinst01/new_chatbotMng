@@ -1293,7 +1293,7 @@ function selectDlgByTxt(groupType, sourceType) {
                         '<td class="txt_left">' + data.list[i].DLG_NAME + '</td>' +
                         '<td class="txt_left tex01"><a href="#"  data-toggle="modal" data-target="#myModal2"  onclick="searchDialog(' + data.list[i].DLG_ID + ');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
-                        '<td><a href="#" onclick="deleteDialog(' + data.list[i].DLG_ID + ');return false;"><span class="fa fa-trash"></span></a></td>' +
+                        '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ');return false;"><span class="fa fa-trash"></span></a></td>' +
                         '</tr>';
 
                 }
@@ -2050,15 +2050,27 @@ function updateDialog() {
     });
 }
 
-function deleteDialog(dlgId) {
+var deleteDlgId = "";
+function deleteDialogModal(dlgId) {
+    deleteDlgId = dlgId;
+    $('#proc_content').html('선택된 정보를 삭제하시겠습니까? 복구할 수 없습니다.');
+    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteDialogBtn" onClick="deleteDialog();"><i class="fa fa-trash"></i> Delete</button>');
+    $('#procDialog').modal('show');
+}
+
+function deleteDialog() {
+    $('#procDialog').modal('hide');
     $.ajax({
         url: '/learning/deleteDialog',                //주소
         dataType: 'json',                  //데이터 형식
         type: 'POST',                      //전송 타입
-        data: { 'dlgId': dlgId },      //데이터를 json 형식, 객체형식으로 전송
+        data: { 'dlgId': deleteDlgId },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
-            alert('delele complete');
+            //alert('delele complete');
+            $('#proc_content').html('삭제되었습니다.');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#procDialog').modal('show');
             $('.createDlgModalClose').click();
             var groupType = $('.selected').text();
             var sourceType = $('#tblSourceType').val();
