@@ -43,7 +43,7 @@ $(document).ready(function() {
             $(this).children().eq(0).removeClass('fa-arrow-down')
             $(this).children().eq(0).addClass('fa-arrow-up')
             $('tr[name=utterSubTr]').show( "fast", function() {
-                
+
             });
         }
     });
@@ -766,11 +766,12 @@ $(document).on("keypress", "#utterInputText", function(e){
 
 //utter 추가  버튼
 $(document).on("click", "a[name=addUtter]", function(e){
+    /*
     if ($(this).parents('tr').next().find('div[name=labelInfoDiv]').length >= 5) {
         alert("우선 5개만 가능합니다.");
         return false;
     }
-
+    */
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
