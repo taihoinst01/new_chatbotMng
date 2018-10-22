@@ -91,6 +91,14 @@ $(document).ready(function() {
     });
 });
 
+//alert 메세지 초기화
+$(document).on("click", "#alertCloseBtn", function () {
+    $('#alertMsg').text('');
+    if ($('#chkAfterAlert').val() != 'NONE') {
+        location.reload();
+    }
+});
+
 //modal esc 종료
 $(document).keyup(function(e) {
     if ($('#create_entity').css('display') == 'block') {
@@ -103,12 +111,32 @@ $(document).keyup(function(e) {
 //entity 삭제 버튼
 $(document).on("click", "a[name=delEntityBtn]", function(e){
     var entityHiddenName = $(this).parent().find('#entityHiddenName').val();
+    
+    var hId = $(this).parent().find('#entityHiddenId').val();
+    var hType = $(this).parent().find('#entityHiddenType').val();
+    $('#hId').val(hId);
+    $('#hType').val(hType);
+    $('#confirmTitle').text('엔티티 삭제');
+    $('#confirmMsg').text("["+ entityHiddenName + "] 삭제하시겠습니까?");
+    $('#confirmBtnModal').modal('show');
+    /*
     if (confirm("["+ entityHiddenName + "] 삭제하시겠습니까?")) {
-        var hId = $(this).parent().find('#entityHiddenId').val();
-        var hType = $(this).parent().find('#entityHiddenType').val();
         deleteEntity(entityHiddenName, hId, hType);
     }
+    */
 });
+
+
+$(document).on("click", "#confirmBtn", function () {
+    var hId = $('#hId').val();
+    var hType = $('#hType').val();
+    $('#confirmTitle').text('');
+    $('#confirmMsg').text("");
+    $(this).prev().trigger('click');
+    deleteEntity(entityHiddenName, hId, hType);
+});
+
+
 
 //entity 상세페이지 이동
 $(document).on("click", "a[name=selEntity]", function(e){
@@ -235,15 +263,20 @@ function makeEntityTable() {
     });
 }
 
+
 //엔티티 생성 
 function createEntity() {
     if ($('#entityName').val().trim() == '') 
     {
-        alert("Entity를 입력해야 합니다.");
+        $('#alertMsg').text('Entity를 입력해야 합니다.');
+        $('#alertBtnModal').modal('show');
+        //alert("Entity를 입력해야 합니다.");
     } 
     else if ($('#createEntityType').val() == 'NONE') 
     {
-        alert("Entity type을 선택해야 합니다.");
+        $('#alertMsg').text('Entity type을 선택해야 합니다.');
+        $('#alertBtnModal').modal('show');
+        //alert("Entity type을 선택해야 합니다.");
     }
     else 
     {
@@ -278,10 +311,14 @@ function createEntity() {
         }
 
         if (isChildEntityBlank) {
-            alert("공백은 등록할 수 없습니다.");
+            $('#alertMsg').text('공백은 등록할 수 없습니다.');
+            $('#alertBtnModal').modal('show');
+            //lert("공백은 등록할 수 없습니다.");
         } 
         else if (isChildEntityOk) {
-            alert("중복된 자식 엔티티가 존재합니다.");
+            $('#alertMsg').text('중복된 자식 엔티티가 존재합니다.');
+            $('#alertBtnModal').modal('show');
+            //alert("중복된 자식 엔티티가 존재합니다.");
         } 
         else 
         {
@@ -332,22 +369,33 @@ function createEntity() {
                 success: function(data) {
                     if (data.dupleRst) {
                         if (data.existEntity) {
-                            alert("[" + data.existEntity + "] 같은 이름의 자식 엔티티가 존재합니다.");
+                            $('#alertMsg').text("[" + data.existEntity + "] 같은 이름의 자식 엔티티가 존재합니다.");
+                            $('#alertBtnModal').modal('show');
+                            //alert("[" + data.existEntity + "] 같은 이름의 자식 엔티티가 존재합니다.");
                         } else {
-                            alert("[" + data.existApp + "] 앱에 같은 이름의 엔티티가 존재합니다.");
+                            $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 엔티티가 존재합니다.");
+                            $('#alertBtnModal').modal('show');
+                            //alert("[" + data.existApp + "] 앱에 같은 이름의 엔티티가 존재합니다.");
                         }
                     }
                     else if (!data.success) 
                     {
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
                     }
                     else if (data.error) {
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
+                        //location.reload();
                     }
                     else 
                     {
-                        alert('생성되었습니다.');
-                        location.reload();
+                        $('#alertMsg').text('생성되었습니다');
+                        $('#alertBtnModal').modal('show');
+                        $('#chkAfterAlert').val('EXIST');
+                        //alert('생성되었습니다.');
                     }
                 }
             });
@@ -362,7 +410,9 @@ function getChildCompositeList() {
         url: '/luis/selectChildCompositeList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) 
             {
@@ -408,14 +458,20 @@ function deleteEntity(entityHiddenName, hId, hType) {
         url: '/luis/deleteEntity',
         success: function(data) {
             if(data.error){
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) {
-                alert(data.message);
-                location.reload();
+                $('#alertMsg').text(data.message);
+                $('#chkAfterAlert').val('EXIST');
+                //alert(data.message);
+                //location.reload();
             }
             else {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
         }
     });

@@ -48,6 +48,12 @@ $(document).ready(function() {
         }
     });
     
+    $('#backToList').click(function() {
+        var pageNum = $('#hiddenListPageNum').val();
+        location.href = "/luis/intentList?rememberPageNum=" + pageNum;
+    });
+
+
 });
 
 // input 엔터 감지
@@ -491,6 +497,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
             $(this).parent().append(utterBodyHtml);
             break;
+            /*
         case 5:
             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
             utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
@@ -508,6 +515,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
             $(this).parent().append(utterBodyHtml);
             break;
+            */
         default:
             break;
     }
@@ -567,7 +575,7 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
                         utterBodyHtml += "<option value='1' selected>Simple</option>";
                         utterBodyHtml += "<option value='3'>hierarchy</option>";
                         //utterBodyHtml += "<option value='4'>composite</option>";
-                        utterBodyHtml += "<option value='5'>closed list</option>";
+                        //utterBodyHtml += "<option value='5'>closed list</option>";
                         utterBodyHtml += "</select>";
             
                         utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
@@ -624,6 +632,7 @@ function makeChildSelBox (selObj, entityType) {
         case 4:
 
             break;
+            /*
         case 5:
             utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
             for (var j=0; j<closedList.length; j++) {
@@ -635,6 +644,7 @@ function makeChildSelBox (selObj, entityType) {
                 }
             }
             break;
+            */
     }
 
     $(selObj).parent().find('select[name=entityChildSelBox]').html(utterBodyHtml);
@@ -756,18 +766,19 @@ $(document).on("keypress", "#utterInputText", function(e){
 
 //utter 추가  버튼
 $(document).on("click", "a[name=addUtter]", function(e){
+    /*
     if ($(this).parents('tr').next().find('div[name=labelInfoDiv]').length >= 5) {
         alert("우선 5개만 가능합니다.");
         return false;
     }
-
+    */
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
     utterBodyHtml += "<option value='1' selected>Simple</option>";
     utterBodyHtml += "<option value='3'>hierarchy</option>";
     utterBodyHtml += "<option value='4'>composite</option>";
-    utterBodyHtml += "<option value='5'>closed list</option>";
+    //utterBodyHtml += "<option value='5'>closed list</option>";
     utterBodyHtml += "</select>";
 
     utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
@@ -1046,7 +1057,7 @@ function makeLabelingTr(entityLabel) {
                             if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
                                 utterBodyHtml += "<option value='4'>composite</option>";
                             }
-                            utterBodyHtml += "<option value='5'>closed list</option>";
+                            //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
                             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
@@ -1074,7 +1085,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<option value='1'>Simple</option>";
                             utterBodyHtml += "<option value='3' selected>hierarchy</option>";
                             utterBodyHtml += "<option value='4'>composite</option>";
-                            utterBodyHtml += "<option value='5'>closed list</option>";
+                            //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
                             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
@@ -1102,7 +1113,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<option value='1'>Simple</option>";
                             utterBodyHtml += "<option value='3'>hierarchy</option>";
                             utterBodyHtml += "<option value='4' selected>composite</option>";
-                            utterBodyHtml += "<option value='5'>closed list</option>";
+                            //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
                             
@@ -1118,6 +1129,7 @@ function makeLabelingTr(entityLabel) {
                         }
                     }
                     break;
+                    /*
                 case 5:
                     //'Closed List';
                     for (var j=0; j<closedList.length; j++) {
@@ -1149,6 +1161,7 @@ function makeLabelingTr(entityLabel) {
                         }
                     }
                     break;
+                    */
                 case 6:
                     //'hierarchy child List';
                     for (var j=0; j<hierarchyList.length; j++) {
@@ -1161,7 +1174,7 @@ function makeLabelingTr(entityLabel) {
                                     utterBodyHtml += "<option value='1'>Simple</option>";
                                     utterBodyHtml += "<option value='3' selected>hierarchy</option>";
                                     utterBodyHtml += "<option value='4'>composite</option>";
-                                    utterBodyHtml += "<option value='5'>closed list</option>";
+                                    //utterBodyHtml += "<option value='5'>closed list</option>";
                                     utterBodyHtml += "</select>";
             
                                     
@@ -1304,6 +1317,7 @@ function changeEntitySel() {
                 }
                 $(this).html(optionHtml);
                 break;
+                /*
             case '5':
                 var childHtml = '';
                 var rememberId = -1;
@@ -1340,6 +1354,7 @@ function changeEntitySel() {
                 $(this).next().css('display', 'inline');
                 $(this).next().html(childHtml);
                 break;
+                */
             case '6':
             /*
                 for (var i=0; i<hierarchyList.length; i++) {
@@ -1506,6 +1521,7 @@ function saveUtterance() {
             if ($(this).find('input[name=intentHiddenId]').val() == 'NEW') {
                 var tmpNewObj = new Object();
                 tmpNewObj.text = utterText;
+                tmpNewObj.intentName = $('#hiddenIntentName').val();
                 newArr.push(tmpNewObj);
             }
             uterObj.text = utterText;
@@ -1545,7 +1561,7 @@ function saveUtterance() {
                         startIndex = $(this).find('input[name=startIndex]').val();
                         endIndex = $(this).find('input[name=endIndex]').val();
                         break;
-
+                    /*
                     case '5':
                         selEntity = $(this).find('select[name=entitySelBox]').val();
                         startIndex = $(this).find('input[name=startIndex]').val();
@@ -1643,6 +1659,7 @@ function saveUtterance() {
                             }
                         }
                         break;
+                    */
                 }
                 
                 if (!isNew) {
@@ -1666,6 +1683,7 @@ function saveUtterance() {
         return false;
     }
     var params = {
+        'intentName' : $('#hiddenIntentName').val(),
         'labelArr' : utterArr,
         'newUtterArr' : newArr,
         'addClosedList' : addClosedList,
@@ -1699,16 +1717,16 @@ function saveUtterance() {
         success: function(data) {
             if (data.error) {
                 alert(data.message);
-                updateUtter();
+                //updateUtter();
             }
             else if (!data.success) {
                 alert(data.message);
-                updateUtter();
+                //updateUtter();
             }
             else 
             {
                 alert(data.message);
-                updateUtter();
+                //updateUtter();
             }
         }
     });

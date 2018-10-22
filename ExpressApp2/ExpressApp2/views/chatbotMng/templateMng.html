@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <%include  ../common/commonLib.html%>
+        <script src="/common/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/common/templateMng.js"></script>
+        <script>
+           
+        </script>
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+        <!-- Header -->
+        <%include  ../header.html%>
+            <!-- //Header -->
+
+            <!-- Left Menu Side -->
+            <%include  ../leftSideBar.html%>
+                <!--// Left Menu Side -->
+
+
+                <!-- Content Wrapper -->
+                <div class="content-wrapper">
+                    <section class="content-header">
+                        <h1>템플릿 관리</h1>
+                    </section>
+
+                    <!-- Main content -->
+                    <section class="content">
+                        <div class="box  color-palette-box">
+                            <div class="box-body">
+                                <div class="mt20">
+                                    <div class="col-lg-4" style="padding-left:0px !important">
+                                        <h4 class=" col-lg-6">
+                                            Template Form
+                                        </h4>
+
+                                        <div class="Tbl_wrap">
+                                            <p>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <form class="form-horizontal" name="templateForm" id="templateForm">
+                                                            <input type="hidden" name="template_id" id="template_id">
+                                                            <input type="hidden" name="chatbotName" id="chatbotName" value="<%=appName%>">
+                                                            <div class="form-group">
+                                                                <label for="inputEmail3" class="col-sm-4 control-label">
+                                                                    <i class="fa fa-asterisk"></i> TOP Color</label>
+                                                                <div class="col-sm-8">
+                                                                    <input type="text" class="form-control" id="top_color" name="top_color" placeholder="TOP Color">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="inputEmail3" class="col-sm-4 control-label">
+                                                                    <i class="fa fa-asterisk"></i> BackGround Color</label>
+                                                                <div class="col-sm-8">
+                                                                    <input type="text" class="form-control" id="background_color" name="background_color" placeholder="BackGround Color">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="inputEmail3" class="col-sm-4 control-label">
+                                                                    <i class="fa fa-asterisk"></i> Icon Image</label>
+                                                                <div class="col-sm-8">
+                                                                    <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="inputEmail3" class="col-sm-4 control-label">
+                                                                    <i class="fa fa-asterisk"></i> BackGround Image</label>
+                                                                <div class="col-sm-8">
+                                                                    <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="panel-footer text-right">
+                                                        <button type="button" class="btn btn-default" id="addTemplateBtn">
+                                                            <i class="fa fa-edit"></i> Save</button>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8" style="padding:0px !important">
+                                        <h4 class=" col-lg-6">Template List</h4>
+                                        <div class="Tbl_wrap">
+                                            <table class="Tbl" summary="banned word list">
+                                                <colgroup>
+                                                    <col width="5%" />
+                                                    <col width="15%" />
+                                                    <col width="15%" />
+                                                    <col width="30%" />
+                                                    <col width="30%" />
+                                                    <col width="5%" />
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Top Color</th>
+                                                        <th>BackGround Color</th>
+                                                        <th>Icon Image</th>
+                                                        <th>BackGround Image</th>
+                                                        <th>...</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="templateTableBodyId">
+                                                   
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="pagination_wrap" id="templateTablePaging">
+                                            <ul class="pagination pagination-sm no-margin">
+
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- //Main content -->
+
+                </div>
+                <!--// Content Wrapper -->
+
+
+                <!--  Footer -->
+                <%include  ../footer.html%>
+                    <!-- // Footer -->
+                    <!-- Modal -->
+                    
+                    <div class="modal fade" id="templateDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">template</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p id="del_content"></p>
+                                </div>
+                                <div class="modal-footer" id="delete_footer_button">
+                                    <p id="footer_button"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        //iCheck for checkbox and radio inputs
+                        $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+                            checkboxClass: 'icheckbox_minimal-blue',
+                            radioClass: 'iradio_minimal-blue'
+                        })
+                        //Red color scheme for iCheck
+                        $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
+                            checkboxClass: 'icheckbox_minimal-red',
+                            radioClass: 'iradio_minimal-red'
+                        })
+                        //Flat red color scheme for iCheck
+                        $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+                            checkboxClass: 'icheckbox_flat-green',
+                            radioClass: 'iradio_flat-green'
+                        })
+
+                    </script>
+</body>
+
+</html>
