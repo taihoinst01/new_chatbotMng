@@ -67,7 +67,10 @@ router.post('/selectTemplateList', function (req, res) {
                 });
 
             } else {
-                res.send({ list: result });
+                res.send({
+                    records : 0,
+                    rows : null
+                });
             }
         } catch (err) {
             console.log(err)
@@ -91,3 +94,50 @@ function checkNull(val, newVal) {
         return val;
     }
 }
+
+router.post('/procTemplate', function (req, res) {
+    var dataArr = JSON.parse(req.body.saveArr);
+    var saveStr = "";
+    var updateStr = "";
+    var deleteStr = "";
+    var userId = req.session.sid;
+
+    for (var i = 0; i < dataArr.length; i++) {
+        if (dataArr[i].statusFlag === 'NEW') {
+            saveStr += "INSERT INTO TBL_BANNED_WORD_LIST (BANNED_WORD, BANNED_WORD_TYPE) " +
+                "VALUES (";
+            saveStr += " '" + dataArr[i].BANNED_WORD + "', '" + dataArr[i].BANNED_WORD_TYPE + "');";
+        } else { //DEL
+            deleteStr += "DELETE FROM TBL_BANNED_WORD_LIST WHERE SEQ = '" + dataArr[i].DEL_SEQ + "'; ";
+        }
+    }
+
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            if (saveStr !== "") {
+                let insertBannedWord = await pool.request().query(saveStr);
+            }
+            if (updateStr !== "") {
+                let updateBannedWord = await pool.request().query(updateStr);
+            }
+            if (deleteStr !== "") {
+                let deleteBannedWord = await pool.request().query(deleteStr);
+            }
+
+            res.send({ status: 200, message: 'Save Success' });
+
+        } catch (err) {
+            console.log(err);
+            res.send({ status: 500, message: 'Save Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+module.exports = router;
