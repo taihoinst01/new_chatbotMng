@@ -371,14 +371,9 @@ router.get('/intentList', function (req, res) {
         var appNumber = req.query.appIndex;
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
-        req.session.selAppName = selApp.APP_NAME;
     }
 
-    if (req.query.rememberPageNum) {
-        res.render('luis/intentList', { pageNumber: req.query.rememberPageNum });
-    } else {
-        res.render('luis/intentList', { pageNumber: '-1' });
-    }
+    res.render('luis/intentList');
     /*
     var selectIntentQry = "";
     var selectedAppId = "";
@@ -680,7 +675,7 @@ router.post('/getUtterInIntent', function (req, res) {
     var userId = req.session.sid;
     var intentName = req.body.intentName;
     var intentId = req.body.intentId;
-    var lebelCnt = req.body.labelCnt;
+    var lebelCnt = req.body.lebelCnt;
     if (lebelCnt == '0') {
         lebelCnt = '1';
     }
@@ -704,7 +699,6 @@ router.post('/getUtterInIntent', function (req, res) {
                 var utterListInIntent = [];
                 utterInfo = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + intentList[iu].APP_ID + '/versions/0.1/models/' + intentList[iu].INTENT_ID + '/reviewLabels?skip=0&take=' + lebelCnt , options);
                 if (utterInfo.statusCode == 200) {
-                    
                     utterPrediction = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + intentList[iu].APP_ID + '/versions/0.1/models/' + intentList[iu].INTENT_ID + '/reviewPredictions?skip=0&take=' + lebelCnt , options);
                 
                     chkSuccess = true;
@@ -715,7 +709,7 @@ router.post('/getUtterInIntent', function (req, res) {
                         utterObj2.tokenizedText = utterInfo.body[jk].tokenizedText;
                         utterObj2.intentId = utterInfo.body[jk].intentId;
                         utterObj2.intentLabel = utterInfo.body[jk].intentLabel;
-                        
+                        /*
                         var entityLabels = [];
                         for (var yu=0; yu<utterInfo.body[jk].entityLabels.length; yu++) {
                             var tmpObj = new Object();
@@ -726,7 +720,6 @@ router.post('/getUtterInIntent', function (req, res) {
                             tmpObj.entityType = utterInfo.body[jk].entityLabels[yu].entityType;
                             entityLabels.push(tmpObj);
                         }
-                        /*
                         if (utterPrediction.body[jk].entityPredictions.length > 0) {
                             for (var yu=0; yu<utterPrediction.body[jk].entityPredictions.length; yu++) {
                                 var tmpObj = new Object();
@@ -740,7 +733,7 @@ router.post('/getUtterInIntent', function (req, res) {
                             }
                         } 
                         */
-                        utterObj2.entityLabels = entityLabels;
+                        utterObj2.entityLabels = utterPrediction.body[jk].entityPredictions;
                         utterObj2.intentScore = utterPrediction.body[jk].intentPredictions;
                         utterListInIntent.push(utterObj2);
                     }
@@ -799,10 +792,9 @@ router.get('/intentDetail', function (req, res) {
     var intentName = req.query.intentName;
     var intentId = req.query.intentId;
     var labelCnt = req.query.labelCnt;
-    var pageNum = req.query.pageNum;
 
 
-    res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt, 'pageNum' : pageNum});
+    res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt});
     
 });
 
@@ -940,7 +932,6 @@ router.get('/entityList', function (req, res) {
         var appNumber = req.query.appIndex;
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
-        req.session.selAppName = selApp.APP_NAME;
     }
 
     /*
@@ -1701,91 +1692,67 @@ router.post('/saveChangedEntity', function (req, res) {
 
 router.post('/saveUtterance', function (req, res) {
     var userId = req.session.sid;
-    var intentName = req.body.intentName;
     var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
     var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
     var addClosedList = req.body.addClosedList==undefined? []:req.body.addClosedList;//req.body['labelArr[]'];
     var tmpLuisObj;
     var luisResult = [];
     try {
-        
-        (async () => {
-            if (labeledUtterArr.length > 0) {
-                var labelArr = [];
-                var tmpObj = new Object();
-                
-                for (var i=0; i<labeledUtterArr.length; i++) {
-                    options.payload = labeledUtterArr[i];
-                    /*
-                    options.payload = { 
-                        "name": entityName,
-                        "children" : childEntityArr
-                    };
-                    */
-                    console.log(options.payload);
-                    tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
-                    console.log(tmpLuisObj.statusCode);
-                    if (newUtterArr != undefined) {
-                        for (var j=0; j<newUtterArr.length; j++) {
-                            if (newUtterArr[j].text == labeledUtterArr[i].text) {
-                                newUtterArr[j].id = tmpLuisObj.body;
-                                var entityTmp = labeledUtterArr[i].entityLabels;
-                                var entities = '';
-                                for (var k=0; k<entityTmp.length; k++) {
-                                    entities += entityTmp[k].entityName;
-                                    if (k < entityTmp.length-1) {
-                                        entities += ',';
-                                    }
-                                }
-
-                                /**
-                                 * 작업중 
-                                 * 
-                                 * */
-                                    let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-                                    var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
-                                    saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";
-                    
-                                    //console.log("intent -" + pp)
-                                    let getDBEntityChild_result = await pool.request()
-                                                                        .input('dlg_text', sql.NVarChar, newUtterArr[j].text)
-                                                                        .input('intent', sql.NVarChar, intentName)
-                                                                        .input('entities', sql.NVarChar, entities)
-                                                                        .input('appId', sql.NVarChar, req.session.selAppId)
-                                                                        .query(saveNewUtterQry);
-
-                                    req.session.entityChildList = getDBEntityChild_result.recordset;
-                                
-
-                            }
+        if (labeledUtterArr.length > 0) {
+            var labelArr = [];
+            var tmpObj = new Object();
+            
+            for (var i=0; i<labeledUtterArr.length; i++) {
+                options.payload = labeledUtterArr[i];
+                /*
+                options.payload = { 
+                    "name": entityName,
+                    "children" : childEntityArr
+                };
+                */
+                console.log(options.payload);
+                tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
+                console.log(tmpLuisObj.statusCode);
+                if (newUtterArr != undefined) {
+                    for (var j=0; j<newUtterArr.length; j++) {
+                        if (newUtterArr[j].text == labeledUtterArr[i].text) {
+                            newUtterArr[j].id = tmpLuisObj.body;
                         }
                     }
-                    luisResult.push(tmpLuisObj);
                 }
-                for (var i=0; i<addClosedList.length; i++) {
-                    options.payload = { 
-                        "canonicalForm": addClosedList[i].canonical,
-                        "list": addClosedList[i].list
-                    };
-                    var tmpLuisListObj = syncClient.put(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/closedlists/' + addClosedList[i].entityId + '/sublists/' + addClosedList[i].childId, options);
-                }
-
-                var rstChk = false;
-                for (var tmp in luisResult) {
-                    console.log(luisResult[tmp]);
-                    if (luisResult[tmp].statusCode != 201) {
-                        var resultCode = luisResult[tmp].body.error.code;
-                        var resultStr = luisResult[tmp].body.error.message;
-                        logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [코드 : %s] [내용 : %s]', userId, 'luis/saveUtterance', luisResult[tmp].statusCode, resultCode + ':' + resultStr);
-                    } 
-                }
-        
-                res.send({success : true, message : '성공', luisResult : luisResult});
-            } else {
-                res.send({success : true, message : '성공', luisResult : luisResult});
+                luisResult.push(tmpLuisObj);
             }
-        })()
-        
+            for (var i=0; i<addClosedList.length; i++) {
+                options.payload = { 
+                    "canonicalForm": addClosedList[i].canonical,
+                    "list": addClosedList[i].list
+                };
+                var tmpLuisListObj = syncClient.put(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/closedlists/' + addClosedList[i].entityId + '/sublists/' + addClosedList[i].childId, options);
+            }
+    
+        }
+        var rstChk = false;
+        for (var tmp in luisResult) {
+            console.log(luisResult[tmp]);
+            if (luisResult[tmp].statusCode != 201) {
+                rstChk = true;
+                var resultCode = luisResult[tmp].body.error.code;
+                var resultStr = luisResult[tmp].body.error.message;
+                logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [코드 : %s] [내용 : %s]', userId, 'luis/saveUtterance', luisResult[tmp].statusCode, resultCode + ':' + resultStr);
+            } 
+        }
+
+        options = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Subscription-Key': subKey
+            }
+        };
+        if (!rstChk) {
+            res.send({success : true, message : '성공'});
+        } else {
+            res.send({success : false, message : '실패했습니다. 관리자에게 문의해주세요.'});
+        }
     } catch(e) {
         logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/saveUtterance', e.message);
         res.send({error : true, message : ' 어터런스 저장 중 이상이 생겼습니다. 관리자에게 문의 해주세요.'});
@@ -1801,7 +1768,7 @@ router.post('/deleteUtterance', function (req, res) {
     try {
         
         tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/examples/' + utterId, options);
-        
+        console.log();
         if (tmpLuisObj.statusCode == 200) { 
             var utterList = req.session.utterList;
             for (var tmpObj in utterList) {
@@ -1912,7 +1879,6 @@ router.get('/publish', function (req, res) {
         var selApp = selAppList[appNumber];
         req.session.selAppId = selApp.APP_ID;
         selAppId = req.session.selAppId;
-        req.session.selAppName = selApp.APP_NAME;
     }
 
     if (typeof req.session.publishsettings == 'undefined') {
@@ -2077,64 +2043,6 @@ router.post('/trainApp', function (req, res){
 
 });
 
-
-
-/* GET users listing. */
-router.get('/newUtterList', function (req, res) {
-
-    res.render('luis/newUtterList');
-
-});
-
-router.post('/getNewUtterList', function (req, res){
-    
-    var searchQnA = req.body.searchQnA == undefined ? '':req.body.searchQnA;
-    var selPage = req.body.selPage;
-
-    var selectQnAMngQry = "SELECT SEQ, Q_ID, DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT, APP_ID, USE_YN \n";
-    selectQnAMngQry += "     FROM TBL_QNAMNG \n";
-    selectQnAMngQry += "    WHERE USE_YN = 'Y' \n";
-    //selectQnAMngQry += "     AND DLG_QUESTION LIKE '%@searchQna%';\n";
-
-    (async () => {
-        try {
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            let selectQnA = await pool.request()
-                //.input('searchQna', sql.NVarChar, searchQnA)
-                .query(selectQnAMngQry);
-
-            var qnaListDb = selectQnA.recordset;
-            var qnaList = [];
-            for (var i=0; i<qnaListDb.length; i++) {
-                if (qnaListDb[i].DLG_QUESTION.indexOf(searchQnA) != -1) {
-                    qnaList.push(qnaListDb[i]);
-                }
-            }
-
-            if(qnaList.length > 0){
-                var listLength = qnaList.length;
-                var pageStartInex = 0;
-                if ((selPage-1)*10 > listLength) {
-                    qnaList = qnaList.splice(0, listLength<11?listLength:10);
-                }
-                else {
-                    qnaList = qnaList.splice((selPage-1)*10, 10);
-                }
-                res.send({qnaList : qnaList, pageList : paging.pagination(selPage, listLength)});
-            } else {
-                res.send({qnaList : qnaList});
-            }
-
-        } catch (err) {
-            console.log(err)
-            // ... error checks
-        } finally {
-            sql.close();
-        }
-    })()
-
-
-});
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------

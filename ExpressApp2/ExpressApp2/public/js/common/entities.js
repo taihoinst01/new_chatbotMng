@@ -144,58 +144,49 @@ $(document).on("click", ".cancelEntityValueBtn", function(e){
 
 
 //엔티티 삭제
-var delEntityDefine = "";
 $(document).on("click", "a[name=delEntityRow]", function(e){
-    delEntityDefine = $(this).parents('tr').children().first().text().trim();
-    $('#proc_content').html('선택된 정보를 삭제하시겠습니까? 복구할 수 없습니다.');
-    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteEntityBtn" onClick="goDeleteEntity();"><i class="fa fa-trash"></i> Delete</button>');
-    $('#procEntity').modal('show');
-});
+    
+    if (confirm(language.ASK_DELETE)) {
 
-function goDeleteEntity(){
-    $.ajax({
-        url: '/learning/deleteEntity',
-        dataType: 'json',
-        type: 'POST',
-        timeout: 0,
-        beforeSend: function () {
-            $('#deleteEntity').modal('hide');
-            var width = 0;
-            var height = 0;
-            var left = 0;
-            var top = 0;
+        var delEntityDefine = $(this).parents('tr').children().first().text().trim();
+        $.ajax({
+            url: '/learning/deleteEntity',
+            dataType: 'json',
+            type: 'POST',
+            timeout: 0,
+            beforeSend: function () {
 
-            width = 50;
-            height = 50;
+                var width = 0;
+                var height = 0;
+                var left = 0;
+                var top = 0;
 
-            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
-            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+                width = 50;
+                height = 50;
 
-            $("#loadingBar").addClass("in");
-            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
-            $("#loadingBar").css("display","block");
-        },
-        complete: function () {
-            $("#loadingBar").removeClass("in");
-            $("#loadingBar").css("display","none");      
-        },
-        data: {'delEntityDefine': delEntityDefine},
-        success: function(data) {
-            if(data.status == 200){
-                //alert(language.SUCCESS);
-                $('#proc_content').html("삭제되었습니다");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
-                searchEntities();
-            } else {
-                //alert(language.It_failed);
-                $('#proc_content').html("삭제에 실패되었습니다");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+                left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+                $("#loadingBar").addClass("in");
+                $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+                $("#loadingBar").css("display","block");
+            },
+            complete: function () {
+                $("#loadingBar").removeClass("in");
+                $("#loadingBar").css("display","none");      
+            },
+            data: {'delEntityDefine': delEntityDefine},
+            success: function(data) {
+                if(data.status == 200){
+                    alert(language.SUCCESS);
+                    searchEntities();
+                } else {
+                    alert(language.It_failed);
+                }
             }
-        }
-    });
-}
+        });
+    }
+});
 
 //기존 entity 값 저장
 var originalEntityVal = {};
@@ -364,22 +355,13 @@ function addEntityValueAjax(addValues) {
         data: addValues,
         success: function(data) {
             if(data.status == 200){
-                //alert(language.Added);
-                $('#proc_content').html("등록되었습니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                alert(language.Added);
                 $("#iptentities").val(addValues.entityValue);
                 searchEntities();
             } else if(data.status == 'Duplicate') {
-                //alert(language.DUPLICATE_ENTITIES_EXIST);
-                $('#proc_content').html("이미 등록된 Entity 입니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                alert(language.DUPLICATE_ENTITIES_EXIST);
             } else {
-                //alert(language.It_failed);
-                $('#proc_content').html("등록에 실패되었습니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                alert(language.It_failed);
             }
         }
     });
@@ -639,24 +621,14 @@ function insertEntity(){
         type: 'POST',
         data: JSON.stringify(entityValueList), //$('#appInsertForm').serializeObject(),
         success: function(data) {
-
             if(data.status == 200){
-                //alert(language.Added);
-                $('#proc_content').html("등록되었습니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
                 $('.addDialogCancel').click();
+                alert(language.Added);
                 entitiesAjax();
             } else if(data.status == 'Duplicate') {
-                //alert(language.DUPLICATE_ENTITIES_EXIST);
-                $('#proc_content').html("이미 등록된 Entity 입니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                alert(language.DUPLICATE_ENTITIES_EXIST);
             } else {
-                //alert(language.It_failed);
-                $('#proc_content').html("등록에 실패되었습니다.");
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
-                $('#procEntity').modal('show');
+                alert(language.It_failed);
             }
         }
     });

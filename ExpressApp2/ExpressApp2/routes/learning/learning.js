@@ -928,17 +928,148 @@ router.post('/addEntityValue', function (req, res) {
 router.post('/deleteEntity', function (req, res) {
 
     var delEntityDefine = req.body.delEntityDefine;
-    
+    var appName = req.session.appName;
+
+    var delUtterId;
+    var delEntityId;
+    var delChildId;
+
+    var saveLuisVerId;
+    var findEntityName = '';
+    //var client = new Client();
+
+    var options = {
+        headers: {
+            'Ocp-Apim-Subscription-Key': req.session.subsKey
+        }
+    };
+
+    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
+    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
+    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME=@chatName)\n";
+
     (async () => {
         try {
 
-            var deleteAppStr = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let pool = await dbConnect.getConnection(sql);
+            let selectAppId = await pool.request()
+                .input('chatName', sql.NVarChar, appName)
+                .query(selectAppIdQuery);
 
-            let result1 = await pool.request().query(deleteAppStr);
+            var appCount = false;
+            var useLuisAppId;
 
-            res.send({ status: 200, message: 'delete Entity Success' });
-            
+            for (var i = 0; i < selectAppId.recordset.length; i++) {
+                var luisAppId = selectAppId.recordset[i].APP_ID;
+                var luisVerId = selectAppId.recordset[i].VERSION;
+                //luis intent count check
+                var intentCountRes = syncClient.get(HOST + '/luis/api/v2.0/apps/' + luisAppId + '/versions/' + luisVerId + '/examples?take=500', options);
+
+                for (var k = 0; k < intentCountRes.body.length; k++) {
+                    //text
+
+                    if (intentCountRes.body[k].text.trim() === delEntityDefine) {
+                        useLuisAppId = luisAppId;
+                        delUtterId = intentCountRes.body[k].id;
+                        saveLuisVerId = luisVerId;
+                        appCount = true;
+
+                        var compareEntity = intentCountRes.body[k].entityLabels[0].entityName.split('::');
+                        if (delEntityDefine == compareEntity[1]) {
+                            findEntityName = compareEntity[0];
+                        }
+                    }
+                }
+            }
+
+            if (appCount == false) {
+                //create luis app 
+                console.log("res 402");
+                return res.send({ result: 402 });
+            } else {
+
+                var entityListRes = syncClient.get(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId + '/hierarchicalentities?take=500', options);
+                appCount = false;
+                for (var k = 0; k < entityListRes.body.length; k++) {
+                    if (entityListRes.body[k].name == findEntityName) {
+
+                        for (var j = 0; j < entityListRes.body[k].children.length; j++) {
+                            if (entityListRes.body[k].children[j].name == delEntityDefine) {
+                                delEntityId = entityListRes.body[k].id;
+                                delChildId = entityListRes.body[k].children[j].id;
+                                appCount = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (appCount) {
+                        break;
+                    }
+                }
+
+            }
+
+            if (appCount == false) {
+                //create luis app 
+                console.log("res 403");
+                return res.send({ result: 403 });
+            } else {
+                //삭제
+                var delUtterRes = syncClient.del(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId + '/examples/' + delUtterId, options);
+
+                if (delUtterRes.statusCode > 200) {
+                    console.log("res 406");
+                    res.send({ result: 406 });
+                } else {
+                    var delHierarChyChild = '';
+                    delHierarChyChild += HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/' + saveLuisVerId;
+                    delHierarChyChild += '/hierarchicalentities/' + delEntityId + '/children/' + delChildId;
+
+                    var delUtterRes = syncClient.del(delHierarChyChild, options);
+
+                    if (delUtterRes.statusCode > 200) {
+                        console.log("res 407");
+                        res.send({ result: 407 });
+                    } else {
+
+
+                        var client = new Client();
+
+                        syncClient.post(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/0.1/train', options, function (data, response) {
+
+                            /*
+                                var repeat = setInterval(function(){
+                                    var count = 0;
+                                    var traninResultGet = syncClient.get(HOST + '/luis/api/v2.0/apps/' + useLuisAppId + '/versions/0.1/train' , options);
+    
+                                    for(var trNum = 0; trNum < traninResultGet.body.length; trNum++) {
+                                        if(traninResultGet.body[trNum].details.status == "Fail") {
+                                            res.send({result:400});
+                                        }
+                                        if(traninResultGet.body[trNum].details.status == "InProgress") {
+                                            break;
+                                        }
+                                        count++;
+                                        if(traninResultGet.body.length == count) {
+                                            clearInterval(repeat);
+    
+                                            res.send({status:200 , message:'delete Success'});
+                                        }
+                                    }
+                                },1000);
+                            */
+
+                        });
+
+                        var deleteAppStr = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
+                        let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+                        let result1 = await pool.request().query(deleteAppStr);
+
+                    }
+                }
+
+            }
         } catch (err) {
             console.log(err);
             console.log("res 500");
@@ -1056,6 +1187,10 @@ router.post('/updateEntity', function (req, res) {
     selEntityQuery += "FROM TBL_COMMON_ENTITY_DEFINE\n";
     selEntityQuery += "WHERE ENTITY = @entity";
 
+    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
+    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
+    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME=@chatName)\n";
+
     var delEntityQuery = "DELETE FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY_VALUE = @entityValue";
 
     var insertEntityQuery = "INSERT INTO TBL_COMMON_ENTITY_DEFINE(ENTITY_VALUE,ENTITY,API_GROUP,TRAIN_FLAG)\n";
@@ -1088,28 +1223,115 @@ router.post('/updateEntity', function (req, res) {
                 }
             }
 
-            //console.log("deleteValue===="+deleteValue);
-            //console.log("insertValue===="+insertValue);
+            //console.log(deleteValue);
+            //console.log(insertValue);
 
             if (insertValue.length > 0 || deleteValue.length > 0) {
-                for (var i = 0; i < insertValue.length; i++) {
+                let pool = await dbConnect.getConnection(sql);
+                let selectAppId = await pool.request()
+                    .input('chatName', sql.NVarChar, appName)
+                    .query(selectAppIdQuery);
 
-                    let insertEntity = await appPool.request()
+                console.log(intentInfo);
+
+                for (var i = 0; i < selectAppId.recordset.length; i++) {
+                    intentInfo[i] = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectAppId.recordset[i].APP_ID + '/versions/0.1/examples?take=500', options);
+                    intentInfo[i].appId = selectAppId.recordset[i].APP_ID;
+                }
+
+                for (var i = 0; i < insertValue.length; i++) {
+                    for (var appNum = 0; appNum < intentInfo.length; appNum++) {
+                        if (intentInfo[appNum].body.length < 280) {
+                            var getEntity = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities', options);
+
+                            for (var eNum = 0; eNum < getEntity.body.length; eNum++) {
+                                for (var cNum = 0; cNum < getEntity.body[eNum].children.length; cNum++) {
+                                    if (entity == getEntity.body[eNum].children[cNum].name) {
+                                        entityCheck = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (entityCheck == false) {
+                                var entityId = getEntity.body[getEntity.body.length - 1].id;
+
+                                var entityResult = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities/' + entityId, options);
+
+                                if (entityResult.body.children.length < 10) {
+                                    options.payload = { "name": entity };
+                                    // add hierarchicalentities
+                                    var entityCreateResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities/' + entityId + '/children', options);
+                                } else {
+                                    options.payload = {
+                                        "name": "entity" + (getEntity.body.length + 1),
+                                        "children": [entity]
+                                    };
+                                    // add hierarchicalentities list, entity
+                                    var entityListResult = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities', options);
+                                }
+                            }
+
+                            var getEntityName = syncClient.get(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/hierarchicalentities?take=500', options);
+                            var addEntity;
+                            for (var k = 0; k < getEntityName.body.length; k++) {
+                                for (var j = 0; j < getEntityName.body[k].children.length; j++) {
+                                    if (getEntityName.body[k].children[j].name == entity) {
+                                        addEntity = getEntityName.body[k].name + "::" + entity;
+                                    }
+                                }
+                            }
+
+                            options.payload = {
+                                "text": insertValue[i],
+                                "intentName": "intent",
+                                "entityLabels":
+                                    [
+                                        {
+                                            "entityName": addEntity,
+                                            "startCharIndex": 0,
+                                            "endCharIndex": insertValue[i].length - 1
+                                        }
+                                    ]
+                            }
+
+                            // add luis label
+                            var addIntentLabel = syncClient.post(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/example', options);
+
+                            let insertEntity = await appPool.request()
                                 .input('entityValue', sql.NVarChar, insertValue[i])
                                 .input('entity', sql.NVarChar, entity)
-                                //.input('apiGroup', sql.NVarChar, apiGroup)
-                                .input('apiGroup', sql.NVarChar, "COMMON")
+                                .input('apiGroup', sql.NVarChar, apiGroup)
                                 .query(insertEntityQuery);
-                                //console.log("insertEntityQuery===="+insertEntityQuery);
 
                             break;
+                        }
+                    }
                 }
 
                 for (var delNum = 0; delNum < deleteValue.length; delNum++) {
-                    let delEntity = await appPool.request()
+                    for (var appNum = 0; appNum < intentInfo.length; appNum++) {
+                        for (var utterNum = 0; utterNum < intentInfo[appNum].body.length; utterNum++) {
+                            if (deleteValue[delNum] == intentInfo[appNum].body[utterNum].text) {
+                                var delInfo = syncClient.del(HOST + '/luis/api/v2.0/apps/' + intentInfo[appNum].appId + '/versions/0.1/examples/' + intentInfo[appNum].body[utterNum].id, options)
+
+                                let delEntity = await appPool.request()
                                     .input('entityValue', sql.NVarChar, deleteValue[delNum])
                                     .query(delEntityQuery);
-                                    //console.log("delEntityQuery===="+delEntityQuery);
+
+                                //console.log(delInfo);
+
+                            }
+                        }
+                    }
+                }
+
+                for (var i = 0; i < selectAppId.recordset.length; i++) {
+                    var trainAppId = selectAppId.recordset[i].APP_ID;
+                    client.post(HOST + '/luis/api/v2.0/apps/' + selectAppId.recordset[i].APP_ID + '/versions/0.1/train', options, function (data, response) {
+                        client.get(HOST + '/luis/api/v2.0/apps/' + trainAppId + '/versions/0.1/train', options, function (data, response) {
+                        });
+                    });
                 }
             }
             res.send({ status: 200 });
@@ -1796,9 +2018,7 @@ router.post('/selectGroup', function (req, res) {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             var queryText = "";
-            if (selectId == "searchIntentGroup") {
-                queryText = "SELECT DISTINCT ISNULL(DLG_INTENT, 'NONE') AS 'DLG_INTENT' FROM TBL_DLG ";
-            } else if (selectId == "searchLargeGroup") {
+            if (selectId == "searchLargeGroup") {
                 queryText = "SELECT DISTINCT GroupL AS 'GROUP' FROM TBL_DLG WHERE GroupL IS NOT NULL";
             } else if (selectId == "searchMediumGroup") {
                 selectValue1 = selectValue1.trim();
@@ -2208,190 +2428,8 @@ router.post('/searchDialog', function (req, res) {
         sql.close();
         console.log(err);
     })
+
 });
-
-
-
-router.post('/searchDialogByIntent', function (req, res) {
-    var searchIntentGroup = req.body.searchIntentGroup;
-    /*
-    var searchLargeGroup = req.body.searchLargeGroup;
-    var searchMediumGroup = req.body.searchMediumGroup;
-    var searchSmallGroup = req.body.searchSmallGroup;
-    */
-    var serachDlg = req.body.serachDlg.trim();
-
-    var tblDlgSearch = "SELECT RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
-    tblDlgSearch += "FROM (\n";
-    tblDlgSearch += "SELECT RANK() OVER(ORDER BY GroupS) AS RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
-    tblDlgSearch += "FROM TBL_DLG \n";
-    tblDlgSearch += "WHERE 1=1\n";
-    if (serachDlg) {
-
-        tblDlgSearch += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup ) {
-            if (searchIntentGroup != "NONE") {
-                tblDlgSearch += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                tblDlgSearch += "AND DLG_INTENT IS NULL\n";
-            }
-        }
-    }
-    tblDlgSearch += ")A \n ORDER BY DLG_ID"
-
-    var dlgText = "SELECT DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
-    dlgText += "FROM TBL_DLG_TEXT\n";
-    dlgText += "WHERE USE_YN = 'Y'\n"
-    dlgText += "AND DLG_ID IN (\n"
-    dlgText += "SELECT DISTINCT DLG_ID\n"
-    dlgText += "FROM TBL_DLG\n"
-    dlgText += "WHERE 1=1\n";
-
-    if (serachDlg) {
-
-        dlgText += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgText += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgText += "AND DLG_INTENT IS NULL\n";
-            }
-        }
-    }
-    dlgText += ") \n ORDER BY DLG_ID";
-
-    var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n";
-    dlgCard += "BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
-    dlgCard += "BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
-    dlgCard += "BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
-    dlgCard += "CARD_ORDER_NO, CARD_VALUE,\n";
-    dlgCard += "USE_YN, '3' AS DLG_TYPE \n";
-    dlgCard += "FROM TBL_DLG_CARD\n";
-    dlgCard += "WHERE USE_YN = 'Y'\n";
-    dlgCard += "AND DLG_ID IN (\n";
-    dlgCard += "SELECT DISTINCT DLG_ID\n";
-    dlgCard += "FROM TBL_DLG\n";
-    dlgCard += "WHERE 1=1\n";
-
-    if (serachDlg) {
-
-        dlgCard += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgCard += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgCard += "AND DLG_INTENT IS NULL\n";
-            }
-        }
-    }
-    dlgCard += ") \n ORDER BY DLG_ID";
-
-    var dlgMedia = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, MEDIA_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n";
-    dlgMedia += "BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
-    dlgMedia += "BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
-    dlgMedia += "BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
-    dlgMedia += "CARD_VALUE,\n";
-    dlgMedia += "USE_YN, '4' AS DLG_TYPE \n";
-    dlgMedia += "FROM TBL_DLG_MEDIA\n";
-    dlgMedia += "WHERE USE_YN = 'Y'\n";
-    dlgMedia += "AND DLG_ID IN (\n";
-    dlgMedia += "SELECT DISTINCT DLG_ID\n";
-    dlgMedia += "FROM TBL_DLG\n";
-    dlgMedia += "WHERE 1=1\n";
-
-    if (serachDlg) {
-
-        dlgMedia += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgMedia += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgMedia += "AND DLG_INTENT IS NULL\n";
-            }
-        }
-    }
-    dlgMedia += ") \n ORDER BY DLG_ID";
-
-    (async () => {
-        try {
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-
-            let dlgTextResult = await pool.request()
-                .query(dlgText);
-            let rowsText = dlgTextResult.recordset;
-
-            let dlgCardResult = await pool.request()
-                .query(dlgCard);
-            let rowsCard = dlgCardResult.recordset;
-
-            let dlgMediaResult = await pool.request()
-                .query(dlgMedia);
-            let rowsMedia = dlgMediaResult.recordset;
-
-            let result1 = await pool.request()
-                .query(tblDlgSearch)
-            let rows = result1.recordset;
-            var result = [];
-            for (var i = 0; i < rows.length; i++) {
-
-                var row = {};
-                row.RNUM = rows[i].RNUM;
-                row.GroupS = rows[i].GroupS;
-                row.DLG_ID = rows[i].DLG_ID;
-                row.DLG_TYPE = rows[i].DLG_TYPE;
-                row.DLG_ORDER_NO = rows[i].DLG_ORDER_NO;
-                row.GroupL = rows[i].GroupL;
-                row.GroupM = rows[i].GroupM;
-                row.dlg = [];
-
-                let dlg_type = rows[i].DLG_TYPE;
-                if (dlg_type == 2) {
-                    for (var j = 0; j < rowsText.length; j++) {
-                        let textDlgId = rowsText[j].DLG_ID;
-                        if (row.DLG_ID == textDlgId) {
-                            row.dlg.push(rowsText[j]);
-                        }
-                    }
-                } else if (dlg_type == 3) {
-                    for (var j = 0; j < rowsCard.length; j++) {
-                        var cardDlgId = rowsCard[j].DLG_ID;
-                        if (row.DLG_ID == cardDlgId) {
-                            row.dlg.push(rowsCard[j]);
-                        }
-                    }
-                } else if (dlg_type == 4) {
-                    for (var j = 0; j < rowsMedia.length; j++) {
-                        var mediaDlgId = rowsMedia[j].DLG_ID;
-                        if (row.DLG_ID == mediaDlgId) {
-                            row.dlg.push(rowsMedia[j]);
-                        }
-                    }
-                }
-                result.push(row);
-            }
-
-            res.send({ list: result });
-
-        } catch (err) {
-            console.log(err);
-        } finally {
-            sql.close();
-        }
-    })()
-
-    sql.on('error', err => {
-        sql.close();
-        console.log(err);
-    })
-});
-
 
 router.post('/addDialog', function (req, res) {
 
@@ -4580,248 +4618,4 @@ router.post('/selectScenarioInfo', function (req, res) {
 });
 
 
-router.post('/relationUtterAjax', function (req, res) {
-    //var luisId = req.body.luisId;
-    
-
-    var luisId;
-
-    var selAppId = req.body.selAppId;
-    var selAppList = req.session.selChatInfo.chatbot.appList;
-    for (var i=0; i<selAppList.length; i++) {
-        if (selAppList[i].APP_ID == selAppId) {
-            luisId = selAppList[i].APP_NAME;
-        }
-    }
-
-    var luisIntent = req.body.luisIntent;
-    var selectUtterSeq = req.body.selectUtterSeq;
-    
-    var entities = req.body.entities;
-    //var predictIntent = req.body.predictIntent;
-
-    var dlgId = [];
-    dlgId = req.body.dlgId;
-
-    var contextData = [];
-    contextData = req.body.contextData;
-
-    if (contextData == undefined) {
-        contextData = [];
-    }
-
-    var contextDataLength;
-    if (typeof contextData === "string") {
-        contextDataLength = 1;
-    } else {
-        contextDataLength = contextData.length
-    }
-
-    var queryText = "";
-    if (contextDataLength == 0) {
-        queryText = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL) "
-            + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'F' ); \n";
-    } else {
-        queryText = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL) "
-            + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'T'); \n";
-    }
-
-
-    var updateQueryText = "";
-    var utterArry;
-    if (req.body.utters) {
-        utterArry = req.body.utters[0];
-        utterArry = utterArry.replace("'", "''");
-        for (var i = 0; i < (typeof utterArry === "string" ? 1 : utterArry.length); i++) {
-            updateQueryText += "UPDATE TBL_QUERY_ANALYSIS_RESULT SET TRAIN_FLAG = 'Y' WHERE QUERY = '" + (typeof utterArry === "string" ? utterArry.replace(" ", "") : utterArry[i]) + "'; \n";
-        }
-    }
-
-
-    var updateTblDlg = "UPDATE TBL_DLG SET GroupS = @entities WHERE DLG_ID = @dlgId; \n";
-
-    var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
-    selectAppIdQuery += "FROM TBL_LUIS_APP \n";
-    selectAppIdQuery += "WHERE CHATBOT_ID = (SELECT CHATBOT_NUM FROM TBL_CHATBOT_APP WHERE CHATBOT_NAME='" + req.session.appName + "')\n";
-
-    var upQuery = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET LUIS_ID = @luisID, LUIS_INTENT = @intetID, LUIS_INTENT_SCORE = '1', RESULT = 'H' "
-        + "WHERE QUERY = @Query";
-
-    var inCacheQuery = "INSERT INTO TBL_QUERY_INTENT(QUERY, LUIS_ID, LUIS_INTENT, DLG_ID)\n"
-        + "VALUES(@query,@luisId, @intent, @dlgId)";
-
-    var selCacheQuery = "SELECT QUERY, LUIS_ID, LUIS_INTENT, DLG_ID\n"
-        + "FROM TBL_QUERY_INTENT\n"
-        + "WHERE QUERY = @query\n"
-        + "AND LUIS_ID = @luisId\n"
-        + "AND LUIS_INTENT = @intent\n"
-        + "AND DLG_ID = @dlgID";
-
-    var checkQuery = "SELECT RELATION_ID FROM TBL_DLG_RELATION_LUIS WHERE LUIS_INTENT = @luisIntent AND DLG_ID = @dlgId AND LUIS_ID = @luisId";
-
-    var contextQuery = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, CONTEXTLABEL, MISSINGENTITIES) "
-        + "VALUES( @luisId, @luisIntent, @entities, @dlgId, 'D', 'Y', 'T', @missing_entity ); \n";
-
-    var contextDefineQuery = "INSERT INTO TBL_CONTEXT_DEFINE(INTENT, ENTITIES) "
-        + "VALUES( @contextIntent, @contextEntity ); \n";
-
-    var updateTblDlgQuery = "UPDATE TBL_DLG SET GROUPM=@luisIntent WHERE DLG_ID=@dlgId";
-
-    var updateNewUtter = "UPDATE TBL_QNAMNG SET USE_YN = N WHERE SEQ = @selectUtterSeq";
-
-    (async () => {
-        try {
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            let result1;
-            let result2;
-            let checkResult;
-
-            /*
-            * 이미 학습되어서 디비에 들어간 내용을 다시 학습시키는 것을 방지함.
-            * 
-            *   
-            for(var jjj = 0 ; jjj < (typeof dlgId ==="string" ? 1:dlgId.length); jjj++){
-             checkResult = await pool.request()
-                 .input('luisId', sql.NVarChar, luisId)
-                 .input('luisIntent', sql.NVarChar, luisIntent)
-                 .input('dlgId', sql.NVarChar, (typeof dlgId ==="string" ? dlgId:dlgId[jjj]))
-                 .query(checkQuery);
- 
-                 if(checkResult.recordset.length > 0) {
-                     return res.send({result:"learned"});
-                 }else{
-                     //nothing
-                 }
-            }
-          */
-
-
-            for (var j = 0; j < (typeof dlgId === "string" ? 1 : dlgId.length); j++) {
-                if (j === ((typeof dlgId === "string" ? 1 : dlgId.length) - 1)) {
-                    queryText += updateQueryText
-                }
-
-                if (entities != "" && entities != null) {
-                    result1 = await pool.request()
-                        .input('luisId', sql.NVarChar, luisId)
-                        .input('luisIntent', sql.NVarChar, luisIntent)
-                        .input('entities', sql.NVarChar, entities)
-                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
-                        .query(queryText);
-
-
-                    result2 = await pool.request()
-                        .input('entities', sql.NVarChar, entities)
-                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
-                        .query(updateTblDlg);
-                } else {
-
-                    var selCacheResult = await pool.request()
-                        .input('query', sql.NVarChar, req.body['utters[]'].replace(" ", ""))
-                        .input('luisId', sql.NVarChar, luisId)
-                        .input('intent', sql.NVarChar, luisIntent)
-                        .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
-                        .query(selCacheQuery)
-
-                    if (selCacheResult.recordset.length == 0) {
-                        /*
-                        * entity 가 없어도 TBL_DLG_RELATION_LUIS 에는 insert
-                        * entity 가 없으면 TBL_DLG_RELATION_LUIS table 을 보지 않고 TBL_QUERY_INTENT table 에서 정보를 빼온다.
-                        * entity 가 없으니까 tbl_dlg 의 groups 를 update 할 필요는 없다.
-                        */
-                        var regExpData = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;//특수문자
-                        var query_ori_data = req.body['utters[]'];
-                        var query_data = query_ori_data.replace(regExpData, "");//특수문자 제거
-                        query_data = query_data.replace(/(\s*)/g, "");//공백제거
-                        var relationLuisResult = await pool.request()
-                            .input('luisId', sql.NVarChar, luisId)
-                            .input('luisIntent', sql.NVarChar, luisIntent)
-                            .input('entities', sql.NVarChar, entities)
-                            .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
-                            .query(queryText);
-                        var inCacheResult = await pool.request()
-                            //.input('query', sql.NVarChar, req.body['utters[]'].replace(" ",""))
-                            .input('query', sql.NVarChar, query_data)
-                            .input('luisId', sql.NVarChar, luisId)
-                            .input('intent', sql.NVarChar, luisIntent)
-                            .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
-                            .query(inCacheQuery);
-                    }
-                }
-            }
-            //context 데이터에 따라서 db insert
-            if (contextDataLength == 0) {
-
-            } else {
-                var context_dlgid;
-                var context_missingEntity;
-                var context_defineEntity = "";
-                var temp_context;
-                var check_array;
-                for (var a = 0; a < contextDataLength; a++) {
-                    if (typeof contextData === "string") {
-                        temp_context = contextData;
-                    } else {
-                        temp_context = contextData[a];
-                    }
-
-                    check_array = temp_context.split('||');
-                    context_dlgid = check_array[0];
-                    context_missingEntity = check_array[1];
-
-                    context_defineEntity = context_defineEntity + check_array[1] + ":,";
-
-                    var contextResult = await pool.request()
-                        .input('luisId', sql.NVarChar, luisId)
-                        .input('luisIntent', sql.NVarChar, luisIntent)
-                        .input('entities', sql.NVarChar, entities)
-                        .input('dlgId', sql.NVarChar, context_dlgid)
-                        .input('missing_entity', sql.NVarChar, context_missingEntity)
-                        .query(contextQuery);
-
-                    var updateTblDlgResult = await pool.request()
-                        .input('luisIntent', sql.NVarChar, luisIntent)
-                        .input('dlgId', context_dlgid)
-                        .query(updateTblDlgQuery);
-
-                }
-                context_defineEntity = context_defineEntity.slice(0, -1);
-                var contextDefineResult = await pool.request()
-                    .input('contextIntent', sql.NVarChar, luisIntent)
-                    .input('contextEntity', context_defineEntity)
-                    .query(contextDefineQuery);
-                    
-               
-            }
-
-            var updateQQ = await pool.request()
-                .input('contextEntity', selectUtterSeq)
-                .query(updateNewUtter);
-            return res.send({ result: true });
-            /********************************************* */
-            //console.log(result1);
-            //console.log(result2);
-
-            /*
-            let rows = result1.rowsAffected;
-
-            if(rows[0] == 1) {
-                res.send({result:true});
-            } else {
-                res.send({result:false});
-            }
-            */
-
-        } catch (err) {
-            // ... error checks
-            console.log(err);
-        } finally {
-            sql.close();
-        }
-    })()
-
-    sql.on('error', err => {
-        // ... error handler
-    })
-});
 module.exports = router;

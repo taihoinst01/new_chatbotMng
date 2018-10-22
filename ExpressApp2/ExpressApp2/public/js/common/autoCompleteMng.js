@@ -128,8 +128,6 @@ function makeAutoCompleteTable(newPage) {
                 saveTableHtml = tableHtml;
                 $('#autoCompleteTableBodyId').html(tableHtml);
 
-                iCheckBoxTrans();
-
                 //사용자의 appList 출력
                 $('#autoCompleteTableBodyId').find('tr').eq(0).children().eq(0).trigger('click');
 
@@ -188,33 +186,5 @@ function procAutoComplete(procType) {
                 alert(language['It_failed']);
             }
         }
-    });
-}
-
-function iCheckBoxTrans() {
-    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
-        checkboxClass: 'icheckbox_minimal-blue',
-        radioClass   : 'iradio_minimal-blue'
-    })
-    //Red color scheme for iCheck
-    $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
-        checkboxClass: 'icheckbox_minimal-red',
-        radioClass   : 'iradio_minimal-red'
-    })
-    //Flat red color scheme for iCheck
-    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass   : 'iradio_flat-green'
-    })
-
-    $('#check-all').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass   : 'iradio_flat-green'
-    }).on('ifChecked', function(event) {
-        $('input[name=DEL_SEQ]').parent().iCheck('check');
-        
-    }).on('ifUnchecked', function() {
-        $('input[name=DEL_SEQ]').parent().iCheck('uncheck');
-        
     });
 }

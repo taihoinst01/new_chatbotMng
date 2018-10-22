@@ -16,9 +16,6 @@ var language;
 
 $(document).ready(function() {
 
-    if ($('#beforePageNum').val() != -1 ) {
-        $('#currentPage').val($('#beforePageNum').val());
-    }
     makeIntentTable();
 
     //검색 버튼 클릭
@@ -243,8 +240,6 @@ $(document).on("click", "a[name=selIntent]", function(e){
 //인텐트 선택
 function intentDetail(intentName, intentId, labelCnt) {
 
-    var pageNum = $('#currentPage').val();
-
     var params = {
         'intentName' : intentName,
         'intentId' : intentId,
@@ -287,7 +282,7 @@ function intentDetail(intentName, intentId, labelCnt) {
             }
             else 
             {
-                location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
+                location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt;
             }
         }
     });

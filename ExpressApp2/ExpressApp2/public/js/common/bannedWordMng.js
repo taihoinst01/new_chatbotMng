@@ -99,25 +99,15 @@ function makeBannedWordTable(newPage) {
             if (data.rows) {
 
                 var tableHtml = "";
-                var bannedWordTypeText = "";
                 for (var i = 0; i < data.rows.length; i++) {
-                    if(data.rows[i].BANNED_WORD_TYPE=="3"){
-                        bannedWordTypeText = "비속어";
-                    }else if(data.rows[i].BANNED_WORD_TYPE=="4"){
-                        bannedWordTypeText = "금칙어";
-                    }else{
-                        bannedWordTypeText = "none";
-                    }
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="DEL_SEQ" id="DEL_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].BANNED_WORD + '</td>'
-                    tableHtml += '<td>' + bannedWordTypeText + '</td><tr>'
+                    tableHtml += '<td>' + data.rows[i].BANNED_WORD_TYPE + '</td><tr>'
                 }
 
                 saveTableHtml = tableHtml;
                 $('#bannedWordTableBodyId').html(tableHtml);
-
-                iCheckBoxTrans();
 
                 //사용자의 appList 출력
                 $('#bannedWordTableBodyId').find('tr').eq(0).children().eq(0).trigger('click');
@@ -171,33 +161,5 @@ function procBandWord(procType) {
                 alert(language['It_failed']);
             }
         }
-    });
-}
-
-function iCheckBoxTrans() {
-    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
-        checkboxClass: 'icheckbox_minimal-blue',
-        radioClass   : 'iradio_minimal-blue'
-    })
-    //Red color scheme for iCheck
-    $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
-        checkboxClass: 'icheckbox_minimal-red',
-        radioClass   : 'iradio_minimal-red'
-    })
-    //Flat red color scheme for iCheck
-    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass   : 'iradio_flat-green'
-    })
-
-    $('#check-all').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass   : 'iradio_flat-green'
-    }).on('ifChecked', function(event) {
-        $('input[name=DEL_SEQ]').parent().iCheck('check');
-        
-    }).on('ifUnchecked', function() {
-        $('input[name=DEL_SEQ]').parent().iCheck('uncheck');
-        
     });
 }
