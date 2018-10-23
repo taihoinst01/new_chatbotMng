@@ -11,7 +11,7 @@
         <script src="/common/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/js/common/templateMng.js"></script>
         <script>
-           
+
         </script>
 
 </head>
@@ -39,8 +39,8 @@
                         <div class="box  color-palette-box">
                             <div class="box-body">
                                 <div class="mt20">
-                                    <div class="col-lg-4" style="padding-left:0px !important">
-                                        <h4 class=" col-lg-6">
+                                    <div class="col-lg-12" style="padding-left:0px !important">
+                                        <h4 class=" col-lg-12">
                                             Template Form
                                         </h4>
 
@@ -48,36 +48,24 @@
                                             <p>
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">
-                                                        <form class="form-horizontal" name="templateForm" id="templateForm">
+                                                        <form class="form-inline" name="templateForm" id="templateForm">
                                                             <input type="hidden" name="template_id" id="template_id">
                                                             <input type="hidden" name="chatbotName" id="chatbotName" value="<%=appName%>">
                                                             <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-4 control-label">
-                                                                    <i class="fa fa-asterisk"></i> TOP Color</label>
-                                                                <div class="col-sm-8">
-                                                                    <input type="text" class="form-control" id="top_color" name="top_color" placeholder="TOP Color">
-                                                                </div>
+                                                                <label class="sr-only" for="exampleInputEmail3">TOP Color</label>
+                                                                <input type="text" class="form-control" id="top_color" name="top_color" placeholder="TOP Color">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-4 control-label">
-                                                                    <i class="fa fa-asterisk"></i> BackGround Color</label>
-                                                                <div class="col-sm-8">
-                                                                    <input type="text" class="form-control" id="background_color" name="background_color" placeholder="BackGround Color">
-                                                                </div>
+                                                                <label class="sr-only" for="exampleInputEmail3">BackGround Color</label>
+                                                                <input type="text" class="form-control" id="background_color" name="background_color" placeholder="BackGround Color">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-4 control-label">
-                                                                    <i class="fa fa-asterisk"></i> Icon Image</label>
-                                                                <div class="col-sm-8">
-                                                                    <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image">
-                                                                </div>
+                                                                <label class="sr-only" for="exampleInputEmail3">Icon Image</label>
+                                                                <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="inputEmail3" class="col-sm-4 control-label">
-                                                                    <i class="fa fa-asterisk"></i> BackGround Image</label>
-                                                                <div class="col-sm-8">
-                                                                    <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
-                                                                </div>
+                                                                <label class="sr-only" for="exampleInputEmail3">BackGround Image</label>
+                                                                <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
                                                             </div>
                                                         </form>
                                                     </div>
@@ -89,30 +77,41 @@
 
                                         </div>
                                     </div>
-                                    <div class="col-lg-8" style="padding:0px !important">
+                                    <div class="col-lg-12" style="padding:0px !important">
                                         <h4 class=" col-lg-6">Template List</h4>
+                                        <div class=" col-lg-6" style="text-align:right; padding:0px !important">
+                                            <button type="button" class="btn btn-default" id="deleteTemplateBtnModal">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </button>
+                                        </div>
                                         <div class="Tbl_wrap">
                                             <table class="Tbl" summary="banned word list">
                                                 <colgroup>
                                                     <col width="5%" />
+                                                    <col width="5%" />
                                                     <col width="15%" />
                                                     <col width="15%" />
-                                                    <col width="30%" />
-                                                    <col width="30%" />
+                                                    <col width="25%" />
+                                                    <col width="25%" />
+                                                    <col width="5%" />
                                                     <col width="5%" />
                                                 </colgroup>
                                                 <thead>
                                                     <tr>
-                                                        <th>No</th>
+                                                        <th></th>
+                                                        <th>
+                                                            <input type="checkbox" class="flat-red" id="check-all">
+                                                        </th>
                                                         <th>Top Color</th>
                                                         <th>BackGround Color</th>
                                                         <th>Icon Image</th>
                                                         <th>BackGround Image</th>
+                                                        <th>Use YN</th>
                                                         <th>...</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="templateTableBodyId">
-                                                   
+
                                                 </tbody>
                                             </table>
                                         </div>
@@ -137,8 +136,7 @@
                 <%include  ../footer.html%>
                     <!-- // Footer -->
                     <!-- Modal -->
-                    
-                    <div class="modal fade" id="templateDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal fade" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -148,7 +146,7 @@
                                     <h4 class="modal-title" id="myModalLabel">template</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <p id="del_content"></p>
+                                    <p id="proc_content"></p>
                                 </div>
                                 <div class="modal-footer" id="delete_footer_button">
                                     <p id="footer_button"></p>

@@ -16,7 +16,29 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    
+
+    $(document).on("click", "#useTemplateeBtn", function () {
+        procTemplate("UPDATE_USEYN");
+    });
+
+    //삭제 버튼 confirm
+    $('#deleteTemplateBtnModal').click(function() {
+        var del_count = $("#DEL_SEQ:checked").length;
+         
+        if(del_count > 0){
+            $('#proc_content').html('정말로 삭제하시겠습니까? 복구할 수 없습니다.<br>모두 삭제하면 기본템플릿을 사용합니다.');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteTemplateBtn"><i class="fa fa-edit"></i> Delete</button>');
+        }else{
+            $('#proc_content').html('삭제할 대상은 한 개 이상이어야 합니다.');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+        }
+        $('#templateModal').modal('show');
+    });
+
+    //삭제 버튼
+    $(document).on("click", "#deleteTemplateBtn", function () {
+        procTemplate('DEL');
+    });
 });
 
 $(document).on('click', '#templateTablePaging .li_paging', function (e) {
@@ -46,12 +68,14 @@ function makeTemplateTable(newPage) {
                 var tableHtml = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     
-                    tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
+                    tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
+                    tableHtml += '<td><input type="checkbox" class="flat-red" name="DEL_SEQ" id="DEL_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].TOP_COLOR + '</td>'
                     tableHtml += '<td>' + data.rows[i].BACKGROUND_COLOR + '</td>'
                     tableHtml += '<td>' + data.rows[i].ICON_IMG + '</td>'
                     tableHtml += '<td>' + data.rows[i].BACKGROUND_IMG + '</td>'
-                    tableHtml += '<td>DELETE</td>'
+                    tableHtml += '<td><a href="#" onClick="goChangeUseYn(\''+ data.rows[i].SEQ+'\')">' + data.rows[i].USE_YN + '</a></td>'
+                    tableHtml += '<td><button type="button" class="btn btn-default btn-sm" id="preview_template" template_id="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> 미리보기</button></td>';
                     tableHtml += '<tr>'
                 }
 
@@ -74,6 +98,15 @@ function makeTemplateTable(newPage) {
     });
 }
 
+var ChangeSeq = "";
+function goChangeUseYn(change_seq){
+    ChangeSeq = change_seq;
+    $('#proc_content').html('선택된 템플릿을 사용하시겠습니까?');
+    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="useTemplateeBtn"><i class="fa fa-edit"></i> Yes</button>');
+    $('#templateModal').modal('show');
+    
+}
+
 function procTemplate(procType) {
     var saveArr = new Array();
 
@@ -85,6 +118,7 @@ function procTemplate(procType) {
         data.BACKGROUND_COLOR = $('#background_color').val();
         data.ICON_IMG = $('#icon_img').val();
         data.BACKGROUND_IMG = $('#background_img').val();
+        data.CHATBOT_NAME = $('#chatbotName').val();
         saveArr.push(data);
     } else if (procType === 'DEL') {
         var data = new Object();
@@ -95,6 +129,12 @@ function procTemplate(procType) {
             console.log(test);
             data.DEL_SEQ = test;
         });
+        saveArr.push(data);
+    } else if (procType === 'UPDATE_USEYN') {
+        var data = new Object();
+        data.statusFlag = procType;
+        data.USEYN_SEQ = ChangeSeq;
+        data.CHATBOT_NAME = $('#chatbotName').val();
         saveArr.push(data);
     }
 
@@ -109,11 +149,49 @@ function procTemplate(procType) {
         url: '/templateMng/procTemplate',
         success: function (data) {
             if (data.status === 200) {
+                ChangeSeq = "";
                 alert(language['REGIST_SUCC']);
+                //$('#proc_content').html("요청사항이 진행되었습니다");
+                //$('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+                //$('#templateModal').modal('show');
                 window.location.reload();
             } else {
-                alert(language['It_failed']);
+                ChangeSeq = "";
+                //alert(language['It_failed']);
+                $('#templateModal').modal('hide');
+                $('#proc_content').html("요청사항이 실패되었습니다");
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+                $('#templateModal').modal('show');
             }
         }
+    });
+}
+
+
+function iCheckBoxTrans() {
+    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+        checkboxClass: 'icheckbox_minimal-blue',
+        radioClass   : 'iradio_minimal-blue'
+    })
+    //Red color scheme for iCheck
+    $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
+        checkboxClass: 'icheckbox_minimal-red',
+        radioClass   : 'iradio_minimal-red'
+    })
+    //Flat red color scheme for iCheck
+    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass   : 'iradio_flat-green'
+    })
+
+    $('#check-all').iCheck({
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass   : 'iradio_flat-green'
+    }).on('ifChecked', function(event) {
+        $('input[name=DEL_SEQ]').parent().iCheck('check');
+        
+    }).on('ifUnchecked', function() {
+        $('input[name=DEL_SEQ]').parent().iCheck('uncheck');
+        
     });
 }
