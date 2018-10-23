@@ -26,6 +26,9 @@
     <div class="wrapper">
         <input type="hidden" name='searchStr' id="searchStr" value="" />
         <input type="hidden" name='currentPage' id="currentPage" value="1" />
+        <input type="hidden" name='chkAfterAlert' id="chkAfterAlert" value="NONE" />
+        <input type="hidden" name='hId' id="hId" value="" />
+        <input type="hidden" name='hType' id="hType" value="" />
         <!-- Header -->
         <%include ../header.html%>
         <!-- //Header -->
@@ -136,6 +139,49 @@
     </div>
 </div>    
 <!-- //팝업_신규단어생성 -->
+
+
+<!-- confirm -->
+<div class="modal fade" id="confirmBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="confirmTitle"></span></h4>
+            </div>
+            <div class="modal-body"><span id="confirmMsg"></span></div>
+            <div class="modal-footer" id="delete_footer_button">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn btn-primary" id="confirmBtn"><i class="fa fa-trash"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- //confirm -->
+
+
+<!-- alert -->
+<div class="modal fade" id="alertBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
+            </div>
+            <div class="modal-body"><span id="alertMsg"></span></div>
+            <div class="modal-footer" >
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- //alert -->
+
+
 
 <div class="modal fade" id="loadingBar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true" >
     <img src="/image/ajax_loader.gif" style="width:50px; height:50px;" id="loadingImg">

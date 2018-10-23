@@ -21,7 +21,83 @@
             .dropdown-menu {
                 left: 0px !important; top: 60% !important;
             }
-    
+        .span_color_0 {
+            background-color: #E5A896;
+        }
+        .span_color_1 {
+            background-color: #C4E6BD;
+        }
+        .span_color_2 {
+            background-color: #FFFF00;
+        }
+        .span_color_3 {
+            background-color: #CE8EC0;
+        }
+        .span_color_4 {
+            background-color: #B7C3C5;
+        }
+
+        a[name=delUtterBtn] {
+            display:inline-block; 
+            margin:5px 0 0 1%; 
+        }
+        tr[name=utterMainTr] {
+            background-color: aliceblue;
+        }
+        div[name=labelInfoDiv] {
+            float: left;
+            width: 90%;
+            display: block;
+        }
+        .barClass {
+            padding:0.3% 0.2%;
+            margin:1px; 
+            font-size:1.4em; 
+            color:red; 
+        }
+        span[name=utterText] {
+            padding:0.3% 0;
+            margin:1px; 
+            font-size:1.4em; 
+        }
+        span[name=alertSpan] {
+            padding:0.3% 0;
+            margin:1px; 
+            font-size:1.4em; 
+            color:red; 
+        }
+        div[name=indentDiv] {
+            float: left;
+            max-width: 10%;
+        }
+        input[name=matchUtterText] {
+            width: 10%;
+            padding: 0.5% 0; 
+            margin: 0 0 0.5% 0;
+        }
+        select[name=entityTypeForLabel] {
+            width:fit-content; 
+            display:inline; 
+            margin:0 1% 0 0;
+        }
+        select[name=entitySelBox] {
+            width:fit-content; 
+            display:inline; 
+            margin:0 1% 0 0;
+        }
+        select[name=entityChildSelBox] {
+            width:fit-content; 
+            display:none; 
+            margin:0 1% 0 0;
+        }
+        select[name=multiMatchUtterSel] {
+            width:fit-content; 
+            display:inline; 
+            margin:0 0 0 1%;
+        }
+        a[name=delLabelBtn] {
+            margin:0.2% 0 0 0.3%;
+        }
         </style>
 
 </head>
@@ -59,7 +135,7 @@
                                             </div>     
                                                         
                                             <div class="form-group col-lg-2 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
-                                                <button type="button" id="searchDlgBtn" class="btn btn_01 "><%= __('SEARCH') %></button> 
+                                                <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
                                             </div>
                                          </div>
                                          
@@ -394,6 +470,101 @@
         </div>
     </div> 
     <!-- // 신규 대화상자 생성 -->
+
+    <!-- 유사질문 등록 -->
+    <div class="modal fade" id="similarQform" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="similarQTitle">유사질문 등록</h4>
+                </div>
+                <div class="modal-body">
+                    <form name="sQinsertForm" id="sQinsertForm">
+                        <input type="hidden" name="sq_dlgId" id="sq_dlgId">s
+                        <input type="hidden" name="sq_qSeq" id="sq_qSeq">
+                        <div class="form-group" >
+                            <label>Question</label>
+                            <p class="form-control-static" id="mother_q"></p>
+                        </div>
+                        <div class="clear-both"></div>
+                        <div class="form-group" >
+                            <label>Intent</label>
+                            <!--<p class="form-control-static" id="mother_intent"></p>-->
+                            <input type="text" id="mother_intent" class="form-control" readonly>
+                        </div>
+                        <div class="clear-both"></div>
+                        <div class="form-group" >
+                            <label>유사질문</label>
+                            <button type="button" class="btn btn_01"  id="addUtterModalBtn">추가</button>
+                            <input type="text" name="s_question" id="s_question" class="form-control">
+                        </div>  
+                    </form>
+                </div>        
+                <div class="modal-footer">
+                    <div class="btn_wrap">
+                        <button type="button" class="btn btn_01" data-dismiss="modal" id="similarQBtn"><%= __('OK') %></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <!-- //유사질문 등록 -->
+
+<div class="modal fade" id="deleteSimilarBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">유사질문</h4>
+            </div>
+            <div class="modal-body">유사질문을 삭제하시겠습니까? 복구할 수 없습니다.</div>
+            <div class="modal-footer" id="delete_footer_button">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn btn-primary" id="deleteSimilarBtn"><i class="fa fa-trash"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- 유사질문 등록 추가 모달-->
+    <div class="modal fade" id="utterModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" style="top: 40%; margin-top: -50px;" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="utterTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <table class="Tbl" summary="table">
+                        <colgroup><col width="2%" /><col width="90%" /><col width="4%" /><col width="4%" /></colgroup>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th style='text-align: left; padding-left:1%;'></th>
+                                <th style='text-align: left; padding-left:2%;'></th>
+                                <th style='text-align: right; padding-right:1%;'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="utteranceTblBody"></tbody>
+            
+                    </table>
+                </div>        
+                <div class="modal-footer">
+                    <div class="btn_wrap">
+                        <button type="button" class="btn btn_01" data-dismiss="modal" id="saveUtterModal"><%= __('OK') %></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <!-- //유사질문 등록 추가 모달 -->
+
+
+
 </body>
 
 </html>

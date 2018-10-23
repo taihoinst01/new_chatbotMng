@@ -63,8 +63,8 @@
                                         </div>        
                                                                
                                         <div class="form-group col-lg-4 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
-                                            <button type="button" id="searchDlgBtn" class="btn btn_01 "><%= __('SEARCH') %></button> 
-                                            <button type="button" id="dialog" class="btn btn-default"  data-toggle="modal" data-target="#myModal2" onclick="openModalBox('#create_dlg')"><%= __('CREATE') %></button>
+                                            <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
+                                            <button type="button" id="dialog" class="btn btn-default"  data-toggle="modal" data-target="#myModal2" onclick="openModalBox('#create_dlg')"><i class="fa fa-edit"></i> <%= __('CREATE') %></button>
                                         </div>
                                      </div>
                                      
@@ -373,25 +373,42 @@
     <!-- // 신규 대화상자 생성 -->
 
 
-        <!-- 팝업_미리보기 -->
-        <div class="modal fade" id="dialogShowMordal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
-                <div class="modal-dialog">
-                        <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                                        <h4 class="modal-title" id="myModalLabel"><%= __('CARD_LIST') %></h4>
+    <!-- 팝업_미리보기 -->
+    <div class="modal fade" id="dialogShowMordal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+            <div class="modal-dialog">
+                    <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title" id="myModalLabel"><%= __('CARD_LIST') %></h4>
+                                </div>
+                                <div class="form-group" id="dialogShow" >
+                                </div>                                                                 
+                                <div class="modal-footer">
+                                    <div class="btn_wrap">
+                                        <button type="button" class="btn btn_01" data-dismiss="modal" ><%= __('OK') %></button>
                                     </div>
-                                    <div class="form-group" id="dialogShow" >
-                                    </div>                                                                 
-                                    <div class="modal-footer">
-                                        <div class="btn_wrap">
-                                            <button type="button" class="btn btn_01" data-dismiss="modal" ><%= __('OK') %></button>
-                                        </div>
-                                    </div>
-                        </div>
+                                </div>
+                    </div>
+            </div>
+    </div>
+    <div class="modal fade" id="procDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">대화상자설정</h4>
                 </div>
-        </div>    
-        <!-- //팝업_미리보기 -->
+                <div class="modal-body"><p id="proc_content"></p></div>
+                <div class="modal-footer" id="footer_button">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- //팝업_미리보기 -->
 
 
 </body>
