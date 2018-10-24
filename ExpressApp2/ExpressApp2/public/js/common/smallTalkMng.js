@@ -71,7 +71,7 @@ $(document).ready(function() {
         insertForm += '</div>';
         insertForm += '</div>';
         insertForm += '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >';
-        insertForm += '<button type="button" class="btn btn-default deleteInsertForm">' + language.DELETE_DIALOG + '</button>';
+        insertForm += '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>';
         insertForm += '</div>';
         insertForm += '</form>';
         insertForm += '</div>';
@@ -154,7 +154,7 @@ $(document).ready(function() {
     $(document).on('change', 'select[name=dlgType]', function (e) {
 
         addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
-            '<button type="button" class="btn btn-default addCarouselBtn">' + language.INSERT_MORE_CARDS + '</button>' +
+            '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
             '</div>';
 
         carouselForm = '<div class="carouselLayout">' +
@@ -166,10 +166,10 @@ $(document).ready(function() {
             '</div>' +
             '<div class="clear-both"></div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+            '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
             '</div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+            '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
             '</div>' +
             '<div class="clear-both"></div>' +
             '</div>';
@@ -183,7 +183,7 @@ $(document).ready(function() {
             '<div class="modal_con btnInsertDiv">' +
             '</div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default addMediaBtn" >' + language.INSERT_MORE_BUTTON + '</button>' +
+            '<button type="button" class="btn btn-default addMediaBtn" ><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
             '<div class="clear-both"></div>';
 
         var idx = $("select[name=dlgType]").index(this);
@@ -520,16 +520,16 @@ function searchDialog(dlgID, relationID) {
         '</div>' +
         '<div class="clear-both"></div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+        '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '</div>' +
         '<div class="clear-both"></div>' +
         '</div>';
 
     addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
-        '<button type="button" class="btn btn-default addCarouselBtn">' + language.INSERT_MORE_CARDS + '</button>' +
+        '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
         '</div>';
 
     mediaForm = '<div class="mediaLayout">' +
@@ -542,7 +542,7 @@ function searchDialog(dlgID, relationID) {
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default addMediaBtn" >' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default addMediaBtn" ><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '<div class="clear-both"></div>' +
         '</div>';
 
@@ -558,7 +558,7 @@ function searchDialog(dlgID, relationID) {
         '</div>';
 
     deleteInsertForm = '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >' +
-        '<button type="button" class="btn btn-default deleteInsertForm">' + language.DELETE_DIALOG + '</button>' +
+        '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>' +
         '</div>';
 
     var inputHtml = '<div><label>' + language.BUTTON + '</label></div>' +
@@ -1233,10 +1233,10 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>' +
         '<div class="clear-both"></div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+        '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '</div>' +
         '<div class="clear-both"></div>' +
         '</div>';

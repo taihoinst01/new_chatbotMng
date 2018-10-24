@@ -10,9 +10,8 @@
     <%include  ../common/commonLib.html%>
         <script src="/common/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/js/common/templateMng.js"></script>
-        <script>
-
-        </script>
+        <script src="/js/import/colorpicker/bootstrap-colorpicker.js"></script>
+        <link href="/css/colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet">
 
 </head>
 
@@ -40,7 +39,7 @@
                             <div class="box-body">
                                 <div class="mt20">
                                     <div class="col-lg-12" style="padding-left:0px !important">
-                                        <h4 class=" col-lg-12">
+                                        <h4 class="col-lg-12">
                                             Template Form
                                         </h4>
 
@@ -48,25 +47,78 @@
                                             <p>
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">
-                                                        <form class="form-inline" name="templateForm" id="templateForm">
+                                                        <form name="templateForm" id="templateForm">
                                                             <input type="hidden" name="template_id" id="template_id">
                                                             <input type="hidden" name="chatbotName" id="chatbotName" value="<%=appName%>">
-                                                            <div class="form-group">
-                                                                <label class="sr-only" for="exampleInputEmail3">TOP Color</label>
-                                                                <input type="text" class="form-control" id="top_color" name="top_color" placeholder="TOP Color">
+                                                            <div class="form-group col-lg-3">
+                                                                <label for="exampleInputEmail3">Header Color</label>
+                                                                <div id="headerColor" class="input-group colorpicker-component">
+                                                                    <input type="text" class="form-control" id="header_color" name="header_color" placeholder="Header Color" value="#302f35">
+                                                                    <span class="input-group-addon"><i></i></span>
+                                                                </div>
+                                                                <script>
+                                                                    $(function () {
+                                                                        $('#headerColor').colorpicker();
+                                                                    });
+                                                                </script>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label class="sr-only" for="exampleInputEmail3">BackGround Color</label>
-                                                                <input type="text" class="form-control" id="background_color" name="background_color" placeholder="BackGround Color">
+                                                            <div class="form-group col-lg-3">
+                                                                <label for="exampleInputEmail3">Body Color</label>
+                                                                <div id="bodyColor" class="input-group colorpicker-component">
+                                                                    <input type="text" class="form-control" id="body_color" name="body_color" placeholder="Body Color" value="#F2F3F7">
+                                                                    <span class="input-group-addon"><i></i></span>
+                                                                </div>
+                                                                <script>
+                                                                    $(function () {
+                                                                        $('#bodyColor').colorpicker();
+                                                                    });
+                                                                </script>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label class="sr-only" for="exampleInputEmail3">Icon Image</label>
+                                                            <div class="form-group col-lg-3">
+                                                                <label for="exampleInputEmail3">Popup Header Color</label>
+                                                                <div id="popheaderColor" class="input-group colorpicker-component">
+                                                                    <input type="text" class="form-control" id="popheader_color" name="popheader_color" placeholder="Popup Header Color" value="#4b4f57">
+                                                                    <span class="input-group-addon"><i></i></span>
+                                                                </div>
+                                                                <script>
+                                                                    $(function () {
+                                                                        $('#popheaderColor').colorpicker();
+                                                                    });
+                                                                </script>
+                                                            </div>
+                                                            <div class="form-group col-lg-3">
+                                                                <label for="exampleInputEmail3">Bot Color</label>
+                                                                <div id="botColor" class="input-group colorpicker-component">
+                                                                    <input type="text" class="form-control" id="bot_color" name="bot_color" placeholder="Bot Color" value="#ffffff">
+                                                                    <span class="input-group-addon"><i></i></span>
+                                                                </div>
+                                                                <script>
+                                                                    $(function () {
+                                                                        $('#botColor').colorpicker();
+                                                                    });
+                                                                </script>
+                                                            </div>
+                                                            <div class="form-group col-lg-3">
+                                                                <label for="exampleInputEmail3">User Color</label>
+                                                                <div id="userColor" class="input-group colorpicker-component">
+                                                                    <input type="text" class="form-control" id="user_color" name="user_color" placeholder="User Color" value="#00aad2">
+                                                                    <span class="input-group-addon"><i></i></span>
+                                                                </div>
+                                                                <script>
+                                                                    $(function () {
+                                                                        $('#userColor').colorpicker();
+                                                                    });
+                                                                </script>
+                                                            </div>
+                                                            <div class="form-group col-lg-4">
+                                                                <label for="exampleInputEmail3">Icon Image</label>
                                                                 <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image">
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label class="sr-only" for="exampleInputEmail3">BackGround Image</label>
+                                                            <div class="form-group col-lg-4">
+                                                                <label for="exampleInputEmail3">BackGround Image</label>
                                                                 <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
                                                             </div>
+                                                        
                                                         </form>
                                                     </div>
                                                     <div class="panel-footer text-right">
@@ -89,21 +141,25 @@
                                                 <colgroup>
                                                     <col width="5%" />
                                                     <col width="5%" />
-                                                    <col width="15%" />
-                                                    <col width="15%" />
-                                                    <col width="25%" />
-                                                    <col width="25%" />
+                                                    <col width="7%" />
+                                                    <col width="7%" />
+                                                    <col width="7%" />
+                                                    <col width="7%" />
+                                                    <col width="7%" />
+                                                    <col width="20%" />
+                                                    <col width="20%" />
                                                     <col width="5%" />
-                                                    <col width="5%" />
+                                                    <col width="10%" />
                                                 </colgroup>
                                                 <thead>
                                                     <tr>
                                                         <th></th>
-                                                        <th>
-                                                            <input type="checkbox" class="flat-red" id="check-all">
-                                                        </th>
-                                                        <th>Top Color</th>
-                                                        <th>BackGround Color</th>
+                                                        <th><input type="checkbox" class="flat-red" id="check-all"></th>
+                                                        <th>Header Color</th>
+                                                        <th>Body Color</th>
+                                                        <th>PopHeader Color</th>
+                                                        <th>Bot Color</th>
+                                                        <th>User Color</th>
                                                         <th>Icon Image</th>
                                                         <th>BackGround Image</th>
                                                         <th>Use YN</th>
@@ -143,7 +199,7 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">template</h4>
+                                    <h4 class="modal-title" id="myModalLabel">ChatBot Template</h4>
                                 </div>
                                 <div class="modal-body">
                                     <p id="proc_content"></p>

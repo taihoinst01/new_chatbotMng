@@ -271,8 +271,8 @@ function entitiesAjax(){
                     item += '<div class="board">';
                     item += '<ul>';
                     item += '<form action="" method="post" onsubmit="return false;" autocomplete="off" name="entityForm">';
-                    item += ' <li class="inp"><input name="entityValue" type="text" class="form-control fl"  style="width:60%;">';
-                    item += '<button type="button" class="btn btn_01 mb05 addEntityValueBtn">저장</button> <button type="button" class="btn btn-default mb05 cancelEntityValueBtn">취소</button>';
+                    item += ' <li class="inp"><input name="entityValue" type="text" class="form-control fl"  style="width:50%;">';
+                    item += '<button type="button" class="btn btn_01 mb05 addEntityValueBtn"><i class="fa fa-edit"></i> 저장</button> <button type="button" class="btn btn-default mb05 cancelEntityValueBtn"><i class="fa fa-times"></i> 취소</button>';
                     item += '</li>';
                     item += '<input type="hidden" name="entityDefine" value="' + data.list[i].ENTITY + '">';
                     item += '<input type="hidden" name="apiGroup" value="' + data.list[i].API_GROUP + '">';
@@ -416,8 +416,8 @@ function searchEntities() {
                         item += '<div class="board">';
                         item += '<ul>';
                         item += '<form action="" method="post" name="entityForm">';
-                        item += ' <li class="inp"><input name="entityValue" type="text" class="form-control fl"  style="width:60%;">';
-                        item += '<button type="button" class="btn btn_01 mb05 addEntityValueBtn">저장</button> <button type="button" class="btn btn-default mb05 cancelEntityValueBtn">취소</button>';
+                        item += ' <li class="inp"><input name="entityValue" type="text" class="form-control fl"  style="width:50%;">';
+                        item += '<button type="button" class="btn btn_01 mb05 addEntityValueBtn"><i class="fa fa-edit"></i> 저장</button> <button type="button" class="btn btn-default mb05 cancelEntityValueBtn"><i class="fa fa-times"></i> 취소</button>';
                         item += '</li>';
                         item += '<input type="hidden" name="entityDefine" value="' + data.list[i].ENTITY + '">';
                         item += '<input type="hidden" name="apiGroup" value="' + data.list[i].API_GROUP + '">';

@@ -17,6 +17,69 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
+    //추가 버튼(Master)
+    $(document).on("click", "#addTemplateBtn", function() {
+        //searchGroupL: $('.currentGroupL').text()
+        var HEADER_COLOR = $('#header_color').val();
+        var BODY_COLOR = $('#body_color').val();
+        var POPHEADER_COLOR = $('#popheader_color').val();
+        var BOT_COLOR = $('#bot_color').val();
+        var USER_COLOR = $('#user_color').val();
+        var ICON_IMG = $('#icon_img').val();
+        var BACKGROUND_IMG = $('#background_img').val();
+        var validation_check = 0;
+        if(HEADER_COLOR==""||HEADER_COLOR==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(BODY_COLOR==""||BODY_COLOR==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(POPHEADER_COLOR==""||POPHEADER_COLOR==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(BOT_COLOR==""||BOT_COLOR==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(USER_COLOR==""||USER_COLOR==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(ICON_IMG==""||ICON_IMG==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(BACKGROUND_IMG==""||BACKGROUND_IMG==null){
+            validation_check = validation_check + 0;
+        }else{
+            validation_check = validation_check + 1;
+        }
+
+        if(validation_check==7){
+            procTemplate('NEW');
+        }else{
+            $('#proc_content').html('모든 사항은 필수사항 입니다');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#templateModal').modal('show');
+            return;
+        }        
+    });
+
     $(document).on("click", "#useTemplateeBtn", function () {
         procTemplate("UPDATE_USEYN");
     });
@@ -70,8 +133,11 @@ function makeTemplateTable(newPage) {
                     
                     tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="DEL_SEQ" id="DEL_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
-                    tableHtml += '<td>' + data.rows[i].TOP_COLOR + '</td>'
-                    tableHtml += '<td>' + data.rows[i].BACKGROUND_COLOR + '</td>'
+                    tableHtml += '<td>' + data.rows[i].HEADER_COLOR + '&nbsp;<span style="background:' + data.rows[i].HEADER_COLOR + '">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>'
+                    tableHtml += '<td>' + data.rows[i].BODY_COLOR + '&nbsp;<span style="background:' + data.rows[i].BODY_COLOR + '">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>'
+                    tableHtml += '<td>' + data.rows[i].POPHEADER_COLOR + '&nbsp;<span style="background:' + data.rows[i].POPHEADER_COLOR + '">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>'
+                    tableHtml += '<td>' + data.rows[i].BOT_COLOR + '&nbsp;<span style="background:' + data.rows[i].BOT_COLOR + '">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>'
+                    tableHtml += '<td>' + data.rows[i].USER_COLOR + '&nbsp;<span style="background:' + data.rows[i].USER_COLOR + '">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>'
                     tableHtml += '<td>' + data.rows[i].ICON_IMG + '</td>'
                     tableHtml += '<td>' + data.rows[i].BACKGROUND_IMG + '</td>'
                     tableHtml += '<td><a href="#" onClick="goChangeUseYn(\''+ data.rows[i].SEQ+'\')">' + data.rows[i].USE_YN + '</a></td>'
@@ -90,7 +156,7 @@ function makeTemplateTable(newPage) {
                 $('#templateTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                saveTableHtml = '<tr><td colspan="6" class="text-center">No Template Data</td></tr>';
+                saveTableHtml = '<tr><td colspan="11" class="text-center">No Template Data</td></tr>';
                 $('#templateTableBodyId').html(saveTableHtml);
             }
 
@@ -114,8 +180,11 @@ function procTemplate(procType) {
 
         var data = new Object();
         data.statusFlag = procType;
-        data.TOP_COLOR = $('#top_color').val();
-        data.BACKGROUND_COLOR = $('#background_color').val();
+        data.HEADER_COLOR = $('#header_color').val();
+        data.BODY_COLOR = $('#body_color').val();
+        data.POPHEADER_COLOR = $('#popheader_color').val();
+        data.BOT_COLOR = $('#bot_color').val();
+        data.USER_COLOR = $('#user_color').val();
         data.ICON_IMG = $('#icon_img').val();
         data.BACKGROUND_IMG = $('#background_img').val();
         data.CHATBOT_NAME = $('#chatbotName').val();
@@ -150,7 +219,7 @@ function procTemplate(procType) {
         success: function (data) {
             if (data.status === 200) {
                 ChangeSeq = "";
-                alert(language['REGIST_SUCC']);
+                //alert(language['REGIST_SUCC']);
                 //$('#proc_content').html("요청사항이 진행되었습니다");
                 //$('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
                 //$('#templateModal').modal('show');

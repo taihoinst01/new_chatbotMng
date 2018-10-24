@@ -44,8 +44,8 @@
                                     <input name="iptentities" id="iptentities" type="text" class="form-control" autocomplete='off' placeholder="<%= __('Description 2') %>" onkeypress="if(event.keyCode==13) {searchEntities(); return false;}">
                                 </div>             
                                 <div class="form-group col-md-2 " style="float:right; text-align:right">
-                                    <button id="searchentities" type="button" class="btn btn_01 " onclick="searchEntities();"><%= __('SEARCH') %></button> 
-                                    <button id="entities" type="button" class="btn btn-default"  data-toggle="modal" data-target="#create_dlg"><%= __('CREAT') %></button>
+                                    <button id="searchentities" type="button" class="btn btn_01 " onclick="searchEntities();"><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
+                                    <button id="entities" type="button" class="btn btn-default"  data-toggle="modal" data-target="#create_dlg"><i class="fa fa-edit"></i> <%= __('CREAT') %></button>
                                 </div>
                              </div>                                         
 
@@ -98,7 +98,7 @@
                                         </div>
                                         <div class="form-group" >
                                             <label><%= __('Entity value') %><span class="nec_ico">*</span></label>
-                                            <button type="button" class="btn btn_01" id="addEntityValBtn" ><%= __('ADD') %></button>
+                                            <button type="button" class="btn btn_01" id="addEntityValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
                                             <div class="entityValDiv" >
                                                 <div style="margin-top:4px;">
                                                     <input name="entityValue" id="entityValue" type="text" tabindex="2" class="form-control" style=" float: left; width:80%;" placeholder=" <%= __('Please_enter') %>" onkeyup="dialogValidation();">
@@ -118,8 +118,8 @@
                                   </form>                                                                    
                                   <div class="modal-footer">
                                         <div class="btn_wrap">
-                                           <button type="button" class="btn btn_01" id="btnAddDlg" onclick="insertEntity()"><%= __('CREAT') %></button>
-                                           <button type="button" class="btn btn-default addDialogCancel"  data-dismiss="modal"><%= __('CANCEL') %></button>
+                                           <button type="button" class="btn btn_01" id="btnAddDlg" onclick="insertEntity()"><i class="fa fa-edit"></i> <%= __('CREAT') %></button>
+                                           <button type="button" class="btn btn-default addDialogCancel"  data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CANCEL') %></button>
                                         </div>
                                   </div>
                         </div>
@@ -148,7 +148,7 @@
                                   </div>
                                   <div class="form-group" >
                                       <label><%= __('Entity value') %><span class="nec_ico">*</span></label>
-                                      <button type="button" class="btn btn_01" id="addEntityValBtn" ><%= __('ADD') %></button>
+                                      <button type="button" class="btn btn_01" id="addEntityValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
                                       <div class="updateEntityValDiv" >
                                           <div style="margin-top:4px;">
                                               <!--<button type="button" class="btn btn_03" style=" margin: 4px 0 0 4px;" name="delEntityBtn" ><%= __('DELETE') %></button>-->
@@ -165,8 +165,8 @@
                             </form>                                                                    
                             <div class="modal-footer">
                                   <div class="btn_wrap">
-                                     <button type="button" class="btn btn_01" id="btnUpdateDlg" onclick="updateEntity()"><%= __('SAVE') %></button>
-                                     <button type="button" class="btn btn-default updateEntityCancel"  data-dismiss="modal"><%= __('CANCEL') %></button>
+                                     <button type="button" class="btn btn_01" id="btnUpdateDlg" onclick="updateEntity()"><i class="fa fa-edit"></i> <%= __('SAVE') %></button>
+                                     <button type="button" class="btn btn-default updateEntityCancel"  data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CANCEL') %></button>
                                   </div>
                             </div>
                     </div>

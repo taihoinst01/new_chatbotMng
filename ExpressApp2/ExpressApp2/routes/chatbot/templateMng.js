@@ -31,7 +31,7 @@ router.post('/selectTemplateList', function (req, res) {
                             " (SELECT ROW_NUMBER() OVER(ORDER BY SEQ DESC) AS NUM, \n" +
                             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
                             "         CEILING((ROW_NUMBER() OVER(ORDER BY SEQ DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                            "         SEQ, TOP_COLOR, BACKGROUND_COLOR, ICON_IMG, BACKGROUND_IMG, CHATBOT_NAME, REG_DT, USE_YN \n" +
+                            "         SEQ, HEADER_COLOR, BODY_COLOR, POPHEADER_COLOR, BOT_COLOR, USER_COLOR, ICON_IMG, BACKGROUND_IMG, CHATBOT_NAME, REG_DT, USE_YN \n" +
                            "          FROM TBL_CHATBOT_TEMPLATE ) tbp \n" +
                            " WHERE CHATBOT_NAME = '"+chatbotName+ "' \n" +
                            "   AND PAGEIDX = " + currentPage + "; \n";
@@ -105,9 +105,9 @@ router.post('/procTemplate', function (req, res) {
 
     for (var i = 0; i < dataArr.length; i++) {
         if (dataArr[i].statusFlag === 'NEW') {
-            saveStr += "INSERT INTO TBL_CHATBOT_TEMPLATE (TOP_COLOR, BACKGROUND_COLOR, ICON_IMG, BACKGROUND_IMG, CHATBOT_NAME, REG_DT, USE_YN) " +
+            saveStr += "INSERT INTO TBL_CHATBOT_TEMPLATE (HEADER_COLOR, BODY_COLOR, POPHEADER_COLOR, BOT_COLOR, USER_COLOR, ICON_IMG, BACKGROUND_IMG, CHATBOT_NAME, REG_DT, USE_YN) " +
                 "VALUES (";
-            saveStr += " '" + dataArr[i].TOP_COLOR + "', '" + dataArr[i].BACKGROUND_COLOR + "', '" + dataArr[i].ICON_IMG + "', '" + dataArr[i].BACKGROUND_IMG + "', '" + dataArr[i].CHATBOT_NAME + "', GETDATE() , '" + dataArr[i].USE_YN + "');";
+            saveStr += " '" + dataArr[i].HEADER_COLOR + "', '" + dataArr[i].BODY_COLOR + "', '" + dataArr[i].POPHEADER_COLOR + "', '" + dataArr[i].BOT_COLOR + "', '" + dataArr[i].USER_COLOR + "', '" + dataArr[i].ICON_IMG + "', '" + dataArr[i].BACKGROUND_IMG + "', '" + dataArr[i].CHATBOT_NAME + "', GETDATE() , 'N');";
         } else if (dataArr[i].statusFlag === 'UPDATE_USEYN') {
             updateAllStr += "UPDATE TBL_CHATBOT_TEMPLATE SET USE_YN ='N' WHERE CHATBOT_NAME = '" + dataArr[i].CHATBOT_NAME + "';";
             updateStr += "UPDATE TBL_CHATBOT_TEMPLATE SET USE_YN ='Y' WHERE SEQ = '" + dataArr[i].USEYN_SEQ + "'; ";
