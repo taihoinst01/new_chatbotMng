@@ -12,7 +12,13 @@
         <script type="text/javascript" src="/js/common/templateMng.js"></script>
         <script src="/js/import/colorpicker/bootstrap-colorpicker.js"></script>
         <link href="/css/colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet">
+        <link rel='stylesheet' href='/css/botchat.css' />
+        <style>
+        /* chat TOP */
+.chatTitle{height:16px;width:16px; display: inline-block;top: 12px; position: absolute; }
+.chatTitleText{font-size:13px;color:#FFF;top: 10px;left:30px; position: absolute;}
 
+        </style>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -111,19 +117,31 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-4">
-                                                                <label for="exampleInputEmail3">Icon Image</label>
-                                                                <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image">
+                                                                <label for="exampleInputEmail3">Bot Icon Image</label>
+                                                                <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image" value="https://bottest.hyundai.com/assets/images/alice_profile_icn_35.png">
+                                                                <small id="backgrondHelpText" class="form-text text-muted">
+                                                                    require Full URL
+                                                                </small>
                                                             </div>
                                                             <div class="form-group col-lg-4">
                                                                 <label for="exampleInputEmail3">BackGround Image</label>
                                                                 <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
+                                                                <small id="backgrondHelpText" class="form-text text-muted">
+                                                                    require Full URL
+                                                                </small>
                                                             </div>
                                                         
                                                         </form>
                                                     </div>
-                                                    <div class="panel-footer text-right">
-                                                        <button type="button" class="btn btn-default" id="addTemplateBtn">
-                                                            <i class="fa fa-edit"></i> Save</button>
+                                                    <div class="panel-footer">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                    <i class="fa fa-info-circle"></i> BodyColor 와 BackGround Image 가 함께 있으면 Image 가 우선입니다.
+                                                            </div>
+                                                            <div class="col-lg-4 text-right">
+                                                                <button type="button" class="btn btn-default" id="addTemplateBtn"><i class="fa fa-edit"></i> Save</button>
+                                                            </div> 
+                                                        </div>                                                       
                                                     </div>
                                                 </div>
 
@@ -160,7 +178,7 @@
                                                         <th>PopHeader Color</th>
                                                         <th>Bot Color</th>
                                                         <th>User Color</th>
-                                                        <th>Icon Image</th>
+                                                        <th>Bot Icon Image</th>
                                                         <th>BackGround Image</th>
                                                         <th>Use YN</th>
                                                         <th>...</th>
@@ -206,6 +224,59 @@
                                 </div>
                                 <div class="modal-footer" id="delete_footer_button">
                                     <p id="footer_button"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 대화상자 미리보기 -->
+                    <div class="modal fade" id="templatePreviewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">ChatBot Preview</h4>
+                                </div>
+                                <div class="modal-body">
+                                    
+                                    <div class ="dialog_box03" id="dialogViewWrap" style="background-color: #f2f3f7;background-image: url('')">
+                                        <div class="dialogView" >
+                                            <div class="wc-header" id="headerColorId" style="background-color: #302f35;">
+                                                <span class='chatTitle'></span>
+                                                <span class='chatTitleText'>ChatBot Header</span>
+                                            </div>
+                                            <p></p>
+                                            <div class="wc-message wc-message-from-bot" style="width:80%;">
+                                                <div class="wc-message-content">
+                                                    <svg class="wc-message-callout" id="botIconImageId" style="background-image: url('https://bottest.hyundai.com/assets/images/alice_profile_icn_35.png')"></svg>
+                                                    <div id="botColorId" style="background-color: #ffffff;">
+                                                        <div class="format-markdown">
+                                                            <div class="textMent">
+                                                                <h1 class="textTitle">BOT 영역입니다.</h1>
+                                                                <p>BOT 이 답하는 부분입니다.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="wc-message wc-message-from-bot" style="width:80%;margin-left:20%;">
+                                                <div class="wc-message-content">
+                                                    <div id="userColorId" style="background-color: #00aad2;">
+                                                        <div class="format-markdown">
+                                                            <div class="textMent">
+                                                                <h1 class="textTitle">USER 영역입니다.</h1>
+                                                                <p>USER 가 답하는 부분입니다.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" id="delete_footer_button">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                                 </div>
                             </div>
                         </div>
