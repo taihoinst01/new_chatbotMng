@@ -5,6 +5,14 @@
   margin-top: 10px;
   /*line-height: 15px;*/
 }
+
+.textUserMent h1 {
+  font-weight: 700;
+  font-size: 16px;
+  color: #333333;
+  margin-top: 10px;
+  /*line-height: 15px;*/
+}
  button { border: 0px; }
  .wc-message-from-bot .wc-message-content {
     width: inherit !important;

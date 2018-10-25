@@ -19,7 +19,7 @@ $(document).ready(function() {
 
     //추가 버튼(Master)
     $(document).on("click", "#addTemplateBtn", function() {
-        //searchGroupL: $('.currentGroupL').text()
+        /*
         var HEADER_COLOR = $('#header_color').val();
         var BODY_COLOR = $('#body_color').val();
         var POPHEADER_COLOR = $('#popheader_color').val();
@@ -77,7 +77,9 @@ $(document).ready(function() {
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
             $('#templateModal').modal('show');
             return;
-        }        
+        }     
+        */
+       procTemplate('NEW');
     });
 
     $(document).on("click", "#useTemplateeBtn", function () {
@@ -101,6 +103,28 @@ $(document).ready(function() {
     //삭제 버튼
     $(document).on("click", "#deleteTemplateBtn", function () {
         procTemplate('DEL');
+    });
+
+    $(document).on("click", "#preview_template", function () {
+        var tr = $(this).parent().parent();
+        var td = tr.children();
+        var header_color = td.eq(2).text().substr(0,7);
+        var body_color = td.eq(3).text().substr(0,7);
+        var popheader_color = td.eq(4).text().substr(0,7);
+        var bot_color = td.eq(5).text().substr(0,7);
+        var user_color = td.eq(6).text().substr(0,7);
+        var boticon_img = td.eq(7).text();
+        var background_img = td.eq(8).text();
+
+        $('#headerColorId').css('background-color', header_color);
+        $('#dialogViewWrap').css('background-color', body_color);
+        $('#popheaderColorId').css('background-color', popheader_color);
+        $('#botColorId').css('background-color', bot_color);
+        $('#userColorId').css('background-color', user_color);
+        $('#botIconImageId').css('background-image', 'url("' + boticon_img + '")');
+        $('#dialogViewWrap').css('background-image', 'url("' + background_img + '")');
+        
+        $('#templatePreviewModal').modal('show');
     });
 });
 
