@@ -497,6 +497,7 @@
                         <div class="form-group" >
                             <label>유사질문</label>
                             <button type="button" class="btn btn_01"  id="addUtterModalBtn">추가</button>
+                            <button type="button" class="btn btn_01"  id="editUtterModalBtn" style="display: none;">수정</button>
                             <input type="text" name="s_question" id="s_question" class="form-control">
                         </div>  
                     </form>
@@ -556,7 +557,10 @@
                 </div>        
                 <div class="modal-footer">
                     <div class="btn_wrap">
+                        <!--
                         <button type="button" class="btn btn_01" data-dismiss="modal" id="saveUtterModal"><%= __('OK') %></button>
+                        -->
+                        <button type="button" class="btn btn_01" id="saveUtterModal"><%= __('OK') %></button>
                     </div>
                 </div>
             </div>

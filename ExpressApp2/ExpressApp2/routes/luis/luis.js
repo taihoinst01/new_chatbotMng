@@ -1738,10 +1738,6 @@ router.post('/saveUtterance', function (req, res) {
                                     }
                                 }
 
-                                /**
-                                 * 작업중 
-                                 * 
-                                 * */
                                     let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                                     var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
                                     saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";

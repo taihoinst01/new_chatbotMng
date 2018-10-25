@@ -446,12 +446,21 @@ $(document).ready(function() {
         $('#utterModal').modal('show');
     });
 
+    $('#editUtterModalBtn').click(function() {
+        $('#utterModal').modal('show');
+    });
+
 });
 
 
 
 
 /**
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * 유두연 주임 작업 시작
  */
 
@@ -486,6 +495,240 @@ $(document).on("click", "a[name=addUtter]", function(e){
     utterBodyHtml += "</div>";
     $(this).parents('tr').next().children().eq(1).append(utterBodyHtml);
 
+});
+
+
+
+//input focusin
+var rememberUtterInput = '';
+var rememberUtterStart = -1;
+var rememberUtterEnd = -1;
+$(document).on("focusin", "input[name=matchUtterText]", function(e){
+    rememberUtterInput = $(this).val().trim();
+    rememberUtterStart = $(this).parent().find('input[name=startIndex]').val();
+    rememberUtterEnd = $(this).parent().find('input[name=endIndex]').val();
+});
+
+
+//input focusout
+$(document).on("focusout", "input[name=matchUtterText]", function(e){
+
+    if ($(this).parent().find('select[name=entityTypeForLabel]').val() == '4') {
+        $(this).val('');
+        return false;
+    }
+
+    //$(this).parent().find('select[name=multiMatchUtterSel]').length > 1 || 
+    if ((rememberUtterInput == $(this).val() && rememberUtterInput != '')) {
+        return false;
+    }
+
+    $(this).val($(this).val().trim());
+    if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
+        if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
+            alert('엔티티를 선택해 주세요.');
+            $(this).val('');
+            return false;
+        }
+        $(this).parent().find('input[name=startIndex]').val('');
+        $(this).parent().find('input[name=endIndex]').val('');
+        if (rememberUtterStart != "") {
+            for (var i=rememberUtterStart; i<=rememberUtterEnd; i++) {
+                $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+            }
+        }
+        var chkMatch = [];
+        var chkMatchIndex = [];
+        var inputStr = $(this).val();
+        var inputLength = $(this).val().length;
+        var utterLength = $(this).parents('tr').prev().find('span[name=utterText]').length;
+
+
+        var isEngNum = false;
+        for (var i=0; i<inputLength; i++) {
+            if (isAlpabet(inputStr[i])) {
+                isEngNum = true;
+                break;
+            }
+        }
+        if (isEngNum) {
+            var indexArr = [];
+            var inputVal = $(this).val();
+            $(this).parents('tr').prev().find('input[name=tokenVal]').each(function(index, item){
+                var strVal = '';
+                var isMatch = false;
+
+                var innerIndex = 0;
+                while (1) {
+                    var hasClass = $(item).parent().find('#utterText_' + index).attr('class');
+                    hasClass = hasClass == undefined? '' : hasClass;
+                    if (hasClass.indexOf('span_color') != -1) {
+                        break;
+                    }
+                    strVal += $(item).parent().find('input[name=tokenVal]').eq(index+innerIndex).val();
+                    var subInput = inputVal.substr(0, strVal.length);
+                    if (inputVal == strVal) {
+                        isMatch = true
+                        break;
+                    } else if (strVal == subInput) {
+                        innerIndex++
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+                if (isMatch) {
+                    var matchObj = new Object();
+                    matchObj.startIndex = index;
+                    matchObj.endIndex = innerIndex;
+                    indexArr.push(matchObj);
+                    //
+                    chkMatch.push(inputStr);
+                    var tmpIndex = index + ',' + innerIndex;
+                    chkMatchIndex.push(tmpIndex);
+                }
+            });
+        } else {
+            for (var i=0; i<=utterLength-inputLength; i++) {
+                var strTmp = '';
+                var chkLabeled = false;
+                for (var j=0; j<inputLength; j++) {
+                    var spanClass = $(this).parents('tr').prev().find('span[name=utterText]').eq(i+j).attr('class');
+                    if (typeof spanClass == 'undefined') {
+                        spanClass = '';
+                }
+                    if (spanClass.indexOf('span_color_') != -1) {
+                        chkLabeled = true;
+                        break;
+                    } else {
+                        strTmp += $(this).parents('tr').prev().find('span[name=utterText]').eq(i+j).text();
+                    }
+                }
+                if ($(this).val() == strTmp && strTmp != '' && !chkLabeled) {
+                    chkMatch.push($(this).val());
+                    var tmpNum = (i + inputLength*1)-1;
+                    var tmpIndex = i + ',' + tmpNum;
+                    chkMatchIndex.push(tmpIndex);
+                }
+            }
+        }
+        
+
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+        var utterBodyHtml = '';
+        if (chkMatch.length > 1) {
+            rememberUtterInput = $(this).val();
+            utterBodyHtml += "<select name='multiMatchUtterSel' class='form-control'  >";
+            var j=0;
+            for (j=0; j<chkMatch.length; j++) {
+                if (j == chkMatch.length-1) {
+                    utterBodyHtml += "<option value='" + chkMatchIndex[j] + "' selected>" + (j+1) + " - " + chkMatch[j] + "</option>";
+                } else {
+                    utterBodyHtml += "<option value='" + chkMatchIndex[j] + "'>" + (j+1) + " - " + chkMatch[j] + "</option>";
+                }
+            }
+            utterBodyHtml += "</select>";
+            if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 0) {
+                $(this).parent().find('select[name=multiMatchUtterSel]').remove();
+            }
+            $(this).after(utterBodyHtml);
+            //$('select[name=multiMatchUtterSel]').focus();
+            
+            var matchStartIndex = chkMatchIndex[--j].split(",")[0];
+            var matchEndIndex = chkMatchIndex[j].split(",")[1];
+            //$(this).parent().find('input[name=startIndex]').val(matchStartIndex);
+            //$(this).parent().find('input[name=endIndex]').val(matchEndIndex);
+            var trIndex = $("tr[name=utterMainTr]").index($(this).parents('tr').prev());
+            var divIndex = $("tr[name=utterMainTr]").eq(trIndex).find('div[name=labelInfoDiv]').index($(this).parents('div[name=labelInfoDiv]'));
+            changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex);
+
+        } else if (chkMatch.length > 0) {
+            console.log("매칭되는것 1개 ");
+            if (!chkLabeled) {
+                if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 1) {
+                    $(this).parent().find('select[name=multiMatchUtterSel]').remove();
+                }
+
+                rememberUtterInput = $(this).val();
+                var matchStartIndex = chkMatchIndex[0].split(",")[0];
+                var matchEndIndex = chkMatchIndex[0].split(",")[1];
+                var colorIndexArr = [0, 1, 2, 3, 4];
+                $(this).parents('tr').prev().find('span[name=utterText]').each(function(){
+                    var classValue = $(this).attr('class');
+
+                    if (typeof classValue == 'undefined') {
+                        classValue = '';
+                    }
+
+                    if (classValue.indexOf('span_color_') != -1) {
+                        for (var i=0; i<colorIndexArr.length; i++) {
+                            if ('span_color_' + colorIndexArr[i] == $(this).attr('class')) {
+                                colorIndexArr.splice(i--, 1);
+                            }
+                        }
+                    }
+                });
+
+                for (var i=0; i<matchStartIndex; i++) {
+                    var tmpClass = $(this).parents('tr').prev().find('span[name=utterText]').eq(i).attr('class');
+                    if (typeof tmpClass == 'undefined') {
+                        tmpClass = '';
+                    }
+                    if (tmpClass.indexOf('span_color_') != -1) {
+                        if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                            colorIndexArr.splice(i--, 1);
+                            break;
+                        }
+                    }
+                }
+                for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
+                    var tmpClass = $(this).parents('tr').prev().find('span[name=utterText]').eq(i).attr('class');
+                    if (tmpClass.indexOf('span_color_') != -1) {
+                        if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                            colorIndexArr.splice(i--, 1);
+                            break;
+                        }
+                    }
+                }
+
+                if (colorIndexArr.length > 0) {
+                    for (var i=matchStartIndex; i<=matchEndIndex; i++) {
+                        $(this).parents('tr').prev().find('#utterText_' + i).addClass('span_color_' + colorIndexArr[0]);
+                    }
+                    $(this).parent().find('input[name=startIndex]').val(matchStartIndex);
+                    $(this).parent().find('input[name=endIndex]').val(matchEndIndex);
+
+                    if ($(this).parent().find('div[name=indentDiv]').length>0) {
+                        var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+                        for (var k=nowIndex-1; k >= 0; k--) {
+                            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                startInx = startInx==""?matchStartIndex:startInx*1;
+                                endInx = endInx==""?matchEndIndex:endInx*1;
+                                if (startInx <= matchStartIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
+                                }
+                                if (endInx >= matchEndIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                                }
+                            }
+                        }
+                    }
+
+                    
+                    var trIndex = $("tr[name=utterMainTr]").index($(this).parents('tr').prev());
+                    
+                    chkDulpleSelBox(trIndex, chkMatchIndex[0]);
+                }
+            }
+        } else {
+            console.log("매칭되는것 없음 ");
+        }
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+    }
 });
 
 function makeUtterTable(inputText) {
@@ -818,7 +1061,201 @@ function getEntityList(intentName, intentId) {
 }
 
 
+
+
+
+function chkDulpleSelBox(trIndex, chkIndexStr) {
+    
+    $("tr[name=utterMainTr]").eq(trIndex).next().find('select[name=multiMatchUtterSel]').each(function(){
+
+        $(this).children().each(function(){
+            if (chkIndexStr == $(this).val()) {
+                $(this).remove();
+                return false;
+            }
+        });
+        if ($(this).children().length <= 1) {
+            //$(this).remove();
+        }
+    });
+
+}
+
+
+
+//utter 삭제  버튼
+$(document).on("click", "a[name=delLabelBtn]", function(e){
+    if ($(this).parent().find('div[name=indentDiv]').length>0) {
+        alert('상위 entity를 삭제해 주세요.');
+        return false;
+    }
+    if ($(this).parent().find('select[name=entityTypeForLabel]').val() == '4') {
+        while(1) {
+            if ($(this).parent().next().find('div[name=indentDiv]').length>0) {
+                $(this).parent().next().remove();
+            } else {
+                break;
+            }
+        }
+    }
+
+    var startIndexTmp = $(this).parent().find('input[name=startIndex]').val();
+    var endIndexTmp = $(this).parent().find('input[name=endIndex]').val();
+    for (var i=startIndexTmp; i<=endIndexTmp; i++) {
+        $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+    }
+
+    $(this).parents('div[name=labelInfoDiv]').remove();
+});
+
+
+
+
+var utterArr = [];
+var newArr = []
+
+$(document).on("click", "#saveUtterModal", function(e){
+
+    utterArr = [];
+    newArr = []
+
+    var isNew = false;
+    var trIndex = 0;
+    var uterObj;
+
+    $('#utteranceTblBody tr').each(function(){ 
+        if (trIndex++%2 == 0) {
+            uterObj = new Object();
+            var utterText = $(this).find('input[name=intentHiddenName]').val();
+            if ($(this).find('input[name=intentHiddenId]').val() == 'NEW') {
+                var tmpNewObj = new Object();
+                tmpNewObj.text = utterText;
+                tmpNewObj.intentName = $('#similarQform').find('#mother_intent').val();
+                newArr.push(tmpNewObj);
+            }
+            uterObj.text = utterText;
+            uterObj.intentName = $('#similarQform').find('#mother_intent').val();
+            return true;
+        }
+        else  // trIndex == 2
+        { 
+            var entityLabels = [];
+            $(this).find('div[name=labelInfoDiv]').each(function(){
+                
+                var labelObj = new Object();
+                var selEntity;
+                var startIndex;
+                var endIndex;
+                var childName = '';
+                var utterEntityType = $(this).find('select[name=entityTypeForLabel]').val();
+                switch (utterEntityType) {
+                    case '1':
+                        
+                        selEntity = $(this).find('select[name=entitySelBox]').val();
+                        startIndex = $(this).find('input[name=startIndex]').val();
+                        endIndex = $(this).find('input[name=endIndex]').val();
+                        break;
+                    case '3':
+                        selEntity = $(this).find('select[name=entitySelBox]').val();
+                        startIndex = $(this).find('input[name=startIndex]').val();
+                        endIndex = $(this).find('input[name=endIndex]').val();
+                        
+                        if ($(this).find('select[name=entityChildSelBox]').val() != "NONE") {
+                            selEntity = selEntity + "::" + $(this).find('select[name=entityChildSelBox]').val();
+                        }
+                        break;
+
+                    case '4':
+                        selEntity = $(this).find('select[name=entitySelBox]').val();
+                        startIndex = $(this).find('input[name=startIndex]').val();
+                        endIndex = $(this).find('input[name=endIndex]').val();
+                        break;
+                }
+                
+                if (!isNew) {
+                    labelObj.entityName = selEntity;
+                    labelObj.childName = childName;
+    
+                    var startInx = $(this).parents('tr').prev().find('#indexVal_' + startIndex).val().split(',')[1];
+                    var endInx = $(this).parents('tr').prev().find('#indexVal_' + endIndex).val().split(',')[2];
+    
+                    labelObj.startCharIndex = startInx;
+                    labelObj.endCharIndex = endInx;
+                    entityLabels.push(labelObj)
+                }
+            });
+            uterObj.entityLabels = entityLabels;
+            utterArr.push(uterObj);
+        }
+
+    });
+    $('#utterModal').modal('hide');
+
+    $('#s_question').attr('readonly', true);
+    $('#editUtterModalBtn').show();
+    $('#addUtterModalBtn').hide();
+
+});
+
+
+
+function changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex) {
+    
+    var colorIndexArr = [0, 1, 2, 3, 4];
+    $('tr[name=utterMainTr]').eq(trIndex).find('span[name=utterText]').each(function(){
+
+        var classValue = $(this).attr('class');
+
+        if (typeof classValue == 'undefined') {
+            classValue = '';
+        }
+
+        if (classValue.indexOf('span_color_') != -1) {
+            for (var i=0; i<colorIndexArr.length; i++) {
+                if ('span_color_' + colorIndexArr[i] == $(this).attr('class')) {
+                    colorIndexArr.splice(i--, 1);
+                }
+            }
+        }
+    });
+
+    for (var i=0; i<matchStartIndex; i++) {
+        var tmpClass = $('tr[name=utterMainTr]').eq(trIndex).find('span[name=utterText]').eq(i).attr('class');
+        if (typeof tmpClass == 'undefined') {
+            tmpClass = '';
+        }
+        if (tmpClass.indexOf('span_color_') != -1) {
+            if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                colorIndexArr.splice(i--, 1);
+                break;
+            }
+        }
+    }
+    for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
+        var tmpClass = $('tr[name=utterMainTr]').eq(trIndex).find('span[name=utterText]').eq(i).attr('class');
+        if (tmpClass.indexOf('span_color_') != -1) {
+            if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                colorIndexArr.splice(i--, 1);
+                break;
+            }
+        }
+    }
+
+    if (colorIndexArr.length > 0) {
+        for (var i=matchStartIndex; i<=matchEndIndex; i++) {
+            $('tr[name=utterMainTr]').eq(trIndex).find('#utterText_' + i).addClass('span_color_' + colorIndexArr[0]);
+        }
+        $('tr[name=utterMainTr]').eq(trIndex).next().find('div[name=labelInfoDiv]').eq(divIndex).find('input[name=startIndex]').val(matchStartIndex);
+        $('tr[name=utterMainTr]').eq(trIndex).next().find('div[name=labelInfoDiv]').eq(divIndex).find('input[name=endIndex]').val(matchEndIndex);
+    }
+}
+
  /**
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
   * 유두연 주임 작업 끝
   */
 
@@ -1711,8 +2148,21 @@ $(document).on('click', '.addCarouselBtn', function (e) {
     }
 });
 
+// input 엔터 감지
+$(document).on("keypress", "input[name=matchUtterText]", function(e){ 
+    if (e.keyCode === 13) {	//	Enter Key
+        if ($(this).parent().find('select[name=multiMatchUtterSel]').length < 2) {
+            if ($(this).val().trim() != '' && rememberUtterInput != $(this).val().trim()) {
+                //$(this).focusout();
+                $(this).trigger('blur');
+            }
+        }
+    }
+});
+
 
 $(document).on("click", "#insert_similarQ_dlg", function () {
+    $('#s_question').val('');
     var dlgID = $(this).attr("dlg_id");
     var qSeq = $(this).attr("q_seq");
   
@@ -1724,14 +2174,16 @@ $(document).on("click", "#insert_similarQ_dlg", function () {
 
     $('#mother_q').text(show_question);
     //$('#mother_intent').text(show_intent);
-
     $('#mother_intent').val(show_intent);
     $('#sq_dlgId').val(dlgID);
     $('#sq_qSeq').val(qSeq);
 
     
+    $('#s_question').attr('readonly', false);
     $('#similarQform').modal('show');
 });
+
+
 
 $(document).on("click", "#similarQBtn", function () {
     /*
@@ -1739,21 +2191,29 @@ $(document).on("click", "#similarQBtn", function () {
     * qnamng table insert
     * 
     * */
+
+    if ($('#s_question').val().trim() == '') {
+        alert('유사질문을 입력 해 주세요.');
+        return false;
+    }
+
     var saveArr = new Array();
     var data = new Object() ;
 
     data.PROC_TYPE = "INSERT";
     data.LUIS_INTENT = $('#mother_intent').val();
-    data.LUIS_ENTITIES = "TEST"; //새로 설정한 값이 들어가야 함.
+    //data.LUIS_ENTITIES = "TEST"; //새로 설정한 값이 들어가야 함.
     data.DLG_ID = $('#sq_dlgId').val();
     data.DLG_QUESTION = $('#s_question').val();
     data.GROUP_ID = $('#sq_qSeq').val();
 
-
     saveArr.push(data);
     var jsonData = JSON.stringify(saveArr);
     var params = {
-        'saveArr' : jsonData
+        'saveArr' : jsonData,
+        'utterArr' : utterArr,
+        'newArr' : newArr,
+        'intentName' : data.LUIS_INTENT
     };
 
     $.ajax({

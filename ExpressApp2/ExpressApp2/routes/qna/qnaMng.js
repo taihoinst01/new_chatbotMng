@@ -583,43 +583,92 @@ router.post('/procSimilarQuestion', function (req, res) {
     var saveQna = "";
     var deleteQna = "";
     var deleteRelation = "";
-    
-    for (var i=0; i<dataArr.length; i++) {
-        if (dataArr[i].PROC_TYPE === 'INSERT') {
-            saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION, SIMILAR_ID) " + 
-                        "VALUES ( ";
-            saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "',(SELECT ISNULL(MAX(SEQ),1) AS SIMILAR_ID FROM TBL_QNAMNG))";
 
-            saveQna += "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT) " + 
-                        "VALUES ( ";
-            saveQna += " '" + dataArr[i].DLG_QUESTION  + "', '" + dataArr[i].LUIS_INTENT  + "', '" + dataArr[i].LUIS_ENTITIES  + "', '" + dataArr[i].GROUP_ID  + "', '" + dataArr[i].DLG_ID  + "', GETDATE()); ";
-        }else{//삭제
-            deleteQna += "DELETE FROM TBL_QNAMNG WHERE SEQ = '" + dataArr[i].DEL_SEQ + "'; ";
-            deleteRelation += "DELETE FROM TBL_DLG_RELATION_LUIS WHERE SIMILAR_ID = '" + dataArr[i].DEL_SEQ + "'; ";
-        }
-    }
+    
+    var intentName = req.body.intentName;
+    var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
+    var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
+    
+    
 
     (async () => {
         try {
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            if (labeledUtterArr.length > 0) {
+                var labelArr = [];
+                var tmpObj = new Object();
+                
+                for (var i=0; i<labeledUtterArr.length; i++) {
+                    options.payload = labeledUtterArr[i];
+                    
+                    tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
+                    
+                    if (newUtterArr != undefined) {
+                        for (var j=0; j<newUtterArr.length; j++) {
+                            if (newUtterArr[j].text == labeledUtterArr[i].text) {
+                                newUtterArr[j].id = tmpLuisObj.body;
+                                var entityTmp = labeledUtterArr[i].entityLabels;
+                                var entities = '';
+                                for (var k=0; k<entityTmp.length; k++) {
+                                    entities += entityTmp[k].entityName;
+                                    if (k < entityTmp.length-1) {
+                                        entities += ',';
+                                    }
+                                }
 
-            if (saveQna !== "") {
-                let insertQna = await pool.request().query(saveQna);
-            }
+                                for (var i=0; i<dataArr.length; i++) {
+                                    if (dataArr[i].PROC_TYPE === 'INSERT') {
+                                        saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION, SIMILAR_ID) " + 
+                                                    "VALUES ( ";
+                                        saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + entities  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "',(SELECT ISNULL(MAX(SEQ),1) AS SIMILAR_ID FROM TBL_QNAMNG))";
+                            
+                                        saveQna += "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT) " + 
+                                                    "VALUES ( ";
+                                        saveQna += " '" + dataArr[i].DLG_QUESTION  + "', '" + dataArr[i].LUIS_INTENT  + "', '" + entities  + "', '" + dataArr[i].GROUP_ID  + "', '" + dataArr[i].DLG_ID  + "', GETDATE()); ";
+                                    }else{//삭제
+                                        deleteQna += "DELETE FROM TBL_QNAMNG WHERE SEQ = '" + dataArr[i].DEL_SEQ + "'; ";
+                                        deleteRelation += "DELETE FROM TBL_DLG_RELATION_LUIS WHERE SIMILAR_ID = '" + dataArr[i].DEL_SEQ + "'; ";
+                                    }
+                                }
+                                    
+                                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            if (saveRelation !== "") {
-                let insertRelation = await pool.request().query(saveRelation);
-            }
+                                if (saveQna !== "") {
+                                    let insertQna = await pool.request().query(saveQna);
+                                }
 
-            if (deleteRelation !== "") {
-                let deleteRelationLet = await pool.request().query(deleteRelation);
-            }
+                                if (saveRelation !== "") {
+                                    let insertRelation = await pool.request().query(saveRelation);
+                                }
 
-            if (deleteQna !== "") {
-                let deleteQnaLet = await pool.request().query(deleteQna);
+                                if (deleteRelation !== "") {
+                                    let deleteRelationLet = await pool.request().query(deleteRelation);
+                                }
+
+                                if (deleteQna !== "") {
+                                    let deleteQnaLet = await pool.request().query(deleteQna);
+                                }
+                                
+
+                            }
+                        }
+                    }
+                    luisResult.push(tmpLuisObj);
+                }
+
+                var rstChk = false;
+                for (var tmp in luisResult) {
+                    console.log(luisResult[tmp]);
+                    if (luisResult[tmp].statusCode != 201) {
+                        var resultCode = luisResult[tmp].body.error.code;
+                        var resultStr = luisResult[tmp].body.error.message;
+                        logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [코드 : %s] [내용 : %s]', userId, 'luis/saveUtterance', luisResult[tmp].statusCode, resultCode + ':' + resultStr);
+                    } 
+                }
+        
+                res.send({status:200 , message:'Save Success'});
+            } else {
+                res.send({status:500 , message:'Save Success'});
             }
-            res.send({status:200 , message:'Save Success'});
-            
         } catch (err) {
             console.log(err);
             res.send({status:500 , message:'Save Error'});

@@ -139,8 +139,10 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         $(this).parent().find('input[name=startIndex]').val('');
         $(this).parent().find('input[name=endIndex]').val('');
     
-        for (var i=rememberUtterStart; i<=rememberUtterEnd; i++) {
-            $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+        if (rememberUtterStart != "") {
+            for (var i=rememberUtterStart; i<=rememberUtterEnd; i++) {
+                $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+            }
         }
         var chkMatch = [];
         var chkMatchIndex = [];
