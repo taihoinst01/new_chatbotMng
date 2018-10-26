@@ -65,7 +65,7 @@ $(document).ready(function() {
         insertForm += '</div>';
         insertForm += '</div>';
         insertForm += '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >';
-        insertForm += '<button type="button" class="btn btn-default deleteInsertForm">' + language.DELETE_DIALOG + '</button>';
+        insertForm += '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>';
         insertForm += '</div>';
         insertForm += '</form>';
         insertForm += '</div>';
@@ -148,7 +148,7 @@ $(document).ready(function() {
     $(document).on('change', 'select[name=dlgType]', function (e) {
 
         addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
-            '<button type="button" class="btn btn-default addCarouselBtn">' + language.INSERT_MORE_CARDS + '</button>' +
+            '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
             '</div>';
 
         carouselForm = '<div class="carouselLayout">' +
@@ -160,10 +160,10 @@ $(document).ready(function() {
             '</div>' +
             '<div class="clear-both"></div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+            '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
             '</div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+            '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
             '</div>' +
             '<div class="clear-both"></div>' +
             '</div>';
@@ -177,7 +177,7 @@ $(document).ready(function() {
             '<div class="modal_con btnInsertDiv">' +
             '</div>' +
             '<div class="btn_wrap" style="clear:both" >' +
-            '<button type="button" class="btn btn-default addMediaBtn" >' + language.INSERT_MORE_BUTTON + '</button>' +
+            '<button type="button" class="btn btn-default addMediaBtn" ><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
             '<div class="clear-both"></div>';
 
         var idx = $("select[name=dlgType]").index(this);
@@ -1323,8 +1323,8 @@ function makeQnaListTable(page) {
                     
                     tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
                     tableHtml += '<td class="txt_left">' + data.rows[i].ENTITY + '</td>';
-                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> Show DLG</button></td>';
-                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> 유사질문 등록</button></td>';
+                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
+                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> ' + language.Insert_similarQ + '</button></td>';
                     tableHtml += '</tr>';
                    
                     
@@ -1391,16 +1391,16 @@ $(document).on("click", "#show_dlg", function () {
         '</div>' +
         '<div class="clear-both"></div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+        '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '</div>' +
         '<div class="clear-both"></div>' +
         '</div>';
 
     addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
-        '<button type="button" class="btn btn-default addCarouselBtn">' + language.INSERT_MORE_CARDS + '</button>' +
+        '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
         '</div>';
 
     mediaForm = '<div class="mediaLayout">' +
@@ -1413,7 +1413,7 @@ $(document).on("click", "#show_dlg", function () {
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default addMediaBtn" >' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default addMediaBtn" ><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '<div class="clear-both"></div>' +
         '</div>';
 
@@ -1429,7 +1429,7 @@ $(document).on("click", "#show_dlg", function () {
         '</div>';
 
     deleteInsertForm = '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >' +
-        '<button type="button" class="btn btn-default deleteInsertForm">' + language.DELETE_DIALOG + '</button>' +
+        '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>' +
         '</div>';
 
     var inputHtml = '<div><label>' + language.BUTTON + '</label></div>' +
@@ -1707,7 +1707,7 @@ $(document).on("click", "#show_dlg", function () {
             $('.dialogView').html(inputUttrHtml);
 
             //대화상자 수정 추가
-            $('h4#myModalLabel.modal-title').text("답변 확인");
+            $('h4#myModalLabel.modal-title').text(language.Show_dlg);
             $('#description').val(result['list'][0].DLG_DESCRIPTION);
             $("#largeGroup").val(result['list'][0].GROUPL);
             $("#middleGroup").val(result['list'][0].GROUPM);
@@ -2099,10 +2099,10 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>' +
         '<div class="clear-both"></div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default deleteCard">' + language.DELETE_CARD + '</button>' +
+        '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
         '</div>' +
         '<div class="btn_wrap" style="clear:both" >' +
-        '<button type="button" class="btn btn-default carouseBtn">' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
         '</div>' +
         '<div class="clear-both"></div>' +
         '</div>';
