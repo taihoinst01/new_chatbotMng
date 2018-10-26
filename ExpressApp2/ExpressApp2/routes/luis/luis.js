@@ -1750,7 +1750,7 @@ router.post('/saveUtterance', function (req, res) {
                                                                         .input('appId', sql.NVarChar, req.session.selAppId)
                                                                         .query(saveNewUtterQry);
 
-                                    req.session.entityChildList = getDBEntityChild_result.recordset;
+                                    //req.session.entityChildList = getDBEntityChild_result.recordset;
                                 
 
                             }
@@ -2090,6 +2090,7 @@ router.post('/getNewUtterList', function (req, res){
     var selectQnAMngQry = "SELECT SEQ, Q_ID, DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT, APP_ID, USE_YN \n";
     selectQnAMngQry += "     FROM TBL_QNAMNG \n";
     selectQnAMngQry += "    WHERE USE_YN = 'Y' \n";
+    selectQnAMngQry += "      AND DLG_ID IS NULL \n";
     //selectQnAMngQry += "     AND DLG_QUESTION LIKE '%@searchQna%';\n";
 
     (async () => {

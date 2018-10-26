@@ -130,6 +130,7 @@ $(document).on("click", "a[name=delEntityBtn]", function(e){
 $(document).on("click", "#confirmBtn", function () {
     var hId = $('#hId').val();
     var hType = $('#hType').val();
+    var entityHiddenName = $(this).parents('td').find('#entityHiddenName').val();
     $('#confirmTitle').text('');
     $('#confirmMsg').text("");
     $(this).prev().trigger('click');
@@ -465,6 +466,7 @@ function deleteEntity(entityHiddenName, hId, hType) {
             else if (data.success) {
                 $('#alertMsg').text(data.message);
                 $('#chkAfterAlert').val('EXIST');
+                $('#alertBtnModal').modal('show');
                 //alert(data.message);
                 //location.reload();
             }

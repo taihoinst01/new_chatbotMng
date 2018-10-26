@@ -774,6 +774,10 @@ $(document).on("click", "a[name=addUtter]", function(e){
         return false;
     }
     */
+    if ($(this).parents('tr').next().css('display') == 'none') {
+        return false;
+    }
+
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
