@@ -35,7 +35,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>권힌그룹관리</h1>
+                        <h1><%= __('AUTHGROUP_MSG') %></h1>
                     </section>
 
                     <!-- Main content -->
@@ -46,8 +46,8 @@
                                     <div class="form-group col-lg-4">
                                         <!--<label class="fl mr10"><%= __('USER_NAME') %></label>-->
                                         <select name="searchType" id="searchType" class="form-control">
-                                            <option value="AUTHGRP_M_ID" selected>권한그룹 ID</option>
-                                            <option value="AUTHGRP_M_NM">권한그룹 명</option>
+                                            <option value="AUTHGRP_M_ID"><%= __('AUTHGROUP_ID') %></option>
+                                            <option value="AUTHGRP_M_NM" selected><%= __('AUTHGROUP_NAME') %></option>
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-4">
@@ -67,7 +67,7 @@
                                     <div class=" col-lg-6" style="text-align:right">
                                         <!--<button type="button" class="btn btn-default" id="addBtn"><%= __('ADD') %></button>-->
                                         <button type="button" class="btn btn-default" onClick="show_authMasterForm();">
-                                            <i class="fa fa-edit"></i>
+                                            <i class="fa fa-plus"></i>
                                             <%= __('ADD') %>
                                         </button>
                                     </div>
@@ -87,11 +87,11 @@
                                         </colgroup>
                                         <thead>
                                             <tr>
-                                                <th>권한이름</th>
-                                                <th>권한등급</th>
-                                                <th>권한설명</th>
-                                                <th>등록일자</th>
-                                                <th>수정일자</th>
+                                                <th><%= __('AUTHGROUP_NAME') %></th>
+                                                <th><%= __('AUTHGROUP_LEVEL') %></th>
+                                                <th><%= __('AUTHGROUP_DESC') %></th>
+                                                <th><%= __('DASHBOARD_ITEMREGDT') %></th>
+                                                <th><%= __('UPDATE_DATE') %></th>
                                                 <th>...</th>
                                             </tr>
                                         </thead>
@@ -125,32 +125,33 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">권한그룹</h4>
+                                    <h4 class="modal-title" id="myModalLabel"><%= __('AUTHGROUP_MSG') %></h4>
                                 </div>
                                 <div class="modal-body">
                                     <form class="form-horizontal" name="authMasterForm" id="authMasterForm">
                                             <input type="hidden" name="AUTHGRP_M_ID" id="AUTHGRP_M_ID">
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i> 권한이름</label>
+                                            <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i> <%= __('AUTHGROUP_NAME') %></label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="AUTHGRP_M_NM" name="AUTHGRP_M_NM" placeholder="권한이름">
+                                                <input type="text" class="form-control" id="AUTHGRP_M_NM" name="AUTHGRP_M_NM" placeholder="<%= __('AUTHGROUP_NAME') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                                <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i> 권한등급</label>
+                                                <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i> <%= __('AUTHGROUP_LEVEL') %></label>
                                                 <div class="col-sm-9">
                                                     <select name="AUTH_LEVEL" id="AUTH_LEVEL" class="form-control">
                                                         <option value="99" selected>ROOT 권한</option>
-                                                        <option value="88">관리메뉴 권한</option>
-                                                        <option value="77">챗봇관리 권한</option>
-                                                        <option value="66">챗봇사용 권한</option>
+                                                        <option value="88">챗봇매니저 관리권한</option>
+                                                        <option value="77">챗봇 별 관리 권한</option>
+                                                        <option value="66">챗봇 별 사용 권한</option>
+                                                        <option value="55">챗봇 별 모니터링 권한</option>
                                                     </select>
                                                 </div>
                                             </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-3 control-label">권한설명</label>
+                                            <label for="inputEmail3" class="col-sm-3 control-label"><%= __('AUTHGROUP_DESC') %></label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="DESCR" name="DESCR" placeholder="권한설명">
+                                                <input type="text" class="form-control" id="DESCR" name="DESCR" placeholder="<%= __('AUTHGROUP_DESC') %>">
                                             </div>
                                         </div>
                                         

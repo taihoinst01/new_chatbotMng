@@ -41,7 +41,7 @@ $(document).ready(function() {
         if(validation_check==1){
             procAuthMaster('NEW');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }  
     });
@@ -59,7 +59,7 @@ $(document).ready(function() {
         document.authMasterForm.AUTH_LEVEL.value = td.eq(1).text();
         document.authMasterForm.DESCR.value = td.eq(2).text();
 
-        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> Update</button>');
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
         $('#authMasterFormModal').modal('show');
     });
@@ -78,7 +78,7 @@ $(document).ready(function() {
         if(validation_check==1){
             procAuthMaster('UPDATE');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }  
        
@@ -135,7 +135,8 @@ function makeAuthTable() {
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> 수정</button> <button type="button" class="btn btn-default btn-sm" id="delete_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-trash"></i> 삭제</button>';
+                    //tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="delete_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-trash"></i> 삭제</button>';
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>';
                     tableHtml += '</td></tr>';
                 }
     

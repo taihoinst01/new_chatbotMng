@@ -48,8 +48,11 @@ $(document).ready(function() {
         if(validation_check==2){
             procBandWord('NEW');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
-            return;
+            //alert("필수사항이 작성되지 않았습니다.");
+            //return;
+            $('#del_content').html(language.IS_REQUIRED);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#bannedWordDeleteModal').modal('show');
         }        
     });
 
@@ -58,11 +61,11 @@ $(document).ready(function() {
         var del_count = $("#DEL_SEQ:checked").length;
          
         if(del_count > 0){
-            $('#del_content').html(' 정말로 삭제하시겠습니까? 복구할 수 없습니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteBannedWordBtn"><i class="fa fa-edit"></i> Delete</button>');
+            $('#del_content').html(language.IS_DELETE_CONFIRM);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="deleteBannedWordBtn"><i class="fa fa-edit"></i> '+language.DELETE+'</button>');
         }else{
-            $('#del_content').html('삭제할 대상은 한 개 이상이어야 합니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#del_content').html(language.IS_DELETE_CONDITION);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button>');
         }
         $('#bannedWordDeleteModal').modal('show');
     });

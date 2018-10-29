@@ -153,8 +153,8 @@ function mkBoardItemRow(rows, checkedApp) {
             appHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
         }
 
-        appHtml += '<td>' + rows[i].BOARD_NM + '</td>';
-        appHtml += '<td>' + rows[i].BOARD_EXPL + '</td>';
+        appHtml += '<td class="text-left">' + rows[i].BOARD_NM + '</td>';
+        appHtml += '<td class="text-left">' + rows[i].BOARD_EXPL + '</td>';
         appHtml += '<td><input type="hidden" value="' + rows[i].BOARD_ID + '" /></td></tr>';
     }
 

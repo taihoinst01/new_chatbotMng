@@ -148,7 +148,7 @@ function makeChatSelBox() {
 
 function saveApp() {
     if ($('#appService :selected').val() === "-1") {
-        alert("챗봇을 선택해야 합니다.");
+        alert(language.You_must_choose_a_chatbot);
         return;
     }
     var params = {

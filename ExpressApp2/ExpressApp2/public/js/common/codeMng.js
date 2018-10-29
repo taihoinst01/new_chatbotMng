@@ -45,7 +45,7 @@ $(document).ready(function() {
         if(validation_check==2){
             procCodeMaster('NEW');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }
         
@@ -77,7 +77,7 @@ $(document).ready(function() {
         if(validation_check==2){
             procCodeMaster('UPDATE');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }
         
@@ -135,12 +135,12 @@ function makeCodeMasterTable() {
                     }
         
                     if(data.rows[i].USE_YN=='Y'){
-                        tableHtml += '<td>사용</td>';
+                        tableHtml += '<td>'+language.USE_Y+'</td>';
                     }else{
-                        tableHtml += '<td>미사용</td>';
+                        tableHtml += '<td>'+language.USE_N+'</td>';
                     }
                     tableHtml += '<td>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" onClick="update_codeMasterForm();"><i class="fa fa-edit"></i> 수정</button> <button type="button" class="btn btn-default btn-sm" id="deleteBtn" onClick="del_codeMaster()"><i class="fa fa-trash"></i> 삭제</button> <button type="button" class="btn btn-default btn-sm" onClick="goDetailCode(\''+ data.rows[i].CDM_ID +'\')"><i class="fa fa-info-circle"></i> detail</button>';                   
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" onClick="update_codeMasterForm();"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="deleteBtn" onClick="del_codeMaster()"><i class="fa fa-trash"></i> '+language.DELETE+'</button> <button type="button" class="btn btn-default btn-sm" onClick="goDetailCode(\''+ data.rows[i].CDM_ID +'\')"><i class="fa fa-info-circle"></i> '+language.CODESET_DETAIL+'</button>';                   
                     tableHtml += '</td></tr>';
                 }
     
@@ -186,15 +186,15 @@ function makeCodeDeatilTable() {
                     tableHtml += '<td>' + data.rows[i].CD_SEQ + '</td>';
         
                     if(data.rows[i].USE_YN=='Y'){
-                        tableHtml += '<td>사용</td>';
+                        tableHtml += '<td>'+language.USE_Y+'</td>';
                     }else{
-                        tableHtml += '<td>미사용</td>';
+                        tableHtml += '<td>'+language.USE_N+'</td>';
                     }
                     tableHtml += '<td>' + data.rows[i].STR_1 + '</td>';
                     tableHtml += '<td>' + data.rows[i].STR_2 + '</td>';
                     tableHtml += '<td>' + data.rows[i].STR_3 + '</td>';
                     tableHtml += '<td>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" onClick="update_codeDetailForm();"><i class="fa fa-edit"></i> 수정</button> <button type="button" class="btn btn-default btn-sm" id="deleteDetailBtn"><i class="fa fa-trash"></i> 삭제</button>';                   
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" onClick="update_codeDetailForm();"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="deleteDetailBtn"><i class="fa fa-trash"></i> '+language.DELETE+'</button>';                   
                     tableHtml += '</td></tr>';
                 }
                 
@@ -220,7 +220,7 @@ function update_codeMasterForm(){
     document.codeMasterForm.new_code_desc.value = $('#codeMasterTbody').children().children().eq(3).text();
     $("#new_code_id").attr("readonly", true);
 
-    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary" id="updateBtn">Update</button>');
+    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
     $('#codeMasterFormModal').modal('show'); 
 }
@@ -238,7 +238,7 @@ function update_codeDetailForm(){
     document.codeDetailForm.STR_3.value = $('#codeDetailTbody').children().children().eq(9).text();
     $("#CDM_ID").attr("readonly", true);
 
-    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary" id="updateDetailBtn">Update</button>');
+    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateDetailBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
     $('#codeDetailFormModal').modal('show'); 
 }

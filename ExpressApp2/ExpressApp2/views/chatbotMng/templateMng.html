@@ -36,7 +36,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>템플릿 관리</h1>
+                        <h1><%= __('TEMPLATE_TITLE') %></h1>
                     </section>
 
                     <!-- Main content -->
@@ -57,9 +57,9 @@
                                                             <input type="hidden" name="template_id" id="template_id">
                                                             <input type="hidden" name="chatbotName" id="chatbotName" value="<%=appName%>">
                                                             <div class="form-group col-lg-3">
-                                                                <label for="exampleInputEmail3">Header Color</label>
+                                                                <label for="exampleInputEmail3"><%= __('HEADER_COLOR') %></label>
                                                                 <div id="headerColor" class="input-group colorpicker-component">
-                                                                    <input type="text" class="form-control" id="header_color" name="header_color" placeholder="Header Color" value="#302f35">
+                                                                    <input type="text" class="form-control" id="header_color" name="header_color" placeholder="<%= __('HEADER_COLOR') %>" value="#302f35">
                                                                     <span class="input-group-addon"><i></i></span>
                                                                 </div>
                                                                 <script>
@@ -69,9 +69,9 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-3">
-                                                                <label for="exampleInputEmail3">Body Color</label>
+                                                                <label for="exampleInputEmail3"><%= __('BODY_COLOR') %></label>
                                                                 <div id="bodyColor" class="input-group colorpicker-component">
-                                                                    <input type="text" class="form-control" id="body_color" name="body_color" placeholder="Body Color" value="#F2F3F7">
+                                                                    <input type="text" class="form-control" id="body_color" name="body_color" placeholder="><%= __('BODY_COLOR') %>" value="#F2F3F7">
                                                                     <span class="input-group-addon"><i></i></span>
                                                                 </div>
                                                                 <script>
@@ -81,9 +81,9 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-3">
-                                                                <label for="exampleInputEmail3">Popup Header Color</label>
+                                                                <label for="exampleInputEmail3"><%= __('POPHEADER_COLOR') %></label>
                                                                 <div id="popheaderColor" class="input-group colorpicker-component">
-                                                                    <input type="text" class="form-control" id="popheader_color" name="popheader_color" placeholder="Popup Header Color" value="#4b4f57">
+                                                                    <input type="text" class="form-control" id="popheader_color" name="popheader_color" placeholder="<%= __('POPHEADER_COLOR') %>" value="#4b4f57">
                                                                     <span class="input-group-addon"><i></i></span>
                                                                 </div>
                                                                 <script>
@@ -93,9 +93,9 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-3">
-                                                                <label for="exampleInputEmail3">Bot Color</label>
+                                                                <label for="exampleInputEmail3"><%= __('BOT_COLOR') %></label>
                                                                 <div id="botColor" class="input-group colorpicker-component">
-                                                                    <input type="text" class="form-control" id="bot_color" name="bot_color" placeholder="Bot Color" value="#ffffff">
+                                                                    <input type="text" class="form-control" id="bot_color" name="bot_color" placeholder="<%= __('BOT_COLOR') %>" value="#ffffff">
                                                                     <span class="input-group-addon"><i></i></span>
                                                                 </div>
                                                                 <script>
@@ -105,9 +105,9 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-3">
-                                                                <label for="exampleInputEmail3">User Color</label>
+                                                                <label for="exampleInputEmail3"><%= __('USER_COLOR') %></label>
                                                                 <div id="userColor" class="input-group colorpicker-component">
-                                                                    <input type="text" class="form-control" id="user_color" name="user_color" placeholder="User Color" value="#00aad2">
+                                                                    <input type="text" class="form-control" id="user_color" name="user_color" placeholder="<%= __('USER_COLOR') %>" value="#00aad2">
                                                                     <span class="input-group-addon"><i></i></span>
                                                                 </div>
                                                                 <script>
@@ -117,14 +117,14 @@
                                                                 </script>
                                                             </div>
                                                             <div class="form-group col-lg-4">
-                                                                <label for="exampleInputEmail3">Bot Icon Image</label>
+                                                                <label for="exampleInputEmail3"><%= __('BOTICON_IMG') %></label>
                                                                 <input type="text" class="form-control" id="icon_img" name="icon_img" placeholder="Icon Image" value="https://bottest.hyundai.com/assets/images/alice_profile_icn_35.png">
                                                                 <small id="backgrondHelpText" class="form-text text-muted">
                                                                     require Full URL
                                                                 </small>
                                                             </div>
                                                             <div class="form-group col-lg-4">
-                                                                <label for="exampleInputEmail3">BackGround Image</label>
+                                                                <label for="exampleInputEmail3"><%= __('BACKGROUND_IMG') %></label>
                                                                 <input type="text" class="form-control" id="background_img" name="background_img" placeholder="BackGround Image">
                                                                 <small id="backgrondHelpText" class="form-text text-muted">
                                                                     require Full URL
@@ -136,7 +136,7 @@
                                                     <div class="panel-footer">
                                                         <div class="row">
                                                             <div class="col-lg-8">
-                                                                    <i class="fa fa-info-circle"></i> BodyColor 와 BackGround Image 가 함께 있으면 Image 가 우선입니다.
+                                                                    <i class="fa fa-info-circle"></i> <%= __('TEMPLATE_INFO') %>
                                                             </div>
                                                             <div class="col-lg-4 text-right">
                                                                 <button type="button" class="btn btn-default" id="addTemplateBtn"><i class="fa fa-edit"></i> Save</button>
@@ -151,7 +151,7 @@
                                         <h4 class=" col-lg-6">Template List</h4>
                                         <div class=" col-lg-6" style="text-align:right; padding:0px !important">
                                             <button type="button" class="btn btn-default" id="deleteTemplateBtnModal">
-                                                <i class="fa fa-trash"></i> Delete
+                                                <i class="fa fa-trash"></i> <%= __('DELETE') %>
                                             </button>
                                         </div>
                                         <div class="Tbl_wrap">
@@ -173,14 +173,14 @@
                                                     <tr>
                                                         <th></th>
                                                         <th><input type="checkbox" class="flat-red" id="check-all"></th>
-                                                        <th>Header Color</th>
-                                                        <th>Body Color</th>
-                                                        <th>PopHeader Color</th>
-                                                        <th>Bot Color</th>
-                                                        <th>User Color</th>
-                                                        <th>Bot Icon Image</th>
-                                                        <th>BackGround Image</th>
-                                                        <th>Use YN</th>
+                                                        <th><%= __('HEADER_COLOR') %></th>
+                                                        <th><%= __('BODY_COLOR') %></th>
+                                                        <th><%= __('POPHEADER_COLOR') %></th>
+                                                        <th><%= __('BOT_COLOR') %></th>
+                                                        <th><%= __('USER_COLOR') %></th>
+                                                        <th><%= __('BOTICON_IMG') %></th>
+                                                        <th><%= __('BACKGROUND_IMG') %></th>
+                                                        <th><%= __('USE_YN') %></th>
                                                         <th>...</th>
                                                     </tr>
                                                 </thead>
@@ -217,7 +217,7 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">ChatBot Template</h4>
+                                    <h4 class="modal-title" id="myModalLabel"><%= __('TEMPLATE_TITLE') %></h4>
                                 </div>
                                 <div class="modal-body">
                                     <p id="proc_content"></p>
@@ -236,7 +236,7 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">ChatBot Preview</h4>
+                                    <h4 class="modal-title" id="myModalLabel"><%= __('TEMPLATE_PREVIEW') %></h4>
                                 </div>
                                 <div class="modal-body">
                                     
@@ -244,7 +244,7 @@
                                         <div class="dialogView" >
                                             <div class="wc-header" id="headerColorId" style="background-color: #302f35;">
                                                 <span class='chatTitle'></span>
-                                                <span class='chatTitleText'>ChatBot Header</span>
+                                                <span class='chatTitleText'><%= __('TEMPLATE_PREVIEW_HEADER') %></span>
                                             </div>
                                             <p></p>
                                             <div class="wc-message wc-message-from-bot" style="width:80%;">
@@ -253,8 +253,8 @@
                                                     <div id="botColorId" style="background-color: #ffffff;">
                                                         <div class="format-markdown">
                                                             <div class="textMent">
-                                                                <h1 class="textTitle">BOT 영역입니다.</h1>
-                                                                <p>BOT 이 답하는 부분입니다.</p>
+                                                                <h1 class="textTitle"><%= __('TEMPLATE_PREVIEW_BOT') %></h1>
+                                                                <p><%= __('TEMPLATE_PREVIEW_BOT_DESC') %></p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -265,8 +265,8 @@
                                                     <div id="userColorId" style="background-color: #00aad2;">
                                                         <div class="format-markdown">
                                                             <div class="textMent">
-                                                                <h1 class="textTitle">USER 영역입니다.</h1>
-                                                                <p>USER 가 답하는 부분입니다.</p>
+                                                                <h1 class="textTitle"><%= __('TEMPLATE_PREVIEW_USER') %></h1>
+                                                                <p><%= __('TEMPLATE_PREVIEW_USER_DESC') %></p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -276,7 +276,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer" id="delete_footer_button">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CLOSE') %><</button>
                                 </div>
                             </div>
                         </div>

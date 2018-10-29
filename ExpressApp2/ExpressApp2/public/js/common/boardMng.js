@@ -37,7 +37,7 @@ $(document).ready(function() {
         if(validation_check==2){
             procBoardItemMaster('NEW');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }        
     });
@@ -55,7 +55,7 @@ $(document).ready(function() {
         document.boardItemForm.BOARD_URL.value = td.eq(2).text();
         document.boardItemForm.BOARD_EXPL.value = td.eq(3).text();
 
-        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="updateBoardItem"><i class="fa fa-edit"></i> Update</button>');
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateBoardItem"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
         $('#boardItemFormModal').modal('show');
     });
@@ -80,7 +80,7 @@ $(document).ready(function() {
         if(validation_check==2){
             procBoardItemMaster('UPDATE');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }       
     });
@@ -126,14 +126,14 @@ function makeBoardItemTable() {
                     tableHtml += '<td>' + data.rows[i].BOARD_EXPL + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_boardItemForm" board_id="' + data.rows[i].BOARD_ID + '"><i class="fa fa-edit"></i> 수정</button> <button type="button" class="btn btn-default btn-sm" id="delete_boardItemForm" board_id="' + data.rows[i].BOARD_ID + '"><i class="fa fa-trash"></i> 삭제</button>';
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_boardItemForm" board_id="' + data.rows[i].BOARD_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="delete_boardItemForm" board_id="' + data.rows[i].BOARD_ID + '"><i class="fa fa-trash"></i> '+language.DELETE+'</button>';
                     tableHtml += '</td></tr>';
                 }
     
                 saveTableHtml = tableHtml;
                 $('#dashBoardItemTbody').html(tableHtml);
             } else {
-                saveTableHtml = '<tr><td colspan="6" class="text-center">No Dashboard Item Data</td></tr>';
+                saveTableHtml = '<tr><td colspan="6" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#dashBoardItemTbody').html(saveTableHtml);
             }
             

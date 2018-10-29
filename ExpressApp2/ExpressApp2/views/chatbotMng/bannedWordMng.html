@@ -31,7 +31,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>금칙어 관리</h1>
+                        <h1><%= __('BANDEDWORD_TITLE') %></h1>
                     </section>
 
                     <!-- Main content -->
@@ -52,18 +52,18 @@
                                                             <input type="hidden" name="AUTHGRP_M_ID" id="AUTHGRP_M_ID">
                                                             <div class="form-group">
                                                                 <label for="inputEmail3" class="col-sm-3 control-label">
-                                                                    <i class="fa fa-asterisk"></i> BANNED_WORD</label>
+                                                                    <i class="fa fa-asterisk"></i> <%= __('BANDED_WORD') %></label>
                                                                 <div class="col-sm-9">
-                                                                    <input type="text" class="form-control" id="BANNED_WORD" name="BANNED_WORD" placeholder="BANNED_WORD">
+                                                                    <input type="text" class="form-control" id="BANNED_WORD" name="BANNED_WORD" placeholder="<%= __('BANDED_WORD') %>">
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="inputEmail3" class="col-sm-3 control-label">
-                                                                    <i class="fa fa-asterisk"></i> TYPE</label>
+                                                                    <i class="fa fa-asterisk"></i> <%= __('BANDEDWORD_TYPE') %></label>
                                                                 <div class="col-sm-9">
                                                                     <select name="BANNED_WORD_TYPE" id="BANNED_WORD_TYPE" class="form-control">
-                                                                        <option value="3" selected>비속어</option>
-                                                                        <option value="4">금칙어</option>
+                                                                        <option value="3" selected><%= __('BANDEDWORD_TYPE1') %></option>
+                                                                        <option value="4"><%= __('BANDEDWORD_TYPE2') %></option>
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -71,17 +71,17 @@
                                                     </div>
                                                     <div class="panel-footer text-right">
                                                         <button type="button" class="btn btn-default" id="addBannedWordBtn">
-                                                            <i class="fa fa-edit"></i> Save</button>
+                                                            <i class="fa fa-edit"></i> <%= __('SAVE') %></button>
                                                     </div>
                                                 </div>
 
                                         </div>
                                     </div>
                                     <div class="col-lg-6" style="padding:0px !important">
-                                        <h4 class=" col-lg-6">Banned List</h4>
+                                        <h4 class=" col-lg-6">Banned Word List</h4>
                                         <div class=" col-lg-6" style="text-align:right; padding:0px !important">
                                             <button type="button" class="btn btn-default" id="deleteBannedWordBtnModal">
-                                                <i class="fa fa-trash"></i> Delete
+                                                <i class="fa fa-trash"></i> <%= __('DELETE') %>
                                             </button>
                                         </div>
                                         <div class="Tbl_wrap">
@@ -94,12 +94,12 @@
                                                 </colgroup>
                                                 <thead>
                                                     <tr>
-                                                        <th></th>
+                                                        <th><%= __('NUM') %></th>
                                                         <th>
                                                             <input type="checkbox" class="flat-red" id="check-all">
                                                         </th>
-                                                        <th>Banned Word</th>
-                                                        <th>Banned Type</th>
+                                                        <th><%= __('BANDED_WORD') %></th>
+                                                        <th><%= __('BANDEDWORD_TYPE') %></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="bannedWordTableBodyId">
@@ -136,7 +136,7 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">BannedWord</h4>
+                                    <h4 class="modal-title" id="myModalLabel"><%= __('BANDED_WORD') %></h4>
                                 </div>
                                 <div class="modal-body">
                                     <p id="del_content"></p>

@@ -52,7 +52,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>공통코드관리</h1>
+                        <h1><%= __('COMMON_CODE_MSG') %></h1>
                     </section>
 
                     <!-- Main content -->
@@ -64,10 +64,10 @@
                                     <h4 class=" col-lg-6" id="detailCode_Title"></h4>
                                     <div class=" col-lg-6" style="text-align:right">
                                         <button type="button" class="btn btn-default" onClick="go_codeMasterList();">
-                                            <i class="fa fa-list"></i> Master Code List
+                                            <i class="fa fa-list"></i> <%= __('CODESET_MASTER_LIST') %>
                                         </button>
                                         <button type="button" class="btn btn-default" onClick="show_codeDetailForm();">
-                                            <i class="fa fa-save"></i> <%= __('ADD') %>
+                                            <i class="fa fa-plus"></i> <%= __('ADD') %>
                                         </button>
                                     </div>
                                 </div>
@@ -90,16 +90,16 @@
                                         </colgroup>
                                         <thead>
                                             <tr>
-                                                <th>No</th>
-                                                <th>코드셋 ID</th>
-                                                <th>코드</th>
-                                                <th>코드명</th>
-                                                <th>설명</th>
-                                                <th>순서</th>
-                                                <th>사용여부</th>
-                                                <th>문자열1</th>
-                                                <th>문자열2</th>
-                                                <th>문자열3</th>
+                                                <th><%= __('NUM') %></th>
+                                                <th><%= __('CODESET_ID') %></th>
+                                                <th><%= __('CODE_') %></th>
+                                                <th><%= __('CODE_NAME') %></th>
+                                                <th><%= __('DESCRIPTION') %></th>
+                                                <th><%= __('CODESET_ORDER') %></th>
+                                                <th><%= __('USE_YN') %></th>
+                                                <th><%= __('CODESET_STRING1') %></th>
+                                                <th><%= __('CODESET_STRING2') %></th>
+                                                <th><%= __('CODESET_STRING3') %></th>
                                                 <th>...</th>
                                             </tr>
                                         </thead>
@@ -131,25 +131,25 @@
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                     <h4 class="modal-title" id="myModalLabel">
-                                        <%=CDM_ID%>코드 디테일</h4>
+                                        <%=CDM_ID%> <%= __('CODE_DETAIL') %></h4>
                                 </div>
                                 <div class="modal-body">
                                     <form class="form-horizontal" name="codeDetailForm" id="codeDetailForm">
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">Code ID</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODE_ID') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="CDM_ID" name="CDM_ID" placeholder="Code ID" value="<%=CDM_ID%>"
+                                                <input type="text" class="form-control" id="CDM_ID" name="CDM_ID" placeholder="<%= __('CODE_ID') %>" value="<%=CDM_ID%>"
                                                     readonly>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">Code</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODE_') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="CD" name="CD" placeholder="Code">
+                                                <input type="text" class="form-control" id="CD" name="CD" placeholder="<%= __('CODE_') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                                <label for="inputEmail3" class="col-sm-2 control-label">Language</label>
+                                                <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODE_LANGUAGE') %></label>
                                                 <div class="col-sm-10">
                                                     <select name="LANG" id="LANG" class="form-control">
                                                         <option value="EN" selected>영어</option>
@@ -158,39 +158,39 @@
                                                 </div>
                                             </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">Code Name</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODE_NAME') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="CD_NM" name="CD_NM" placeholder="Code Name">
+                                                <input type="text" class="form-control" id="CD_NM" name="CD_NM" placeholder="<%= __('CODE_NAME') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">Description</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('DESCRIPTION') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="CD_EXPL" name="CD_EXPL" placeholder="Description">
+                                                <input type="text" class="form-control" id="CD_EXPL" name="CD_EXPL" placeholder="<%= __('DESCRIPTION') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">순서</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODESET_ORDER') %></label>
                                             <div class="col-sm-10">
-                                                <input type="number" class="form-control" id="CD_SEQ" name="CD_SEQ" placeholder="Code Order">
+                                                <input type="number" class="form-control" id="CD_SEQ" name="CD_SEQ" placeholder="<%= __('CODESET_ORDER') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">문자열1</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODESET_STRING1') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="STR_1" name="STR_1" placeholder="문자열1">
+                                                <input type="text" class="form-control" id="STR_1" name="STR_1" placeholder="<%= __('CODESET_STRING1') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">문자열2</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODESET_STRING2') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="STR_2" name="STR_2" placeholder="문자열2">
+                                                <input type="text" class="form-control" id="STR_2" name="STR_2" placeholder="<%= __('CODESET_STRING2') %>">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">문자열3</label>
+                                            <label for="inputEmail3" class="col-sm-2 control-label"><%= __('CODESET_STRING3') %></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="STR_3" name="STR_3" placeholder="문자열3">
+                                                <input type="text" class="form-control" id="STR_3" name="STR_3" placeholder="<%= __('CODESET_STRING3') %>">
                                             </div>
                                         </div>
                                     </form>

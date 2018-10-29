@@ -137,7 +137,7 @@ function makeUserTable() {
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>'
-                    tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + '초기화'+ '</a>' + '</td>'
+                    tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'

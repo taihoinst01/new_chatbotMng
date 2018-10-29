@@ -46,7 +46,7 @@ $(document).ready(function () {
         if(validation_check==3){
             procMenuMaster('NEW');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }        
     });
@@ -64,7 +64,7 @@ $(document).ready(function () {
         document.menuForm.MENU_URL.value = td.eq(1).text();
         document.menuForm.MENU_AUTH.value = td.eq(2).text();
 
-        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> Update</button>');
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
         $('#menuFormModal').modal('show');
     });
@@ -97,7 +97,7 @@ $(document).ready(function () {
         if(validation_check==3){
             procMenuMaster('UPDATE');
         }else{
-            alert("필수사항이 작성되지 않았습니다.");
+            alert(language.IS_REQUIRED);
             return;
         }       
         
@@ -148,7 +148,7 @@ function makeMenuTable() {
                     tableHtml += '<td>' + data.rows[i].MOD_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-edit"></i> 수정</button> <button type="button" class="btn btn-default btn-sm" id="delete_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-trash"></i> 삭제</button>';
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="delete_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-trash"></i> '+language.DELETE+'</button>';
                     tableHtml += '</td></tr>';
                 }
 
@@ -233,12 +233,12 @@ function getMenu() {
         url: '/menu/selectMenuAuthList',
         success: function (data) {
             if (data.records > 0) {
-                select_menu = "<option value='' selected>권한선택</option>"
+                select_menu = "<option value='' selected>"+language.CHOOSE_AUTH+"</option>"
                 for (var i = 0; i < data.rows.length; i++) {
                     select_menu += '<option value="' + data.rows[i].AUTH_LEVEL + '">' + data.rows[i].AUTHGRP_M_NM + '</option>';
                 }
             } else {
-                select_menu = "<option value='' selected>권한선택</option>"
+                select_menu = "<option value='' selected>"+language.CHOOSE_AUTH+"</option>"
             }
             $('#MENU_AUTH').html(select_menu);
         }

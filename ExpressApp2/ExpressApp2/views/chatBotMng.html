@@ -27,7 +27,7 @@
                 <div class="content-wrapper">
                     <!--<section class="content-header"><h1><%= __('CHATBOT_MNG') %></h1>  </section>-->
                     <section class="content-header">
-                        <h1>챗봇 앱관리</h1>
+                        <h1><%= __('CHATBOT_APP_MSG') %></h1>
                     </section>
                     <input type="hidden" id="selectChatHiddenId" value="" />
                     <!-- Main content -->
@@ -41,7 +41,7 @@
                                             style="width:80%">
                                     </div>
                                     <div class="form-group col-lg-2" style="text-align:left">
-                                        <button type="button" class="btn btn_01" id="searchBtn"><%= __('SEARCH') %></button>
+                                        <button type="button" class="btn btn_01" id="searchBtn"><i class="fa fa-search"></i> <%= __('SEARCH') %></button>
                                     </div>
                                 </div>
 
@@ -95,8 +95,8 @@
                                         </h4>
                                         <div class=" col-lg-6" style="text-align:right; padding:0px !important">
                                             <!--<button type="button" class="btn btn-default" data-toggle="modal" data-target="#addAppShowMordal" id="addAppMordalId" ><%= __('create_app') %></button>-->
-                                            <button type="button" class="btn btn-default" id="saveBtn"><%= __('SAVE') %></button>
-                                            <button type="button" class="btn btn-default" id="initBtn"><%= __('INIT') %></button>
+                                            <button type="button" class="btn btn-default" id="saveBtn"><i class="fa fa-edit"></i> <%= __('SAVE') %></button>
+                                            <button type="button" class="btn btn-default" id="initBtn"><i class="fa fa-refresh"></i> <%= __('INIT') %></button>
                                         </div>
                                         <div class="Tbl_wrap">
                                             <table class="Tbl" summary="사용자 권한관리">
@@ -169,8 +169,8 @@
 
                                 <div class="modal-footer">
                                     <div class="btn_wrap">
-                                        <button type="button" class="btn btn_01" onclick="saveApp(); return false;"><%= __('CREAT') %></button>
-                                        <button type="button" class="btn btn-default createDlgModalClose" data-dismiss="modal"><%= __('CANCEL') %></button>
+                                        <button type="button" class="btn btn_01" onclick="saveApp(); return false;"><i class="fa fa-edit"></i> <%= __('CREAT') %></button>
+                                        <button type="button" class="btn btn-default createDlgModalClose" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CANCEL') %></button>
                                     </div>
                                 </div>
                             </div>
