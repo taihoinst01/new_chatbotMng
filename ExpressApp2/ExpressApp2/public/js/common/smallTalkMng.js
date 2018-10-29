@@ -21,11 +21,11 @@ $(document).ready(function() {
         var del_count = $("#CANCEL_ST_SEQ:checked").length;
          
         if(del_count > 0){
-            $('#cancel_content').html(' 정말로 취소하시겠습니까? 복구할 수 없습니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="cancelSmallTalkBtn"><i class="fa fa-edit"></i> SmallTalk Cancel</button>');
+            $('#cancel_content').html(language.SmallTalk_CANCEL_CONFIRM);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button><button type="button" class="btn btn-primary" id="cancelSmallTalkBtn"><i class="fa fa-edit"></i> '+ language.SmallTalk_Cancel +'</button>');
         }else{
-            $('#cancel_content').html('취소할 대상은 한 개 이상이어야 합니다.');
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#cancel_content').html(language.SmallTalk_CANCEL_COUNT);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
         }
         $('#cancelSmallTalkModal').modal('show');
     });
@@ -493,7 +493,7 @@ function makeSmallTalkTable(page) {
                 $('#smallTalkTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                saveTableHtml = '<tr><td colspan="4" class="text-center">No SmallTalk Data</td></tr>';
+                saveTableHtml = '<tr><td colspan="4" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#smallTalktbody').html(saveTableHtml);
             }
 

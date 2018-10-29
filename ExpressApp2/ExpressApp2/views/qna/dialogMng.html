@@ -47,7 +47,7 @@
     <%include  ../leftSideBar.html%>
 
     <div class="content-wrapper">
-            <section class="content-header"><h1>대화상자관리</h1>  </section>
+            <section class="content-header"><h1><%= __('DIALOG_MNG_TITLE') %></h1>  </section>
 
             <!-- Main content -->
             <section class="content">
@@ -56,10 +56,10 @@
                                   <div class="modal-body search_op">
                                       <input type="hidden" id="sourceType2" name="sourceType" value="D">
                                         <div class="form-group col-lg-4"  style=" padding-left:0px !important" >
-                                            <input type="text" name="searchTitleTxt" id="searchTitleTxt" class="form-control" placeholder="제목 검색">
+                                            <input type="text" name="searchTitleTxt" id="searchTitleTxt" class="form-control" placeholder="<%= __('Please_enter_a_title') %>">
                                         </div> 
                                         <div class="form-group col-lg-4"  style=" padding-left:0px !important" >
-                                            <input type="text" name="searchDescTxt" id="searchDescTxt" class="form-control" placeholder="설명 검색">
+                                            <input type="text" name="searchDescTxt" id="searchDescTxt" class="form-control" placeholder="<%= __('Please_enter_your_content') %>">
                                         </div>        
                                                                
                                         <div class="form-group col-lg-4 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
@@ -76,9 +76,9 @@
                                             <input type="hidden" name="sourceType" id="tblSourceType" value="D">
                                                   <tr>
                                                     <th></th>
-                                                      <th>제목</th>
+                                                      <th><%= __('TITLE') %></th>
                                                       <th><%= __('DESC') %></th>
-                                                      <th>다이알로그 타입</th>
+                                                      <th><%= __('DIALOG_BOX_TYPE') %></th>
                                                       <th></th>
                                                   </tr>
                                                 <tbody id="dialogTbltbody">
@@ -117,13 +117,13 @@
                                 <h5><span class="col01 fa fa-chevron-right"></span> <%= __('GROUP_INFORMATION') %></h5>          
                                 <div class="clear-both"></div>
                                 <div class="form-group" >
-                                    <label>Title</label>
+                                    <label><%= __('TITLE') %></label>
                                     <textarea class="form-control" name="title" id="title" rows="1" placeholder="<%= __('Please_enter') %>"></textarea>
                                 </div> 
                             
                                 <div class="clear-both"></div>
                                 <div class="form-group" >
-                                    <label><%= __('explanation') %></label>
+                                    <label><%= __('DESC') %></label>
                                     <textarea class="form-control" name="description" id="description" rows="3" placeholder="<%= __('Please_enter') %>"></textarea>
                                 </div>  
                             </form>
@@ -398,7 +398,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="myModalLabel">대화상자설정</h4>
+                    <h4 class="modal-title" id="myModalLabel"><%= __("DIALOG_MNG_TITLE") %></h4>
                 </div>
                 <div class="modal-body"><p id="proc_content"></p></div>
                 <div class="modal-footer" id="footer_button">

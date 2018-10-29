@@ -496,9 +496,10 @@
                         <div class="clear-both"></div>
                         <div class="form-group" >
                             <label><%= __('SimilarQ') %></label>
-                            <button type="button" class="btn btn_01"  id="addUtterModalBtn"><i class="fa fa-edit"></i> <%= __('ADD') %></button>
-                            <button type="button" class="btn btn_01"  id="editUtterModalBtn" style="display: none;"> <i class="fa fa-edit"></i> <%= __('MODIFY') %></button>
+                            <button type="button" class="btn btn_01 pull-right"  id="addUtterModalBtn"><i class="fa fa-plus"></i> Add Entity</button>
+                            <button type="button" class="btn btn_01 pull-right"  id="editUtterModalBtn" style="display: none;"> <i class="fa fa-edit"></i> Modify Entity</button>
                             <input type="text" name="s_question" id="s_question" class="form-control">
+                            <small id="similarQhelp" class="form-text text-muted">질문입력 후 Entity 를 등록해야 합니다.</small>
                         </div>  
                     </form>
                 </div>        

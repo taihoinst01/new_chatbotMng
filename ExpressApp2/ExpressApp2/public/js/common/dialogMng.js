@@ -1280,11 +1280,11 @@ function selectDlgByTxt(groupType, sourceType) {
             if (data.list.length > 0) {
                 for (var i = 0; i < data.list.length; i++) {
                     if(data.list[i].DLG_TYPE==2){
-                        type_name = "TEXT";
+                        type_name = language.DLG_TEXT;
                     }else if(data.list[i].DLG_TYPE==3){
-                        type_name = "CARD";
+                        type_name = language.DLG_CARD;
                     }else if(data.list[i].DLG_TYPE==4){
-                        type_name = "MEDIA";
+                        type_name = language.DLG_MEDIA;
                     }else{
                         type_name = "NONE";
                     }
@@ -2053,8 +2053,8 @@ function updateDialog() {
 var deleteDlgId = "";
 function deleteDialogModal(dlgId) {
     deleteDlgId = dlgId;
-    $('#proc_content').html('선택된 정보를 삭제하시겠습니까? 복구할 수 없습니다.');
-    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteDialogBtn" onClick="deleteDialog();"><i class="fa fa-trash"></i> Delete</button>');
+    $('#proc_content').html(language.IS_DELETE_CONFIRM);
+    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button><button type="button" class="btn btn-primary" id="deleteDialogBtn" onClick="deleteDialog();"><i class="fa fa-trash"></i> ' + language.DELETE +'</button>');
     $('#procDialog').modal('show');
 }
 
@@ -2068,7 +2068,7 @@ function deleteDialog() {
 
         success: function (result) {
             //alert('delele complete');
-            $('#proc_content').html('삭제되었습니다.');
+            $('#proc_content').html(language.Deleted);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
             $('#procDialog').modal('show');
             $('.createDlgModalClose').click();
