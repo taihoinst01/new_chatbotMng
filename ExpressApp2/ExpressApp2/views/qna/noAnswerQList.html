@@ -14,7 +14,7 @@
     <script src="common/js/html5shiv.min.js"></script>
     <script src="common/js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script type="text/javascript" src="/js/common/recommend.js"></script>
+    <script type="text/javascript" src="/js/common/noAnswerQList.js"></script>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -44,12 +44,19 @@
                                 <option value="lastMonth"><%= __('Last_month') %></option>
                             </select>
                         </div>
+
+                        <div class="form-group w50 fl"  style="width: 250px;">
+                            <select id="intentListSelect" class="form-control"> 
+                                <option value="all"><%= __('SELECT') %></option>
+                            </select>
+                        </div>
+
                         <!-- 검색창 --> 
                         <div class="form-group w50 fr ">
                             <div class="input-group input-group-sm fr" style="width: 250px;">
                                 <input type="text" name="searchRecommendText" spellcheck="false" autocomplete='off' class="form-control pull-right" placeholder="<%= __('Enter_search_word') %>">
                                 <div class="input-group-btn">
-                                <button class="btn btn-default" onclick="recommendSearch()"><i class="fa fa-search"></i></button>
+                                <button class="btn btn-default" onclick="noAnswerQSearch()"><i class="fa fa-search"></i></button>
                                 </div>
                             </div>
                         </div> 
@@ -64,13 +71,13 @@
                                         <th><%= __('REGIST_DATE') %></th>
                                     </tr>
                                 </thead>
-                                <tbody id="recommendContents">
+                                <tbody id="noAnswerContents">
                                     
                                 </tbody>
                             </table>
                         </div> 
                         <!-- 버튼 --> 
-                        <div class="btn_wrap03"><button type="button" class="btn btn-default fr" onclick="deleteRecommend()"><%= __('DELETE') %></button> </div>                                                
+                        <div class="btn_wrap03"><button type="button" class="btn btn-default fr" onclick="deleteNoAnswerQ()"><%= __('DELETE') %></button> </div>                                                
                         
                         <!-- 페이징 --> 
                         <div class="pagination_wrap" >

@@ -682,4 +682,179 @@ router.post('/procSimilarQuestion', function (req, res) {
     })
 });
 
+
+
+router.post('/selectNoAnswerQList', function (req, res) {
+    var selectType = req.body.selectType;
+    var currentPage = req.body.currentPage;
+    var searchRecommendText = req.body.searchRecommendText;
+
+    (async () => {
+        try {
+            var entitiesQueryString = "" +
+                "SELECT TBZ.* \n" +
+                "  FROM ( \n" +
+                "        SELECT TBY.*  \n" +
+                "          FROM ( \n" +
+                "		        SELECT ROW_NUMBER() OVER(ORDER BY TBX.SEQ DESC) AS NUM,  \n" +
+                "                       COUNT('1') OVER(PARTITION BY '1') AS TOTCNT,  \n" +
+                "                       CEILING((ROW_NUMBER() OVER(ORDER BY TBX.SEQ DESC) )/ convert(numeric ,10)) PAGEIDX,  \n" +
+                "                       TBX.*  \n" +
+                "                 FROM (  \n" +
+                "                        SELECT SEQ,QUERY,CONVERT(CHAR(19), UPD_DT, 20) AS UPD_DT,TBH.QUERY_KR \n" + //--(SELECT RESULT FROM dbo.FN_ENTITY_ORDERBY_ADD(QUERY)) AS ENTITIES
+                "                          FROM TBL_QUERY_ANALYSIS_RESULT, ( \n" +
+                "						                                     SELECT CUSTOMER_COMMENT_KR AS QUERY_KR \n" +
+                "						                                       FROM TBL_HISTORY_QUERY \n" +
+                "						                                      GROUP BY CUSTOMER_COMMENT_KR ) TBH \n" +
+                "                         WHERE RESULT NOT IN ('H')  \n" +
+            //    "                           AND TRAIN_FLAG = 'N'  \n" +
+                "                           AND QUERY = dbo.fn_replace_regex(TBH.QUERY_KR)  \n";
+
+            if (selectType == 'yesterday') {
+                entitiesQueryString += " AND (CONVERT(CHAR(10), UPD_DT, 23)) like '%'+(select CONVERT(CHAR(10), (select dateadd(day,-1,getdate())), 23)) + '%'";
+            } else if (selectType == 'lastWeek') {
+                entitiesQueryString += " AND (CONVERT(CHAR(10), UPD_DT, 23)) >= (SELECT CONVERT(CHAR(10), (DATEADD(wk, DATEDIFF(d, 0, getdate()) / 7 - 1, -1)), 23))";
+                entitiesQueryString += " AND (CONVERT(CHAR(10), UPD_DT, 23)) <= (SELECT CONVERT(CHAR(10), (DATEADD(wk, DATEDIFF(d, 0, getdate()) / 7 - 1, 5)), 23))";
+            } else if (selectType == 'lastMonth') {
+                entitiesQueryString += "  AND CONVERT(CHAR(10), UPD_DT, 23)  BETWEEN CONVERT(CHAR(10),dateadd(month,-1,getdate()), 23) and CONVERT(CHAR(10), getdate(), 23) ";
+            } else {
+            }
+
+            if (searchRecommendText) {
+
+                entitiesQueryString += " AND QUERY LIKE '%" + searchRecommendText + "%' ";
+            }
+
+            entitiesQueryString += "" +
+                "                       ) TBX \n" +
+                "			   ) TBY \n" +
+                "	     ) TBZ \n" +
+                " WHERE 1=1  \n" +
+                "   AND PAGEIDX = @currentPage  \n" +
+                " ORDER BY NUM \n";
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request()
+                .input('currentPage', sql.Int, currentPage)
+                .query(entitiesQueryString)
+            let rows = result1.recordset;
+
+
+            var result = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                var query = rows[i].QUERY_KR;
+                var seq = rows[i].SEQ;
+                //var entities = rows[i].ENTITIES;
+                var updDt = rows[i].UPD_DT;
+                //var entityArr = rows[i].ENTITIES.split(',');
+                //var luisQueryString = "";
+
+                item.QUERY = query;
+                item.UPD_DT = updDt;
+                item.SEQ = seq;
+                
+                /*
+                item.ENTITIES = entities;
+                if (entityArr[0] == "") {
+                    item.intentList = [];
+                } else {
+                    for (var j = 0; j < entityArr.length; j++) {
+                        if (j == 0) {
+                            luisQueryString += "SELECT DISTINCT LUIS_INTENT FROM TBL_DLG_RELATION_LUIS WHERE LUIS_ENTITIES LIKE '%" + entityArr[j] + "%'"
+                        } else {
+                            luisQueryString += "OR LUIS_ENTITIES LIKE '%" + entityArr[j] + "%'";
+                        }
+                    }
+                    let luisIntentList = await pool.request()
+                        .query(luisQueryString)
+                    item.intentList = luisIntentList.recordset
+                }
+                */
+                result.push(item);
+            }
+
+            if (rows.length > 0) {
+                res.send({ list: result, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
+            } else {
+                res.send({ list: result });
+            }
+
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+
+
+router.post('/deleteNoAnswerQ', function (req, res) {
+    var seqs = req.body.seq;
+    var arryseq = seqs.split(',');
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            for (var i = 0; i < arryseq.length; i++) {
+                var deleteQueryString1 = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET TRAIN_FLAG = 'Y' WHERE seq='" + arryseq[i] + "'";
+                let result5 = await pool.request().query(deleteQueryString1);
+            }
+            res.send();
+        } catch (err) {
+            res.send();
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        console.log(err);
+    })
+});
+
+
+
+
+router.post('/selectIntentApp', function (req, res) {
+    var userId = req.session.sid;
+
+    (async () => {
+        try {
+            var intentQry = "  SELECT INTENT, APP_ID \n"
+                            + "FROM TBL_LUIS_INTENT \n"
+                            + "WHERE REG_ID = @userId; \n";
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result5 = await pool.request()
+                        .input('userId', sql.NVarChar, userId)
+                        .query(intentQry);
+            res.send({ result: true, intentList: result5.recordset});
+        } catch (err) {
+            res.send({ result: false });
+
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        console.log(err);
+    })
+});
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;
