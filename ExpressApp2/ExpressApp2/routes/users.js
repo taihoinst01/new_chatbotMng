@@ -171,6 +171,7 @@ router.post('/selectUserList', function (req, res) {
                             "                            , ISNULL(A.EMP_NM, ' ')       AS EMP_NM \n" +
                             "                            , ISNULL(A.EMP_ENGNM, ' ')    AS EMP_ENGNM \n" +
                             "                            , ISNULL(A.EMAIL, ' ')        AS EMAIL \n" +
+                            "                            , ISNULL(A.HPHONE, ' ')        AS HPHONE \n" +
                             "                            , ISNULL(A.M_P_NUM_1, ' ')    AS M_P_NUM_1 \n" +
                             "                            , ISNULL(A.M_P_NUM_2, ' ')    AS M_P_NUM_2 \n" +
                             "                            , ISNULL(A.M_P_NUM_3, ' ')    AS M_P_NUM_3 \n" +
@@ -280,11 +281,11 @@ router.post('/saveUserInfo', function (req, res) {
 
     for (var i=0; i<userArr.length; i++) {
         if (userArr[i].statusFlag === 'NEW') {
-            saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, EMP_NM, USE_YN) " + 
+            saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, EMP_NM, HPHONE, USE_YN) " + 
                        "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-            saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "', '" + userArr[i].EMP_NM  + "', 'Y'); ";
+            saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y'); ";
         } else if (userArr[i].statusFlag === 'EDIT') {
-            updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
+            updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
         } else { //DEL
             deleteStr += "UPDATE TB_USER_M SET USE_YN = 'N' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
         }

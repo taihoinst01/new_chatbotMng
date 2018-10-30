@@ -27,7 +27,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>사용자 앱매핑 관리</h1>
+                        <h1><%= __('USERAPP_MAPPING_MSG') %></h1>
                     </section>
                     <input type="hidden" id="selectUserHiddenId" value="" />
                     <!-- Main content -->
@@ -51,7 +51,7 @@
                                     </div>
                                     <div class="form-group col-lg-2" style="text-align:right">
                                         <button type="button" class="btn btn_01" id="searchBtn">
-                                            <%= __('SEARCH') %>
+                                            <i class="fa fa-search"></i> <%= __('SEARCH') %>
                                         </button>
                                     </div>
                                 </div>
@@ -97,13 +97,13 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-6" style="padding:0px !important">
-                                        <h4 class=" col-lg-6">Mapping App</h4>
+                                        <h4 class=" col-lg-6">Mapping ChatBot</h4>
                                         <div class=" col-lg-6" style="text-align:right; padding:0px !important">
                                             <button type="button" class="btn btn-default" id="saveBtn">
-                                                <%= __('SAVE') %>
+                                                <i class="fa fa-edit"></i> <%= __('SAVE') %>
                                             </button>
                                             <button type="button" class="btn btn-default" id="initBtn">
-                                                <%= __('INIT') %>
+                                                <i class="fa fa-refresh"></i> <%= __('INIT') %>
                                             </button>
                                         </div>
                                         <div class="Tbl_wrap">
@@ -121,10 +121,10 @@
                                                             <input type="checkbox" class="flat-red" id="check-all">
                                                         </th>
                                                         <th>
-                                                            <%= __('APP') %>
+                                                            <%= __('CHATBOT') %>
                                                         </th>
                                                         <th>
-                                                            <%= __('APP_ID') %>
+                                                            <%= __('CHATBOT_ID') %>
                                                         </th>
                                                         <th></th>
                                                     </tr>

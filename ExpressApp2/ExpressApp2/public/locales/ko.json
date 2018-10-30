@@ -66,7 +66,7 @@
 	"Small group": "소그룹",
 	"Input sentence": "입력 문장",
 	"Added": "추가하였습니다.",
-	"It_failed": "실패하였습니다.",
+	"It_failed": "요청사항이 실패하였습니다.",
 	"Learned": "이미 학습한 문장입니다.",
 	"NoEntity": "엔티티 없음",
 	"Description_must_be_entered": "설명을 입력해야 합니다.",
@@ -149,7 +149,7 @@
 	"CHATBOT_LANGUAGE": "챗봇 언어 설정",
 	"CHATBOT_DESCRIPTION": "챗봇설명",
 	"INPUT_CHAT_NAME": "챗봇의 이름을 입력해 주세요.",
-	"REGIST_SUCC": "등록했습니다.",
+	"REGIST_SUCC": "요청사항이 진행되었습니다.",
 	"ASK_CANCEL": "취소 하시겠습니까?",
 	"============= left_side_bar  =============": "",
 	"CHATBOT": "챗봇",
@@ -347,7 +347,10 @@
 	"MENU_MSG": "메뉴관리",
 	"AUTHGROUP_MSG": "권한그룹관리",
 	"AUTHUSER_MSG": "사용자 권한관리",
-	"USERAPP_MAPPING_MSG": "사용자 앱매핑 관리",
+	"USERAPP_MAPPING_MSG": "사용자 챗봇매핑 관리",
+
+	"============= 관리자설정-사용자관리 =============": "",
+	"HPHONE": "휴대폰번호",
 
 	"============= 관리자설정-챗봇앱관리 =============": "",
 	"You_must_choose_a_chatbot": "챗봇을 선택해야 합니다.",
@@ -394,6 +397,12 @@
 	"AUTHGROUP_LEVEL": "권한등급",
 	"AUTHGROUP_DESC": "권한설명",
 	"AUTHGROUP_ID": "권한아이디",
+
+	"============= 관리자설정-사용자권한관리 =============": "",
+	"AUTHUSER_": "사용권한없음",
+
+	"============= 관리자설정-챗봇매핑관리 =============": "",
+	"CHATBOT_ID": "챗봇 아이디",
 
 	"============= The end =============": ""
 }

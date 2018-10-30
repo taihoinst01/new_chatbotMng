@@ -42,7 +42,7 @@ $(document).ready(function () {
         $('#S_USER_ID').html(user_id);
         $('#USER_AUTH').html(td.eq(4).text());
 
-        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> Update</button>');
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
         $('#authUpdateFormModal').modal('show');
     });
@@ -84,7 +84,7 @@ function makeUserTable(newPage) {
                 var s_auth_name = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     if (data.rows[i].AUTH_NM == "" || data.rows[i].AUTH_NM == null) {
-                        s_auth_name = "사용권한없음";
+                        s_auth_name = language.AUTHUSER_;
                     } else {
                         s_auth_name = data.rows[i].AUTH_NM;
                     }
@@ -93,7 +93,7 @@ function makeUserTable(newPage) {
                     tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMAIL + '</td>'
                     tableHtml += '<td>' + s_auth_name + '</td>'
-                    tableHtml += '<td><button type="button" class="btn btn-default btn-sm" id="update_authForm" user_id="' + data.rows[i].USER_ID + '"><i class="fa fa-edit"></i> 권한수정</button></td></tr>'
+                    tableHtml += '<td><button type="button" class="btn btn-default btn-sm" id="update_authForm" user_id="' + data.rows[i].USER_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button></td></tr>'
                 }
 
                 saveTableHtml = tableHtml;
@@ -122,12 +122,12 @@ function getAuthList() {
         isloading: true,
         success: function (data) {
             if (data.records > 0) {
-                select_menu = "<option value=''>권한선택</option>"
+                select_menu = "<option value=''>"+language.CHOOSE_AUTH+"</option>"
                 for (var i = 0; i < data.rows.length; i++) {
                     select_menu += '<option value="' + data.rows[i].AUTH_LEVEL + '">' + data.rows[i].AUTHGRP_M_NM + '</option>';
                 }
             } else {
-                select_menu = "<option value=''>권한선택</option>"
+                select_menu = "<option value=''>"+language.CHOOSE_AUTH+"</option>"
             }
             $('#UPDATE_USER_AUTH').html(select_menu);
         }

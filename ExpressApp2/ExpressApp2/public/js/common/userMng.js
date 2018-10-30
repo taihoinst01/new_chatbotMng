@@ -137,6 +137,7 @@ function makeUserTable() {
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>'
+                    tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>'
                     tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
@@ -184,7 +185,8 @@ function addUser() {
     addHtml = '<tr><td>NEW</td><td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>'
     addHtml += '<td><input type="text" name="new_user_id" spellcheck="false" autocomplete="off" value="" /></td>';
     addHtml += '<td><input type="text" name="new_user_name" spellcheck="false" autocomplete="off" value="" /></td> ';
-    addHtml += '<td></td>   <td></td>  <td></td>  <td></td>  <td></td>  <td></td></tr>'
+    addHtml += '<td><input type="text" name="new_hphone" spellcheck="false" autocomplete="off" value="" /></td> ';
+    addHtml += '<td colspan="6"></td></tr>'
 
     $('#tableBodyId').prepend(addHtml);
 
@@ -253,6 +255,7 @@ function saveUser() {
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).children().eq(2).text();
                 data.EMP_NM = $(this).children().eq(3).text();
+                data.HPHONE = $(this).children().eq(4).text();
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
@@ -261,6 +264,7 @@ function saveUser() {
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();
                 data.EMP_NM = $(this).find('input[name=new_user_name]').val();
+                data.HPHONE = $(this).find('input[name=new_hphone]').val();
                 saveArr.push(data);
             } else if (statusFlag === 'DEL') {
 

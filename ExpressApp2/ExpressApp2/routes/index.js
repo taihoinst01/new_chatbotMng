@@ -245,13 +245,7 @@ router.get('/', function (req, res) {
 router.get('/list', function (req, res) {
     req.session.selMenu = 'm1';
     var loginId = req.session.sid;
-    /*
-    var userListStr = "SELECT A.APP_ID, A.VERSION, A.APP_NAME, FORMAT(A.REG_DT,'yyyy-MM-dd') REG_DT, A.CULTURE, A.DESCRIPTION, A.APP_COLOR \n" +
-                      "  FROM TBL_LUIS_APP A, TBL_USER_RELATION_APP B \n" +
-                      " WHERE 1=1 \n" +
-                      "   AND A.APP_ID = B.APP_ID \n" +
-                      "   AND B.USER_ID = '" + loginId + "'; \n";
-    */
+
     var userListStr = " SELECT DISTINCT B.CHATBOT_NUM, B.CHATBOT_NAME, B.CULTURE, B.DESCRIPTION, B.APP_COLOR \n";
        userListStr += "   FROM TBL_USER_RELATION_APP A, TBL_CHATBOT_APP B \n";
        userListStr += "  WHERE A.USER_ID = '" + loginId + "'   \n";
@@ -278,7 +272,7 @@ router.get('/list', function (req, res) {
             for (var i=0; i<rows.length; i++) {
 
                 var cnt_query = "SELECT  (SELECT COUNT(DLG_ID) FROM TBL_DLG) AS DLG_CNT, \n" +
-                                    "		(SELECT count(distinct GroupM) FROM TBL_DLG) AS INTENT_CNT, " + i + " AS I_INDEX;"
+                                    "		(SELECT count(distinct DLG_INTENT) FROM TBL_DLG) AS INTENT_CNT, " + i + " AS I_INDEX;"
 
                 var dbPool = await dbConnect.getAppConnection(appSql, rows[i].CHATBOT_NAME, req.session.dbValue);
                 var result2 = await dbPool.request()
@@ -304,6 +298,7 @@ router.get('/list', function (req, res) {
             }
             
         } catch (err) {
+            console.log("====================================================================")
             console.log(err)
             // ... error checks
         } finally {
@@ -331,13 +326,15 @@ router.post('/admin/addChatBotApps', function (req, res){
 
     (async () => {
         try {
-            var insertChatQuery_old = "INSERT INTO TBL_CHATBOT_APP(CHATBOT_NUM,CHATBOT_NAME,CULTURE,DESCRIPTION,APP_COLOR, LUIS_SUBSCRIPTION) ";
-            insertChatQuery_old += "VALUES((SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP)+1, @chatName, @culture, @chatDes, @chatColor, @luisSubscription)";
+            
             var insertChatQuery = "INSERT INTO TBL_CHATBOT_APP(CHATBOT_NUM,CHATBOT_NAME,CULTURE,DESCRIPTION,APP_COLOR) ";
             insertChatQuery += "VALUES((SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP)+1, @chatName, @culture, @chatDes, @chatColor)";
 
             var insertDbQuery = "INSERT INTO TBL_DB_CONFIG(USER_NAME,PASSWORD,SERVER,DATABASE_NAME,APP_NAME,APP_ID) ";
             insertDbQuery += "VALUES(@dbId, @dbPassword, @dbUrl, @dbName, @chatName, @chatName)";
+
+            var insertUserRelationQuery = "INSERT INTO TBL_USER_RELATION_APP(USER_ID,APP_ID,CHAT_ID) ";
+            insertUserRelationQuery += "VALUES(@loginId, (SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP),(SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP))";
 
             let pool = await dbConnect.getConnection(sql);
             let insertChat = await pool.request()
@@ -357,6 +354,11 @@ router.post('/admin/addChatBotApps', function (req, res){
                 .query(insertDbQuery);
             
             if(insertChat.rowsAffected.length > 0 && insertDb.rowsAffected.length > 0){
+                var loginId = req.session.sid;
+                let insertUserRelation = await pool.request()
+                .input('loginId', sql.NVarChar, loginId)
+                .query(insertUserRelationQuery);
+                
                 res.send({result:true});
             } else {
                 res.send({result:false});
