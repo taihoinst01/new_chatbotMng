@@ -97,7 +97,11 @@ function makeIntentTable() {
             $('#pagination').html('');
             var intentBodyHtml = '';
             if(data.intentList.length > 0){
+                var rememIndex = -1;
                 for(var i = 0; i < data.intentList.length; i++){
+                    if ($('#selectIntent').val() != "-1" && data.intentList[i].INTENT == $('#selectIntent').val()) {
+                        rememIndex = i;
+                    }
                     intentBodyHtml += "<tr>";
                     intentBodyHtml += "<td style='text-align: left; padding-left:1%;'><a href='#' name='selIntent'  onclick='return false;'>" + data.intentList[i].INTENT + "</a></td>";
                     intentBodyHtml += "<td style='text-align: left; padding-left:1.5%;'><span name='intentLabelCnt' style = '' >" + data.intentList[i].UTTER_COUNT + "</span> </td>";
@@ -112,6 +116,11 @@ function makeIntentTable() {
                 //<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>
                 $('#intentListBody').html(intentBodyHtml);
                 $('#pagination').html('').append(data.pageList);
+
+
+                if (rememIndex != -1) {
+                    $('a[name=selIntent]').eq(rememIndex).trigger('click');
+                }
             }
         }
     });
@@ -287,7 +296,12 @@ function intentDetail(intentName, intentId, labelCnt) {
             }
             else 
             {
-                location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
+                if ($('#createQuery').val() != -1) {
+                    var createQuery = $('#createQuery').val();
+                    location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum + "&createQuery=" + createQuery;
+                } else {
+                    location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
+                }
             }
         }
     });

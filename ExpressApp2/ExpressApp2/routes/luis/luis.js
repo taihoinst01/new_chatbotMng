@@ -365,20 +365,44 @@ CREATE TABLE TB_LUIS_INTENT(
 router.get('/intentList', function (req, res) {
 
     var userId = req.session.sid;
+    try {
+        var selAppList = req.session.selChatInfo.chatbot.appList;
+        if (typeof req.query.appIndex != 'undefined') {
+            var appNumber = req.query.appIndex;
+            var selApp = selAppList[appNumber];
+            req.session.selAppId = selApp.APP_ID;
+            req.session.selAppName = selApp.APP_NAME;
+        }
 
-    var selAppList = req.session.selChatInfo.chatbot.appList;
-    if (typeof req.query.appIndex != 'undefined') {
-        var appNumber = req.query.appIndex;
-        var selApp = selAppList[appNumber];
-        req.session.selAppId = selApp.APP_ID;
-        req.session.selAppName = selApp.APP_NAME;
-    }
+        if (req.query.createQuery) {
+            var appNumber = req.query.appIndex;
+            var selApp = selAppList[appNumber];
+            req.session.selAppId = selApp.APP_ID;
+            req.session.selAppName = selApp.APP_NAME;
+            
+            var pageNum = -1;
 
-    if (req.query.rememberPageNum) {
-        res.render('luis/intentList', { pageNumber: req.query.rememberPageNum });
-    } else {
-        res.render('luis/intentList', { pageNumber: '-1' });
+            var selectIntent = req.query.selectIntent;
+            var createQuery = req.query.createQuery;
+
+            var intentList = req.session.intentList;
+            for (var i=0; i<intentList.length; i++) {
+                if (intentList[i].INTENT == selectIntent) {
+                    pageNum = i/10;
+                }
+            }
+
+            res.render('luis/intentList', { pageNumber: ++pageNum, createQuery: createQuery, selectIntent: selectIntent});
+        }
+        else if (req.query.rememberPageNum) {
+            res.render('luis/intentList', { pageNumber: req.query.rememberPageNum, createQuery: -1, selectIntent: -1});
+        } else {
+            res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1 });
+        }
+    } catch(e) {
+        res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1 });
     }
+    
     /*
     var selectIntentQry = "";
     var selectedAppId = "";
@@ -800,9 +824,13 @@ router.get('/intentDetail', function (req, res) {
     var intentId = req.query.intentId;
     var labelCnt = req.query.labelCnt;
     var pageNum = req.query.pageNum;
+    var createQuery = req.query.createQuery;
 
-
-    res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt, 'pageNum' : pageNum});
+    if (createQuery) {
+        res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt, 'pageNum' : pageNum, 'createQuery' : createQuery});
+    } else {
+        res.render('luis/intentDetail', {'intentName' : intentName, 'intentId' : intentId, 'labelCnt' : labelCnt, 'pageNum' : pageNum, 'createQuery' : -1});
+    }
     
 });
 

@@ -25,6 +25,18 @@ $(document).ready(function () {
         $('#currentPage').val('1');
         noAnswerQListAjax();
     });
+
+    
+})
+
+$(document).mouseup(function(e) {
+    if ($('.entityValDiv').css('display') != 'none') {
+
+        var container = $('.entityValDiv');
+        if (container.has(e.target).length === 0 && !container.is(e.target)) {
+            $('.entityValDiv').hide();//.css('display', 'none');
+        }
+    }
 })
 
 function noAnswerQListAjax(){
@@ -50,8 +62,7 @@ function noAnswerQListAjax(){
                             '<td><input type="checkbox" class="flat-red" name="tableCheckBox"><input type="hidden" class="seq" value="'+data.list[i].SEQ+'"></td>' +
                             '<td class="txt_left">' +
 
-                            '<a href="/learning/utterances?utterance='+data.list[i].QUERY + 
-                                    '" class="dashLink" style="font-size:14px">';
+                            '<a href="#" class="dashLink" name="queryLink" style="font-size:14px">';
                     var query = data.list[i].QUERY;
                     /*
                     var entities = data.list[i].ENTITIES.split(',');
@@ -98,11 +109,6 @@ function noAnswerQListAjax(){
                 
             }
             
-            
-
-            
-
-            
         }
     });
 }
@@ -116,6 +122,74 @@ $(document).on('click','div[type=checkbox]',function(e){
         $(this).removeAttr('checked');
     }
     checkBoxHandler(e);
+});
+
+
+$(document).on('click','a[name=queryLink]',function(e){
+
+
+    var sWidth = window.innerWidth;
+    var sHeight = window.innerHeight;
+
+    var oWidth = $('.entityValDiv').width();
+    var oHeight = $('.entityValDiv').height();
+
+    // 레이어가 나타날 위치를 셋팅한다.
+    var divLeft = e.clientX;
+    var divTop = e.clientY;
+
+    // 레이어가 화면 크기를 벗어나면 위치를 바꾸어 배치한다.
+    if( divLeft + oWidth > sWidth ) divLeft -= oWidth;
+    if( divTop + oHeight > sHeight ) divTop -= oHeight;
+
+    // 레이어 위치를 바꾸었더니 상단기준점(0,0) 밖으로 벗어난다면 상단기준점(0,0)에 배치하자.
+    if( divLeft < 0 ) divLeft = 0;
+    if( divTop < 0 ) divTop = 0;
+
+    
+    var selQuery = $(this).text();
+    $('#selQry').val(selQuery);
+    $('#intentListSelect').html(selectHtml);
+
+    var selectWidth = $('#intentListSelect').css('width');
+    $('#intentListSelect').parent().css('width', selectWidth);
+    $('#intentListSelect').parent().parent().css('width', selectWidth);
+    $('.entityValDiv').css({
+        "top": divTop,
+        "left": divLeft,
+        "width" : selectWidth + 10,
+        "position": "absolute"
+        
+    }).show();
+});
+
+$(document).on('click','#goUtterBtn',function(e){
+ 
+    var selVal = $('#intentListSelect').val();
+    var selText = $('#intentListSelect option:selected').text();
+    if (selVal == "NONE") {
+        alert('인텐트를 선택해 주세요.');
+        return false;
+    } else {
+        var selIntentAppId = $('#intentListSelect').val();
+        $.ajax({
+            type: 'POST',
+            data : {'appId' : selIntentAppId},
+            url : '/qna/getAppNumber',
+            isloading : true,
+            success: function(data){
+                if (!data.result) {
+                    alert('다시 시도해 주세요.');
+                } else {
+                    var selIndex = data.selIndex;
+                    var selQry = $('#selQry').val();
+                    var intentAddr = "/luis/intentList?appIndex=" + selIndex + "&createQuery=" + selQry + "&selectIntent=" + selText;
+                    location.href = intentAddr;
+                }
+            }
+        });
+
+    }
 });
 
 $(document).on('click','.li_paging',function(e){
@@ -217,6 +291,8 @@ function deleteNoAnswerQ(){
     }
 }
 
+
+var selectHtml = '';
 function getIntentList() {
     $.ajax({
         type: 'POST',
@@ -228,12 +304,13 @@ function getIntentList() {
                 var intentList = data.intentList;
                 for (var i=0; i<intentList.length; i++) {
                     if (i==0) {
-                        htmlStr += "<option value='appName'>" + language.SELECT + "</option>";
+                        htmlStr += "<option value='NONE'>" + language.SELECT + "</option>";
                     } else {
-                        htmlStr += "<option value='appName'>" + intentList[i].INTENT + "</option>";
+                        htmlStr += "<option value='" + intentList[i].APP_ID + "'>" + intentList[i].INTENT + "</option>";
                     }
                 }
                 $('#intentListSelect').html(htmlStr);
+                selectHtml = htmlStr;
             }
             
         }
