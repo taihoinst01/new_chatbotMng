@@ -29,6 +29,11 @@ Array.prototype.move = function(from,to){
 $(document).ready(function() {
     makeUtteranceTable();
 
+    if ($('#createQuery').val() != -1) {
+        $('#utterInputText').val($('#createQuery').val());
+        $('#utterInputText').focus();
+    }
+
     $('#updateIntentName').click(function() {
         editIntentName();
     });

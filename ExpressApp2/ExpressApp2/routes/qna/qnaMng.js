@@ -826,14 +826,8 @@ router.post('/selectIntentApp', function (req, res) {
 
     (async () => {
         try {
-            var intentQry = "  SELECT INTENT, APP_ID \n"
-                            + "FROM TBL_LUIS_INTENT \n"
-                            + "WHERE REG_ID = @userId; \n";
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            let result5 = await pool.request()
-                        .input('userId', sql.NVarChar, userId)
-                        .query(intentQry);
-            res.send({ result: true, intentList: result5.recordset});
+            var intentList = req.session.intentList;
+            res.send({ result: true, intentList: intentList});
         } catch (err) {
             res.send({ result: false });
 
@@ -847,6 +841,26 @@ router.post('/selectIntentApp', function (req, res) {
     })
 });
 
+
+router.post('/getAppNumber', function (req, res) {
+    var userId = req.session.sid;
+    var selAppId = req.body.appId
+    try {
+        var selIndex = -1;
+        var appInfo = req.session.selChatInfo;
+        for (var i=0; i<appInfo.chatbot.appList.length; i++) { 
+            if (appInfo.chatbot.appList[i].APP_ID == selAppId) {
+                selIndex = i;
+            }
+        }
+        res.send({ result: true, selIndex: selIndex});
+    } catch (err) {
+        res.send({ result: false });
+
+    } finally {
+        sql.close();
+    }
+});
 
 
 

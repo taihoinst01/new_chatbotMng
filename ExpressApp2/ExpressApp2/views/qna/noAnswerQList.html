@@ -15,6 +15,18 @@
     <script src="common/js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script type="text/javascript" src="/js/common/noAnswerQList.js"></script>
+    <style type="text/css">
+        .entityValDiv {
+            background-color:#ffffff; 
+            border:solid 2px #d0d0d0; 
+            height:200px; 
+            padding:10px;
+
+            max-height: 300px !important; 
+            display: none;
+        }
+
+    </style>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -45,11 +57,6 @@
                             </select>
                         </div>
 
-                        <div class="form-group w50 fl"  style="width: 250px;">
-                            <select id="intentListSelect" class="form-control"> 
-                                <option value="all"><%= __('SELECT') %></option>
-                            </select>
-                        </div>
 
                         <!-- 검색창 --> 
                         <div class="form-group w50 fr ">
@@ -90,6 +97,19 @@
                 </div>
             </section>
             <!-- //Main content -->  
+            
+    <div class="entityValDiv">
+
+        <input type="text" id="selQry" value="" class="form-control" disabled>
+        <div style="margin-top:4px;">
+            <div class="form-group w50 fl" >
+                <select id="intentListSelect" class="form-control"> 
+                    <option value="all"><%= __('SELECT') %></option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-default fr" id="goUtterBtn">등록</button>
+    </div>
         </div>
         
         <!--  Footer -->
@@ -98,6 +118,8 @@
     </div>
     <!--// Content Wrapper -->
     
+
+
     <script>
 
         //iCheck for checkbox and radio inputs
