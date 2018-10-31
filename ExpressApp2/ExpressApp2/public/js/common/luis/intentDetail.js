@@ -137,7 +137,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
     $(this).val($(this).val().trim());
     if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
         if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
-            alert('엔티티를 선택해 주세요.');
+            $('#alertMsg').text('엔티티를 선택해 주세요.');
+            $('#alertBtnModal').modal('show');
+            //alert('엔티티를 선택해 주세요.');
             $(this).val('');
             return false;
         }
@@ -674,15 +676,21 @@ $(document).on('focusout','#editIntentName',function(e){
             url: '/luis/renameIntent',
             success: function(data) {
                 if (data.error) {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                 } 
                 else if (!data.success) {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                     
                     $('#intentNameTitle').html('');
                     $('#intentNameTitle').text($('#hiddenIntentName').val());
                 } else {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                     $('#intentNameTitle').html('');
                     $('#intentNameTitle').text(editEntityName);
                     $('#hiddenIntentName').val(editEntityName);
@@ -812,7 +820,9 @@ $(document).on("click", "a[name=addUtter]", function(e){
 //utter 삭제  버튼
 $(document).on("click", "a[name=delLabelBtn]", function(e){
     if ($(this).parent().find('div[name=indentDiv]').length>0) {
-        alert('상위 entity를 삭제해 주세요.');
+        $('#alertMsg').text('상위 entity를 삭제해 주세요.');
+        $('#alertBtnModal').modal('show');
+        //alert('상위 entity를 삭제해 주세요.');
         return false;
     }
     if ($(this).parent().find('select[name=entityTypeForLabel]').val() == '4') {
@@ -867,20 +877,28 @@ $(document).on("click", "a[name=delUtterBtn]", function(e){
                 url: '/luis/deleteUtterance',
                 success: function(data) {
                     if (data.dupleRst) {
-                        alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                        $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                        $('#alertBtnModal').modal('show');
+                        //alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
                     }
                     else if (!data.success) 
                     {
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
                     }
                     else if (data.error) {
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
                     }
                     else 
                     {
                         $(this).parents('tr').next().remove();
                         $(this).parents('tr').remove();
-                        alert(data.message);
+                        //alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
                     }
                 }
             });
@@ -916,7 +934,9 @@ function makeUtteranceTable() {
         url: '/luis/selectUtterList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else {
                 if (typeof data.utterObj.UTTER_LIST != "undefined") {
@@ -1398,7 +1418,9 @@ function changeEntitySel() {
 function createIntent() {
     if ($('#intentName').val().trim() == '') 
     {
-        alert("Intent를 입력해야 합니다.");
+        $('#alertMsg').text("Intent를 입력해야 합니다.");
+        $('#alertBtnModal').modal('show');
+        //alert("Intent를 입력해야 합니다.");
     } 
     else 
     {
@@ -1412,19 +1434,28 @@ function createIntent() {
             url: '/luis/createIntent',
             success: function(data) {
                 if (data.dupleRst) {
-                    alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                    $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                    $('#alertBtnModal').modal('show');
+                    //alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
                 }
                 else if (!data.success) 
                 {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                 }
                 else if (data.error) {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                 }
                 else 
                 {
-                    alert('생성되었습니다.');
-                    location.reload();
+                    $('#alertMsg').text('생성되었습니다.');
+                    $('#alertBtnModal').modal('show');
+                    $('#chkAfterAlert').val('RELOAD');
+                    //alert('생성되었습니다.');
+                    //location.reload();
                 }
             }
         });
@@ -1469,14 +1500,21 @@ function deleteIntent(intentHiddenName, hId) {
         url: '/luis/deleteIntent',
         success: function(data) {
             if(data.error){
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) {
-                alert(data.message);
-                location.href = "/luis/intentList";
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                $('#chkAfterAlert').val('GO_LIST');
+                //alert(data.message);
+                //location.href = "/luis/intentList";
             }
             else {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
         }
     });
@@ -1491,7 +1529,9 @@ function getEntityList(intentName, intentId) {
         url: '/luis/getEntityList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else 
             {
@@ -1690,7 +1730,9 @@ function saveUtterance() {
         }
     });
     if (isOk) {
-        alert('list type의 child Entity를 선택해 주세요.');
+        $('#alertMsg').text('list type의 child Entity를 선택해 주세요.');
+        $('#alertBtnModal').modal('show');
+        //alert('list type의 child Entity를 선택해 주세요.');
         return false;
     }
     var params = {
@@ -1728,16 +1770,22 @@ function saveUtterance() {
         url: '/luis/saveUtterance',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
                 //updateUtter();
             }
             else if (!data.success) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
                 //updateUtter();
             }
             else 
             {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
                 //updateUtter();
             }
         }
@@ -1768,10 +1816,14 @@ function updateUtter() {
         success: function(data) {   
             if (!data.success) 
             {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else 
             {
@@ -1780,3 +1832,20 @@ function updateUtter() {
         }
     });
 }
+
+
+
+
+//alert 메세지 초기화
+$(document).on("click", "#alertCloseBtn", function () {
+    $('#alertMsg').text('');
+    var chkMsg = $('#chkAfterAlert').val();
+    if (chkMsg != 'NONE') {
+        if (chkMsg == 'RELOAD') {
+            location.reload();
+        }
+        else if (chkMsg == 'GO_LIST') {
+            location.href = "/luis/intentList"
+        }
+    }
+});

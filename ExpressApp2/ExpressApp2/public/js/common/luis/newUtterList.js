@@ -35,7 +35,10 @@ $(document).ready(function() {
     $("#searchDialogBtn").on('click', function () {
 
         if ($('input[name=serachDlg]').val() == '' && $('#searchLargeGroup').val() == '') {
-            alert(language.Select_search_word_or_group);
+            
+            $('#alertMsg').text(language.Select_search_word_or_group);
+            $('#alertBtnModal').modal('show');
+            //alert(language.Select_search_word_or_group);
         } else {
             $("#searchDlgResultDiv").html("");
 
@@ -70,7 +73,10 @@ $(document).ready(function() {
     $("#searchDialogBtn").on('click', function () {
 
         if ($('input[name=serachDlg]').val() == '' && $('#searchLargeGroup').val() == '') {
-            alert(language.Select_search_word_or_group);
+            
+            $('#alertMsg').text(language.Select_search_word_or_group);
+            $('#alertBtnModal').modal('show');
+            //alert(language.Select_search_word_or_group);
         } else {
             $("#searchDlgResultDiv").html("");
 
@@ -141,7 +147,9 @@ function getEntityList(intentName, intentId) {
         url: '/luis/getEntityList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else 
             {
@@ -493,7 +501,9 @@ function searchDialog(contextEntityData) {
 
         },
         error: function (e) {
-            alert(e.responseText);
+            $('#alertMsg').text(e.responseText);
+            $('#alertBtnModal').modal('show');
+            //alert(e.responseText);
         }
     });
 }
@@ -553,8 +563,10 @@ function selectDialog() {
     });
 
     if (successFlagg == false) {
-
-        alert(language.Please_select_a_dialogue);
+        
+        $('#alertMsg').text(language.Please_select_a_dialogue);
+        $('#alertBtnModal').modal('show');
+        //alert(language.Please_select_a_dialogue);
     } else {
         makeRelation();
         
@@ -575,9 +587,11 @@ function makeRelation() {
     var entities = $('#selectUtterEntities').val().trim();
 
     if (entities == "") {
-        alert("엔티티를 먼저 등록해 주세요.");
+        $('#alertMsg').text("엔티티를 먼저 등록해 주세요.");
+        $('#alertBtnModal').modal('show');
+        //alert("엔티티를 먼저 등록해 주세요.");
     }
-    
+
     //var inputDlgId = $('input[name=dlgId]');
 
     var dlgId = new Array();
@@ -659,11 +673,16 @@ function makeRelation() {
         },
         success: function (result) {
             if (!result) {
-                alert("failed");
+                
+                $('#alertMsg').text("failed");
+                $('#alertBtnModal').modal('show');
+                //alert("failed");
                 return false;
             }
             else {
-                alert(language.Added);
+                $('#alertMsg').text("language.Added");
+                $('#alertBtnModal').modal('show');
+                //alert(language.Added);
                 location.reload();
             }
         }

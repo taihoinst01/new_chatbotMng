@@ -143,7 +143,9 @@ $(document).on("keypress", "input[name=editSynonymsVal]", function(e){
         if (addVal == '' ) {
             //none
         } else if (addVal.indexOf(',') >= 0) {
-            alert(' , 를 입력할 수 없습니다.');
+            $('#alertMsg').text(' , 를 입력할 수 없습니다.');
+            $('#alertBtnModal').modal('show');
+            //alert(' , 를 입력할 수 없습니다.');
         } else {
             var inputHtmlStr = makeListTypeSynonyms(addVal, "NOT_LIST");
             $(this).parent().append(inputHtmlStr);
@@ -160,7 +162,9 @@ $(document).on("keypress", "#entityInputText", function(e){
         if (addVal == '' ) {
             //none
         } else if (addVal.indexOf(',') >= 0) {
-            alert(' , 를 입력할 수 없습니다.');
+            $('#alertMsg').text(' , 를 입력할 수 없습니다.');
+            $('#alertBtnModal').modal('show');
+            //alert(' , 를 입력할 수 없습니다.');
         } else {
             if (!chkDupleListEntity(addVal)) {
                 //none
@@ -310,10 +314,14 @@ function saveEntityDetail() {
                 url: '/luis/saveChangedEntity',
                 success: function(data) {
                     if(data.error){
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
                     }
                     else if (data.success) {
-                        alert(data.message);
+                        $('#alertMsg').text(data.message);
+                        $('#alertBtnModal').modal('show');
+                        //alert(data.message);
                         childList = [];
                         for (var i=0; i<saveChildList.length; i++) {
                             var tmpObj = new Object();
@@ -322,7 +330,9 @@ function saveEntityDetail() {
                         }
                     }
                     else {
-                        alert("실패했습니다. 다시 시도해주세요.");
+                        $('#alertMsg').text("실패했습니다. 다시 시도해주세요.");
+                        $('#alertBtnModal').modal('show');
+                        //alert("실패했습니다. 다시 시도해주세요.");
                     }
                 }
             });
@@ -421,10 +431,14 @@ function chkEntityChange() {
     //return false;
 
     if (isBlank) {
-        alert("공백은 저장할 수 없습니다.");
+        $('#alertMsg').text("공백은 저장할 수 없습니다.");
+        $('#alertBtnModal').modal('show');
+        //alert("공백은 저장할 수 없습니다.");
         return false;
     } else if (!isChange && (entityType != "1" || entityType != "2" ) ) {
-        alert("변경된 값이 없습니다.");
+        $('#alertMsg').text("변경된 값이 없습니다.");
+        $('#alertBtnModal').modal('show');
+        //alert("변경된 값이 없습니다.");
         return false;
     } else {
         return true;
@@ -445,14 +459,18 @@ function getChildEntityList() {
         url: '/luis/getChildEntity',
         success: function(data) {
             if(data.error){
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) {
                 childList = data.selChildList;
                 makeChildList();
             }
             else {
-                alert("실패했습니다. 다시 시도해주세요.");
+                $('#alertMsg').text("실패했습니다. 다시 시도해주세요.");
+                $('#alertBtnModal').modal('show');
+                //alert("실패했습니다. 다시 시도해주세요.");
             }
         }
     });
@@ -619,7 +637,9 @@ function getChildCompositeList() {
         url: '/luis/selectChildCompositeList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) 
             {
@@ -665,14 +685,21 @@ function deleteEntity(entityHiddenName, hId, hType) {
         url: '/luis/deleteEntity',
         success: function(data) {
             if(data.error){
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) {
-                alert(data.message);
-                location.href = "/luis/entityList";
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                $('#chkAfterAlert').val('GO_LIST');
+                //alert(data.message);
+                //location.href = "/luis/entityList";
             }
             else {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
         }
     });
@@ -698,12 +725,16 @@ function chkDupleListEntity(inputVal) {
         }
     });
     if (chkDuple) {
-        alert ("같은 이름의 엔티티가 존재합니다.");
+        $('#alertMsg').text("같은 이름의 엔티티가 존재합니다.");
+        $('#alertBtnModal').modal('show');
+        //alert ("같은 이름의 엔티티가 존재합니다.");
         return false;
     } else {
         if ($('input[name=editNormalVal]').length>0) {
             if ($('input[name=editNormalVal]').val().trim() == '') {
-                alert('공백을 입력할 수 없습니다.')
+                $('#alertMsg').text("공백을 입력할 수 없습니다.");
+                $('#alertBtnModal').modal('show');
+                //alert('공백을 입력할 수 없습니다.')
                 return false;
             }
         }
@@ -711,3 +742,19 @@ function chkDupleListEntity(inputVal) {
     }
 }
 
+
+
+
+//alert 메세지 초기화
+$(document).on("click", "#alertCloseBtn", function () {
+    $('#alertMsg').text('');
+    var chkMsg = $('#chkAfterAlert').val();
+    if (chkMsg != 'NONE') {
+        if (chkMsg == 'RELOAD') {
+            location.reload();
+        }
+        else if (chkMsg == 'GO_LIST') {
+            location.href = "/luis/entityList"
+        }
+    }
+});

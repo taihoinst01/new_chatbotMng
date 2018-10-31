@@ -131,7 +131,9 @@ function makeIntentTable() {
 function createIntent() {
     if ($('#intentName').val().trim() == '') 
     {
-        alert("Intent를 입력해야 합니다.");
+        $('#alertMsg').text('Intent를 입력해야 합니다.');
+        $('#alertBtnModal').modal('show');
+        //alert("Intent를 입력해야 합니다.");
     } 
     else 
     {
@@ -167,19 +169,28 @@ function createIntent() {
             url: '/luis/createIntent',
             success: function(data) {
                 if (data.dupleRst) {
-                    alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                    $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                    $('#alertBtnModal').modal('show');
+                    //alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
                 }
                 else if (!data.success) 
                 {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                 }
                 else if (data.error) {
-                    alert(data.message);
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                    //alert(data.message);
                 }
                 else 
                 {
-                    alert('생성되었습니다.');
-                    location.reload();
+                    $('#alertMsg').text('생성되었습니다');
+                    $('#alertBtnModal').modal('show');
+                    $('#chkAfterAlert').val('RELOAD');
+                    //alert('생성되었습니다.');
+                    //location.reload();
                 }
             }
         });
@@ -224,14 +235,22 @@ function deleteIntent(intentHiddenName, hId) {
         url: '/luis/deleteIntent',
         success: function(data) {
             if(data.error){
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.success) {
-                alert(data.message);
-                location.reload();
+                
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                $('#chkAfterAlert').val('RELOAD');
+                //alert(data.message);
+                //location.reload();
             }
             else {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
         }
     });
@@ -289,10 +308,14 @@ function intentDetail(intentName, intentId, labelCnt) {
         success: function(data) {
             if (!data.success) 
             {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else if (data.error) {
-                alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
             }
             else 
             {
@@ -305,6 +328,19 @@ function intentDetail(intentName, intentId, labelCnt) {
             }
         }
     });
-    
-    
 }
+
+
+
+//alert 메세지 초기화
+$(document).on("click", "#alertCloseBtn", function () {
+    $('#alertMsg').text('');
+    var chkMsg = $('#chkAfterAlert').val();
+    if (chkMsg != 'NONE') {
+        if (chkMsg == 'RELOAD') {
+            location.reload();
+        }
+    }
+});
+
+
