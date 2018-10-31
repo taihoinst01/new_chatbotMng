@@ -572,8 +572,12 @@ function makeRelation() {
     var selectUtterSeq = $('#selectUtterSeq').val();
     
     //var entities = $('input[name=entity]').val();
-    var entities = $('#selectUtterEntities').val();
+    var entities = $('#selectUtterEntities').val().trim();
 
+    if (entities == "") {
+        alert("엔티티를 먼저 등록해 주세요.");
+    }
+    
     //var inputDlgId = $('input[name=dlgId]');
 
     var dlgId = new Array();
@@ -595,6 +599,8 @@ function makeRelation() {
         }
     }
     */
+
+
     $('input[name=dlgId]').each(function (n) {
         var chk = $(this).parents('.chat_box').find('input[name=searchDlgChk]').parent().hasClass('checked');
         if (chk == true) {

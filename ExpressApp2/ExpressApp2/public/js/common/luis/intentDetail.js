@@ -1721,7 +1721,8 @@ function saveUtterance() {
             $("#loadingBar").css("display","block");
         },
         complete: function () {
-            
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");
         },
         data: params,
         url: '/luis/saveUtterance',

@@ -4667,7 +4667,7 @@ router.post('/relationUtterAjax', function (req, res) {
 
     var updateTblDlgQuery = "UPDATE TBL_DLG SET GROUPM=@luisIntent WHERE DLG_ID=@dlgId";
 
-    var updateNewUtter = "UPDATE TBL_QNAMNG SET USE_YN = 'N' WHERE SEQ = @selectUtterSeq";
+    var updateNewUtter = "UPDATE TBL_QNAMNG SET DLG_ID=@dlgId, USE_YN = 'N' WHERE SEQ = @selectUtterSeq";
 
     (async () => {
         try {
@@ -4794,10 +4794,14 @@ router.post('/relationUtterAjax', function (req, res) {
                
             }
 
-            var updateQQ = await pool.request()
-                .input('selectUtterSeq', sql.NVarChar, selectUtterSeq)
-                .query(updateNewUtter);
-            return res.send({ result: true });
+            for (var j = 0; j < (typeof dlgId === "string" ? 1 : dlgId.length); j++) {
+                var updateQQ = await pool.request()
+                    .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
+                    .input('selectUtterSeq', sql.NVarChar, selectUtterSeq)
+                    .query(updateNewUtter);
+                return res.send({ result: true });
+            }
+            
             /********************************************* */
             //console.log(result1);
             //console.log(result2);
