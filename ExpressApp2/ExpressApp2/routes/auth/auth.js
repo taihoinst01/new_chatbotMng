@@ -59,7 +59,7 @@ router.post('/selectAuthGrpList', function (req, res) {
                                 }
                 
                                 if (searchType=="AUTHGRP_M_NM") {
-                                    QueryStr += "AND A.AUTHGRP_M_NM LIKE '%" + searchWord + "%' \n";
+                                    QueryStr += "AND A.AUTHGRP_M_NM LIKE N'%" + searchWord + "%' \n";
                                 }
                             }
             QueryStr +=     "                       ) TBX \n" +
@@ -140,12 +140,12 @@ router.post('/procAuthMaster', function (req, res) {
         if (authMasterArr[i].statusFlag === 'NEW') {
             saveStr += "INSERT INTO TB_AUTHGRP_M (AUTHGRP_M_ID, AUTHGRP_M_NM, DESCR, AUTH_LEVEL, REG_ID, REG_DT, MOD_ID, MOD_DT) " + 
                        "VALUES ( ";
-            saveStr += " '" + authMasterArr[i].AUTHGRP_M_ID  + "', '" + authMasterArr[i].AUTHGRP_M_NM  + "', '" + authMasterArr[i].DESCR  + "', ";
+            saveStr += " '" + authMasterArr[i].AUTHGRP_M_ID  + "', N'" + authMasterArr[i].AUTHGRP_M_NM  + "', N'" + authMasterArr[i].DESCR  + "', ";
             saveStr += " '" + authMasterArr[i].AUTH_LEVEL  + "', '" + userId  + "', GETDATE(), ";
             saveStr += " '" + userId  + "', GETDATE()); ";
         } else if (authMasterArr[i].statusFlag === 'UPDATE') {
             updateStr += "UPDATE TB_AUTHGRP_M SET ";
-            updateStr += "AUTHGRP_M_NM = '" + authMasterArr[i].AUTHGRP_M_NM  + "', DESCR = '" + authMasterArr[i].DESCR + "', ";
+            updateStr += "AUTHGRP_M_NM = N'" + authMasterArr[i].AUTHGRP_M_NM  + "', DESCR = N'" + authMasterArr[i].DESCR + "', ";
             updateStr += "AUTH_LEVEL = '" + authMasterArr[i].AUTH_LEVEL  + "', ";
             updateStr += "MOD_ID = '" + userId  + "', MOD_DT = GETDATE() ";
             updateStr += "WHERE AUTHGRP_M_ID = '" + authMasterArr[i].AUTHGRP_M_ID + "'; ";

@@ -29,11 +29,11 @@ router.post('/procMenu', function (req, res) {
         if (menuArr[i].statusFlag === 'NEW') {
             saveStr += "INSERT INTO TB_MENU_AUTH (MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT) " +
                 "VALUES ( ";
-            saveStr += " '" + menuArr[i].MENU_ID + "', '" + menuArr[i].MENU_NM + "', '" + menuArr[i].MENU_URL + "', ";
+            saveStr += " '" + menuArr[i].MENU_ID + "', N'" + menuArr[i].MENU_NM + "', N'" + menuArr[i].MENU_URL + "', ";
             saveStr += " '" + menuArr[i].MENU_AUTH + "', '" + userId + "', GETDATE()); ";
         } else if (menuArr[i].statusFlag === 'UPDATE') {
             updateStr += "UPDATE TB_MENU_AUTH SET ";
-            updateStr += "MENU_NM = '" + menuArr[i].MENU_NM + "', MENU_URL = '" + menuArr[i].MENU_URL + "', ";
+            updateStr += "MENU_NM = N'" + menuArr[i].MENU_NM + "N', MENU_URL = '" + menuArr[i].MENU_URL + "', ";
             updateStr += "MENU_AUTH = '" + menuArr[i].MENU_AUTH + "', ";
             updateStr += "MOD_ID = '" + userId + "', MOD_DT = GETDATE() ";
             updateStr += "WHERE MENU_ID = '" + menuArr[i].MENU_ID + "'; ";

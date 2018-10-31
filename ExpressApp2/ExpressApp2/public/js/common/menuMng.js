@@ -19,8 +19,8 @@ var deleteCheck = "";
 $(document).ready(function () {
     //추가 버튼(Master)
     $(document).on("click", "#addMenuBtn", function () {
-        getMenu();
-        document.menuForm.reset();
+        //getMenu();
+        //document.menuForm.reset();
         var MENU_NM = $('#MENU_NM').val();
         var MENU_URL = $('#MENU_URL').val();
         var MENU_AUTH = $('#MENU_AUTH').val();

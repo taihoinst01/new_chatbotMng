@@ -277,13 +277,14 @@ router.post('/saveUserInfo', function (req, res) {
     var updateStr = "";
     var deleteStr = "";
 
-    
+    console.log("saveUserInfo===");
 
     for (var i=0; i<userArr.length; i++) {
         if (userArr[i].statusFlag === 'NEW') {
             saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, EMP_NM, HPHONE, USE_YN) " + 
                        "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
             saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y'); ";
+            console.log("saveStr==="+saveStr);
         } else if (userArr[i].statusFlag === 'EDIT') {
             updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
         } else { //DEL
