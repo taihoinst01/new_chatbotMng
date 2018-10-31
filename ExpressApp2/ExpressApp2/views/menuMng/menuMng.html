@@ -13,6 +13,7 @@
         <script>
             function show_menuForm() {
                 document.menuForm.reset();
+                getMenu();
                 $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="addMenuBtn"><i class="fa fa-edit"></i> Save</button>');
                 $('#menuFormModal').modal('show');
             }

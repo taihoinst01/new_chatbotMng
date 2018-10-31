@@ -32,7 +32,7 @@ $(document).ready(function () {
 $(document).mouseup(function(e) {
     if ($('.entityValDiv').css('display') != 'none') {
 
-        var container = $('.entityValDiv');
+        var container = $('.entityValDiv, #alertBtnModal');
         if (container.has(e.target).length === 0 && !container.is(e.target)) {
             $('.entityValDiv').hide();//.css('display', 'none');
         }
@@ -168,7 +168,8 @@ $(document).on('click','#goUtterBtn',function(e){
     var selVal = $('#intentListSelect').val();
     var selText = $('#intentListSelect option:selected').text();
     if (selVal == "NONE") {
-        alert('인텐트를 선택해 주세요.');
+        $('#alertMsg').text('인텐트를 선택해 주세요.');
+        $('#alertBtnModal').modal('show');
         return false;
     } else {
         var selIntentAppId = $('#intentListSelect').val();
@@ -247,7 +248,8 @@ function deleteNoAnswerQ(){
                 url : '/learning/deleteNoAnswerQ',
                 isloading : true,
                 success: function(data){
-                    alert("삭제되었습니다.");
+                    $('#alertMsg').text('삭제되었습니다');
+                    $('#alertBtnModal').modal('show');
                     $('#currentPage').val(1)
                     noAnswerQListAjax();
                 }
@@ -261,36 +263,12 @@ function noAnswerQSearch() {
     var searchRecommendText = $('input[name=searchRecommendText]').val();
 
     if(!searchRecommendText) {
-        alert("검색어를 입력해주시기 바랍니다.");
+        $('#alertMsg').text('검색어를 입력해주시기 바랍니다.');
+        $('#alertBtnModal').modal('show');
     } else {
         noAnswerQListAjax();
     }
 }
-
-
-
-//delete 버튼 클릭 이벤트 //deleteRecommend
-function deleteNoAnswerQ(){
-    if ( confirm( language.ASK_DELETE)) {
-        var arry = [];
-        for(var i = 0; i < $('#noAnswerContents .checked').length; i++)
-        {
-            arry.push($('#noAnswerContents .checked + .seq')[i].value);
-        }
-        $.ajax({
-                type: 'POST',
-                data : {'seq' : arry+''},
-                url : '/learning/deleteNoAnswerQ',
-                isloading : true,
-                success: function(data){
-                    alert("삭제되었습니다.");
-                    $('#currentPage').val(1)
-                    noAnswerQListAjax();
-                }
-            });
-    }
-}
-
 
 var selectHtml = '';
 function getIntentList() {

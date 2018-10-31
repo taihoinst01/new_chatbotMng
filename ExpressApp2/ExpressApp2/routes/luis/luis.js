@@ -741,14 +741,26 @@ router.post('/getUtterInIntent', function (req, res) {
                         utterObj2.intentLabel = utterInfo.body[jk].intentLabel;
                         
                         var entityLabels = [];
-                        for (var yu=0; yu<utterInfo.body[jk].entityLabels.length; yu++) {
+                        if (utterInfo.body[jk].entityLabels == null) {
                             var tmpObj = new Object();
-                            tmpObj.id = utterInfo.body[jk].entityLabels[yu].id;
-                            tmpObj.entityName = utterInfo.body[jk].entityLabels[yu].entityName;
-                            tmpObj.startTokenIndex = utterInfo.body[jk].entityLabels[yu].startTokenIndex;
-                            tmpObj.endTokenIndex = utterInfo.body[jk].entityLabels[yu].endTokenIndex;
-                            tmpObj.entityType = utterInfo.body[jk].entityLabels[yu].entityType;
+                            /*
+                            tmpObj.id = '';
+                            tmpObj.entityName = '';
+                            tmpObj.startTokenIndex = '';
+                            tmpObj.endTokenIndex = '';
+                            tmpObj.entityType = '';
+                            */
                             entityLabels.push(tmpObj);
+                        } else {
+                            for (var yu=0; yu<utterInfo.body[jk].entityLabels.length; yu++) {
+                                var tmpObj = new Object();
+                                tmpObj.id = utterInfo.body[jk].entityLabels[yu].id;
+                                tmpObj.entityName = utterInfo.body[jk].entityLabels[yu].entityName;
+                                tmpObj.startTokenIndex = utterInfo.body[jk].entityLabels[yu].startTokenIndex;
+                                tmpObj.endTokenIndex = utterInfo.body[jk].entityLabels[yu].endTokenIndex;
+                                tmpObj.entityType = utterInfo.body[jk].entityLabels[yu].entityType;
+                                entityLabels.push(tmpObj);
+                            }
                         }
                         /*
                         if (utterPrediction.body[jk].entityPredictions.length > 0) {
@@ -1743,7 +1755,12 @@ router.post('/saveUtterance', function (req, res) {
                 var tmpObj = new Object();
                 
                 for (var i=0; i<labeledUtterArr.length; i++) {
-                    options.payload = labeledUtterArr[i];
+                    if (typeof labeledUtterArr[i].entityLabels != 'undefined') {
+                        options.payload = labeledUtterArr[i];
+                    } else {
+                        labeledUtterArr[i].entityLabels = [];
+                        options.payload = labeledUtterArr[i];
+                    }
                     /*
                     options.payload = { 
                         "name": entityName,
@@ -1766,20 +1783,29 @@ router.post('/saveUtterance', function (req, res) {
                                     }
                                 }
 
-                                    let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-                                    var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
-                                    saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";
-                    
-                                    //console.log("intent -" + pp)
-                                    let getDBEntityChild_result = await pool.request()
-                                                                        .input('dlg_text', sql.NVarChar, newUtterArr[j].text)
-                                                                        .input('intent', sql.NVarChar, intentName)
-                                                                        .input('entities', sql.NVarChar, entities)
-                                                                        .input('appId', sql.NVarChar, req.session.selAppId)
-                                                                        .query(saveNewUtterQry);
+                                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                                var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
+                                saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";
+                
+                                //console.log("intent -" + pp)
+                                let getDBEntityChild_result = await pool.request()
+                                                                    .input('dlg_text', sql.NVarChar, newUtterArr[j].text)
+                                                                    .input('intent', sql.NVarChar, intentName)
+                                                                    .input('entities', sql.NVarChar, entities)
+                                                                    .input('appId', sql.NVarChar, req.session.selAppId)
+                                                                    .query(saveNewUtterQry);
 
-                                    //req.session.entityChildList = getDBEntityChild_result.recordset;
+                                //req.session.entityChildList = getDBEntityChild_result.recordset;
                                 
+                                var intentList = req.session.intentList;
+
+                                for( var q=0; q<intentList.length; q++ ) {
+                                    //console.log( key + '=>' + utterCntObj.body[key] );
+                                    if (req.session.selAppId == intentList[q].APP_ID && intentList[q].INTENT == intentName) {
+                                        intentList[q].UTTER_COUNT = intentList[q].UTTER_COUNT + 1;
+                                        break;
+                                    }
+                                }
 
                             }
                         }

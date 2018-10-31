@@ -139,7 +139,10 @@ $(document).ready(function() {
                 '</tr>'
             $(this).parent().prev().find('tbody').append(inputTrHtml);
         } else {
-            alert(language.Up_to_4_buttons_can_be_added);
+            
+            $('#alertMsg').text(language.Up_to_4_buttons_can_be_added);
+            $('#alertBtnModal').modal('show');
+            //alert(language.Up_to_4_buttons_can_be_added);
         }
 
     });
@@ -437,7 +440,9 @@ $(document).ready(function() {
     $('#addUtterModalBtn').click(function() {
         var inputUtter = $('#s_question').val().trim();
         if (inputUtter == '') {
-            alert('공백을 입력할 수 없습니다.');
+            $('#alertMsg').text('공백을 입력할 수 없습니다.');
+            $('#alertBtnModal').modal('show');
+            //alert('공백을 입력할 수 없습니다.');
             return false;
         }
         $('#utterTitle').text(inputUtter);
@@ -526,7 +531,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
     $(this).val($(this).val().trim());
     if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
         if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
-            alert('엔티티를 선택해 주세요.');
+            //alert('엔티티를 선택해 주세요.');
+            $('#alertMsg').text('엔티티를 선택해 주세요.');
+            $('#alertBtnModal').modal('show');
             $(this).val('');
             return false;
         }
@@ -1047,7 +1054,9 @@ function getEntityList(intentName, intentId) {
         url: '/luis/getEntityList',
         success: function(data) {
             if (data.error) {
-                alert(data.message);
+                //alert(data.message);
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
             }
             else 
             {
@@ -1086,7 +1095,9 @@ function chkDulpleSelBox(trIndex, chkIndexStr) {
 //utter 삭제  버튼
 $(document).on("click", "a[name=delLabelBtn]", function(e){
     if ($(this).parent().find('div[name=indentDiv]').length>0) {
-        alert('상위 entity를 삭제해 주세요.');
+        //alert('상위 entity를 삭제해 주세요.');
+        $('#alertMsg').text('상위 entity를 삭제해 주세요.');
+        $('#alertBtnModal').modal('show');
         return false;
     }
     if ($(this).parent().find('select[name=entityTypeForLabel]').val() == '4') {
@@ -1741,7 +1752,9 @@ function updateDialog() {
 */
     $('.insertForm textarea[name=dialogText]').each(function (index) {
         if ($(this).val().trim() === "") {
-            alert(language.You_must_enter_a_Dialog_Title);
+            //alert(language.You_must_enter_a_Dialog_Title);
+            $('#alertMsg').text(language.You_must_enter_a_Dialog_Title);
+            $('#alertBtnModal').modal('show');
             exit = true;
             return false;
         }
@@ -1749,7 +1762,9 @@ function updateDialog() {
     if (exit) return;
     $('.insertForm input[name=imgUrl]').each(function (index) {
         if ($(this).val().trim() === "") {
-            alert(language.ImageURL_must_be_entered);
+            $('#alertMsg').text(language.ImageURL_must_be_entered);
+            $('#alertBtnModal').modal('show');
+            //alert(language.ImageURL_must_be_entered);
             exit = true;
             return false;
         }
@@ -1847,12 +1862,18 @@ function updateDialog() {
         data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
-            alert('success');
-            $('.createDlgModalClose').click();
+            
+            $('#alertMsg').text('success');
+            $('#alertBtnModal').modal('show');
+            $('#chkAfterAlert').val('UPDATE_DLG');
 
-            var groupType = $('.selected').text();
-            var sourceType = $('#tblSourceType').val();
-            selectDlgByTxt(groupType, sourceType);
+            //alert('success');
+            
+            //$('.createDlgModalClose').click();
+
+            //var groupType = $('.selected').text();
+            //var sourceType = $('#tblSourceType').val();
+            //selectDlgByTxt(groupType, sourceType);
         }
 
     });
@@ -1866,11 +1887,16 @@ function deleteDialog(dlgId) {
         data: { 'dlgId': dlgId },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
-            alert('delele complete');
-            $('.createDlgModalClose').click();
-            var groupType = $('.selected').text();
-            var sourceType = $('#tblSourceType').val();
-            selectDlgByTxt(groupType, sourceType);
+            
+            $('#alertMsg').text('delele complete');
+            $('#alertBtnModal').modal('show');
+            $('#chkAfterAlert').val('DELETE_DLG');
+
+            //alert('delele complete');
+            //$('.createDlgModalClose').click();
+            //var groupType = $('.selected').text();
+            //var sourceType = $('#tblSourceType').val();
+            //selectDlgByTxt(groupType, sourceType);
         }
 
     });
@@ -1953,7 +1979,9 @@ $(document).on('click', '.deleteInsertForm', function (e) {
 
     insertFormLength = $('.insertForm').length;
     if (insertFormLength == 1) {
-        alert(language.You_must_have_one_dialog_by_default);
+        $('#alertMsg').text(language.You_must_have_one_dialog_by_default);
+        $('#alertBtnModal').modal('show');
+        //alert(language.You_must_have_one_dialog_by_default);
     } else {
         var idx = $(".deleteInsertForm").index(this);
         if (idx == 0) {
@@ -1984,7 +2012,9 @@ $(document).on('click', '.deleteCard', function (e) {
     if (insertFormLength == 1) {
 
         if (carouselLayoutLength == 1) {
-            alert(language.You_must_have_at_least_one_card);
+            $('#alertMsg').text(language.You_must_have_at_least_one_card);
+            $('#alertBtnModal').modal('show');
+            //alert(language.You_must_have_at_least_one_card);
 
         } else {
 
@@ -2001,7 +2031,9 @@ $(document).on('click', '.deleteCard', function (e) {
     } else {
 
         if (carouselLayoutLength == 1) {
-            alert(language.You_must_have_at_least_one_card);
+            $('#alertMsg').text(language.You_must_have_at_least_one_card);
+            $('#alertBtnModal').modal('show');
+            //alert(language.You_must_have_at_least_one_card);
         } else {
 
             if ($('.dialogView').eq(insertFormIdx).find('.slideDiv .wc-carousel-item').length == 3) {
@@ -2068,7 +2100,9 @@ $(document).on('click', '.carouseBtn', function (e) {
             '</tr>'
         $(this).parent().prev().prev().prev().find('.cardCopyTbl tbody').append(inputTrHtml);
     } else {
-        alert("버튼은 4개까지 추가할 수 있습니다.");
+        $('#alertMsg').text('버튼은 4개까지 추가할 수 있습니다.');
+        $('#alertBtnModal').modal('show');
+        //alert("버튼은 4개까지 추가할 수 있습니다.");
     }
 
 });
@@ -2108,7 +2142,9 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>';
 
     if ($(this).parents('.insertForm').find('.carouselLayout').length == 10) {
-        alert(language.Up_to_10_cards_can_be_added);
+        $('#alertMsg').text(language.Up_to_10_cards_can_be_added);
+        $('#alertBtnModal').modal('show');
+        //alert(language.Up_to_10_cards_can_be_added);
     } else {
         var idx = $(".addCarouselBtn:visible").index(this);
         var jdx = $('select[name=dlgType]').index(($(".addCarouselBtn:visible").eq(idx).parents('form[name=dialogLayout]').find('select[name=dlgType]')));
@@ -2193,7 +2229,9 @@ $(document).on("click", "#similarQBtn", function () {
     * */
 
     if ($('#s_question').val().trim() == '') {
-        alert('유사질문을 입력 해 주세요.');
+        $('#alertMsg').text('유사질문을 입력 해 주세요.');
+        $('#alertBtnModal').modal('show');
+        //alert('유사질문을 입력 해 주세요.');
         return false;
     }
 
@@ -2224,10 +2262,17 @@ $(document).on("click", "#similarQBtn", function () {
         success: function(data) {
             console.log(data);
             if (data.status === 200) {
-                alert(language['REGIST_SUCC']);
-                window.location.reload();
+                
+                $('#alertMsg').text(language['REGIST_SUCC']);
+                $('#alertBtnModal').modal('show');
+                $('#chkAfterAlert').val('RELOAD');
+
+                //alert(language['REGIST_SUCC']);
+                //window.location.reload();
             } else {
-                alert(language['It_failed']);
+                //alert(language['It_failed']);
+                $('#alertMsg').text(language['It_failed']);
+                $('#alertBtnModal').modal('show');
             }
         }
     });
@@ -2256,11 +2301,45 @@ $(document).on("click", "#deleteSimilarBtn", function () {
         success: function(data) {
             console.log(data);
             if (data.status === 200) {
-                alert(language['REGIST_SUCC']);
-                window.location.reload();
+
+                $('#alertMsg').text(language['REGIST_SUCC']);
+                $('#alertBtnModal').modal('show');
+                $('#chkAfterAlert').val('RELOAD');
+                //alert(language['REGIST_SUCC']);
+                //window.location.reload();
             } else {
-                alert(language['It_failed']);
+                //alert(language['It_failed']);
+                $('#alertMsg').text(language['It_failed']);
+                $('#alertBtnModal').modal('show');
             }
         }
     });
 });
+
+
+
+//alert 메세지 초기화
+$(document).on("click", "#alertCloseBtn", function () {
+    $('#alertMsg').text('');
+    var chkMsg = $('#chkAfterAlert').val();
+    if (chkMsg != 'NONE') {
+        if (chkMsg == 'RELOAD') {
+            location.reload();
+        }
+        else if (chkMsg == 'DELETE_DLG') {
+            var groupType = $('.selected').text();
+            var sourceType = $('#tblSourceType').val();
+            selectDlgByTxt(groupType, sourceType);
+        }
+        else if (chkMsg == 'UPDATE_DLG') {
+            
+            $('.createDlgModalClose').click();
+
+            var groupType = $('.selected').text();
+            var sourceType = $('#tblSourceType').val();
+            selectDlgByTxt(groupType, sourceType);
+        }
+    }
+});
+
+

@@ -51,12 +51,14 @@ $(document).ready(function() {
         document.authMasterForm.reset();
 
         var auth_id = $(this).attr("auth_id");
+        var auth_level = $(this).attr("auth_level");
         var tr = $(this).parent().parent();
         var td = tr.children();
     
         document.authMasterForm.AUTHGRP_M_ID.value = auth_id;
         document.authMasterForm.AUTHGRP_M_NM.value = td.eq(0).text();
-        document.authMasterForm.AUTH_LEVEL.value = td.eq(1).text();
+        //document.authMasterForm.AUTH_LEVEL.value = td.eq(1).text();
+        document.authMasterForm.AUTH_LEVEL.value = auth_level;
         document.authMasterForm.DESCR.value = td.eq(2).text();
 
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
@@ -126,17 +128,20 @@ function makeAuthTable() {
             if (data.records > 0) {
                 
                 var tableHtml = "";
-    
-                for (var i=0;i<data.rows.length;i++) { 
+                var authLevel_text = "";
+                //var authLevel_code = ""
+                for (var i=0;i<data.rows.length;i++) {
+                    eval('authLevel_text = language.AUTH_'+data.rows[i].AUTH_LEVEL);
                     tableHtml += '<tr>';
                     tableHtml += '<td class="editable-cell">' + data.rows[i].AUTHGRP_M_NM + '</td>'
-                    tableHtml += '<td>' + data.rows[i].AUTH_LEVEL + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].AUTH_LEVEL + '</td>'
+                    tableHtml += '<td>' + authLevel_text + '</td>'
                     tableHtml += '<td>' + data.rows[i].DESCR + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>';
                     //tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="delete_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-trash"></i> 삭제</button>';
-                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>';
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_authForm" auth_level="' + data.rows[i].AUTH_LEVEL + '" auth_id="' + data.rows[i].AUTHGRP_M_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>';
                     tableHtml += '</td></tr>';
                 }
     
