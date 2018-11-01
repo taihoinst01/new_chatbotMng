@@ -127,6 +127,7 @@ $(document).ready(function () {
     selectAll();
 
     $('#searchBoardBtn').click(function () {
+        $('#loadingModal').modal('show');
         selectAll();
     });
 });
@@ -346,6 +347,7 @@ function selectAll() {
                     }
                 }
             }
+            $('#loadingModal').modal('hide');
         }
     });
     /*

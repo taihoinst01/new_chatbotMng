@@ -92,13 +92,13 @@ router.post('/intentScore', function (req, res) {
 
     var selectQuery = "";
     selectQuery += "SELECT tbp.* from \n" +
-            " (SELECT ROW_NUMBER() OVER(ORDER BY LUIS_INTENT DESC) AS NUM, \n" +
+            " (SELECT ROW_NUMBER() OVER(ORDER BY A.LUIS_INTENT DESC) AS NUM, \n" +
             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
-            "         CEILING((ROW_NUMBER() OVER(ORDER BY LUIS_INTENT DESC))/ convert(numeric , 9)) PAGEIDX, \n";
-    selectQuery += "	LOWER(LUIS_INTENT) AS intentName, \n";
-    selectQuery += "ROUND(AVG(CAST(LUIS_INTENT_SCORE AS FLOAT)), 2) AS intentScoreAVG,  \n";
-    selectQuery += "MAX(CAST(LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMAX , \n";
-    selectQuery += "MIN(CAST(LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMIN, \n";
+            "         CEILING((ROW_NUMBER() OVER(ORDER BY A.LUIS_INTENT DESC))/ convert(numeric , 9)) PAGEIDX, \n";
+    selectQuery += "	LOWER(A.LUIS_INTENT) AS intentName, \n";
+    selectQuery += "ROUND(AVG(CAST(A.LUIS_INTENT_SCORE AS FLOAT)), 2) AS intentScoreAVG,  \n";
+    selectQuery += "MAX(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMAX , \n";
+    selectQuery += "MIN(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMIN, \n";
     //selectQuery += "CHANNEL AS channel, \n";
     //selectQuery += "CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS regDate, \n";
     selectQuery += "COUNT(*) AS intentCount \n";
@@ -114,9 +114,10 @@ router.post('/intentScore', function (req, res) {
         selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
     }
 
-    selectQuery += "GROUP BY LUIS_INTENT ) tbp \n";
+    selectQuery += "GROUP BY A.LUIS_INTENT ) tbp \n";
     selectQuery += " WHERE 1=1 \n" +
                     " AND PAGEIDX = " + currentPageNo + "; \n";
+
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
@@ -494,7 +495,7 @@ router.post('/firstQueryTable', function (req, res) {
         selectQuery += "    ON DL.DLG_ID = ME.DLG_ID ) tbp \n";
         selectQuery += " WHERE 1=1 \n" +
                        " AND PAGEIDX = " + currentPageNo + "; \n";
-    
+    console.log("selectQuery=="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
