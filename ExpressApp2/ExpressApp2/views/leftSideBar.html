@@ -79,21 +79,22 @@
                                <li class="header"><%= __('MENU') %></li>
 
 
-                               <li class=" treeview">
+                               <li class=" treeview" id="luisMenuLi">
                                    <a href="#">
                                        <i class="fa fa-desktop"></i> <span>LUIS</span>
                                        <span class="pull-right-container">
                                            <i class="fa fa-angle-left pull-right"></i>
                                        </span>
                                    </a>
-                                   
+                                   <!--selChatInfo.chatbot.appList.length-->
+                                   <!--selChatAppLength-->
                                 <%
-                                for(var k=0; k<selChatAppLength; k++) {
+                                for(var k=0; k<selChatInfo.chatbot.appList.length; k++) {
                                                                 %>
                                     <ul class="treeview-menu">
-                                        <li class=" treeview">
+                                        <li class=" treeview" name="appListLi">
                                             <a href="#">
-                                                <i class="fa fa-book"></i> <span><%=appName %> <%=k+1 %></span>
+                                                <i class="fa fa-book"></i> <span name="appNameSpan"><%=appName %> <%=k+1 %></span>
                                                 <span class="pull-right-container">
                                                     <i class="fa fa-angle-left pull-right"></i>
                                                 </span>
@@ -271,11 +272,21 @@
         $('.treeview-menu').find('i').each(function() {
             var menuName = $.trim($(this).parent().text()).replace(/\s/gi, ""); 
             var pageTitle = $.trim($('.content-header>h1').text()).replace(/\s/gi, ""); 
+            if ($('#hiddenMenuTitle').length > 0) {
+                pageTitle = $.trim($('#hiddenMenuTitle').val()).replace(/\s/gi, ""); ;
+            }
             if (menuName === pageTitle) {
-                $(this).parents('li').addClass('active');
+                if ($(this).parents('#luisMenuLi').length > 0) {
+                    var appIndex = $('#appIndex').val();
+                    var appCompare = $(this).parents('li[name=appListLi]').find('span[name=appNameSpan]').text().split(' ')[1];
+                    if (appIndex == --appCompare) {
+                        $(this).parents('li').addClass('active');
+                    }
+                } else {
+                    $(this).parents('li').addClass('active');
+                }
             }
         });
-        
         //대시보드 active
         $('.treeview').find('i').each(function() {
             var menuName = $.trim( $(this).next().text() ).replace(/ /gi, ""); 

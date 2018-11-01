@@ -365,17 +365,19 @@ CREATE TABLE TB_LUIS_INTENT(
 router.get('/intentList', function (req, res) {
 
     var userId = req.session.sid;
+    var appNumber = req.query.appIndex;
+    req.session.appIndex = appNumber;
     try {
         var selAppList = req.session.selChatInfo.chatbot.appList;
         if (typeof req.query.appIndex != 'undefined') {
-            var appNumber = req.query.appIndex;
+            //var appNumber = req.query.appIndex;
             var selApp = selAppList[appNumber];
             req.session.selAppId = selApp.APP_ID;
             req.session.selAppName = selApp.APP_NAME;
         }
 
         if (req.query.createQuery) {
-            var appNumber = req.query.appIndex;
+            //var appNumber = req.query.appIndex;
             var selApp = selAppList[appNumber];
             req.session.selAppId = selApp.APP_ID;
             req.session.selAppName = selApp.APP_NAME;
@@ -392,15 +394,15 @@ router.get('/intentList', function (req, res) {
                 }
             }
 
-            res.render('luis/intentList', { pageNumber: ++pageNum, createQuery: createQuery, selectIntent: selectIntent});
+            res.render('luis/intentList', { pageNumber: ++pageNum, createQuery: createQuery, selectIntent: selectIntent, appIndex: appNumber});
         }
         else if (req.query.rememberPageNum) {
-            res.render('luis/intentList', { pageNumber: req.query.rememberPageNum, createQuery: -1, selectIntent: -1});
+            res.render('luis/intentList', { pageNumber: req.query.rememberPageNum, createQuery: -1, selectIntent: -1, appIndex: appNumber});
         } else {
-            res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1 });
+            res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1, appIndex: appNumber });
         }
     } catch(e) {
-        res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1 });
+        res.render('luis/intentList', { pageNumber: '-1', createQuery: -1, selectIntent: -1, appIndex:0 });
     }
     
     /*
@@ -972,6 +974,9 @@ router.get('/entityList', function (req, res) {
     var selectedAppList = [];
     var selectedIntentList = [];
     
+    var appIndex = req.query.appIndex;
+
+    req.session.appIndex = appIndex;
     var leftList = req.session.leftList;
     var chatNum = -1;
 
@@ -1005,7 +1010,7 @@ router.get('/entityList', function (req, res) {
         }
     })();
     */
-    res.render('luis/entityList');
+    res.render('luis/entityList', { appIndex: appIndex });
 
 });
 

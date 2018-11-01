@@ -146,6 +146,12 @@ app.use(function(req, res, next) {
     } else {
         res.locals.selChatInfo = null;
     }
+    
+    if (req.session.appIndex) {
+        res.locals.appIndex = req.session.appIndex;
+    } else {
+        res.locals.appIndex = null;
+    }
 
     if (req.session.selChatAppLength) {
         res.locals.selChatAppLength = req.session.selChatAppLength;
