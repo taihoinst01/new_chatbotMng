@@ -31,7 +31,7 @@ router.post('/selectSmallTalkList', function (req, res) {
                             "         CEILING((ROW_NUMBER() OVER(ORDER BY RELATION_ID DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
                             "         b.RELATION_ID, b.LUIS_INTENT, b.LUIS_ENTITIES, b.DLG_ID, b.DLG_QUESTION, b.ST_FLAG, b.USE_YN \n" +
                            "          FROM TBL_DLG a, TBL_DLG_RELATION_LUIS b \n" +
-                           "          WHERE b.ST_FLAG='F' AND a.DLG_ID = b.DLG_ID \n";
+                           "          WHERE b.ST_FLAG='T' AND a.DLG_ID = b.DLG_ID \n";
                            if (req.body.searchQuestiontText !== '') {
                             QueryStr += "AND b.DLG_QUESTION like '%" + req.body.searchQuestiontText + "%' \n";
                         }

@@ -163,8 +163,8 @@ function selectAll() {
                         drawScoreListHtml += '	<div class="box-body">';
                         drawScoreListHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.INTENT_SCROE_AVG_MIN_MAX + '</h3></div> ';
                         drawScoreListHtml += '		       <div class="Tbl_wrap">';
-                        drawScoreListHtml += '			    <table class="Tbl" summary="INTENT SCORE 평균/최소/최대">';
-                        drawScoreListHtml += '				<colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>';
+                        drawScoreListHtml += '			    <table class="table table-hover" summary="INTENT SCORE 평균/최소/최대">';
+                        drawScoreListHtml += '				<colgroup><col width="40%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="15%"/></colgroup>';
 
                         drawScoreListHtml += '				<thead>';
                         drawScoreListHtml += '				      <tr>';
@@ -199,12 +199,12 @@ function selectAll() {
                         getOftQuestionHtml += '	<div class="box-body">';
                         getOftQuestionHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.Answers_to_Frequently_Asked_Questions + '</h3></div> ';
                         getOftQuestionHtml += '		       <div class="Tbl_wrap">';
-                        getOftQuestionHtml += '			    <table class="Tbl" summary="자주 묻는 질문에 대한 답변 top 10">';
-                        getOftQuestionHtml += '				<colgroup><col width="2%"/><col width="15%"/><col width="35%"/><col width="8%"/><col width="5%"/></colgroup>';
+                        getOftQuestionHtml += '			    <table class="table table-hover" summary="자주 묻는 질문에 대한 답변 top 10">';
+                        getOftQuestionHtml += '				<colgroup><col width="2%"/><col width="50%"/><col width="8%"/><col width="5%"/></colgroup>';
                         getOftQuestionHtml += '				<thead>';
-                        getOftQuestionHtml += '				      <tr>';
+                        getOftQuestionHtml += '				      <tr class="text-center">';
                         getOftQuestionHtml += '					  <th> </th>';
-                        getOftQuestionHtml += '					  <th>' + language.Intent_name + '</th>';
+                        //getOftQuestionHtml += '					  <th>' + language.Intent_name + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.HangulQuestion + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.channel + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.QuestionCount + '</th>';
@@ -260,8 +260,8 @@ function selectAll() {
                         drawNoneQuerytableHtml += '	<div class="box-body">';
                         drawNoneQuerytableHtml += '	       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.Unanswered_questions + '</h3></div> ';
                         drawNoneQuerytableHtml += '	       <div class="Tbl_wrap">';
-                        drawNoneQuerytableHtml += '		    <table class="Tbl" summary="자주 묻는 질문에 대한 답변 top 10">';
-                        drawNoneQuerytableHtml += '			<colgroup><col width="10%"/><col width="25%"/><col width="5%"/><col width="3%"/>';
+                        drawNoneQuerytableHtml += '		    <table class="table table-hover" summary="미답변 질문">';
+                        drawNoneQuerytableHtml += '			<colgroup><col width="10%"/><col width="23%"/><col width="5%"/><col width="5%"/>';
                         drawNoneQuerytableHtml += '				  <col width="15%"/><col width="5%"/><col width="10%"/><col width="10%"/><col width="10%"/>';
                         drawNoneQuerytableHtml += '			</colgroup>';
                         drawNoneQuerytableHtml += '			<thead>';
@@ -317,11 +317,11 @@ function selectAll() {
                         drawfirstQuerytableHtml += '   <div class="box  color-palette-box">';
                         drawfirstQuerytableHtml += '	<div class="box-body">';
                         drawfirstQuerytableHtml += '	       <div class="Tbl_wrap">';
-                        drawfirstQuerytableHtml += '		    <table class="Tbl" summary="">';
-                        drawfirstQuerytableHtml += '			<colgroup><col width="10%"/><col width="30%"/><col width="5%"/><col width="3%"/><col width="15%"/><col width="5%"/><col width="5%"/></colgroup>';
+                        drawfirstQuerytableHtml += '		    <table class="table table-hover" summary="">';
+                        drawfirstQuerytableHtml += '			<colgroup><col width="35%"/><col width="5%"/><col width="8%"/><col width="15%"/><col width="5%"/><col width="5%"/></colgroup>';
                         drawfirstQuerytableHtml += '			<thead>';
                         drawfirstQuerytableHtml += '			    <tr>';
-                        drawfirstQuerytableHtml += '				<th>' + language.Intent_name + '</th>';
+                        //drawfirstQuerytableHtml += '				<th>' + language.Intent_name + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.HangulQuestion + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.channel + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.QuestionCount + '</th>';
@@ -457,7 +457,7 @@ function drawScoreList(page) {
                 var scoreList = "";
 
                 for (var i = 0; i < list.length; i++) {
-                    scoreList += "<tr><td>" + list[i].intentName + "</td>";
+                    scoreList += "<tr><td class=\"text-left\">" + list[i].intentName + "</td>";
                     scoreList += "<td>" + list[i].intentCount + "</td>";
                     scoreList += "<td>" + list[i].intentScoreAVG + "</td>";
                     scoreList += "<td>" + list[i].intentScoreMIN + "</td>";
@@ -487,8 +487,8 @@ function getOftQuestion() {
 
             for (var i = 0; i < tableList.length; i++) {
                 scoreList += "<tr><td>" + Number(i + 1) + "</td>";
-                scoreList += "<td>" + tableList[i].INTENT + "</td>";
-                scoreList += "<td>" + tableList[i].KORQ + "</td>";
+                //scoreList += "<td>" + tableList[i].INTENT + "</td>";
+                scoreList += "<td class=\"text-left\">" + tableList[i].KORQ + "</td>";
                 scoreList += "<td>" + tableList[i].CHANNEL + "</td>";
                 scoreList += "<td>" + tableList[i].QNUM + "</td>";
                 scoreList += "</tr>";
@@ -675,7 +675,8 @@ function drawfirstQuerytable(page) {
                 var firstList = "";
 
                 for (var i = 0; i < list.length; i++) {
-                    firstList += "<tr><td>" + list[i].intent_name + "</td>";
+                    firstList += "<tr>";
+                    //firstList += "<tr><td>" + list[i].intent_name + "</td>";
                     firstList += "<td>" + list[i].koQuestion + "</td>";
                     firstList += "<td>" + list[i].channel + "</td>";
                     firstList += "<td>" + list[i].query_cnt + "</td>";

@@ -31,7 +31,7 @@
 	"Search_response_rate": "검색 응답률",
 	"Maximum_Number_of_Customer_Questions": "최대 고객 질문 수",
 	"INTENT_SCROE_AVG_MIN_MAX": "INTENT SCORE 평균/최소/최대",
-	"Answers_to_Frequently_Asked_Questions": "자주 묻는 질문에 대한 답변 top 10",
+	"Answers_to_Frequently_Asked_Questions": "자주 묻는 질문 top 10",
 	"RESPONSE_AVG_MAX_MIN_STAYTIME": "응답(평균/최대/최소)/평균 머무르는 시간",
 	"QUESTION_CNT_EACH_HOUR": "시간대 별 질문수",
 	"Unanswered_questions": "미답변 질문",

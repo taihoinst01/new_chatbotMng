@@ -24,6 +24,7 @@ $(document).ready(function () {
     });
 
     $('#saveApp').click(function() {
+        $('#loadingModal').modal('show');
         addApp();
     });
     
@@ -53,7 +54,10 @@ function addApp() {
         'dbId' : $('#dbId').val(),
         'dbPassword' : $('#dbPassword').val(),
         'dbUrl' : $('#dbUrl').val(),
-        'dbName' : $('#dbName').val()
+        'dbName' : $('#dbName').val(),
+        'luisAppName' : $('#luis_app_name').val(),
+        'luisAppId' : $('#luis_app_id').val(),
+        'luisAuthKey' : $('#luis_auth_key').val()
     };
 
 
@@ -62,6 +66,7 @@ function addApp() {
         url: 'admin/addChatBotApps',
         data: params,
         success: function(data) {
+            $('#loadingModal').modal('hide');
             if(data.result == true) {
                 alert(language['REGIST_SUCC']);
                 window.location.href = '/';

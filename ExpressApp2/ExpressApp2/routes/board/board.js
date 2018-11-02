@@ -290,6 +290,7 @@ if (selChannel !== 'all') {
     selectQuery += "     ) AA\n";
     selectQuery += "WHERE RESULT <> '' AND RESULT IN ('H')\n";
     selectQuery += "ORDER BY 질문수 DESC; \n";
+    
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
@@ -495,7 +496,7 @@ router.post('/firstQueryTable', function (req, res) {
         selectQuery += "    ON DL.DLG_ID = ME.DLG_ID ) tbp \n";
         selectQuery += " WHERE 1=1 \n" +
                        " AND PAGEIDX = " + currentPageNo + "; \n";
-    console.log("selectQuery=="+selectQuery);
+    
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
