@@ -76,6 +76,12 @@ app.use(function(req, res, next) {
         res.locals.sid = null;
     }
 
+    if (req.session.sAuth) {
+        res.locals.sAuth = req.session.sAuth;
+    } else {
+        res.locals.sAuth = null;
+    }
+
     if(req.session.dbValue) {
         res.locals.dbValue = req.session.dbValue;
     } else {

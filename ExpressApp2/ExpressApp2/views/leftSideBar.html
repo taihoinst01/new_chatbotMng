@@ -5,13 +5,12 @@
         <input type="hidden" id="successHidden" value="<%= __('SUCCESS') %> " />
         <input type="hidden" id="failHidden" value="<%= __('FAIL') %> " />
         <input type="hidden" id="simulURL" value="<%=simul_url%>" />
-        <div class="sidebar-form">
-            <%= __('CHATBOT') %>
-            <% 
-                                if(sid==="admin") { 
+                           <div class="sidebar-form"><%= __('CHATBOT') %> 
+                            <%
+                                if(sAuth>=99) {
                             %>
-            <a href="/users/userMng" class="left_set"><span class="sr-only">관리자설정바로가기</span></a>
-            <%
+                            <li class="btn_set01"> <a href="/users/userMng" class="left_set"></a></li>
+                            <%
                                 }
                             %>
         </div>
