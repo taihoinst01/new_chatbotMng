@@ -17,6 +17,7 @@ $('html').click(function(e) {
 
 $(document).ready(function(){
 
+    /*
     $(".js-modal-close").click(function() {
         $('html').css({'overflow': 'auto', 'height': '100%'}); //scroll hidden 해제
         //$('#element').off('scroll touchmove mousewheel'); // 터치무브 및 마우스휠 스크롤 가능
@@ -24,10 +25,10 @@ $(document).ready(function(){
         $('#currentAppName').val('');
         $('#layoutBackground').hide();
     });
-
-    
+    */
 
     $('.box-body.tc').click(function() { 
+
         var width = 0;
         var height = 0;
         var left = 0;
@@ -42,8 +43,14 @@ $(document).ready(function(){
         $("#loadingBar").addClass("in");
         $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
         $("#loadingBar").css("display","block");
+
+
+        var appName = $(this).find('span').text().trim();
+        location.href = "/board?appName=" + appName;
+
     });
 
+    /*
     $(document).mousedown(function(e){
 
         $('.appLayout').each(function(){
@@ -70,9 +77,10 @@ $(document).ready(function(){
             }
         });
     }); 
+    */
 })
 
-
+/*
 function openModalBox(target){
     if(target === '#rename_chatbot'){
         $('#lay').css('display','none');
@@ -164,3 +172,4 @@ function itemClick(e, object, deleteAppId, appName){
     //ex_obj.style.display = ex_obj.style.display=='none'?'block':'none';
 }
 
+*/
