@@ -1,7 +1,8 @@
 ﻿<header class="main-header">
     <input type="hidden" id="signMassage" value="<%= __('SIGN_IN_REQUIRED') %>" />
     <!-- Logo -->
-    <a href="/list" class="logo">
+    <!--<a href="/list" class="logo">-->
+    <a href="#" onClick="goMainList();" class="logo">
         <span class="logo-mini"></span>
         <span class="logo-lg"></span>
     </a>
@@ -59,7 +60,21 @@
         </div>
     </nav>
 </header>
-
+<div class="modal fade" id="loadingModalMain" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0;">Loading...</h3>
+            </div>
+            <div class="modal-body">
+                <div class="progress progress-striped active" style="margin-bottom:0;">
+                    <div class="progress-bar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -68,5 +83,10 @@
             location.href="/index/lang"
         });
     });
+
+    function goMainList(){
+        $('#loadingModalMain').modal('show');
+        location.href = "/list";
+    }
 
 </script>

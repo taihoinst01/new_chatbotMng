@@ -277,9 +277,10 @@ router.post('/saveUserInfo', function (req, res) {
     var updateStr = "";
     var deleteStr = "";
 
-    console.log("saveUserInfo===");
+    
 
     for (var i=0; i<userArr.length; i++) {
+        console.log("saveUserInfo==="+userArr[i].statusFlag);
         if (userArr[i].statusFlag === 'NEW') {
             saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, EMP_NM, HPHONE, USE_YN) " + 
                        "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
@@ -290,6 +291,7 @@ router.post('/saveUserInfo', function (req, res) {
         } else { //DEL
             deleteStr += "UPDATE TB_USER_M SET USE_YN = 'N' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
         }
+        console.log("saveStr==="+saveStr);
     }
 
     (async () => {

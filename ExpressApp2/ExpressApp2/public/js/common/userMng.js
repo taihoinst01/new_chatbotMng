@@ -259,7 +259,6 @@ function saveUser() {
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
-alert("statusFlag-new");
                 var data = new Object() ;
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();

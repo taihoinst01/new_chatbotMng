@@ -77,6 +77,22 @@ router.get('/dashBoard', function (req, res) {
         res.status(500).send({ message: "${err}"})
         sql.close();
     });
+
+    var getSimulUrlStr = "SELECT ISNULL(" +
+    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = '" + req.session.sid + "' AND CHATBOT_NAME = '" + req.session.appName + "'), " +
+    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = 'admin' AND CHATBOT_NAME = '" + req.session.appName + "'))  AS SIMUL_URL";
+            console.log("getSimulUrlStr==="+getSimulUrlStr);
+    dbConnect.getConnection(sql).then(pool => { 
+        return pool.request().query( getSimulUrlStr ) 
+    }).then(result => {
+        
+        req.session.simul_url = result.recordset[0].SIMUL_URL;
+        console.log("simul_url==="+req.session.simul_url);
+
+    }).catch(err => {
+        console.log(err);
+        sql.close();
+    });
 });
 
 

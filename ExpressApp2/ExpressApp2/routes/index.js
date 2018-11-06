@@ -47,7 +47,8 @@ router.get('/', function (req, res) {
                         }).then(result => {
                             let dbValue = result.recordset;
                             req.session.dbValue = dbValue;
-
+/*
+챗봇별로 SIMUL URL 이 틀리므로 각 챗봇의 DASHBOARD 를 실행하였을 시에 SIMUL URL 을 가지고 와야 한다
                             var getSimulUrlStr = "SELECT ISNULL(" +
                                                 "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = '" + userId + "'), " +
                                                 "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = 'admin'))  AS SIMUL_URL";
@@ -62,7 +63,7 @@ router.get('/', function (req, res) {
                                 console.log(err);
                                 sql.close();
                             });
-
+*/
                         }).catch(err => {
                             console.log(err);
                             sql.close();
@@ -252,12 +253,9 @@ router.get('/list', function (req, res) {
        userListStr += "  WHERE A.USER_ID = '" + loginId + "'   \n";
        userListStr += "    AND A.CHAT_ID = B.CHATBOT_NUM;   \n";
     var rows;
-    
-
 
     (async () => {
         try {
-
             let pool = await dbConnect.getAppConnection(sql);
             let rslt = await pool.request()
                 .query(userListStr);
