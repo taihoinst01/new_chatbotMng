@@ -112,6 +112,8 @@ $(document).on('keyup','#editCell',function(e){
         $('.edit-cell').attr('class', 'editable-cell');
     }
 });
+
+
 var saveTableHtml = "";
 function makeUserTable() {
     
@@ -169,13 +171,35 @@ function initPassword(userId) {
         }
         
         $.ajax({
+            type: 'POST',
             data: params,
             url: '/users/inItPassword',
+            beforeSend: function () {
+    
+                var width = 0;
+                var height = 0;
+                var left = 0;
+                var top = 0;
+    
+                width = 50;
+                height = 50;
+    
+                top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+                left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+    
+                $("#loadingBar").addClass("in");
+                $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+                $("#loadingBar").css("display","block");
+            },
+            complete: function () {
+                $("#loadingBar").removeClass("in");
+                $("#loadingBar").css("display","none");
+            },
             success: function(data) {
                 alert(data.message);
             }
         });
-        
+
     }
 }
 
@@ -259,7 +283,7 @@ function saveUser() {
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
-alert("statusFlag-new");
+    alert("statusFlag-new");
                 var data = new Object() ;
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();

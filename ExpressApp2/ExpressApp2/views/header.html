@@ -33,10 +33,10 @@
             if(sid) { 
         %>
             <li class="user_id"> <strong><%=sid%></strong> <%= __('SIR') %></li>
-            <% 
-                if(sid==="admin") { 
+            <%
+                if(sAuth>=99) {
             %>
-                <li class="btn_set01"> <a href="/users/userMng" class="left_set"></a></li>
+            <li class="btn_set01"> <a href="/users/userMng" class="left_set"></a></li>
             <%
                 }
             %>

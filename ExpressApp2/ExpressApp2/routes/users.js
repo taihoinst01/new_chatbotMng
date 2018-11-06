@@ -272,29 +272,51 @@ function checkNull(val, newVal) {
 }
 
 router.post('/saveUserInfo', function (req, res) {  
-    var userArr = JSON.parse(req.body.saveArr);
-    var saveStr = "";
-    var updateStr = "";
-    var deleteStr = "";
-
-    console.log("saveUserInfo===");
-
-    for (var i=0; i<userArr.length; i++) {
-        if (userArr[i].statusFlag === 'NEW') {
-            saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, EMP_NM, HPHONE, USE_YN) " + 
-                       "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-            saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y'); ";
             
-        } else if (userArr[i].statusFlag === 'EDIT') {
-            updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
-        } else { //DEL
-            deleteStr += "UPDATE TB_USER_M SET USE_YN = 'N' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
-        }
-    }
+    
 
     (async () => {
         try {
+
+            
+            var userArr = JSON.parse(req.body.saveArr);
+            var saveStr = "";
+            var updateStr = "";
+            var deleteStr = "";
+
+            var initPWQry = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
+
+            
             let pool = await dbConnect.getConnection(sql);
+
+
+            var initPw = "";
+            let initPwQry = await pool.request().query(initPWQry);
+            var getUserInitRow = initPwQry.recordset;
+            if (getUserInitRow.length > 0) {
+                initPw = getUserInitRow[0].CNF_VALUE;
+            } else {
+                res.send({status:500 , message:'등록된 초기화 비밀번호가 없습니다. 설정해주세요.'});
+            }
+
+            
+            var newSalt = await pwConfig.getSaltCode();
+            let basePW = pwConfig.getPassWord(initPw, newSalt);
+
+            for (var i=0; i<userArr.length; i++) {
+                if (userArr[i].statusFlag === 'NEW') {
+                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, USE_YN) " + 
+                               "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
+                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y'); ";
+                    
+                } else if (userArr[i].statusFlag === 'EDIT') {
+                    updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
+                } else { //DEL
+                    deleteStr += "UPDATE TB_USER_M SET USE_YN = 'N' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
+                }
+            }
+
+
             if (saveStr !== "") {
                 let insertUser = await pool.request().query(saveStr);
             }
@@ -321,16 +343,38 @@ router.post('/saveUserInfo', function (req, res) {
 });
 router.post('/inItPassword', function (req, res) {
 
-    var userId = req.body.paramUserId;
-    var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW  + "' WHERE USER_ID = '" + userId + "'; ";
+    //var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW  + "' WHERE USER_ID = '" + userId + "'; ";
     //basePW
     (async () => {
         try {
-            let pool = await dbConnect.getConnection(sql);
-            let initPwStr = await pool.request().query(initStr);
-
-            res.send({status:200 , message:'Init Success'});
             
+            var userId = req.body.paramUserId;
+            var initPw = "";
+            var initPWQry = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
+            
+            let pool = await dbConnect.getConnection(sql);
+
+            let initPwQry = await pool.request().query(initPWQry);
+            var getUserInitRow = initPwQry.recordset;
+            if (getUserInitRow.length > 0) {
+                initPw = getUserInitRow[0].CNF_VALUE;
+
+                var newSalt = await pwConfig.getSaltCode();
+                let basePW = pwConfig.getPassWord(initPw, newSalt);
+
+                var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '@basePW', SCRT_SALT = '@newSalt' WHERE USER_ID = '@userId'; ";
+                let initPwStr = await pool.request()
+                    .input('basePW', sql.NVarChar, basePW)
+                    .input('newSalt', sql.NVarChar, newSalt)
+                    .input('userId', sql.NVarChar, userId)
+                    .query(initStr);
+
+
+                res.send({status:200 , message:'Init Success'});
+
+            } else {
+                res.send({status:500 , message:'등록된 초기화 비밀번호가 없습니다. 설정해주세요.'});
+            }
         } catch (err) {
             console.log(err);
             res.send({status:500 , message:'Init Error'});
@@ -338,10 +382,6 @@ router.post('/inItPassword', function (req, res) {
             sql.close();
         }
     })()
-
-    sql.on('error', err => {
-        // ... error handler
-    })
 
 });
 
