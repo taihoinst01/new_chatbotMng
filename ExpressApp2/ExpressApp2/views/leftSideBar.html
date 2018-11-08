@@ -129,9 +129,6 @@
                             <li name='intentIndex_<%=k%>'><a href="/luis/intentList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Intent
                                     List</a></li>
                             <li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Entity List</a></li>
-                            <!--<li><a href="/luis/newUtterList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>New Utter List</a></li>-->
-                            <!--<li><a href="/luis/publish?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i>Publish</a></li>-->
-                            <!--<li class="active"><a href="#" class="spmenu" id="">학습</a></li>-->
                             <li class="active"><a href="#" class="spmenu" id="trainBtn">
                                     <%= __('TRAIN') %></a></li>
                             <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
@@ -314,7 +311,8 @@
             if (menuName === pageTitle) {
                 if ($(this).parents('#luisMenuLi').length > 0) {
                     var appIndex = $('#appIndex').val();
-                    var appCompare = $(this).parents('li[name=appListLi]').find('span[name=appNameSpan]').text().split(' ')[1];
+                    var appCompare = $(this).parents('li[name=appListLi]').find('span[name=appNameSpan]').text().split(' ');
+                    appCompare = appCompare[appCompare.length-1];
                     if (appIndex == --appCompare) {
                         $(this).parents('li').addClass('active');
                     }
@@ -333,7 +331,7 @@
         });
     });
 
-    $(document).ready(function () {
+    $(document).ready(function () {   
         $('.more').click(function () {
             if ($('.more').hasClass('more')) {
                 $('.more').addClass('close').removeClass('more');
