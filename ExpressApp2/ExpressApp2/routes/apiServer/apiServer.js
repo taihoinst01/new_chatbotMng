@@ -68,34 +68,47 @@ router.get('/getChatSentence', function (req, res) {
 
 router.get('/getChatTemplate', function (req, res) {
 
-    if (req.query.chat_res_code == '134679') {
+    if (req.query.chat_name) {
         (async () => {
             try {
                 let pool = await dbConnect.getConnection(sql);
                 
-                
-                var selectQry = "SELECT TOP_COLOR \n"
-                selectQry += "          ,BACKGROUND_COLOR \n";
+                var selectQry = "SELECT HEADER_COLOR \n"
+                selectQry += "          ,BODY_COLOR \n";
+                selectQry += "          ,POPHEADER_COLOR \n";
+                selectQry += "          ,BOT_COLOR \n";
+                selectQry += "          ,USER_COLOR \n";
                 selectQry += "          ,ICON_IMG \n";
                 selectQry += "          ,BACKGROUND_IMG \n";
                 selectQry += "          ,CHATBOT_NAME \n";
-                selectQry += "          ,REG_DT \n";
                 selectQry += "     FROM TBL_CHATBOT_TEMPLATE \n";
                 selectQry += "    WHERE USE_YN = 'Y' \n";
+                selectQry += "      AND CHATBOT_NAME = @chatName \n";
 
 
-                let getSentence = await pool.request().query(selectQry);
+                let getSentence = await pool.request()
+                        .input('chatName', sql.NVarChar, req.query.chat_name)
+                        .query(selectQry);
                 let templateResult = getSentence.recordset;
 
                 var content = new Object();
                 var contentList = [];
-                for (var i=0; i<templateResult.length; i++) {
-                    contentList.push(templateResult[i]);
+
+                if (templateResult.length == 0) {
+                    content['statusCode'] = 200;
+                    content['message'] = "Chatbot does not exist."
+                    content['content'] = contentList;
+                    return res.json(content);
+                } else {
+                    for (var i=0; i<templateResult.length; i++) {
+                        contentList.push(templateResult[i]);
+                        break;
+                    }
+                    
+                    content['statusCode'] = 200;
+                    content['content'] = contentList;
+                    return res.json(content);
                 }
-                
-                content['statusCode'] = 200;
-                content['content'] = contentList;
-                return res.json(content);
             }
             catch(e) {
                 
@@ -111,7 +124,8 @@ router.get('/getChatTemplate', function (req, res) {
     } else {
         var apiFail = [
             {
-                statusCode : 401
+                statusCode : 403,
+                message : "missing parameter"
             }
         ]
         return res.json(apiFail);
