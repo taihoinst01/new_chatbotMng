@@ -261,5 +261,28 @@
 	"Edited": "Edit completed.",
 	"Deleted": "Delete completed.",
 	"ADD_DIALOG_BOX": "ADD DIALOG BOX",
-	"USE_YN": "USE STATUS"
+	"USE_YN": "USE STATUS",
+
+	
+	"============= LUIS =============": "",
+	"LABELED_UTTER": "Labeled Utterance",
+	"INTENT_LIST": "Intent List",
+	"CREATE_INTENT": "Create Intent",
+	"ALERT": "ALERT",
+	"ENTITY_LIST": "Entity List",
+	"ENTITY_NAME": "Entity Name",
+	"SIMPLE_ENTITY": "simple",
+	"HIERARCHY_ENTITY": "hierarchy",
+	"COMPOSITE_ENTITY": "composite",
+	"CLOSED_LIST_ENTITY": "closed list",
+	"SELECT_NOTHING": "NONE",
+	"ALERT_ENTITY_SELECT": "Entity must be selected.",
+	"ALERT_CHANGE_ENTITY": "Are you sure you change the entity name?",
+	"ALERT_DELETE_HIGH_LEVEL": "High level entity must be deleted first.",
+	"ALERT_INTENT_SELECT": "Intent must be filled.",
+	"ALERT_SAME_INTENT_EXIST": "Entity with Same name exists in your chatbot",
+	"ALERT_SELECT_LIST_TYPE": "Please select child Entity of list type",
+
+
+	"============= The end =============": ""
 }

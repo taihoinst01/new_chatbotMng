@@ -38,7 +38,7 @@
         <!--// Left Menu Side -->
         <!-- css�� recommend.css �� ��������ϴ� -->
         <div class="content-wrapper">
-            <section class="content-header"><h1>Entity List</h1>  </section>
+            <section class="content-header"><h1><%= __('ENTITY_LIST') %></h1>  </section>
             <!-- Main content -->
             <section class="content">
                 <div class="box  color-palette-box">
@@ -46,10 +46,10 @@
                         <div class="form-group w50 fl" style="width: 250px;">
                             <select id="entityTypeSelBox" class="form-control">
                                 <option value="ALL"><%= __('ALL') %></option>
-                                <option value="1">simple</option>
-                                <option value="3">hierarchy</option>
-                                <option value="4">composite</option>
-                                <option value="5">closed list</option>
+                                <option value="1"><%= __('SIMPLE_ENTITY') %></option>
+                                <option value="3"><%= __('HIERARCHY_ENTITY') %></option>
+                                <option value="4"><%= __('COMPOSITE_ENTITY') %></option>
+                                <option value="5"><%= __('CLOSED_LIST_ENTITY') %></option>
                             </select>
                         </div>
                         <!-- �˻�â -->
@@ -73,8 +73,8 @@
                                 <colgroup><col width="60%" /><col width="30%" /><col width="10%" /></colgroup>
                                 <thead>
                                     <tr>
-                                        <th style='text-align: left; padding-left:1%;'>Entity Name</th>
-                                        <th style='text-align: left; padding-left:1%;'>Type</th>
+                                        <th style='text-align: left; padding-left:1%;'><%= __('ENTITY_NAME') %></th>
+                                        <th style='text-align: left; padding-left:1%;'><%= __('Type') %></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -114,13 +114,13 @@
                         <input name="entityName" id="entityName" type="text" class="form-control" tabindex="1" placeholder=" <%= __('Please_enter') %>">
                     </div>
                     <div class="form-group" >
-                        <label>Type <span class="nec_ico">*</span></label>
+                        <label><%= __('Type') %> <span class="nec_ico">*</span></label>
                         <select id="createEntityType" name="createEntityType" class="form-control"> 
                                 <option value="NONE"><%= __('SELECT') %></option>
-                                <option value="1">simple</option>
-                                <option value="3">hierarchy</option>
-                                <option value="4">composite</option>
-                                <option value="5">closed list</option>
+                                <option value="1"><%= __('SIMPLE_ENTITY') %></option>
+                                <option value="3"><%= __('HIERARCHY_ENTITY') %></option>
+                                <option value="4"><%= __('COMPOSITE_ENTITY') %></option>
+                                <option value="5"><%= __('CLOSED_LIST_ENTITY') %></option>
                         </select>
                     </div>
                 </div>
@@ -154,8 +154,8 @@
             </div>
             <div class="modal-body"><span id="confirmMsg"></span></div>
             <div class="modal-footer" id="delete_footer_button">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
-                <button type="button" class="btn btn-primary" id="confirmBtn"><i class="fa fa-trash"></i> Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CLOSE') %></button>
+                <button type="button" class="btn btn-primary" id="confirmBtn"><i class="fa fa-trash"></i> <%= __('DELETE') %></button>
             </div>
         </div>
     </div>
@@ -171,11 +171,11 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
+                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle"><%= __('ALERT') %></span></h4>
             </div>
             <div class="modal-body"><span id="alertMsg"></span></div>
             <div class="modal-footer" >
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn"><%= __('OK') %></button>
             </div>
         </div>
     </div>

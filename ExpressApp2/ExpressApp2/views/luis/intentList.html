@@ -24,6 +24,9 @@
         <input type="hidden" name='createQuery' id="createQuery" value="<%=createQuery %>" />
         <input type="hidden" name='selectIntent' id="selectIntent" value="<%=selectIntent %>" />
         <input type="hidden" name='appIndex' id="appIndex" value="<%=appIndex %>" />
+        <input type="hidden" name='hName' id="hName" value="" />
+        <input type="hidden" name='hId' id="hId" value="" />
+        <input type="hidden" name='chkAfterAlert' id="chkAfterAlert" value="NONE" />
         <!-- Header -->
         <%include ../header.html%>
         <!-- //Header -->
@@ -32,14 +35,14 @@
         <!--// Left Menu Side -->
         <!-- -->
         <div class="content-wrapper">
-            <section class="content-header"><h1>Intent List</h1>  </section>
+            <section class="content-header"><h1><%= __('INTENT_LIST') %></h1>  </section>
             <!-- Main content -->
             <section class="content">
                 <div class="box  color-palette-box">
                     <div class="box-body">
                         <div class="form-group w50 fl" style="width: 250px;">
-                            <button id="createIntentBtn" type="button" class="btn btn-default"  ><%= __('CREAT') %></button>
-                            <button id="createIntentHiddenBtn" type="button" style="display:none;"  data-toggle="modal" data-target="#create_intent"><%= __('CREAT') %></button>
+                            <button id="createIntentBtn" type="button" class="btn btn-default"  ><%= __('CREATE') %></button>
+                            <button id="createIntentHiddenBtn" type="button" style="display:none;"  data-toggle="modal" data-target="#create_intent"><%= __('CREATE') %></button>
                         </div>
                         <!--  -->
                         <div class="form-group w50 fr ">
@@ -56,8 +59,8 @@
                                     <colgroup><col width="60%" /><col width="30%" /><col width="10%" /></colgroup>
                                     <thead>
                                         <tr>
-                                            <th style='text-align: left; padding-left:1%;'>Intent</th>
-                                            <th style='text-align: left; padding-left:1%;'>Labeled Utterance</th>
+                                            <th style='text-align: left; padding-left:1%;'><%= __('Intent_name') %></th>
+                                            <th style='text-align: left; padding-left:1%;'><%= __('LABELED_UTTER') %></th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -89,12 +92,12 @@
         <div class="modal-content" style="max-height: 380px;">
             <div class="modal-header">
                     <button type="button" class="close addIntentModalClose" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">인텐트 생성</h4>
+                    <h4 class="modal-title" id="myModalLabel"><%= __('CREATE_INTENT') %></h4>
             </div>
             <div class="modal-body" style="max-height: 350px;">
                 <div id="modalBodyMain">
                     <div class="form-group" >
-                        <label>의도명<span class="nec_ico">*</span></label>
+                        <label><%= __('Intent_name') %><span class="nec_ico">*</span></label>
                         <input name="intentName" id="intentName" type="text" class="form-control" tabindex="1" placeholder=" <%= __('Please_enter') %>">
                     </div>
                 </div>
@@ -110,6 +113,25 @@
 </div>    
 <!-- //팝업_신규단어생성 -->
 
+<!-- confirm -->
+<div class="modal fade" id="confirmBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="z-index: 1050;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="confirmTitle"></span></h4>
+            </div>
+            <div class="modal-body"><span id="confirmMsg"></span></div>
+            <div class="modal-footer" id="delete_footer_button">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CLOSE') %></button>
+                <button type="button" class="btn btn-primary" id="confirmBtn"><i class="fa fa-trash"></i> <%= __('DELETE') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- //confirm -->
 
 <!-- alert -->
 <div class="modal fade" id="alertBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -119,11 +141,11 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
+                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle"><%= __('ALERT') %></span></h4>
             </div>
             <div class="modal-body"><span id="alertMsg"></span></div>
             <div class="modal-footer" >
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn"><%= __('OK') %></button>
             </div>
         </div>
     </div>

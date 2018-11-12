@@ -206,7 +206,6 @@
 	"You_must_have_one_dialog_by_default": "다이얼로그는 기본으로 1개 가지고 있어야합니다",
 	"You_must_have_at_least_one_card": "카드는 1개 이상 가지고 있어야 합니다. 카드를 완전히 삭제 하고 싶으신 경우에는 다이얼로그 삭제 버튼을 눌러주세요",
 	"UPDATE": "UPDATE",
-
 	"============= common =============": "",
 	"NUM": "번호",
 	"INTENT": "의도",
@@ -294,7 +293,6 @@
 	"Enter_entity_value_to_save": "저장하실 엔티티 밸류를 입력해주세요",
 	"Enter_entity_deifne_to_save": "저장하실 엔티티 디파인을 입력해주세요",
 	"DUPLICATE_ENTITIES_EXIST": "[실패]중복된 엔티티가 존재합니다.",
-
 	"============= 챗봇관리-금칙어관리 =============": "",
 	"CHATBOTMNG_TITLE": "챗봇관리",
 	"BANDEDWORD_TITLE": "금칙어 관리",
@@ -335,7 +333,6 @@
 	"Edited": "수정되었습니다.",
 	"Deleted": "삭제되었습니다.",
 	"ADD_DIALOG_BOX": "(자식) 다이얼로그 추가",
-
 	"============= ADMIN MENU =============": "",
 	"CHATBOT_APP_MSG": "챗봇 앱관리",
 	"CHATBOT_STATUS_MSG": "챗봇 상태관리",
@@ -348,13 +345,10 @@
 	"AUTHGROUP_MSG": "권한그룹관리",
 	"AUTHUSER_MSG": "사용자 권한관리",
 	"USERAPP_MAPPING_MSG": "사용자 챗봇매핑 관리",
-
 	"============= 관리자설정-사용자관리 =============": "",
 	"HPHONE": "휴대폰번호",
-
 	"============= 관리자설정-챗봇앱관리 =============": "",
 	"You_must_choose_a_chatbot": "챗봇을 선택해야 합니다.",
-
 	"============= 관리자설정-대시보드항목관리 =============": "",
 	"DASHBOARD_ITEMLIST": "DashBoard 항목목록",
 	"DASHBOARD_ITEMID": "항목ID",
@@ -362,7 +356,6 @@
 	"DASHBOARD_ITEMURL": "항목URL",
 	"DASHBOARD_ITEMDESC": "항목설명",
 	"DASHBOARD_ITEMREGDT": "등록일자",
-
 	"============= 관리자설정-공통코드관리 =============": "",
 	"CODESET_MASTER_LIST": "공통코드 마스터 목록",
 	"CODESET_DETAIL_LIST": "공통코드 상세 목록",
@@ -381,7 +374,6 @@
 	"CODE_DETAIL": "코드상세",
 	"CODE_ID": "코드아이디",
 	"CODE_LANGUAGE": "코드언어",
-
 	"============= 관리자설정-메뉴관리 =============": "",
 	"MENU_LIST": "메뉴 목록",
 	"MENU_NAME": "메뉴이름",
@@ -390,7 +382,6 @@
 	"UPDATE_ID": "수정ID",
 	"UPDATE_DATE": "수정일자",
 	"CHOOSE_AUTH": "권한선택",
-
 	"============= 관리자설정-권한그룹관리 =============": "",
 	"AUTHGROUP_LIST": "권한그룹 목록",
 	"AUTHGROUP_NAME": "권한이름",
@@ -403,12 +394,31 @@
 	"AUTH_77": "챗봇 별 관리 권한",
 	"AUTH_66": "챗봇 별 사용 권한",
 	"AUTH_55": "챗봇 별 모니터링 권한",
-
 	"============= 관리자설정-사용자권한관리 =============": "",
 	"AUTHUSER_": "사용권한없음",
-
 	"============= 관리자설정-챗봇매핑관리 =============": "",
-	"CHATBOT_ID": "챗봇 아이디",
 
+	"============= LUIS =============": "",
+	"CHATBOT_ID": "챗봇 아이디",
+	"INTENT_LIST": "의도 목록",
+	"LABELED_UTTER": "어터런스 수",
+	"CREATE_INTENT": "의도 생성",
+	"ALERT": "알림",
+	"ENTITY_LIST": "단어 목록",
+	"ENTITY_NAME": "단어 명",
+	"SIMPLE_ENTITY": "simple",
+	"HIERARCHY_ENTITY": "hierarchy",
+	"COMPOSITE_ENTITY": "composite",
+	"CLOSED_LIST_ENTITY": "closed list",
+	"SELECT_NOTHING": "선택안함",
+	"ALERT_ENTITY_SELECT": "엔티티를 선택해 주세요.",
+	"ALERT_CHANGE_ENTITY": "엔티티 명을 변경하시겠습니까?",
+	"ALERT_DELETE_HIGH_LEVEL": "상위 entity를 삭제해 주세요.",
+	"ALERT_INTENT_SELECT": "Intent를 입력해야 합니다.",
 	"============= The end =============": ""
 }
+language.ALERT_ENTITY_SELECT
+
+" + language.SELECT + "
+
+" + language.SIMPLE_ENTITY + "

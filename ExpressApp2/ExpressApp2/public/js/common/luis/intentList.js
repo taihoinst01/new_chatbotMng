@@ -73,12 +73,29 @@ $(document).keyup(function(e) {
 
 //intent 삭제 버튼
 $(document).on("click", "a[name=delIntentBtn]", function(e){
+    
     var intentHiddenName = $(this).parent().find('#intentHiddenName').val();
-    if (confirm("["+ intentHiddenName + "] 삭제하시겠습니까?")) {
-        var hId = $(this).parent().find('#intentHiddenId').val();
-        deleteIntent(intentHiddenName, hId);
-    }
+    var hId = $(this).parent().find('#intentHiddenId').val();
+    $('#hId').val(hId);
+    $('#hName').val(intentHiddenName);
+    $('#confirmTitle').text('인텐트 삭제');
+    $('#confirmMsg').text("["+ intentHiddenName + "] 삭제하시겠습니까?");
+    $('#confirmBtnModal').modal('show');
 });
+
+
+$(document).on("click", "#confirmBtn", function () {
+    var hId = $('#hId').val();
+    var hName = $('#hName').val();
+    $('#confirmTitle').text('');
+    $('#confirmMsg').text("");
+    $(this).prev().trigger('click');
+    deleteIntent(hName, hId);
+    $('#confirmBtn').prev().trigger('click');
+});
+
+
+
 
 
 //인텐트 리스트 출력

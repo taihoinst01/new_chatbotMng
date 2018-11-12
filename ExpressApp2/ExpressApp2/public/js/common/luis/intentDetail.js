@@ -137,7 +137,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
     $(this).val($(this).val().trim());
     if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
         if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
-            $('#alertMsg').text('엔티티를 선택해 주세요.');
+            $('#alertMsg').text(language.ALERT_ENTITY_SELECT);
             $('#alertBtnModal').modal('show');
             //alert('엔티티를 선택해 주세요.');
             $(this).val('');
@@ -258,7 +258,6 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex);
 
         } else if (chkMatch.length > 0) {
-            console.log("매칭되는것 1개 ");
             if (!chkLabeled) {
                 if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 1) {
                     $(this).parent().find('select[name=multiMatchUtterSel]').remove();
@@ -463,7 +462,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
     switch($(this).val()*1) {
         case 1:
             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
             for (var j=0; j<simpleList.length; j++) {
                 utterBodyHtml += "<option value='" + simpleList[j].ENTITY_NAME + "'>" + simpleList[j].ENTITY_NAME + "</option>";
             }
@@ -477,7 +476,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             break;
         case 3:
             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
             for (var j=0; j<hierarchyList.length; j++) {
                 utterBodyHtml += "<option value='" + hierarchyList[j].ENTITY_NAME + "'>" + hierarchyList[j].ENTITY_NAME + "</option>";
             }
@@ -494,7 +493,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             break;
         case 4:
             utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
             for (var j=0; j<compositeList.length; j++) {
                 utterBodyHtml += "<option value='" + compositeList[j].ENTITY_NAME + "'>" + compositeList[j].ENTITY_NAME + "</option>";
             }
@@ -581,14 +580,14 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
                         
                         utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
                         utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                        utterBodyHtml += "<option value='1' selected>Simple</option>";
-                        utterBodyHtml += "<option value='3'>hierarchy</option>";
-                        //utterBodyHtml += "<option value='4'>composite</option>";
-                        //utterBodyHtml += "<option value='5'>closed list</option>";
+                        utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                        utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='5'>" + language.CLOSED_LIST_ENTITY + "</option>";
                         utterBodyHtml += "</select>";
             
                         utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-                        utterBodyHtml += "<option value='NONE'>선택하세요.</option>";
+                        utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
                         for (var q=0; q<childList.length; q++) {
                             utterBodyHtml += "<option value='" + childList[q].CHILDREN_NAME + "'>" + childList[q].CHILDREN_NAME + "</option>";
                         }
@@ -627,7 +626,7 @@ function makeChildSelBox (selObj, entityType) {
     switch(entityType*1) {
         case 3:
         
-            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
             for (var j=0; j<hierarchyList.length; j++) {
                 if (selEntity == hierarchyList[j].ENTITY_NAME) {
                     for (var k=0; k<hierarchyList[j].CHILD_ENTITY_LIST.length; k++) {
@@ -664,7 +663,7 @@ function makeChildSelBox (selObj, entityType) {
 $(document).on('focusout','#editIntentName',function(e){
     var editEntityName = $('#editIntentName').val();
 
-    if ( confirm("이름을 변경하시겠습니까?")) {
+    if ( confirm(language.ALERT_CHANGE_ENTITY)) {
         var params = {
             'intentName' : editEntityName,
             'intentId' : $('#hiddenIntentId').val()
@@ -794,14 +793,14 @@ $(document).on("click", "a[name=addUtter]", function(e){
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-    utterBodyHtml += "<option value='1' selected>Simple</option>";
-    utterBodyHtml += "<option value='3'>hierarchy</option>";
-    utterBodyHtml += "<option value='4'>composite</option>";
-    //utterBodyHtml += "<option value='5'>closed list</option>";
+    utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+    utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+    utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+    //utterBodyHtml += "<option value='5'>" + language.CLOSED_LIST_ENTITY + "</option>";
     utterBodyHtml += "</select>";
 
     utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-    utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+    utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
     for (var j=0; j<simpleList.length; j++) {
         utterBodyHtml += "<option value='" + simpleList[j].ENTITY_NAME + "'>" + simpleList[j].ENTITY_NAME + "</option>";
     }
@@ -820,7 +819,7 @@ $(document).on("click", "a[name=addUtter]", function(e){
 //utter 삭제  버튼
 $(document).on("click", "a[name=delLabelBtn]", function(e){
     if ($(this).parent().find('div[name=indentDiv]').length>0) {
-        $('#alertMsg').text('상위 entity를 삭제해 주세요.');
+        $('#alertMsg').text(language.ALERT_DELETE_HIGH_LEVEL);
         $('#alertBtnModal').modal('show');
         //alert('상위 entity를 삭제해 주세요.');
         return false;
@@ -1083,10 +1082,10 @@ function makeLabelingTr(entityLabel) {
                                 }
                             }
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1' selected>Simple</option>";
-                            utterBodyHtml += "<option value='3'>hierarchy</option>";
+                            utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
                             if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
-                                utterBodyHtml += "<option value='4'>composite</option>";
+                                utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
                             }
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
@@ -1112,10 +1111,20 @@ function makeLabelingTr(entityLabel) {
                         if (hierarchyList[j].ENTITY_ID == entityLabel[i].id) {
                             utterBodyHtml += "<div name='labelInfoDiv'>";
     
+                            if (chkComposit) {
+                                if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                } else {
+                                    chkComposit = false;
+                                }
+                            }
+
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1'>Simple</option>";
-                            utterBodyHtml += "<option value='3' selected>hierarchy</option>";
-                            utterBodyHtml += "<option value='4'>composite</option>";
+                            utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
+                            if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                            }
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
@@ -1141,9 +1150,9 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<div name='labelInfoDiv'>";
     
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1'>Simple</option>";
-                            utterBodyHtml += "<option value='3'>hierarchy</option>";
-                            utterBodyHtml += "<option value='4' selected>composite</option>";
+                            utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='4' selected>" + language.COMPOSITE_ENTITY + "</option>";
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
@@ -1201,10 +1210,22 @@ function makeLabelingTr(entityLabel) {
                                 if (hierarchyList[j].CHILD_ENTITY_LIST[k].CHILDREN_ID == entityLabel[i].id) {
                                     utterBodyHtml += "<div name='labelInfoDiv'>";
     
+
+                                    if (chkComposit) {
+                                        if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                            utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                        } else {
+                                            chkComposit = false;
+                                        }
+                                    }
+
                                     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                                    utterBodyHtml += "<option value='1'>Simple</option>";
-                                    utterBodyHtml += "<option value='3' selected>hierarchy</option>";
-                                    utterBodyHtml += "<option value='4'>composite</option>";
+                                    utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                                    utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
+                                    if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                        utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                                    }
+                                    //utterBodyHtml += "<option value='4'>composite</option>";
                                     //utterBodyHtml += "<option value='5'>closed list</option>";
                                     utterBodyHtml += "</select>";
             
@@ -1315,13 +1336,13 @@ function changeEntitySel() {
                 $(this).html(optionHtml);
 
                 if ($(this).parent().find('select[name=entityChildSelBox]').val() == ''  ) {
-                    childHtml += "<option value='NONE' >선택안함</option>";
+                    childHtml += "<option value='NONE' >" + language.SELECT_NOTHING + "</option>";
                     for (var k=0; k<hierarchyList[rememberId].CHILD_ENTITY_LIST.length; k++) {
                         childHtml += "<option value='" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "' >" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
                     }
                 }
                 else {
-                    childHtml += "<option value='NONE' >선택안함</option>";
+                    childHtml += "<option value='NONE' >" + language.SELECT_NOTHING + "</option>";
                     for (var k=0; k<hierarchyList[rememberId].CHILD_ENTITY_LIST.length; k++) {
                         if (hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_ID == $(this).next().val()) {
                             childHtml += "<option value='" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "' selected>" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
@@ -1418,7 +1439,7 @@ function changeEntitySel() {
 function createIntent() {
     if ($('#intentName').val().trim() == '') 
     {
-        $('#alertMsg').text("Intent를 입력해야 합니다.");
+        $('#alertMsg').text(language.ALERT_INTENT_SELECT);
         $('#alertBtnModal').modal('show');
         //alert("Intent를 입력해야 합니다.");
     } 
@@ -1434,7 +1455,7 @@ function createIntent() {
             url: '/luis/createIntent',
             success: function(data) {
                 if (data.dupleRst) {
-                    $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
+                    $('#alertMsg').text("[" + data.existApp + "] " + language.ALERT_SAME_INTENT_EXIST);
                     $('#alertBtnModal').modal('show');
                     //alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
                 }
@@ -1451,7 +1472,7 @@ function createIntent() {
                 }
                 else 
                 {
-                    $('#alertMsg').text('생성되었습니다.');
+                    $('#alertMsg').text(language.SUCCESS);
                     $('#alertBtnModal').modal('show');
                     $('#chkAfterAlert').val('RELOAD');
                     //alert('생성되었습니다.');
@@ -1730,7 +1751,7 @@ function saveUtterance() {
         }
     });
     if (isOk) {
-        $('#alertMsg').text('list type의 child Entity를 선택해 주세요.');
+        $('#alertMsg').text(language.ALERT_SELECT_LIST_TYPE);
         $('#alertBtnModal').modal('show');
         //alert('list type의 child Entity를 선택해 주세요.');
         return false;
