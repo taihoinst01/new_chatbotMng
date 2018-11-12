@@ -54,10 +54,7 @@ function addApp() {
         'dbId' : $('#dbId').val(),
         'dbPassword' : $('#dbPassword').val(),
         'dbUrl' : $('#dbUrl').val(),
-        'dbName' : $('#dbName').val(),
-        'luisAppName' : $('#luis_app_name').val(),
-        'luisAppId' : $('#luis_app_id').val(),
-        'luisAuthKey' : $('#luis_auth_key').val()
+        'dbName' : $('#dbName').val()
     };
 
 
@@ -69,7 +66,8 @@ function addApp() {
             $('#loadingModal').modal('hide');
             if(data.result == true) {
                 alert(language['REGIST_SUCC']);
-                window.location.href = '/';
+                //window.location.href = '/';
+                window.location.href = '/users/chatBotMng';
             } else {
                 alert(language['It_failed']);
             }

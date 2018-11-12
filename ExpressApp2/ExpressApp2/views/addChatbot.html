@@ -35,18 +35,18 @@
         <!-- //Header -->
 
         <!-- Left Menu Side -->
-        <%include  ./leftSideBar.html%>
+        <%include  ./leftSideBar_admin.html%>
         <!--// Left Menu Side -->
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
             <section class="content-header">
-                <h1>
-                    <%= __('REGISTER_CHATBOT') %>
-                </h1>
+                <h1><%= __('ADD_CHAT') %></h1>
+                <!--
                 <div class="nec"><span class="nec_ico">*</span>
                     <%= __('IS_REQUIRED') %>
                 </div>
+                -->
             </section>
 
             <!-- Main content -->
@@ -138,29 +138,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-12" style="padding-left:0px !important">
-                                <h4 class="col-lg-12">
-                                    ChatBot LUIS Infomation
-                                </h4>
-                                <div class="Tbl_wrap">
-                                    <div class="panel panel-default">
-                                        <div class="panel-body">
-                                            <div class="form-group col-lg-6 col-lg-offset-6">
-                                                <label>APP Name<span class="nec_ico">*</span></label>
-                                                <input type="text" class="form-control" id="luis_app_name">
-                                            </div>
-                                            <div class="form-group col-lg-6">
-                                                <label>APP ID<span class="nec_ico">*</span></label>
-                                                <input type="text" class="form-control" id="luis_app_id">
-                                            </div>
-                                            <div class="form-group col-lg-6">
-                                                <label>Authoring Key <span class="nec_ico">*</span></label>
-                                                <input type="text" class="form-control" id="luis_auth_key">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </form>
                         <div class="btn_wrap">
                             <button type="button" class="btn btn-default" id="cancelApp"><i class="fa fa-times"></i>
@@ -168,76 +145,6 @@
                                     class="fa fa-edit"></i>
                                 <%= __('SAVE') %></button>
                         </div>
-
-
-                        <!-- old style
-                        <div class="form-group">
-                            <label class="fl">
-                                <%= __('SELET_COLOR') %></label>
-                            <div class="img-circle_wrap">
-                                <div id="selColor" class="img-circle_l color_01"> </div>
-                                <div class="img-circle_wrap02">
-                                    <div name="colorCircle" class="img-circle color_01"></div>
-                                    <div name="colorCircle" class="img-circle color_02"></div>
-                                    <div name="colorCircle" class="img-circle color_03"></div>
-                                    <div name="colorCircle" class="img-circle color_04"></div>
-                                    <div name="colorCircle" class="img-circle color_05"></div>
-                                    <div name="colorCircle" class="img-circle color_06"></div>
-                                    <div name="colorCircle" class="img-circle color_07"></div>
-                                    <div name="colorCircle" class="img-circle color_08"></div>
-                                    <div name="colorCircle" class="img-circle color_09"></div>
-                                    <div name="colorCircle" class="img-circle color_10"></div>
-                                    <div name="colorCircle" class="img-circle color_11"></div>
-                                    <div name="colorCircle" class="img-circle color_12"></div>
-                                    <div name="colorCircle" class="img-circle color_13"></div>
-                                    <div name="colorCircle" class="img-circle color_14"></div>
-                                    <div name="colorCircle" class="img-circle color_15"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="clear:both">
-                            <label>
-                                <%= __('CHATBOT_NAME') %><span class="nec_ico">*</span></label>
-                            <input type="text" class="form-control" id="appInsertName">
-                        </div>
-                        <div class="form-group w50 fl">
-                            <label>DB ID<span class="nec_ico">*</span></label>
-                            <input type="text" class="form-control" id="dbId">
-                        </div>
-                        <div class="form-group w50 fr">
-                            <label>DB PASSWORD<span class="nec_ico">*</span></label>
-                            <input type="password" class="form-control" id="dbPassword">
-                        </div>
-                        <div class="form-group  w50 fl" style="clear:both">
-                            <label>DB SERVER URL<span class="nec_ico">*</span></label>
-                            <input type="text" class="form-control" id="dbUrl">
-                        </div>
-                        <div class="form-group w50 fr">
-                            <label>DB NAME<span class="nec_ico">*</span></label>
-                            <input type="text" class="form-control" id="dbName">
-                        </div>
-                       
-                        <div class="form-group w50 fl ">
-                            <label>
-                                <%= __('CHATBOT_LANGUAGE') %> <span class="nec_ico">*</span></label>
-                            <p> <input type="radio" name="r3" class="flat-red" checked value="ko-kr"> <span class="mr30">
-                                    <%= __('KOREAN') %> </span>
-                                <input type="radio" name="r3" class="flat-red" value="en-us">
-                                <%= __('ENGLISH') %>
-                            </p>
-                        </div>
-                        <div class="form-group" style="clear:both">
-                            <label>
-                                <%= __('CHATBOT_DESCRIPTION') %></label>
-                            <textarea class="form-control" rows="10" id="appDes"> </textarea>
-                        </div>
-                        <div class="btn_wrap">
-                            <button type="button" class="btn btn-default" id="cancelApp"><i class="fa fa-times"></i>
-                                <%= __('CANCEL') %></button> <button type="button" class="btn btn_01" id="saveApp"><i
-                                    class="fa fa-edit"></i>
-                                <%= __('SAVE') %></button>
-                        </div>
-                    -->
                     </div>
                 </div>
             </section>
