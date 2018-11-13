@@ -26,6 +26,7 @@ var autoCompleteMng = require('./routes/chatbot/autoCompleteMng');
 var templateMng = require('./routes/chatbot/templateMng');
 var chatBotEnv = require('./routes/chatbot/chatBotEnv');
 var smallTalkMng = require('./routes/learning/smallTalkMng');
+var historyMng = require('./routes/chatbot/historyMng');
 var qna = require('./routes/qna/qnaMng');
 
 var Logger = require("./config/logConfig");
@@ -258,6 +259,7 @@ app.use('/bannedWordMng', bannedWordMng);
 app.use('/autoCompleteMng', autoCompleteMng);
 app.use('/templateMng', templateMng);
 app.use('/chatBotEnv', chatBotEnv);
+app.use('/historyMng', historyMng);
 app.use('/smallTalkMng', smallTalkMng);
 app.use('/qna', qna);
 
