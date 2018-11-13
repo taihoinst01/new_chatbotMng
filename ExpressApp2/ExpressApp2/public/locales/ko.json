@@ -235,6 +235,8 @@
 	"NODATA": "NO DATA",
 	"USE_Y": "사용",
 	"USE_N": "미사용",
+	"LOGIN_BTN": "로그인",
+	"CHECK_ID": "아이디 저장",
 	"============= 질문답변관리-질문답변목록 =============": "",
 	"QNAMNG_TITLE": "질문답변관리",
 	"QNA_TITLE": "질문답변목록",
@@ -417,8 +419,3 @@
 	"ALERT_INTENT_SELECT": "Intent를 입력해야 합니다.",
 	"============= The end =============": ""
 }
-language.ALERT_ENTITY_SELECT
-
-" + language.SELECT + "
-
-" + language.SIMPLE_ENTITY + "

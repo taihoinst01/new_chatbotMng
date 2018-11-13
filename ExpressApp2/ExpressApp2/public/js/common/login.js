@@ -4,6 +4,7 @@ $(document).ready(function () {
     $('#mLoginId').focus();
 
     $('#sendLoginBtn').click(function () {
+        $("#loadingLoginModalMain").modal('show');
         $('#loginfrm').submit();
     });
 

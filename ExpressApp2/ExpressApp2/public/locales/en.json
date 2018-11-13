@@ -244,7 +244,7 @@
 	"Please_enter_your_content": "Please enter your content",
 	"DELETE_DIALOG": "DELETE DIALOG",
 	"DELETE_CARD": "DELETE CARD",
-	"Up_to_4_buttons_can_be_added" : "Up to 4 buttons can be added",
+	"Up_to_4_buttons_can_be_added": "Up to 4 buttons can be added",
 	"Up_to_10_cards_can_be_added": "Up to 10 cards can be added",
 	"You_must_have_one_dialog_by_default": "You must have one dialog by default",
 	"You_must_have_at_least_one_card": "You must have at least one card. If you want to delete the card completely, press the Delete Dialog button",
@@ -262,8 +262,6 @@
 	"Deleted": "Delete completed.",
 	"ADD_DIALOG_BOX": "ADD DIALOG BOX",
 	"USE_YN": "USE STATUS",
-
-	
 	"============= LUIS =============": "",
 	"LABELED_UTTER": "Labeled Utterance",
 	"INTENT_LIST": "Intent List",
@@ -282,7 +280,12 @@
 	"ALERT_INTENT_SELECT": "Intent must be filled.",
 	"ALERT_SAME_INTENT_EXIST": "Entity with Same name exists in your chatbot",
 	"ALERT_SELECT_LIST_TYPE": "Please select child Entity of list type",
-
-
-	"============= The end =============": ""
+	"============= The end =============": "",
+	"QNAMNG_TITLE": "QNAMNG_TITLE",
+	"QNA_TITLE": "QNA_TITLE",
+	"NOANSWER_TITLE": "NOANSWER_TITLE",
+	"DIALOG_MNG_TITLE": "DIALOG_MNG_TITLE",
+	"SmallTalk_Title": "SmallTalk_Title",
+	"BANDEDWORD_TITLE": "BANDEDWORD_TITLE",
+	"TEMPLATE_TITLE": "TEMPLATE_TITLE"
 }

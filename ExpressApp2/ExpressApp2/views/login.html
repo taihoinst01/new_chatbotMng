@@ -43,16 +43,35 @@
                 </div>
                 <div class="row">
                         <div class="col-xs-8">
-                        <input type="checkbox" class="flat-red" checked> 아이디 저장
+                        <input type="checkbox" class="flat-red" checked> <%= __('CHECK_ID') %>
                         </div>
                 </div>
             </form>
 
-        <div class="social-auth-links text-center"><button type="submit" class="btn btn_login" id="sendLoginBtn">로그인</button></div>
+        <div class="social-auth-links text-center"><button type="submit" class="btn btn_login" id="sendLoginBtn"><%= __('LOGIN_BTN') %></button></div>
     
         <p class="login_footer ">COPYRIGHTS <strong> ©TAIHOINST </strong> ALL RIGHTS RESERVED.</p>
     </div>
   </div>
+
+  <div class="modal fade" id="loadingLoginModalMain" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0;">Log In...</h3>
+            </div>
+            <div class="modal-body">
+                <div class="progress progress-striped active" style="margin-bottom:0;">
+                    <div class="progress-bar" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <strong>TIIZ</strong> ChatBot Manager
+            </div>
+        </div>
+    </div>
+</div>
   <script>
         //iCheck for checkbox and radio inputs
           $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
