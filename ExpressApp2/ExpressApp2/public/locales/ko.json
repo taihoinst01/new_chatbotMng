@@ -320,6 +320,11 @@
 	"TEMPLATE_PREVIEW_USER": "USER 영역",
 	"TEMPLATE_PREVIEW_USER_DESC": "USER가 답하는 부분입니다.",
 	"TEMPLATE_CHOICE_CONFIRM": "선택된 템플릿을 사용하시겠습니까?",
+	"============= 챗봇관리-로그관리 =============": "",
+	"LOG_TITLE": "로그 관리",
+	"REPLY_TIME": "답변 시간",
+	"SAME_QRY": "같은 질문 목록",
+	"SELECT_DATE": "날짜 선택",
 	"============== scenario ==============": "",
 	"SCENARIO_NAME": "시나리오명",
 	"SCENARIO_LIST": "시나리오 목록",
@@ -397,7 +402,6 @@
 	"============= 관리자설정-사용자권한관리 =============": "",
 	"AUTHUSER_": "사용권한없음",
 	"============= 관리자설정-챗봇매핑관리 =============": "",
-
 	"============= LUIS =============": "",
 	"CHATBOT_ID": "챗봇 아이디",
 	"INTENT_LIST": "의도 목록",
@@ -415,10 +419,7 @@
 	"ALERT_CHANGE_ENTITY": "엔티티 명을 변경하시겠습니까?",
 	"ALERT_DELETE_HIGH_LEVEL": "상위 entity를 삭제해 주세요.",
 	"ALERT_INTENT_SELECT": "Intent를 입력해야 합니다.",
+	"ALERT_SAME_INTENT_EXIST": "앱에 같은 이름의 인텐트가 존재합니다.",
+	"ALERT_SELECT_LIST_TYPE": "list type의 child Entity를 선택해 주세요.",
 	"============= The end =============": ""
 }
-language.ALERT_ENTITY_SELECT
-
-" + language.SELECT + "
-
-" + language.SIMPLE_ENTITY + "

@@ -70,16 +70,7 @@ router.get('/', function (req, res) {
                         });
                         //db정보 조회 end----
 
-                        var subsKeyList;
-                        await dbConnect.getConnection(sql).then(pool => { 
-                            return pool.request().query( "SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' GROUP BY CNF_VALUE; " ) 
-                        }).then(result => {
-                            subsKeyList = result.recordset;
-                        }).catch(err => {
-                            console.log(err);
-                            sql.close();
-                        });
-
+                        var subsKeyList = req.session.subsKeyList;
 
                         //여기서부터 동기화 입니다.
                         /*

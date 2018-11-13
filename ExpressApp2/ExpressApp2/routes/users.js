@@ -75,21 +75,35 @@ router.post('/login', function (req, res) {
                     req.session.sAuth = rows[0].USER_AUTH;
 
                     //subscription key 조회 start-----
+                    var subsQry = "";
+                    subsQry += "SELECT CNF_VALUE \n";
+                    subsQry += "  FROM TBL_CHATBOT_CONF \n";
+                    subsQry += " WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' \n";
+                    subsQry += "   AND CHATBOT_NAME IN (SELECT CHAT_ID \n";
+                    subsQry += "					      FROM TBL_USER_RELATION_APP \n";
+                    subsQry += "					     WHERE USER_ID = @userId) \n";
+                    subsQry += "GROUP BY CNF_VALUE; \n";
+
                     dbConnect.getConnection(sql).then(pool => { 
-                        return pool.request().query( "SELECT CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION'; " ) 
+                        return pool.request()
+                            .input('userId', sql.NVarChar, userId)
+                            .query(subsQry) 
                     }).then(result => {
 
 
 
                         let subsList = result.recordset;
                         req.session.subsKeyList = subsList;
-
+                        if (subsList.length > 0) {
+                            req.session.subsKey = subsList[0].CNF_VALUE;
+                        }
+                        /*
                         if (subsList.findIndex(x => x.CNF_NM === req.session.sid) !== -1) {
                             req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === req.session.sid)].CNF_VALUE;
                         } else {
                             req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === 'admin')].CNF_VALUE;
                         }
-                        
+                        */
                         req.session.save(function(){
                             res.redirect("/");
                         });
