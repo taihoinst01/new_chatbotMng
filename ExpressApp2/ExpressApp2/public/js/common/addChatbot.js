@@ -54,7 +54,9 @@ function addApp() {
         'dbId' : $('#dbId').val(),
         'dbPassword' : $('#dbPassword').val(),
         'dbUrl' : $('#dbUrl').val(),
-        'dbName' : $('#dbName').val()
+        'dbName' : $('#dbName').val(),
+        'luisSubscription' : $('#luisSubscription').val(),
+        'simulationUrl' : $('#simulationUrl').val()
     };
 
 

@@ -77,8 +77,8 @@ router.get('/', function (req, res) {
                         루이스 아이디가 틀릴때는 문제가 될수가 있다
                         임시로 동기화 중지
                         */
-                       if(userId == 'adminSync') {
-                        //if(userId == 'admin') {
+                       //if(userId == 'adminSync') {
+                        if(userId == 'admin') {
 
                             await dbConnect.getConnection(sql).then(pool => {
                                 return pool.request().query( "SELECT SUBSC_KEY, APP_NAME, APP_ID FROM TBL_LUIS_APP;" ) 
@@ -314,6 +314,7 @@ router.post('/admin/addChatBotApps', function (req, res){
     var dbName = req.body.dbName;
     var luisAppIdData = req.body.luisAppId;
     var luisSubscription = req.body.luisSubscription;
+    var simulationUrl = req.body.simulationUrl;
 
     (async () => {
         try {
@@ -329,6 +330,12 @@ router.post('/admin/addChatBotApps', function (req, res){
 
             var insertChatRelationQuery = "INSERT INTO TBL_CHAT_RELATION_APP(CHAT_ID,APP_ID) ";
             insertChatRelationQuery += "VALUES((SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP),@luisAppId)";
+
+            var insertChatConfScriptionQuery = "INSERT INTO TBL_CHATBOT_CONF(CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO, CHATBOT_NAME) ";
+            insertChatConfScriptionQuery += "VALUES('LUIS_SUBSCRIPTION','admin',@luisSubscription, 1, (SELECT ISNULL(MAX(CHATBOT_NUM),0))";
+
+            var insertChatConfSimulationQuery = "INSERT INTO TBL_CHATBOT_CONF(CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO, CHATBOT_NAME) ";
+            insertChatConfSimulationQuery += "VALUES('SIMULATION_URL','admin',@simulationUrl, 1, @chatName)";
 
             let pool = await dbConnect.getConnection(sql);
             let insertChat = await pool.request()
@@ -356,6 +363,16 @@ router.post('/admin/addChatBotApps', function (req, res){
                 let insertChatRelation = await pool.request()
                 .input('luisAppId', sql.NVarChar, luisAppIdData)
                 .query(insertChatRelationQuery);
+
+                let insertChatConfScription = await pool.request()
+                .input('luisSubscription', sql.NVarChar, luisSubscription)
+                .input('chatName', sql.NVarChar, chatName)
+                .query(insertChatConfScriptionQuery);
+
+                let insertChatConfSimulation = await pool.request()
+                .input('simulationUrl', sql.NVarChar, simulationUrl)
+                .input('chatName', sql.NVarChar, chatName)
+                .query(insertChatConfSimulationQuery);
                 
                 res.send({result:true});
             } else {
