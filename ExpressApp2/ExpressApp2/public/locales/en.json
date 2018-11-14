@@ -267,6 +267,7 @@
 	"REPLY_TIME": "REPLY_TIME",
 	"SAME_QRY": "SAME QUERY LIST",
 	"SELECT_DATE": "Select DATE",
+	"ALERT_ERROR": "Error occurred. Please try again.",
 	"============= LUIS =============": "",
 	"LABELED_UTTER": "Labeled Utterance",
 	"INTENT_LIST": "Intent List",

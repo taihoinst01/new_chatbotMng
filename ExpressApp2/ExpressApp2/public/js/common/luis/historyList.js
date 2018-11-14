@@ -14,12 +14,16 @@ var language;
 $(document).ready(function() {
     dataPick();
 
-    makeHistoryTable();    
+    makeHistoryTable(1);    
 });
 
 $(document).ready(function() {
 
-    
+    $('#searchDlgBtn').click(function() {
+        var searchInputStr = $('#searchQuestion').val().trim();
+        $('#searchStr').val(searchInputStr);
+        makeHistoryTable(1);
+    });
 /*
     $(document).on("click", "#useTemplateeBtn", function () {
         procTemplate("UPDATE_USEYN");
@@ -42,17 +46,57 @@ $(document).on("change", "#selDate", function () {
     }
 });
 
+function getFilterVal(page) {
+
+    var searchQuestion = $('#searchStr').val();
+
+    var filterVal;
+    if ($('#datePickerDiv').css('display') == 'none') {
+        filterVal = {
+            'searchQuestion' : searchQuestion,
+            'currentPage': page,
+            'startDate' : 'ALL', 
+            'endDate' : 'ALL', 
+            'selDate' : $('#selDate').val(),
+            'selChannel' : $('#selChannel').val(),
+        };
+    } else {
+        
+        var dateArr = $('#reservation').val().split('-');
+
+        if (dateArr.length == 2) {
+            var startDate = $.trim(dateArr[0]);
+            var endDate = $.trim(dateArr[1]);
+
+            filterVal = {
+                'searchQuestion' : searchQuestion,
+                'currentPage': page,
+                'startDate' : startDate, 
+                'endDate' : endDate, 
+                'selDate' : $('#selDate').val(),
+                'selChannel' : $('#selChannel').val(),
+            };
+        } else {
+            return false;
+        }
+    }
+        
+    return filterVal;
+    
+}
+
+
 function makeHistoryTable(newPage) {
     var saveTableHtml = "";
-    var searchQuestion = $('#searchQuestion').val().trim();
-    var params = {
-        'searchQuestion' : searchQuestion,
-        'currentPage': newPage,
-    };
+    var param = getFilterVal(newPage);
+    if (param == false) {
+        alert('날짜 형식을 확인해주세요.');
+        return false;
+    } 
 
     $.ajax({
         type: 'POST',
-        data: params,
+        data: param,
         beforeSend: function () {
 
             var width = 0;
@@ -74,40 +118,42 @@ function makeHistoryTable(newPage) {
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display","none");      
         },
-        data: params,
         url: '/historyMng/selectHistoryList',
         success: function (data) {
-
-            if (data.rows.length > 0) {
-
-                var tableHtml = "";
-                for (var i = 0; i < data.rows.length; i++) {
-                    
-                    tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
-                    tableHtml += '<td><input type="checkbox" class="flat-red" name="DEL_MAIN_SEQ" id="DEL_MAIN_SEQ" value="'+ data.rows[i].NUM+'"></td>';
-                    tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>'
-                    tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
-                    tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
-                    tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
-                    tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
-                    tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
-                    tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
-                    tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
-                    tableHtml += '<tr>'
-                }
-
-                saveTableHtml = tableHtml;
-                $('#historyBody').html(saveTableHtml);
-
-                iCheckBoxTrans();
-
-                $('#historyTablePaging').html('').append(data.pageList);
-
+            if (status) {
+                $('#alertMsg').text(language.ALERT_ERROR);
+                $('#alertBtnModal').modal('show');
             } else {
-                saveTableHtml = '<tr><td colspan="11" class="text-center">No Data</td></tr>';
-                $('#historyBody').html(saveTableHtml);
-            }
+                if (data.rows.length > 0) {
 
+                    var tableHtml = "";
+                    for (var i = 0; i < data.rows.length; i++) {
+                        
+                        tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
+                        tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>'
+                        tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>'
+                        tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
+                        tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
+                        tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
+                        tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
+                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
+                        tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
+                        tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
+                        tableHtml += '<tr>'
+                    }
+    
+                    saveTableHtml = tableHtml;
+                    $('#historyBody').html(saveTableHtml);
+    
+                    iCheckBoxTrans();
+    
+                    $('#historyTablePaging').html('').append(data.pageList);
+    
+                } else {
+                    saveTableHtml = '<tr><td colspan="11" class="text-center">No Data</td></tr>';
+                    $('#historyBody').html(saveTableHtml);
+                }
+            }
         }
     });
 }
@@ -145,37 +191,39 @@ function getHistoryDetail(sId) {
         },
         data: params,
         success: function (data) {
-
-            if (data.rows.length > 0) {
-
-                var tableHtml = "";
-                for (var i = 0; i < data.rows.length; i++) {
-                    
-                    tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
-                    tableHtml += '<td><input type="checkbox" class="flat-red" name="DEL_MODAL_SEQ" id="DEL_MODAL_SEQ" value="'+ data.rows[i].NUM+'"></td>';
-                    tableHtml += '<td>'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
-                    tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
-                    tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
-                    tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
-                    tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
-                    tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
-                    tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
-                    tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
-                    tableHtml += '<tr>'
-                }
-
-                saveTableHtml = tableHtml;
-                $('#historyModalBody').html(saveTableHtml);
-
-                iCheckBoxTrans();
-
-                $('#similarQform').modal('show');
-
+            if (status) {
+                $('#alertMsg').text(language.ALERT_ERROR);
+                $('#alertBtnModal').modal('show');
             } else {
-                saveTableHtml = '<tr><td colspan="11" class="text-center">No Data</td></tr>';
-                $('#historyModalBody').html(saveTableHtml);
-            }
+                if (data.rows.length > 0) {
 
+                    var tableHtml = "";
+                    for (var i = 0; i < data.rows.length; i++) {
+                        
+                        tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
+                        tableHtml += '<td>'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
+                        tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
+                        tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
+                        tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
+                        tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
+                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
+                        tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
+                        tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
+                        tableHtml += '<tr>'
+                    }
+    
+                    saveTableHtml = tableHtml;
+                    $('#historyModalBody').html(saveTableHtml);
+    
+                    iCheckBoxTrans();
+    
+                    $('#similarQform').modal('show');
+    
+                } else {
+                    saveTableHtml = '<tr><td colspan="11" class="text-center">No Data</td></tr>';
+                    $('#historyModalBody').html(saveTableHtml);
+                }
+            }
         }
     });
 }

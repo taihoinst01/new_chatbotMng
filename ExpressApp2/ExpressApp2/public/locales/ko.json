@@ -327,6 +327,7 @@
 	"REPLY_TIME": "답변 시간",
 	"SAME_QRY": "같은 질문 목록",
 	"SELECT_DATE": "날짜 선택",
+	"ALERT_ERROR": "문제가 발생했습니다. 다시 시도해 주세요.",
 	"============== scenario ==============": "",
 	"SCENARIO_NAME": "시나리오명",
 	"SCENARIO_LIST": "시나리오 목록",

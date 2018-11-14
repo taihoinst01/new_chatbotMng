@@ -30,6 +30,7 @@
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
+    <input type="hidden" name='searchStr' id="searchStr" value="" />
     <input type="hidden" name='chkAfterAlert' id="chkAfterAlert" value="NONE" />
     <div class="wrapper">
 
@@ -126,13 +127,13 @@
                                                 <colgroup><col width="15%"/><col width="25%"/><col width="40%"/><col width="17%"/><col width="3%"/></colgroup>
                                                 -->
                                                 <colgroup>
-                                                    <col width="3%"/><col width="2%"/><col width="30%"/><col width="8%"><col width="7%">
+                                                    <col width="3%"/><col width="30%"/><col width="5%"/><col width="8%"><col width="7%">
                                                     <col width="5%"/><col width="10%"/><col width="10%"/><col width="15%"><col width="5%">
                                                 </colgroup>
                                                       <tr>
                                                           <th><%= __('NUM') %></th>
-                                                          <th></th>
                                                           <th><%= __('DLG_QUESTION') %></th>
+                                                          <th>중복 갯수</th>
                                                           <th><%= __('CODE_') %></th>
                                                           <th><%= __('channel') %></th>
                                                           <th><%= __('REPLY_TIME') %></th>
@@ -202,12 +203,11 @@
                             <colgroup><col width="15%"/><col width="25%"/><col width="40%"/><col width="17%"/><col width="3%"/></colgroup>
                             -->
                             <colgroup>
-                                <col width="3%"/><col width="2%"/><col width="30%"/><col width="8%"><col width="7%">
+                                <col width="3%"/><col width="30%"/><col width="8%"><col width="7%">
                                 <col width="5%"/><col width="10%"/><col width="10%"/><col width="15%"><col width="5%">
                             </colgroup>
                                   <tr>
                                       <th><%= __('NUM') %></th>
-                                      <th></th>
                                       <th><%= __('DLG_QUESTION') %></th>
                                       <th><%= __('CODE_') %></th>
                                       <th><%= __('channel') %></th>
@@ -255,24 +255,24 @@
 <!-- //confirm -->
 
 
-    <!-- alert -->
-    <div class="modal fade" id="alertBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
-                </div>
-                <div class="modal-body"><span id="alertMsg"></span></div>
-                <div class="modal-footer" >
-                    <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
-                </div>
+<!-- alert -->
+<div class="modal fade" id="alertBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle"><%= __('ALERT') %></span></h4>
+            </div>
+            <div class="modal-body"><span id="alertMsg"></span></div>
+            <div class="modal-footer" >
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn"><%= __('OK') %></button>
             </div>
         </div>
     </div>
-    <!-- //alert -->
+</div>
+<!-- //alert -->
 
 
 <div class="modal fade" id="loadingBar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true" >

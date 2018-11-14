@@ -215,6 +215,12 @@ app.use(function(req, res, next) {
     } else {
         res.locals.version = null;
     }
+    
+    if (req.session.channelList) {
+        res.locals.channelList = req.session.channelList;
+    } else {
+        res.locals.channelList = null;
+    }
     // -----------------------------------------------------------
 
     if (req.session.subKey)  {

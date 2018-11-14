@@ -318,6 +318,13 @@ $(document).ready(function () {
 
             $(".dialogView").eq(idx).html(insertHtml);
         }
+        
+        //dyyoo change이벤트 후 미리보기 적용. keycode:17 - ctrl한번 누르기
+        var e = jQuery.Event( "keyup", { keyCode: 17 } ); 
+        $("input[name=dialogTitle]").trigger(e);
+        $("input[name=dialogText]").trigger(e);
+        $("input[name=imgUrl]").trigger(e);
+        $("input[name=mediaUrl]").trigger(e);
     });
 
     //다이얼로그 생성 - 닫는 버튼
@@ -1015,7 +1022,7 @@ function selectDlgByFilter(group) {
                     item += '<tr>' +
                         '<td>' + data.list[i].NUM + '</td>' +
                         '<td class="txt_left">' + data.list[i].DLG_NAME + '</td>' +
-                        '<td class="txt_left tex01"><a href="#"  data-toggle="modal" data-target="#myModal2"  onclick="searchDialog(' + data.list[i].DLG_ID + ');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        '<td class="txt_left tex01"><a href="#" onclick="searchDialog(' + data.list[i].DLG_ID + ');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
                         '<td><a href="#" onclick="deleteDialog(' + data.list[i].DLG_ID + ');return false;"><span class="fa fa-trash"></span></a></td>' +
                         '</tr>';
@@ -1291,7 +1298,7 @@ function selectDlgByTxt(groupType, sourceType) {
                     item += '<tr>' +
                         '<td>' + data.list[i].NUM + '</td>' +
                         '<td class="txt_left">' + data.list[i].DLG_NAME + '</td>' +
-                        '<td class="txt_left tex01"><a href="#"  data-toggle="modal" data-target="#myModal2"  onclick="searchDialog(' + data.list[i].DLG_ID + ');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        '<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
                         '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ');return false;"><span class="fa fa-trash"></span></a></td>' +
                         '</tr>';
@@ -1351,6 +1358,7 @@ var addCarouselForm;
 var deleteInsertForm;
 function openModalBox(target) {
 
+    $('#title').val('');
 
     // 화면의 높이와 너비를 변수로 만듭니다.
     var maskHeight = $(document).height();
@@ -1676,7 +1684,27 @@ function searchDialog(dlgID) {
         dataType: 'json',                  //데이터 형식
         type: 'POST',                      //전송 타입
         data: { 'dlgID': dlgID },      //데이터를 json 형식, 객체형식으로 전송
+        beforeSend: function () {
 
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
             var inputUttrHtml = '';
             if (result['list'].length == 0) {
@@ -1708,6 +1736,7 @@ function searchDialog(dlgID) {
 
                             $(".insertForm form").append(dlgForm);
                             $(".insertForm form").append(deleteInsertForm);
+
                             $("#dialogLayout").eq(j).find("select[name=dlgType]").val("2").prop("selected", true);
                             $("#dialogLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
                             $("#dialogLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
@@ -1909,6 +1938,8 @@ function searchDialog(dlgID) {
             $("#createDialog").attr('onclick', 'updateDialog()');
 
             //$(".insertForm .textLayout").css("display","block");
+
+            $('#myModal2').modal('show');
 
         }
 
