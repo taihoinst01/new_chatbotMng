@@ -286,12 +286,15 @@
 	"ALERT_INTENT_SELECT": "Intent must be filled.",
 	"ALERT_SAME_INTENT_EXIST": "Entity with Same name exists in your chatbot",
 	"ALERT_SELECT_LIST_TYPE": "Please select child Entity of list type",
-	"============= The end =============": "",
+	"============= edit =============": "",
 	"QNAMNG_TITLE": "QNAMNG_TITLE",
 	"QNA_TITLE": "QNA_TITLE",
 	"NOANSWER_TITLE": "NOANSWER_TITLE",
 	"DIALOG_MNG_TITLE": "DIALOG_MNG_TITLE",
 	"SmallTalk_Title": "SmallTalk_Title",
 	"BANDEDWORD_TITLE": "BANDEDWORD_TITLE",
-	"TEMPLATE_TITLE": "TEMPLATE_TITLE"
+	"TEMPLATE_TITLE": "TEMPLATE_TITLE",
+	"CLOSE": "CLOSE",
+	"YES": "YES",
+	"============= The end =============": ""
 }

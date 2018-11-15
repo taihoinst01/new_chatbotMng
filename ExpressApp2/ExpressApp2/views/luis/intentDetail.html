@@ -96,7 +96,7 @@
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
-        <input type="hidden" name='hiddenMenuTitle' id="hiddenMenuTitle" value="<%= INTENT_LIST %>" />
+        <input type="hidden" name='hiddenMenuTitle' id="hiddenMenuTitle" value="<%= __('INTENT_LIST') %>" />
         <input type="hidden" name='currentPage' id="currentPage" value="1" />
         <input type="hidden" name='hiddenIntentName' id="hiddenIntentName" value="<%= intentName %>" />
         <input type="hidden" name='hiddenIntentId' id="hiddenIntentId" value="<%= intentId %>" />
@@ -138,10 +138,10 @@
                                     <tr>
                                         <th></th>
                                         <th style='text-align: left; padding-left:1%;'>
-                                            <%= Utterance %>
+                                            <%= __('UTTERANCE') %>
                                             <a href='#' id='scrollUpDownBtn' name='scrollUpDownBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-arrow-up' style='font-size: 25px;'></span></a>
                                         </th>
-                                        <th style='text-align: left; padding-left:2%;'><%=Intent_score %></th>
+                                        <th style='text-align: left; padding-left:2%;'><%= __('Intent_score') %></th>
                                         <th style='text-align: right; padding-right:1%;'></th>
                                     </tr>
                                 </thead>
