@@ -140,7 +140,12 @@ function makeUserTable() {
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>'
-                    tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
+                    if (data.rows[i].PW_INIT_YN == 'Y') {
+                        tableHtml += '<td>초기화완료</td>';
+                    } else {
+                        tableHtml += '<td><button type="button" class="btn btn_01" name=pwInitBtn>' + language.INIT+ '</button></td>';
+                    }
+                    //tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
@@ -164,8 +169,12 @@ function makeUserTable() {
 }
 
 // 비밀번호 초기화 
-function initPassword(userId) {
+//function initPassword(userId) {
+$(document).on('click', 'button[name=pwInitBtn]', function (e) {
     if (confirm(language['ASK_PW_INIT'])) {
+        var userId = $(this).parents('tr').find('td').eq(2).text();
+        var userIndex = $('#tableBodyId').children().index($(this).parents('tr'));
+
         var params = {
             paramUserId: userId
         }
@@ -196,12 +205,19 @@ function initPassword(userId) {
                 $("#loadingBar").css("display","none");
             },
             success: function(data) {
-                alert(data.message);
+                if (data.status == 200) {
+
+                    alert(data.message);
+                    $('#tableBodyId').children().eq(userIndex).children().eq(4).html('').text('초기화완료');
+
+                } else {
+                    alert(data.message);
+                }
             }
         });
 
     }
-}
+});
 
 //사용자 추가
 function addUser() {

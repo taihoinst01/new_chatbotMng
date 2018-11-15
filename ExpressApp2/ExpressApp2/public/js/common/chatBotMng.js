@@ -89,6 +89,27 @@ function makeChatBotTable(newPage) {
         type: 'POST',
         data: params,
         url: '/users/selecChatList',
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            //$("#loadingBar").removeClass("in");
+            //$("#loadingBar").css("display","none");      
+        },
         success: function(data) {
            
             if (data.rows) {
@@ -227,11 +248,13 @@ function mkAppRow(rows, checkedApp) {
         appHtml += '<tr><td>' + Number(i+1) + '</td>';
         
         var j=0;
-        for (; j<checkedApp.length; j++) {
-            if (rows[i].APP_ID === checkedApp[j].APP_ID) {
-                appHtml += '<td><input type="checkbox" class="flat-red" checked name="tableCheckBox"></td>';
-                break;
-            } 
+        if (checkedApp.length > 0) {
+            for (; j<checkedApp.length; j++) {
+                if (rows[i].APP_ID === checkedApp[j].APP_ID) {
+                    appHtml += '<td><input type="checkbox" class="flat-red" checked name="tableCheckBox"></td>';
+                    break;
+                } 
+            }
         }
         if (j === checkedApp.length) {
             appHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';

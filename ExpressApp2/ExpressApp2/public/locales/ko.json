@@ -424,5 +424,9 @@
 	"ALERT_INTENT_SELECT": "Intent를 입력해야 합니다.",
 	"ALERT_SAME_INTENT_EXIST": "앱에 같은 이름의 인텐트가 존재합니다.",
 	"ALERT_SELECT_LIST_TYPE": "list type의 child Entity를 선택해 주세요.",
+	"ALERT_CHNG_SUCCESS": "비밀번호 변경에 성공했습니다. 로그인 해주세요.",
+	"ALERT_CHNG_FAIL": "비밀번호 변경에 실패했습니다. 다시 시도해주세요.",
+	"ALERT_WRONG_ACCESS": "비정상 접근입니다. 로그인 해주세요.",
+	"ALERT_WRONG_ACCESS2": "비정상 접근입니다.",
 	"============= The end =============": ""
 }

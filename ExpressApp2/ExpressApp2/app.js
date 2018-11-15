@@ -191,6 +191,12 @@ app.use(function(req, res, next) {
         res.locals.appId = null;
     }
 
+    if (req.session.hostURL)  {
+        res.locals.hostURL = req.session.hostURL;
+    } else { 
+        res.locals.hostURL = null;
+    }
+
     // bwj -------------------------------------------------------
     if (req.session.publishsettings) {
         res.locals.publishsettings = req.session.publishsettings;

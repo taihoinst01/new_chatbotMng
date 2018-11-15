@@ -4,19 +4,22 @@ var Client = require('node-rest-client').Client;
 var sql = require('mssql');
 var dbConfig = require('../config/dbConfig');
 var dbConnect = require('../config/dbConnect');
-var luisConfig = require('../config/luisConfig');
 var i18n = require("i18n");
 const syncClient = require('sync-rest-client');
 const appDbConnect = require('../config/appDbConnect');
 const appSql = require('mssql');
 var router = express.Router();
 
-const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
-var subKey = luisConfig.subKey; // Subscription Key
+//var luisConfig = require('../config/luisConfig');
+//const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
+//var subKey = luisConfig.subKey; // Subscription Key
 var saveAppList;
 /* GET home page. */
 router.get('/', function (req, res) {
     if(req.session.sid) {
+        
+        var HOST = req.session.hostURL;
+
         var userId = req.session.sid;
         try{
             //등록된 앱 있는지 조회
@@ -394,6 +397,8 @@ router.post('/admin/putAddApps', function (req, res){
     var appName = req.body.appInsertName;
     var appCulture = req.body.appInsertCulture;
     var appDes = req.body.appDes;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
 
     var client = new Client();
     
@@ -429,6 +434,8 @@ router.post('/admin/putAddApps', function (req, res){
 //Luis app delete
 router.post('/admin/deleteApp', function (req, res){
     var appId = req.body.deleteAppId;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
 
     var client = new Client();
     var options = {
@@ -448,6 +455,8 @@ router.post('/admin/deleteApp', function (req, res){
 
 //Luis app rename
 router.post('/admin/renameApp', function (req, res){
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
     var appId = req.body.renameAppId;
     var appName = req.body.renameAppName;
     var client = new Client();
@@ -473,7 +482,9 @@ router.post('/admin/renameApp', function (req, res){
 router.post('/admin/trainApp', function (req, res){
     var appId = req.session.appId;
     var appName = req.session.appName;
-    var subsKey = req.session.subsKey;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+
     var versionId;
     var entityArray = [];
     
@@ -481,7 +492,7 @@ router.post('/admin/trainApp', function (req, res){
     
     var options = {
         headers: {
-            'Ocp-Apim-Subscription-Key': subsKey
+            'Ocp-Apim-Subscription-Key': subKey
         }
     };
 
@@ -510,7 +521,7 @@ router.post('/admin/trainApp', function (req, res){
 
                 var pubOption = {
                     headers: {
-                        'Ocp-Apim-Subscription-Key': subsKey,
+                        'Ocp-Apim-Subscription-Key': subKey,
                         'Content-Type':'application/json'
                     },
                     payload:{

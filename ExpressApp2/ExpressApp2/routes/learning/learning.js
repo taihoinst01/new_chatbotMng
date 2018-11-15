@@ -14,7 +14,7 @@ const appSql = require('mssql');
 
 var router = express.Router();
 
-const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
+//const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
 router.get('/', function (req, res) {
     req.session.selMenus = 'ms1';
@@ -3479,6 +3479,7 @@ router.post('/predictIntentAjax', function (req, res) {
     var request = require('request');
     var querystring = require('querystring');
     var appId;
+    var HOST = req.session.hostURL;
 
     var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
     selectAppIdQuery += "FROM TBL_LUIS_APP \n";

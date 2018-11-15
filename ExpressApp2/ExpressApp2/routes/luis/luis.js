@@ -23,20 +23,23 @@ var logger = Logger.CreateLogger();
 
 var luisUtil = require("../../config/luisUtil");
 
-var luisConfig = require("../../config/luisConfig");
-const HOST = luisConfig.HOST_URL;
-var subKey = luisConfig.subKey;
+//var luisConfig = require("../../config/luisConfig");
+//var HOST = luisConfig.HOST_URL;
+//var subKey = luisConfig.subKey;
 
 var options = {
     headers: {
-        'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': subKey
+        'Content-Type': 'application/json'
+        //,'Ocp-Apim-Subscription-Key': subKey
     }
 };
 
 router.get('/synchronizeLuis', function (req, res) {
     
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
 
     var luisObj = [];
 
@@ -468,6 +471,10 @@ router.get('/intentList', function (req, res) {
 router.post('/selectIntentList', function (req, res) {
 
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+
     var selAppId = req.session.selAppId;
     var searchIntent = req.body.searchIntent == undefined ? '':req.body.searchIntent;
     var selPage = req.body.selPage;
@@ -510,6 +517,9 @@ router.post('/createIntent', function (req, res) {
     try 
     {
         var userId = req.session.sid;
+        var HOST = req.session.hostURL;
+        var subKey = req.session.subKey;
+        options.headers['Ocp-Apim-Subscription-Key'] = subKey;
         var intentName = req.body.intentName;
 
         var intentList = req.session.intentList.slice();
@@ -627,6 +637,9 @@ router.post('/createIntent', function (req, res) {
 router.post('/deleteIntent', function (req, res) {
 
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var deleteIntentName = req.body.deleteIntentName;
     var deleteIntentId = req.body.deleteIntentId;
     var intentList = req.session.intentList;
@@ -704,6 +717,9 @@ router.post('/deleteIntent', function (req, res) {
 router.post('/getUtterInIntent', function (req, res) {
 
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var intentName = req.body.intentName;
     var intentId = req.body.intentId;
     var lebelCnt = req.body.labelCnt;
@@ -813,7 +829,7 @@ router.post('/getUtterInIntent', function (req, res) {
             res.send({success : true});
         }
         else {
-            if (tmpLuisObj.body.error) {
+            if (utterInfo.body.error) {
                 var resultCode = utterInfo.body.error.code;
                 var resultStr = utterInfo.body.error.message;
                 logger.info('[에러]intent의 utterance 조회 실패  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/getUtterInIntent',  resultCode + ' : ' + resultStr);
@@ -1078,6 +1094,9 @@ router.post('/createEntity', function (req, res) {
     try 
     {
         var userId = req.session.sid;
+        var HOST = req.session.hostURL;
+        var subKey = req.session.subKey;
+        options.headers['Ocp-Apim-Subscription-Key'] = subKey;
         var entityName = req.body.entityName;
         var entityType = req.body.entityType;
         var childEntityArr;
@@ -1344,6 +1363,9 @@ router.post('/selectChildCompositeList', function (req, res) {
 router.post('/deleteEntity', function (req, res) {
 
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var deleteEntityName = req.body.deleteEntityName;
     var deleteEntityId = req.body.deleteEntityId;
     var deleteEntityType = req.body.deleteEntityType;
@@ -1560,6 +1582,9 @@ router.post('/getChildEntity', function (req, res) {
 router.post('/saveChangedEntity', function (req, res) {
 
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var entityId = req.body.entityId;
     var entityName = req.body.entityName;
     var entityType = req.body.entityType;
@@ -1746,6 +1771,9 @@ router.post('/saveChangedEntity', function (req, res) {
 
 router.post('/saveUtterance', function (req, res) {
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var intentName = req.body.intentName;
     var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
     var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
@@ -1850,6 +1878,9 @@ router.post('/saveUtterance', function (req, res) {
 
 router.post('/deleteUtterance', function (req, res) {
     var userId = req.session.sid;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var utterId = req.body.utterId;//req.body['labelArr[]'];intentId
     var intentId = req.body.intentId;//req.body['labelArr[]'];
     var tmpLuisObj;
@@ -1881,6 +1912,9 @@ router.post('/deleteUtterance', function (req, res) {
 
 router.post('/renameIntent', function (req, res) {
 
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var intentId = req.body.intentId;
     var intentName = req.body.intentName;
     var tmpLuisObj;
@@ -1948,6 +1982,9 @@ function getEntityType(typeVal) {
 router.get('/publish', function (req, res) {
 
     var selAppId = req.session.selAppId;
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var userId = req.session.sid;
     
     var publishSettings = req.session.publishsettings;
@@ -2002,13 +2039,9 @@ router.get('/publish', function (req, res) {
 
 router.post('/publishExecution', function (req, res){
     var appName = req.session.appName;
-    var subsKey = req.session.subsKey;
-
-    var options = {
-        headers: {
-            'Ocp-Apim-Subscription-Key': subsKey
-        }
-    };
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
 
     var selectAppIdQuery = "SELECT CHATBOT_ID, APP_ID, VERSION, APP_NAME,CULTURE, SUBSC_KEY \n";
     selectAppIdQuery += "FROM TBL_LUIS_APP \n";
@@ -2027,7 +2060,7 @@ router.post('/publishExecution', function (req, res){
     
                     var pubOption = {
                         headers: {
-                            'Ocp-Apim-Subscription-Key': subsKey,
+                            'Ocp-Apim-Subscription-Key': subKey,
                             'Content-Type':'application/json'
                         },
                         payload:{
@@ -2063,6 +2096,10 @@ router.post('/trainApp', function (req, res){
     var userId = req.session.sid;
     var publishCount = 0;
     
+    var HOST = req.session.hostURL;
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+
     var selAppList = req.session.selChatInfo.chatbot.appList;
     if (typeof req.body.appIndex != 'undefined') {
         var appNumber = req.body.appIndex;
@@ -2078,7 +2115,7 @@ router.post('/trainApp', function (req, res){
 
                 var pubOption = {
                     headers: {
-                        'Ocp-Apim-Subscription-Key': luisConfig.subKey,
+                        'Ocp-Apim-Subscription-Key': subKey,
                         'Content-Type':'application/json'
                     },
                     payload:{

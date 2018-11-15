@@ -9,6 +9,12 @@ var paging = require('../config/paging');
 var router = express.Router();
 
 
+var i18n = require("i18n");
+
+//log start
+var Logger = require("../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
 /*
 var key = 'taiho123!@#$';
 var initPW = '1234';
@@ -23,11 +29,16 @@ basePW = cipher.final('base64');
 var pwConfig = require('../config/passConfig');
 
 
-const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
+//const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
 router.get('/', function (req, res) {
-    
-    res.send('respond with a resource');
+    if (!req.session.sid) {
+        res.cookie('i18n', 'ko', { maxAge: 900000, httpOnly: true });
+        res.render('login');   
+    } else {
+        res.redirect("/list");
+    }
+    //res.send('respond with a resource');
 });
 
 router.post('/login', function (req, res) {  
@@ -45,7 +56,7 @@ router.post('/login', function (req, res) {
     */
 
     var loginSelQry = "";
-    loginSelQry = "SELECT USER_ID, SCRT_NUM, SCRT_SALT, USER_AUTH \n";
+    loginSelQry = "SELECT USER_ID, SCRT_NUM, ISNULL(PW_INIT_YN, 'N') AS PW_INIT_YN, SCRT_SALT, USER_AUTH \n";
     loginSelQry += " FROM TB_USER_M \n WHERE USER_ID = @userId; ";
 
     dbConnect.getConnection(sql).then(pool => {
@@ -61,63 +72,66 @@ router.post('/login', function (req, res) {
 
                 
                 var userPwConverted = pwConfig.getPassWord(userPw, rows[0].SCRT_SALT);
-                /*
-                //암호화 해제
-                var decipher = crypto.createDecipher('aes192', key);
-                decipher.update(rows[0].SCRT_NUM, 'base64', 'utf8');
-                var decipheredOutput = decipher.final('utf8');
 
-                console.log(decipheredOutput);
-                */
-                if (rows[0].SCRT_NUM == userPwConverted) {
-                //if(decipheredOutput == userPw) {
-                    req.session.sid = req.body.mLoginId;
-                    req.session.sAuth = rows[0].USER_AUTH;
-
-                    //subscription key 조회 start-----
-                    var subsQry = "";
-                    subsQry += "SELECT CNF_VALUE \n";
-                    subsQry += "  FROM TBL_CHATBOT_CONF \n";
-                    subsQry += " WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' \n";
-                    subsQry += "   AND CHATBOT_NAME IN (SELECT CHAT_ID \n";
-                    subsQry += "					      FROM TBL_USER_RELATION_APP \n";
-                    subsQry += "					     WHERE USER_ID = @userId) \n";
-                    subsQry += "GROUP BY CNF_VALUE; \n";
-
-                    dbConnect.getConnection(sql).then(pool => { 
-                        return pool.request()
-                            .input('userId', sql.NVarChar, userId)
-                            .query(subsQry) 
-                    }).then(result => {
-
-
-
-                        let subsList = result.recordset;
-                        req.session.subsKeyList = subsList;
-                        if (subsList.length > 0) {
-                            req.session.subsKey = subsList[0].CNF_VALUE;
-                        }
-                        /*
-                        if (subsList.findIndex(x => x.CNF_NM === req.session.sid) !== -1) {
-                            req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === req.session.sid)].CNF_VALUE;
-                        } else {
-                            req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === 'admin')].CNF_VALUE;
-                        }
-                        */
-                        req.session.save(function(){
-                            res.redirect("/");
-                        });
-                    }).catch(err => {
-                        console.log(err);
-                        sql.close();
+                if (rows[0].PW_INIT_YN == 'Y') {
+                    res.render('passwordChng', {
+                        changeId: req.body.mLoginId,
                     });
-                    //subscription key 조회 end-----
-
-
-                    
                 } else {
-                    res.send('<script>alert("비밀번호가 일치하지 않습니다.");location.href="/";</script>');
+                    if (rows[0].SCRT_NUM == userPwConverted) {
+                        //if(decipheredOutput == userPw) {
+                        req.session.sid = req.body.mLoginId;
+                        req.session.sAuth = rows[0].USER_AUTH;
+    
+                        //subscription key 조회 start-----
+                        var subsQry = "";
+                        subsQry += "SELECT CNF_TYPE, CNF_VALUE \n";
+                        subsQry += "  FROM TBL_CHATBOT_CONF \n";
+                        subsQry += " WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' \n";
+                        subsQry += "    OR CNF_TYPE = 'HOST_URL' \n";
+                        //subsQry += "   AND CHATBOT_NAME IN (SELECT CHAT_ID \n";
+                        //subsQry += "					      FROM TBL_USER_RELATION_APP \n";
+                        //subsQry += "					     WHERE USER_ID = @userId) \n";
+                        //subsQry += "GROUP BY CNF_VALUE; \n";
+    
+                        dbConnect.getConnection(sql).then(pool => { 
+                            return pool.request()
+                                .input('userId', sql.NVarChar, userId)
+                                .query(subsQry) 
+                        }).then(result => {
+                            let subsList = result.recordset;
+                            if (subsList.length > 0) {
+                                //req.session.subsKey = subsList[0].CNF_VALUE;
+                                req.session.subKey = subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}).CNF_VALUE;
+                                req.session.subsKey = req.session.subKey;
+                                req.session.hostURL = subsList.find((item, idx) => {return item.CNF_TYPE === 'HOST_URL'}).CNF_VALUE;
+                                var tmpArr = [];
+                                tmpArr.push(subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}));
+                                req.session.subsKeyList = tmpArr;
+                            }
+                            /*
+                            //subsList[subsList.findIndex(x => x.CNF_TYPE === 'LUIS_SUBSCRIPTION')].CNF_VALUE;
+                            //subsList[subsList.findIndex(x => x.CNF_TYPE === 'HOST_URL')].CNF_VALUE;
+                            if (subsList.findIndex(x => x.CNF_NM === req.session.sid) !== -1) {
+                                req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === req.session.sid)].CNF_VALUE;
+                            } else {
+                                req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === 'admin')].CNF_VALUE;
+                            }
+                            */
+                            req.session.save(function(){
+                                res.redirect("/");
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                            sql.close();
+                        });
+                            //subscription key 조회 end-----
+                            
+                    } else {
+                        res.send('<script>alert("비밀번호가 일치하지 않습니다.");location.href="/";</script>');
+                    }
                 }
+                
             } else {
                 res.send('<script>alert("아이디를 찾을수 없습니다.");location.href="/";</script>');
             }
@@ -194,6 +208,7 @@ router.post('/selectUserList', function (req, res) {
                             "                            , ISNULL(A.REG_ID, ' ')       AS REG_ID " +
                             "                            , ISNULL(CONVERT(NVARCHAR(10), A.MOD_DT, 120), ' ') AS MOD_DT \n" +
                             "                            , ISNULL(A.MOD_ID, ' ')       AS MOD_ID \n" +
+                            "                            , ISNULL(PW_INIT_YN, 'N')  AS PW_INIT_YN  \n" + 
                             "                            , ISNULL(A.LOGIN_FAIL_CNT, 0)      AS LOGIN_FAIL_CNT \n" +
                             "                            , ISNULL(CONVERT(NVARCHAR, A.LAST_LOGIN_DT, 120), ' ')  AS LAST_LOGIN_DT \n" +
                             "                            , ISNULL(CONVERT(NVARCHAR, A.LOGIN_FAIL_DT, 120), ' ')  AS LOGIN_FAIL_DT \n" +
@@ -361,40 +376,61 @@ router.post('/saveUserInfo', function (req, res) {
 });
 router.post('/inItPassword', function (req, res) {
 
-    //var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW  + "' WHERE USER_ID = '" + userId + "'; ";
+    var initPWStr = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
+
+    var adminId = req.session.sid;
+    var userId = req.body.paramUserId;
     //basePW
     (async () => {
         try {
-            
-            var userId = req.body.paramUserId;
-            var initPw = "";
-            var initPWQry = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
-            
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('사용자 비밀번호 초기화 전 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, 'users/inItPassword');
 
-            let initPwQry = await pool.request().query(initPWQry);
-            var getUserInitRow = initPwQry.recordset;
-            if (getUserInitRow.length > 0) {
-                initPw = getUserInitRow[0].CNF_VALUE;
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
 
-                var newSalt = await pwConfig.getSaltCode();
-                let basePW = pwConfig.getPassWord(initPw, newSalt);
-
-                var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '@basePW', SCRT_SALT = '@newSalt' WHERE USER_ID = '@userId'; ";
-                let initPwStr = await pool.request()
-                    .input('basePW', sql.NVarChar, basePW)
-                    .input('newSalt', sql.NVarChar, newSalt)
-                    .input('userId', sql.NVarChar, userId)
-                    .query(initStr);
-
-
-                res.send({status:200 , message:'Init Success'});
-
+                logger.info('사용자 비밀번호 초기화 전 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, getUserAuthRow[0].ADMIN_YN, 'users/saveUserInfo');
             } else {
-                res.send({status:500 , message:'등록된 초기화 비밀번호가 없습니다. 설정해주세요.'});
+                logger.info('[에러]사용자 비밀번호 초기화 전 [관리자id : %s] [url : %s] [error : %s]', adminId, 'users/saveUserInfo', '계정 정보가 없습니다.');
+                res.send({ status: 400, message: 'failed' });
+                return;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러]사용자 비밀번호 초기화 전 [관리자id : %s] [url : %s] [error : %s]', adminId, 'users/inItPassword', '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({ status: 400, message: 'failed' });
+                return;
+            } else {
+                let initRst = await pool.request().query(initPWStr);
+                
+                var getUserInitRow = initRst.recordset;
+                if (getUserInitRow.length > 0) {
+
+                    var initPW = getUserInitRow[0].CNF_VALUE; 
+                    var newSalt = await pwConfig.getSaltCode();
+                    let basePW = pwConfig.getPassWord(initPW, newSalt);
+    
+                    var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW + "', SCRT_SALT = '" + newSalt + "', PW_INIT_YN='Y' WHERE USER_ID = '" + userId + "'; ";
+                    let initPwRst = await pool.request().query(initStr);
+    
+                    logger.info('사용자 비밀번호 초기화 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userId, 'users/inItPassword');
+                    res.send({status:200 , message:'Init Success'});
+                } else {
+                    res.send({status:500 , message:'등록된 초기화 비밀번호가 없습니다. 설정해주세요.'});
+                }
+                
             }
         } catch (err) {
-            console.log(err);
+            logger.info('[에러]사용자 비밀번호 초기화 [관리자id : %s] [대상id : %s] [url : %s] [error : %s]', adminId, userId, 'users/inItPassword', err);
             res.send({status:500 , message:'Init Error'});
         } finally {
             sql.close();
@@ -650,25 +686,31 @@ router.post('/selectChatAppList', function (req, res) {
             let rows2 = userAppList.recordset;
 
             var checkedApp = [];
-            for(var i = 0; i < rows2.length; i++){
-                for (var j=0; j < recordList.length; j++) {
-                    if (rows2[i].APP_ID.trim() === recordList[j].APP_ID.trim()) {
-                        var item = {};
-                        rows2[i].APP_ID = rows2[i].APP_ID.trim();
-                        item = rows2[i];
-                        checkedApp.push(item);
-                        break;
-                    }
-                }
-                
-            }
 
+            if (rows2.length > 0) {
+                for(var i = 0; i < rows2.length; i++){
+                    for (var j=0; j < recordList.length; j++) {
+                        if (rows2[i].APP_ID.trim() === recordList[j].APP_ID.trim()) {
+                            var item = {};
+                            rows2[i].APP_ID = rows2[i].APP_ID.trim();
+                            item = rows2[i];
+                            checkedApp.push(item);
+                            break;
+                        }
+                    }
+                    
+                }
+            } else {
+
+            }
+            
             res.send({
                 records : recordList.length,
                 rows : recordList,
                 checkedApp : checkedApp,
                 pageList : paging.pagination(currentPage,rows[0].TOTCNT)
             });
+
             
         } catch (err) {
             console.log(err);
@@ -844,7 +886,7 @@ router.post('/saveApiInfo', function(req, res){
 router.get('/addApp', function (req, res) {
     res.render('addApp');
 });
-
+/*
 router.post('/selecChatList', function (req, res) {
 
     var selectAppListStr =  " SELECT CHATBOT_NUM, CHATBOT_NAME, CULTURE, DESCRIPTION, APP_COLOR \n" + 
@@ -881,6 +923,7 @@ router.post('/selecChatList', function (req, res) {
         // ... error handler
     })
 })
+*/
 
 router.post('/addApp', function (req, res) {
 
@@ -888,6 +931,7 @@ router.post('/addApp', function (req, res) {
     var chatName = req.body.selAppName;
     var appDes = checkNull(req.body.appDes, ' ');
     var getApplist = "SELECT APP_NAME, CULTURE, SUBSC_KEY FROM TBL_LUIS_APP WHERE CHATBOT_ID = " + chatNum + ";";
+    var HOST = req.session.hostURL;
     
     (async () => {
         try {
@@ -1025,6 +1069,53 @@ router.post('/getAppSelValues', function (req, res) {
 })
 
 
+router.post('/changePW', function (req, res) {
+
+    if (req.body.err) {
+        res.redirect("/users/error");
+        return;
+    }
+    
+    var userId = req.body.changeId;
+    var userPw = req.body.changePw1;
+
+    //let chngPw = encryption(userPw);
+    (async () => {
+        try {
+
+            var newSalt = await pwConfig.getSaltCode();
+            let chngPw = pwConfig.getPassWord(userPw, newSalt);
+
+            var QueryStr = "UPDATE TB_USER_M SET SCRT_NUM = @chngPw, SCRT_SALT = @newSalt, PW_INIT_YN = 'N' WHERE USER_ID = @userId;";
+
+            let pool = await dbConnect.getConnection(sql);
+            let result1 = await pool.request()
+                .input('chngPw', sql.NVarChar, chngPw)
+                .input('newSalt', sql.NVarChar, newSalt)
+                .input('userId', sql.NVarChar, userId)
+                .query(QueryStr);
+
+            logger.info('비밀번호변경 [id : %s] [url : %s]', userId, 'users/changePW');
+            res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_SUCCESS + '");location.href="/";</script>');
+
+        } catch (err) {
+            logger.info('[에러]비밀번호변경 [id : %s] [url : %s] [message : %s]', userId, 'users/changePW', err);
+            res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL + '");location.href="/";</script>');
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        logger.info('[에러]비밀번호변경 [id : %s] [url : %s] [message : %s]', userId, 'users/changePW', err);
+        res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL + '");location.href="/";</script>');
+    })
+});
+
+
+
+
+
 function pad(n, width) {
     n = n + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
@@ -1037,6 +1128,9 @@ function checkNull(val, newVal) {
         return val;
     }
 }
+
+
+
 
 /*
 router.post('/', function (req, res) {
@@ -1140,6 +1234,9 @@ router.post('/', function (req, res) {
     })
 });
 */
+
+
+
 
 
 router.get('/error', function (req, res) {

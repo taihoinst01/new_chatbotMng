@@ -7,7 +7,7 @@ var autowayDbConfig = require('../../config/dbConfig').autowayDbConfig;
 var dbConnect = require('../../config/dbConnect');
 var paging = require('../../config/paging');
 var util = require('../../config/util');
-var luisConfig = require('../../config/luisConfig');
+//var luisConfig = require('../../config/luisConfig');
 var router = express.Router();
 
 /* GET users listing. */
@@ -19,7 +19,7 @@ router.get('/', function (req, res) {
     }
     if (typeof req.query.appName !== 'undefined') {
         req.session.appName = req.query.appName;
-        req.session.subKey = luisConfig.subKey;
+        //req.session.subKey = luisConfig.subKey;
 
         //챗봇에 속한 앱리스트 새션 저장
         var selChatInfo = new Object();
