@@ -316,8 +316,8 @@ router.post('/admin/addChatBotApps', function (req, res){
     var dbUrl = req.body.dbUrl;
     var dbName = req.body.dbName;
     var luisAppIdData = req.body.luisAppId;
-    var luisSubscription = req.body.luisSubscription;
-    var simulationUrl = req.body.simulationUrl;
+    //var luisSubscription = req.body.luisSubscription;
+    //var simulationUrl = req.body.simulationUrl;
 
     (async () => {
         try {
@@ -333,13 +333,13 @@ router.post('/admin/addChatBotApps', function (req, res){
 
             var insertChatRelationQuery = "INSERT INTO TBL_CHAT_RELATION_APP(CHAT_ID,APP_ID) ";
             insertChatRelationQuery += "VALUES((SELECT ISNULL(MAX(CHATBOT_NUM),0) FROM TBL_CHATBOT_APP),@luisAppId)";
-
+/*
             var insertChatConfScriptionQuery = "INSERT INTO TBL_CHATBOT_CONF(CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO, CHATBOT_NAME) ";
             insertChatConfScriptionQuery += "VALUES('LUIS_SUBSCRIPTION','admin',@luisSubscription, 1, (SELECT ISNULL(MAX(CHATBOT_NUM),0))";
 
             var insertChatConfSimulationQuery = "INSERT INTO TBL_CHATBOT_CONF(CNF_TYPE, CNF_NM, CNF_VALUE, ORDER_NO, CHATBOT_NAME) ";
             insertChatConfSimulationQuery += "VALUES('SIMULATION_URL','admin',@simulationUrl, 1, @chatName)";
-
+*/
             let pool = await dbConnect.getConnection(sql);
             let insertChat = await pool.request()
                 .input('chatName', sql.NVarChar, chatName)
@@ -366,7 +366,7 @@ router.post('/admin/addChatBotApps', function (req, res){
                 let insertChatRelation = await pool.request()
                 .input('luisAppId', sql.NVarChar, luisAppIdData)
                 .query(insertChatRelationQuery);
-
+/*
                 let insertChatConfScription = await pool.request()
                 .input('luisSubscription', sql.NVarChar, luisSubscription)
                 .input('chatName', sql.NVarChar, chatName)
@@ -376,7 +376,7 @@ router.post('/admin/addChatBotApps', function (req, res){
                 .input('simulationUrl', sql.NVarChar, simulationUrl)
                 .input('chatName', sql.NVarChar, chatName)
                 .query(insertChatConfSimulationQuery);
-                
+*/                
                 res.send({result:true});
             } else {
                 res.send({result:false});
