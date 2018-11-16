@@ -61,7 +61,8 @@ $(document).ready(function() {
         insertForm += '</div>';
         insertForm += '<div class="form-group">';
         insertForm += '<label>' + language.DIALOG_BOX_CONTENTS + '<span class="nec_ico">*</span></label>';
-        insertForm += '<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' ">';
+        //insertForm += '<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' ">';
+        insertForm += '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>';
         insertForm += '</div>';
         insertForm += '</div>';
         insertForm += '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >';
@@ -1435,7 +1436,8 @@ $(document).on("click", "#show_dlg", function () {
         '</div>' +
         '<div class="form-group">' +
         '<label>' + language.DIALOG_BOX_CONTENTS + '</label>' +
-        '<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="' + language.Please_enter + '">' +
+        //'<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="' + language.Please_enter + '">' +
+        '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>' +
         '</div>' +
         '</div>';
 
@@ -1525,25 +1527,32 @@ $(document).on("click", "#show_dlg", function () {
                     var tmp = val;//val[l];
 
                     for (var j = 0; j < tmp.dlg.length; j++) {
-
+                        var cardTextHtml = tmp.dlg[j].CARD_TEXT;
+                        var dlgTextArea = tmp.dlg[j].CARD_TEXT;;
+                        cardTextHtml = cardTextHtml.replace(/\/n/gi,'</br>');
+                        dlgTextArea = dlgTextArea.replace(/\/n/gi,'\r\n');
                         if (tmp.dlg[j].DLG_TYPE == 2) {
 
                             inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:200px">';
                             inputUttrHtml += '<div class="wc-message-content">';
                             inputUttrHtml += '<svg class="wc-message-callout"></svg>';
                             inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
-                            inputUttrHtml += '<p>';
-                            inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            
+                            inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '">';
                             inputUttrHtml += '<h1 class="textTitle">' + tmp.dlg[j].CARD_TITLE + '</h1>';
-                            inputUttrHtml += tmp.dlg[j].CARD_TEXT;
-                            inputUttrHtml += '</p>';
+                            inputUttrHtml += '<div class="dlg_content">';
+                            //inputUttrHtml += tmp.dlg[j].CARD_TEXT;
+                            inputUttrHtml += cardTextHtml;
+                            inputUttrHtml += '</div>';
                             inputUttrHtml += '</div></div></div></div></div>';
 
                             $(".insertForm form").append(dlgForm);
                             $(".insertForm form").append(deleteInsertForm);
                             $("#dialogLayout").eq(j).find("select[name=dlgType]").val("2").prop("selected", true);
                             $("#dialogLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
-                            $("#dialogLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
                             $(".insertForm .textLayout").css("display", "block");
                         } else if (tmp.dlg[j].DLG_TYPE == 3) {
 
@@ -1608,7 +1617,8 @@ $(document).on("click", "#show_dlg", function () {
                             $("#dialogLayout").find(".carouselLayout").eq(j).css("display", "block");
 
                             $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
-                            $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=imgUrl]").val(tmp.dlg[j].IMG_URL);
 
                             if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
@@ -1674,7 +1684,8 @@ $(document).on("click", "#show_dlg", function () {
                             $("#dialogLayout").find(".mediaLayout").eq(j).css("display", "block");
 
                             $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
-                            $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
 
                             $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mediaImgUrl]").val(tmp.dlg[j].MEDIA_URL);
                             $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mediaUrl]").val(tmp.dlg[j].CARD_VALUE);
@@ -1716,6 +1727,7 @@ $(document).on("click", "#show_dlg", function () {
             }
             
             $('.dialogView').html(inputUttrHtml);
+            //console.log("dialogView=="+inputUttrHtml);
 
             //대화상자 수정 추가
             $('h4#myModalLabel.modal-title').text(language.Show_dlg);
@@ -1759,6 +1771,12 @@ function updateDialog() {
             return false;
         }
     });
+
+    //dialogText textarea 값 치환
+    var temp = $("#dialogText").val();
+    temp = temp.replace(/(?:\r\n|\r|\n)/g, '/n');
+    $("#dialogText").val(temp);
+
     if (exit) return;
     $('.insertForm input[name=imgUrl]').each(function (index) {
         if ($(this).val().trim() === "") {
@@ -1863,17 +1881,15 @@ function updateDialog() {
 
         success: function (result) {
             
-            $('#alertMsg').text('success');
-            $('#alertBtnModal').modal('show');
-            $('#chkAfterAlert').val('UPDATE_DLG');
-
-            //alert('success');
+            $('#proc_content').html(language.REGIST_SUCC);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#procDialog').modal('show');
             
-            //$('.createDlgModalClose').click();
+            $('.createDlgModalClose').click();
 
-            //var groupType = $('.selected').text();
-            //var sourceType = $('#tblSourceType').val();
-            //selectDlgByTxt(groupType, sourceType);
+            var groupType = $('.selected').text();
+            var sourceType = $('#tblSourceType').val();
+            selectDlgByTxt(groupType, sourceType);
         }
 
     });
@@ -1950,15 +1966,18 @@ function writeDialog(e) {
     var idx = $('#commonLayout .insertForm').index($(e).parents('.insertForm'));
     var icx = $('#commonLayout').find('.insertForm').index($(e).parents('.insertForm'));
     //var jcx = $(e).parents('.insertForm').find('input[name=dialogTitle]').index(e);
+    
 
     if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 3) {
         //$('.dialogView:eq(' + idx + ') .carousel').html(e.value);
         //var icx = $('#commonLayout').find('.insertForm').index($(e).parents('.insertForm'));
-        var jcx = $(e).parents('.insertForm').find('input[name=dialogText]').index(e);
+        //var jcx = $(e).parents('.insertForm').find('input[name=dialogText]').index(e);
+        var jcx = $(e).parents('.insertForm').find('textarea[name=dialogText]').index(e);
         if ($(e).parent().prev().find('input[name=dialogTitle]').val() == '') {
             $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('h1').text('');
         }
-        $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('p').text(e.value);
+        //$('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('p').text(e.value);
+        $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('textMent').text(e.value);
 
 
     } else if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 4) {
@@ -1966,10 +1985,14 @@ function writeDialog(e) {
     } else {
         //$('.dialogView .textMent p:eq(' + idx + ')').html(e.value);
         //$('.dialogView').children().eq(icx).find('.textMent p:eq(' + idx + ')').html(e.value);
+        
         if ($(e).parent().prev().find('input[name=dialogTitle]').val() == '') {
             $('.dialogView').children().eq(icx).find('.textMent .textTitle').text('');
         }
-        $('.dialogView').children().eq(icx).find('.textMent p').text(e.value);
+        var test = e.value;
+        test = test.replace(/(?:\r\n|\r|\n)/g, '\n');
+        var obj = $('.dialogView').children().eq(icx).find('.textMent .dlg_content').text(test);
+        obj.html(obj.html().replace(/\n/g,'<br/>'));
     }
 
 }
@@ -2120,7 +2143,8 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>' +
         '<div class="form-group">' +
         '<label>' + language.DIALOG_BOX_CONTENTS + '<span class="nec_ico">*</span></label>' +
-        '<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="' + language.Please_enter + '">' +
+        //'<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="' + language.Please_enter + '">' +
+        '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>'+
         '</div>' +
         '</div>';
 

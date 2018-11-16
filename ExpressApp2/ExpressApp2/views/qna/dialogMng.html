@@ -118,13 +118,15 @@
                                 <div class="clear-both"></div>
                                 <div class="form-group" >
                                     <label><%= __('TITLE') %></label>
-                                    <textarea class="form-control" name="title" id="title" rows="1" placeholder="<%= __('Please_enter') %>"></textarea>
+                                    <!--<textarea class="form-control" name="title" id="title" rows="1" placeholder="<%= __('Please_enter') %>"></textarea>-->
+                                    <input type="text" name="title" id="title" class="form-control" placeholder="<%= __('Please_enter') %>">
                                 </div> 
                             
                                 <div class="clear-both"></div>
                                 <div class="form-group" >
                                     <label><%= __('DESC') %></label>
-                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="<%= __('Please_enter') %>"></textarea>
+                                    <!--<textarea class="form-control" name="description" id="description" rows="3" placeholder="<%= __('Please_enter') %>"></textarea>-->
+                                    <input type="text" name="description" id="description" class="form-control" placeholder="<%= __('Please_enter') %>">
                                 </div>  
                             </form>
                             <div id="commonLayout" class="dialog_w">
@@ -157,7 +159,8 @@
                                     </div>                                                                                        
                                     <div class="form-group">
                                         <label><%= __('DIALOG_BOX_CONTENTS') %><span class="nec_ico">*</span></label>
-                                        <input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>">
+                                        <!--<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>">-->
+                                        <textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>" rows="5"></textarea>
                                     </div>                                     
                                 </div>
                                 <!--카드 타입 -->
@@ -341,9 +344,9 @@
                                                 <div class="format-markdown">
                                                     <div class="textMent">
                                                         <h1 class="textTitle"><%= __('Please_enter_a_title') %></h1>
-                                                        <p>
+                                                        <div class="dlg_content">
                                                                 <%= __('Please_enter_your_content') %>
-                                                        </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

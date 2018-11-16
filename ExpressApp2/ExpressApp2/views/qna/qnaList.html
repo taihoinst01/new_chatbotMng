@@ -257,7 +257,8 @@
                                     </div>                                                                                        
                                     <div class="form-group">
                                         <label><%= __('DIALOG_BOX_CONTENTS') %><span class="nec_ico">*</span></label>
-                                        <input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>">
+                                        <!--<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>">-->
+                                        <textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>" rows="5"></textarea>
                                     </div>                                     
                                 </div>
                                 <!--카드 타입 -->
@@ -570,18 +571,18 @@
     <!-- //유사질문 등록 추가 모달 -->
 
     <!-- alert -->
-    <div class="modal fade" id="alertBtnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal fade" id="procDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
+                    <h4 class="modal-title" id="myModalLabel"><%= __("QNA_TITLE") %></h4>
                 </div>
-                <div class="modal-body"><span id="alertMsg"></span></div>
-                <div class="modal-footer" >
-                    <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
+                <div class="modal-body"><p id="proc_content"></p></div>
+                <div class="modal-footer" id="footer_button">
+                    
                 </div>
             </div>
         </div>
