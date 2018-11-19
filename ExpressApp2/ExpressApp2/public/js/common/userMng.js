@@ -50,6 +50,11 @@ $(document).ready(function() {
         initUserList();
     });
 
+    //사용여부 버튼
+    $('#useYNBtn').click(function() {
+        useYNChange();
+    });
+
 });
 
 
@@ -136,19 +141,25 @@ function makeUserTable() {
     
                 for (var i=0;i<data.rows.length;i++) { 
                     tableHtml += '<tr><td>' + data.rows[i].SEQ + '</td>';
-                    tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
+                    if(data.rows[i].USER_ID=="admin"){
+                        tableHtml += '<td>&nbsp;</td>';
+                    }else{
+                        tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
+                    }
+                    
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>'
                     tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>'
                     if (data.rows[i].PW_INIT_YN == 'Y') {
                         tableHtml += '<td>초기화완료</td>';
                     } else {
-                        tableHtml += '<td><button type="button" class="btn btn_01" name=pwInitBtn>' + language.INIT+ '</button></td>';
+                        tableHtml += '<td><button type="button" class="btn btn_01" name=pwInitBtn><i class="fa fa-refresh"></i> ' + language.INIT+ '</button></td>';
                     }
                     //tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
-                    tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
-                    tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
-                    tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
+                    tableHtml += '<td>' + data.rows[i].USE_YN + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].REG_DT + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].LAST_LOGIN_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].LOGIN_FAIL_CNT + '</td></tr>'
                 }
@@ -206,18 +217,22 @@ $(document).on('click', 'button[name=pwInitBtn]', function (e) {
             },
             success: function(data) {
                 if (data.status == 200) {
-
-                    alert(data.message);
+                    //alert(data.message);
                     $('#tableBodyId').children().eq(userIndex).children().eq(4).html('').text('초기화완료');
 
                 } else {
-                    alert(data.message);
+                    //alert(data.message);
                 }
+                $('#procDialog').modal('hide');
+                $('#proc_content').html(data.message);
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+                $('#procDialog').modal('show');
             }
         });
 
     }
 });
+
 
 //사용자 추가
 function addUser() {
@@ -245,10 +260,35 @@ function initUserList() {
 
 function deleteUser() {
     if ($('tr div[class*=checked]').length < 1) {
-        alert(language['NO_SELECTED_CELL']);
+        //alert(language['NO_SELECTED_CELL']);
+        $('#procDialog').modal('hide');
+        $('#proc_content').html(language.NO_SELECTED_CELL);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
     } else {
         $('tr div[class*=checked]').each(function() {
             $(this).parent().prev().text('DEL');
+            var checkAdmin = $(this).parent().next().text();
+            $('#procDialog').modal('hide');
+            $('#proc_content').html(language.IS_DELETE_CONFIRM);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#procDialog').modal('show');
+        });
+    }
+    
+}
+
+function useYNChange() {
+    if ($('tr div[class*=checked]').length < 1) {
+        //alert(language['NO_SELECTED_CELL']);
+        $('#procDialog').modal('hide');
+        $('#proc_content').html(language.NO_SELECTED_CELL);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
+    } else {
+        $('tr div[class*=checked]').each(function() {
+            $(this).parent().prev().text('USEYN');
+            var checkAdmin = $(this).parent().next().text();
         });
     }
     
@@ -257,8 +297,13 @@ function deleteUser() {
 function saveUser() {
 
     if ($('td>div[class*=checked]').length < 1) {
-        alert(language['NO_SELECTED_CELL']);
+        $('#procDialog').modal('hide');
+        $('#proc_content').html(language.NO_SELECTED_CELL);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
         return;
+        //alert(language['NO_SELECTED_CELL']);
+        //return;
     }
 
     var chkEmptyInput = false;
@@ -269,7 +314,11 @@ function saveUser() {
         }
     }
     if (chkEmptyInput) {
-        alert(language['ID_NAME_BE_FILLED']);
+        //alert(language['ID_NAME_BE_FILLED']);
+        $('#procDialog').modal('hide');
+        $('#proc_content').html(language.ID_NAME_BE_FILLED);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
         return;
     }
 
@@ -313,7 +362,21 @@ function saveUser() {
                 data.USER_ID = $(this).children().eq(2).text();
                 data.EMP_NM = $(this).children().eq(3).text();
                 saveArr.push(data);
+            } else if (statusFlag === 'USEYN') {
+                var useyn_data = $(this).children().eq(6).text();
+                var data = new Object() ;
+                data.statusFlag = statusFlag;
+                data.USER_ID = $(this).children().eq(2).text();
+                data.EMP_NM = $(this).children().eq(3).text();
+                if(useyn_data=="Y"){
+                    data.USE_YN = "N";
+                }else{
+                    data.USE_YN = "Y";
+                }
+                saveArr.push(data);
             }
+
+
         }
         
     });
@@ -330,13 +393,23 @@ function saveUser() {
         success: function(data) {
             console.log(data);
             if (data.status === 200) {
-                alert(language['REGIST_SUCC']);
-                window.location.reload();
+                //alert(language['REGIST_SUCC']);
+                $('#proc_content').html(language.REGIST_SUCC);
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="goReloadPage();"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+                $('#procDialog').modal('show');
+                //window.location.reload();
             } else {
-                alert(language['It_failed']);
+                $('#proc_content').html(language.It_failed);
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+                $('#procDialog').modal('show');
+                //alert(language['It_failed']);
             }
         }
     });    
+}
+
+function goReloadPage(){
+    window.location.reload();
 }
 
 

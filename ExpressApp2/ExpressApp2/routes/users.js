@@ -57,7 +57,7 @@ router.post('/login', function (req, res) {
 
     var loginSelQry = "";
     loginSelQry = "SELECT USER_ID, SCRT_NUM, ISNULL(PW_INIT_YN, 'N') AS PW_INIT_YN, SCRT_SALT, USER_AUTH \n";
-    loginSelQry += " FROM TB_USER_M \n WHERE USER_ID = @userId; ";
+    loginSelQry += " FROM TB_USER_M \n WHERE USER_ID = @userId AND USE_YN = 'Y' ";
 
     dbConnect.getConnection(sql).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
@@ -128,12 +128,12 @@ router.post('/login', function (req, res) {
                             //subscription key 조회 end-----
                             
                     } else {
-                        res.send('<script>alert("비밀번호가 일치하지 않습니다.");location.href="/";</script>');
+                        res.send('<script>alert("비밀번호가 일치하지 않습니다");location.href="/";</script>');
                     }
                 }
                 
             } else {
-                res.send('<script>alert("아이디를 찾을수 없습니다.");location.href="/";</script>');
+                res.send('<script>alert("아이디를 찾을수 없거나 사용중지 중입니다");location.href="/";</script>');
             }
           sql.close();
         }).catch(err => {
@@ -213,8 +213,8 @@ router.post('/selectUserList', function (req, res) {
                             "                            , ISNULL(CONVERT(NVARCHAR, A.LAST_LOGIN_DT, 120), ' ')  AS LAST_LOGIN_DT \n" +
                             "                            , ISNULL(CONVERT(NVARCHAR, A.LOGIN_FAIL_DT, 120), ' ')  AS LOGIN_FAIL_DT \n" +
                             "                         FROM TB_USER_M A \n" +
-                            "                         WHERE 1 = 1 \n" +
-                            "					      AND A.USE_YN = 'Y' \n"; 
+                            "                         WHERE 1 = 1 \n";
+                            //"					      AND A.USE_YN = 'Y' \n"; 
 
             if (searchName) {
                 QueryStr += "					      AND A.EMP_NM like '%" + searchName + "%' \n";
@@ -237,21 +237,6 @@ router.post('/selectUserList', function (req, res) {
             var recordList = [];
             for(var i = 0; i < rows.length; i++){
                 var item = {};
-/*
-                item.USER_ID = rows[i].USER_ID;
-                item.USER_ID_HIDDEN = rows[i].USER_ID_HIDDEN;
-                item.SCRT_NUM = rows[i].SCRT_NUM;
-                item.USE_YN = rows[i].USE_YN;
-                item.REG_ID = rows[i].REG_ID;
-                item.REG_DT = rows[i].REG_DT;
-                item.MOD_ID = rows[i].MOD_ID;
-                item.MOD_DT = rows[i].MOD_DT;
-                item.TOT_CNT = rows[i].TOT_CNT;
-                item.EMAIL = rows[i].EMAIL;
-                item.M_P_NUM_1 = rows[i].M_P_NUM_1;
-                item.M_P_NUM_2 = rows[i].M_P_NUM_2;
-                item.M_P_NUM_3 = rows[i].M_P_NUM_3;
-*/
                 item = rows[i];
                 
 
@@ -316,6 +301,7 @@ router.post('/saveUserInfo', function (req, res) {
             var saveStr = "";
             var updateStr = "";
             var deleteStr = "";
+            var useYnStr = "";
 
             var initPWQry = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
 
@@ -330,6 +316,7 @@ router.post('/saveUserInfo', function (req, res) {
                 initPw = getUserInitRow[0].CNF_VALUE;
             } else {
                 res.send({status:500 , message:'등록된 초기화 비밀번호가 없습니다. 설정해주세요.'});
+                return;
             }
 
             
@@ -344,8 +331,10 @@ router.post('/saveUserInfo', function (req, res) {
                     
                 } else if (userArr[i].statusFlag === 'EDIT') {
                     updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
+                } else if (userArr[i].statusFlag === 'USEYN') {
+                    useYnStr += "UPDATE TB_USER_M SET USE_YN = '" + userArr[i].USE_YN + "' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
                 } else { //DEL
-                    deleteStr += "UPDATE TB_USER_M SET USE_YN = 'N' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
+                    deleteStr += "DELETE FROM TB_USER_M WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
                 }
             }
 
@@ -355,6 +344,9 @@ router.post('/saveUserInfo', function (req, res) {
             }
             if (updateStr !== "") {
                 let updateUser = await pool.request().query(updateStr);
+            }
+            if (useYnStr !== "") {
+                let useYnUser = await pool.request().query(useYnStr);
             }
             if (deleteStr !== "") {
                 let deleteUser = await pool.request().query(deleteStr);
@@ -634,7 +626,11 @@ router.post('/selecChatList', function (req, res) {
                 });
 
             }else{
-                res.send({list : result});
+                //res.send({list : result});
+                res.send({
+                    records: 0,
+                    rows: null
+                });
             }
         } catch (err) {
             console.log(err)

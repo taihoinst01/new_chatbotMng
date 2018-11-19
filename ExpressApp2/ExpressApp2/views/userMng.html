@@ -49,8 +49,9 @@
                                                      <div class=" col-lg-6" style="text-align:right"> 
                                                              <button type="button" class="btn btn-default" id="addBtn"><i class="fa fa-plus"></i> <%= __('ADD') %></button>
                                                              <button type="button" class="btn btn-default" id="deleteBtn"><i class="fa fa-trash"></i> <%= __('DELETE') %></button>
+                                                             <button type="button" class="btn btn-default" id="useYNBtn"><i class="fa fa-refresh"></i> <%= __('USE_YN') %></button>
                                                              <button type="button" class="btn btn-default" id="saveBtn"><i class="fa fa-edit"></i> <%= __('SAVE') %></button>
-                                                             <button type="button" class="btn btn-default" id="initBtn"><i class="fa fa-refresh"></i> <%= __('INIT') %></button>
+                                                             <button type="button" class="btn btn-default" id="initBtn"><i class="fa fa-list"></i> <%= __('LIST_INIT') %></button>
                                                      </div>
                                                 </div>
                                                 
@@ -62,14 +63,17 @@
                                                         </colgroup>
                                                         <thead><tr>
                                                                 <th></th>
-                                                                <th><input type="checkbox" class="flat-red" id="check-all"></th>   <!-- <th><input type="checkbox" class="flat-red" checked id="check-all"></th> -->
+                                                                <th><input type="checkbox" class="flat-red" id="check-all"></th>
                                                                 <th><%= __('USER_ID') %></th>
                                                                 <th><%= __('USER_NAME') %></th>
                                                                 <th><%= __('HPHONE') %></th>
                                                                 <th><%= __('PASSWOARD') %></th>
+                                                                <th><%= __('USE_YN') %></th>
+                                                                <!--
                                                                 <th><%= __('REGIST_DATE') %></th>
                                                                 <th><%= __('REGIST_ID') %></th>
-                                                                <th><%= __('MODIFIED_DATE') %></th>                                                                  
+                                                                <th><%= __('MODIFIED_DATE') %></th>
+                                                                -->                                                                
                                                                 <th><%= __('LAST_LOGIN_DATE') %></th>
                                                                 <th><%= __('LOGIN_FAIL_CNT') %></th>   
                                                             </tr>
@@ -100,6 +104,23 @@
     
 <div class="modal fade" id="loadingBar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true" >
     <img src="/image/ajax_loader.gif" style="width:50px; height:50px;" id="loadingImg">
+</div>
+
+<div class="modal fade" id="procDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><%= __("USER_MNG") %></h4>
+            </div>
+            <div class="modal-body"><p id="proc_content"></p></div>
+            <div class="modal-footer" id="footer_button">
+                
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

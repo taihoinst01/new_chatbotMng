@@ -111,7 +111,10 @@ router.post('/selectUserList', function (req, res) {
                 });
 
             } else {
-                res.send({ list: result });
+                res.send({
+                    records: 0,
+                    rows: null
+                });
             }
         } catch (err) {
             console.log(err)

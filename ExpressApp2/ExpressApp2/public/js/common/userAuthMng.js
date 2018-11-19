@@ -77,10 +77,10 @@ function makeUserTable(newPage) {
         data: params,
         url: '/user/selectUserList',
         success: function (data) {
-
+            var tableHtml = "";
             if (data.rows) {
 
-                var tableHtml = "";
+                
                 var s_auth_name = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     if (data.rows[i].AUTH_NM == "" || data.rows[i].AUTH_NM == null) {
@@ -105,7 +105,8 @@ function makeUserTable(newPage) {
                 $('#userTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                $('#userTableBodyId').html('');
+                tableHtml += '<tr><td colspan="6">' + language.NO_DATA + '</td></tr>';
+                $('#userTableBodyId').html(tableHtml);
                 $('#appTableBodyId').html('');
             }
 
