@@ -208,6 +208,7 @@ router.post('/selectUserList', function (req, res) {
                             "                            , ISNULL(A.REG_ID, ' ')       AS REG_ID " +
                             "                            , ISNULL(CONVERT(NVARCHAR(10), A.MOD_DT, 120), ' ') AS MOD_DT \n" +
                             "                            , ISNULL(A.MOD_ID, ' ')       AS MOD_ID \n" +
+                            "                            , ISNULL(A.USER_AUTH, ' ')       AS USER_AUTH \n" +
                             "                            , ISNULL(PW_INIT_YN, 'N')  AS PW_INIT_YN  \n" + 
                             "                            , ISNULL(A.LOGIN_FAIL_CNT, 0)      AS LOGIN_FAIL_CNT \n" +
                             "                            , ISNULL(CONVERT(NVARCHAR, A.LAST_LOGIN_DT, 120), ' ')  AS LAST_LOGIN_DT \n" +
@@ -227,7 +228,6 @@ router.post('/selectUserList', function (req, res) {
                             "       ) TBZ \n" +
                             " WHERE PAGEIDX = " + currentPageNo + " \n" +
                             "ORDER BY " + sortIdx + " \n";
-            
             
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
@@ -325,12 +325,12 @@ router.post('/saveUserInfo', function (req, res) {
 
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
-                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, USE_YN, USER_AUTH) " + 
+                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH) " + 
                                "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y', 77); ";
+                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "', '" + userArr[i].EMAIL  + "', 'Y', 77); ";
                     
                 } else if (userArr[i].statusFlag === 'EDIT') {
-                    updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
+                    updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "',EMAIL = '" + userArr[i].EMAIL + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
                 } else if (userArr[i].statusFlag === 'USEYN') {
                     useYnStr += "UPDATE TB_USER_M SET USE_YN = '" + userArr[i].USE_YN + "' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
                 } else { //DEL

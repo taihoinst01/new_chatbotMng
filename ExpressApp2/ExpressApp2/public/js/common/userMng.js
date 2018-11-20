@@ -141,17 +141,27 @@ function makeUserTable() {
     
                 for (var i=0;i<data.rows.length;i++) { 
                     tableHtml += '<tr><td>' + data.rows[i].SEQ + '</td>';
-                    if(data.rows[i].USER_ID=="admin"){
+                    
+                    if(data.rows[i].USER_AUTH=="99"){
                         tableHtml += '<td>&nbsp;</td>';
                     }else{
                         tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
+                        
+                    }
+
+                    tableHtml += '<td>' + data.rows[i].USER_ID + '</td>';
+                    if(data.rows[i].USER_AUTH=="99"){
+                        tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>';
+                        tableHtml += '<td>' + data.rows[i].HPHONE + '</td>';
+                        tableHtml += '<td>' + data.rows[i].EMAIL + '</td>';
+                    }else{
+                        tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>';
+                        tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>';
+                        tableHtml += '<td class="editable-cell">' + data.rows[i].EMAIL + '</td>';
                     }
                     
-                    tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
-                    tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>'
-                    tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>'
                     if (data.rows[i].PW_INIT_YN == 'Y') {
-                        tableHtml += '<td>초기화완료</td>';
+                        tableHtml += '<td>' + language.INIT_COMPLETE+ '</td>';
                     } else {
                         tableHtml += '<td><button type="button" class="btn btn_01" name=pwInitBtn><i class="fa fa-refresh"></i> ' + language.INIT+ '</button></td>';
                     }
@@ -241,6 +251,7 @@ function addUser() {
     addHtml += '<td><input type="text" name="new_user_id" spellcheck="false" autocomplete="off" value="" /></td>';
     addHtml += '<td><input type="text" name="new_user_name" spellcheck="false" autocomplete="off" value="" /></td> ';
     addHtml += '<td><input type="text" name="new_hphone" spellcheck="false" autocomplete="off" value="" /></td> ';
+    addHtml += '<td><input type="text" name="new_email" spellcheck="false" autocomplete="off" value="" /></td> ';
     addHtml += '<td colspan="6"></td></tr>'
 
     $('#tableBodyId').prepend(addHtml);
@@ -345,6 +356,7 @@ function saveUser() {
                 data.USER_ID = $(this).children().eq(2).text();
                 data.EMP_NM = $(this).children().eq(3).text();
                 data.HPHONE = $(this).children().eq(4).text();
+                data.EMAIL = $(this).children().eq(5).text();
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
@@ -354,6 +366,7 @@ function saveUser() {
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();
                 data.EMP_NM = $(this).find('input[name=new_user_name]').val();
                 data.HPHONE = $(this).find('input[name=new_hphone]').val();
+                data.EMAIL = $(this).find('input[name=new_email]').val();
                 saveArr.push(data);
             } else if (statusFlag === 'DEL') {
 
@@ -363,7 +376,7 @@ function saveUser() {
                 data.EMP_NM = $(this).children().eq(3).text();
                 saveArr.push(data);
             } else if (statusFlag === 'USEYN') {
-                var useyn_data = $(this).children().eq(6).text();
+                var useyn_data = $(this).children().eq(7).text();
                 var data = new Object() ;
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).children().eq(2).text();
