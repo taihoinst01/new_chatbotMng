@@ -51,7 +51,7 @@ router.get('/', function (req, res) {
 });
 
 router.get('/dashBoard', function (req, res) {
-    
+
     var selectChannel = "";
     selectChannel += "  SELECT ISNULL(CHANNEL,'') AS CHANNEL FROM TBL_HISTORY_QUERY \n";
     selectChannel += "   WHERE 1=1 \n";
@@ -78,21 +78,7 @@ router.get('/dashBoard', function (req, res) {
         sql.close();
     });
 
-    var getSimulUrlStr = "SELECT ISNULL(" +
-    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = '" + req.session.sid + "' AND CHATBOT_NAME = '" + req.session.appName + "'), " +
-    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = 'admin' AND CHATBOT_NAME = '" + req.session.appName + "'))  AS SIMUL_URL";
-            
-    dbConnect.getConnection(sql).then(pool => { 
-        return pool.request().query( getSimulUrlStr ) 
-    }).then(result => {
-        
-        req.session.simul_url = result.recordset[0].SIMUL_URL;
-        //console.log("simul_url==="+req.session.simul_url);
-
-    }).catch(err => {
-        console.log(err);
-        sql.close();
-    });
+    
 });
 
 
@@ -708,6 +694,24 @@ router.post('/getDashboardInfo', function (req, res) {
     sql.on('error', err => {
         // ... error handler
     })
+});
+
+router.post('/getSimulUrlInfo', function (req, res) {
+
+    var getSimulUrlStr = "SELECT ISNULL(" +
+    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = '" + req.session.sid + "' AND CHATBOT_NAME = '" + req.session.appName + "'), " +
+    "(SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'SIMULATION_URL' AND CNF_NM = 'admin' AND CHATBOT_NAME = '" + req.session.appName + "'))  AS SIMUL_URL";
+            
+    dbConnect.getConnection(sql).then(pool => { 
+        return pool.request().query( getSimulUrlStr ) 
+    }).then(result => {
+        req.session.simul_url = result.recordset[0].SIMUL_URL;
+        res.send({status:200 , simul_url:req.session.simul_url});
+    }).catch(err => {
+        console.log(err);
+        sql.close();
+    });
+
 });
 
 module.exports = router;

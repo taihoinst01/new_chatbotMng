@@ -66,7 +66,8 @@ router.post('/selectUserList', function (req, res) {
                 "                            , (SELECT AUTHGRP_M_NM FROM TB_AUTHGRP_M WHERE AUTH_LEVEL = A.USER_AUTH) AS AUTH_NM \n" +
                 "                         FROM TB_USER_M A \n" +
                 "                         WHERE 1 = 1 \n" +
-                "					      AND A.USE_YN = 'Y' \n";
+                "                         AND USER_AUTH < 99 \n";
+                //"					      AND A.USE_YN = 'Y' \n";
 
             if (searchName) {
                 QueryStr += "					      AND A.EMP_NM like '%" + searchName + "%' \n";

@@ -92,6 +92,7 @@ function makeUserTable(newPage) {
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMAIL + '</td>'
+                    tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
                     tableHtml += '<td>' + s_auth_name + '</td>'
                     tableHtml += '<td><button type="button" class="btn btn-default btn-sm" id="update_authForm" user_id="' + data.rows[i].USER_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button></td></tr>'
                 }
@@ -105,7 +106,7 @@ function makeUserTable(newPage) {
                 $('#userTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                tableHtml += '<tr><td colspan="6">' + language.NO_DATA + '</td></tr>';
+                tableHtml += '<tr><td colspan="7">' + language.NO_DATA + '</td></tr>';
                 $('#userTableBodyId').html(tableHtml);
                 $('#appTableBodyId').html('');
             }

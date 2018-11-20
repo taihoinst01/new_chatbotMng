@@ -325,9 +325,9 @@ router.post('/saveUserInfo', function (req, res) {
 
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
-                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, USE_YN) " + 
+                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, USE_YN, USER_AUTH) " + 
                                "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y'); ";
+                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', '" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "','Y', 77); ";
                     
                 } else if (userArr[i].statusFlag === 'EDIT') {
                     updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";

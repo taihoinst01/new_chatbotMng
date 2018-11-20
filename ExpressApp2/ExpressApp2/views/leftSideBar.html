@@ -4,7 +4,7 @@
     <section class="sidebar">
         <input type="hidden" id="successHidden" value="<%= __('SUCCESS') %> " />
         <input type="hidden" id="failHidden" value="<%= __('FAIL') %> " />
-        <input type="hidden" id="simulURL" value="<%=simul_url%>" />
+        <input type="text" id="simulURL" value="<%=simul_url%>" />
                            <div class="sidebar-form"><%= __('CHATBOT') %> 
                             <%
                                 if(sAuth>=99) {
@@ -175,7 +175,7 @@
             <li class=" treeview">
                 <!--<li class="active treeview">-->
                 <a href="#">
-                    <i class="fa fa-tasks"></i> <span>챗봇관리</span>
+                    <i class="fa fa-tasks"></i> <span><%= __('CHATBOTMNG_TITLE') %></span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -187,7 +187,7 @@
                     <!--<li><a href="/autoCompleteMng/autoCompleteMng"><i class="fa fa-circle-o"></i> 자동완성 관리</a></li>-->
                     <li><a href="/templateMng/templateMng"><i class="fa fa-circle-o"></i>
                             <%= __('TEMPLATE_TITLE') %></a></li>
-                    <li><a href="/chatBotEnv/chatBotEnv"><i class="fa fa-circle-o"></i>챗봇 환경</a></li>
+                    <li><a href="/chatBotEnv/chatBotEnv"><i class="fa fa-circle-o"></i> <%= __('CHATBOT_ENV') %></a></li>
                     <li><a href="/historyMng/historyList"><i class="fa fa-circle-o"></i>
                         <%= __('LOG_TITLE') %></a></li>
                 </ul>

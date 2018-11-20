@@ -85,11 +85,13 @@ function makeUserTable(newPage) {
             if (data.rows) {
                 
                 var tableHtml = "";
+                var tableHtmlApp = "";
     
                 for (var i=0;i<data.rows.length;i++) { 
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].SEQ + '</td>';
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>'
+                    tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMAIL + '</td></tr>'
                 }
     
@@ -102,8 +104,10 @@ function makeUserTable(newPage) {
                 $('#userTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                $('#userTableBodyId').html('');
-                $('#appTableBodyId').html('');
+                tableHtml += '<tr><td colspan="5">' + language.NO_DATA + '</td></tr>';
+                tableHtmlApp += '<tr><td colspan="5">' + language.NO_DATA + '</td></tr>';
+                $('#userTableBodyId').html(tableHtml);
+                $('#appTableBodyId').html(tableHtmlApp);
             }
             
         }
