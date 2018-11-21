@@ -128,6 +128,7 @@ router.post('/intentScore', function (req, res) {
         res.send({list : rows, pageList : paging.pagination(currentPageNo,rows[0].TOTCNT)});
         sql.close();
     }).catch(err => {
+        console.log("INTENT error===="+err);
         res.status(500).send({ message: "${err}"})
         sql.close();
     });        
@@ -225,14 +226,17 @@ router.post('/getScorePanel', function (req, res) {
     if (selChannel !== 'all') {
         selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
     }
+    
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset
+          let rows = result.recordset;
+          console.log("getscore rows===="+rows.length);
           res.send({list : rows});
           sql.close();
         }).catch(err => {
+            console.log("getscore error===="+err);
           res.status(500).send({ message: "${err}"})
           sql.close();
         });
@@ -292,12 +296,12 @@ if (selChannel !== 'all') {
     selectQuery += "     ) AA\n";
     selectQuery += "WHERE RESULT <> '' AND RESULT IN ('H')\n";
     selectQuery += "ORDER BY 질문수 DESC; \n";
-    
+    console.log("getOftQuestion=="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset
+          let rows = result.recordset;
           res.send({list : rows});
           sql.close();
         }).catch(err => {
@@ -370,9 +374,16 @@ router.post('/nodeQuery', function (req, res) {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset
-          res.send({list : rows, pageList : paging.pagination(currentPage,rows[0].TOTCNT)});
+          var rowsCnt = rows.length;
+          if(rowsCnt > 0){
+            res.send({list : rows, pageList : paging.pagination(currentPage,rows[0].TOTCNT)});
+          }else{
+            res.send({ list: rows });
+          }
+
           sql.close();
         }).catch(err => {
+            console.log("NODE error===="+err);
           res.status(500).send({ message: "${err}"})
           sql.close();
         });
