@@ -192,10 +192,16 @@
                 </ul>
             </li>
 
+            <li class="treeview" id="synchronizeLuis">
+                <a href="/luis/synchronizeLuis">
+                    <i class="fa fa-window-restore"></i> <span><%= __('SYNCH') %></span>
+                </a>
+            </li>
             
 
             <a href="#" class="spmenu" id="trainBtnHidden" data-toggle="modal" data-target="#myModal" style="visibility: hidden;">
                 <%= __('TRAIN') %></a>
+
         </ul>
         <!--// left Menu-->
         <%
@@ -351,6 +357,28 @@
             var url = "/board";
             $(location).attr('href', url);
         });
+
+        
+        $('#synchronizeLuis').click(function () {
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ($(window).height() - height) / 2 + $(window).scrollTop();
+            left = ($(window).width() - width) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({ position: 'absolute' }).css({ left: left, top: top });
+            $("#loadingBar").css("display", "block");
+
+            var url = "/luis/synchronizeLuis";
+            $(location).attr('href', url);
+        });
+
 
         //simulataion url 아이디별로 구분.
         $('#simulBtn').click(function () {

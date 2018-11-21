@@ -8,46 +8,129 @@ var dbConnect = require('../../config/dbConnect');
 var paging = require('../../config/paging');
 var util = require('../../config/util');
 //var luisConfig = require('../../config/luisConfig');
+
+const syncClient = require('sync-rest-client');
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 /* GET users listing. */
 router.get('/', function (req, res) {
-    req.session.menu = 'm2';
-    //로그인체크
-    if (!req.session.sid) {
-        res.render( 'board_new' );   
-    }
-    if (typeof req.query.appName !== 'undefined') {
-        req.session.appName = req.query.appName;
-        //req.session.subKey = luisConfig.subKey;
+    
 
-        //챗봇에 속한 앱리스트 새션 저장
-        var selChatInfo = new Object();
-        var chatList = req.session.leftList;
-        var appList = req.session.ChatRelationAppList;
-        for (var kk=0; kk<chatList.length; kk++) {
-            if (req.query.appName == chatList[kk].CHATBOT_NAME) {
-                var tmpObj = new Object();
-                tmpObj.chatId = chatList[kk].CHATBOT_NUM;
-                tmpObj.chatName = chatList[kk].CHATBOT_NAME;
+    (async () => {
+        try { 
 
-                var tmpArr = [];    
-                for (var jj=0; jj<appList.length; jj++) {
-                    if (tmpObj.chatId == appList[jj].CHAT_ID) {
-                        tmpArr.push(appList[jj]);
+            var userId = req.session.sid;
+            req.session.menu = 'm2';
+            //로그인체크
+            if (!req.session.sid) {
+                res.render( 'board_new' );   
+            }
+            if (typeof req.query.appName !== 'undefined') {
+                req.session.appName = req.query.appName;
+                //req.session.subKey = luisConfig.subKey;
+
+                //챗봇에 속한 앱리스트 새션 저장
+                var selChatInfo = new Object();
+                var chatList = req.session.leftList;
+                var appList = req.session.ChatRelationAppList;
+                for (var kk=0; kk<chatList.length; kk++) {
+                    if (req.query.appName == chatList[kk].CHATBOT_NAME) {
+                        var tmpObj = new Object();
+                        tmpObj.chatId = chatList[kk].CHATBOT_NUM;
+                        tmpObj.chatName = chatList[kk].CHATBOT_NAME;
+
+                        var tmpArr = [];    
+                        for (var jj=0; jj<appList.length; jj++) {
+                            if (tmpObj.chatId == appList[jj].CHAT_ID) {
+                                tmpArr.push(appList[jj]);
+                            }
+                        }
+                        tmpObj.appList = tmpArr;
+                        selChatInfo.chatbot = tmpObj;
+                        //selAppList.push(tmpObj);
                     }
                 }
-                tmpObj.appList = tmpArr;
-                selChatInfo.chatbot = tmpObj;
-                //selAppList.push(tmpObj);
+                
+                req.session.selChatAppLength = selChatInfo.chatbot.appList.length;
+                req.session.selChatInfo = selChatInfo;
             }
-        }
-        
-        req.session.selChatAppLength = selChatInfo.chatbot.appList.length;
-        req.session.selChatInfo = selChatInfo;
-    }
+            
 
-    res.redirect('/luis/synchronizeLuis');
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'db Intent 조회 시작');
+            
+            let getDBIntent_result = await pool.request()
+                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT");   
+            var sessionIntentList = getDBIntent_result.recordset;
+            req.session.intentList = sessionIntentList;
+            
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'intent 조회 완료, db Entity 조회 시작');
+            let getDBEntity_result = await pool.request()
+                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, ENTITY_TYPE, MOD_DT FROM TBL_LUIS_ENTITY");     
+            var sessionEntityList = getDBEntity_result.recordset;            
+            req.session.entityList = sessionEntityList;
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'entity 조회 완료, db child entity 조회 시작');
+            let getDBEntityChild_result = await pool.request()
+                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY");      
+            var sessionEntityChildList = getDBEntityChild_result.recordset;           
+            req.session.entityChildList = sessionEntityChildList;
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', ' db child entity 조회 완료');
+
+
+            //어터런스 cnt 
+            //https://westus.api.cognitive.microsoft.com/luis/webapi/v2.0/apps/0a66734d-690a-4877-9b4c-28ada8098751/versions/0.1/stats/labelsperintent
+
+            
+            var options = {
+                headers: {
+                    'Content-Type': 'application/json'
+                    //,'Ocp-Apim-Subscription-Key': subKey
+                }
+            };
+            var HOST = req.session.hostURL;
+            var subKey = req.session.subKey;
+            options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+
+            var utterCntObj;
+            var saveAppId = '';
+            var intentList = req.session.intentList;
+            for (var iu=0; iu<intentList.length; iu++) {
+                if (saveAppId != intentList[iu].APP_ID) {
+                    saveAppId = intentList[iu].APP_ID;
+                    utterCntObj = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + saveAppId + '/versions/0.1/stats/labelsperintent', options);
+                }
+                
+                for( var key in utterCntObj.body ) {
+                    //console.log( key + '=>' + utterCntObj.body[key] );
+                    if (key == intentList[iu].INTENT_ID) {
+                        intentList[iu].UTTER_COUNT = utterCntObj.body[key];
+                        break;
+                    }
+                }
+                if (typeof intentList[iu].UTTER_COUNT=='undefined') {
+                    intentList[iu].UTTER_COUNT = 0;
+                }
+                //intentList[iu].UTTER_CNT = utterCntObj.body.intentList[iu].INTENT_ID;
+            }
+            
+            //res.redirect('/luis/synchronizeLuis');
+            res.redirect('/board/dashBoard');
+
+
+        } catch (err) {
+            logger.info('[오류]동기화  [id : %s] [url : %s] [error : %s]', userId, '/board', err);
+            res.render('error');
+        } finally {
+            sql.close();
+        }
+    })()
 });
 
 router.get('/dashBoard', function (req, res) {
