@@ -72,7 +72,7 @@ router.get('/', function (req, res) {
             
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'intent 조회 완료, db Entity 조회 시작');
             let getDBEntity_result = await pool.request()
-                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY");     
+                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, ENTITY_TYPE, MOD_DT FROM TBL_LUIS_ENTITY");     
             var sessionEntityList = getDBEntity_result.recordset;            
             req.session.entityList = sessionEntityList;
 
