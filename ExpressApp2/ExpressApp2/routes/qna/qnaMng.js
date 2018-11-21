@@ -271,7 +271,7 @@ router.post('/updateDialog', function (req, res) {
         }
 
     } else {
-        console.log("data is object======");
+        console.log("data is object======qna");
 
         //array = JSON.parse(data);
 
@@ -313,8 +313,8 @@ router.post('/updateDialog', function (req, res) {
                 '(@dlgId,@dialogTitle,@dialogDesc,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
-            var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN) VALUES ' +
-                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\')';
+            var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
+                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
             var insertTblDlgMedia = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_DIVISION,CARD_VALUE,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardDivision,@cardValue,\'Y\')';
             var insertTblRelation = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, DLG_QUESTION, ST_FLAG) "
@@ -334,15 +334,7 @@ router.post('/updateDialog', function (req, res) {
                 .query(selDlgQuery);
 
             let selDlg = selDlgRes.recordset;
-/*
-            let selDlgGroupS = await pool.request()
-                .input('groupS', sql.NVarChar, selDlg[0].GROUPS)
-                .query(selDlgGroupSQuery);
 
-            for (var gNum = 0; gNum < selDlgGroupS.recordset.length; gNum++) {
-                order.push(selDlgGroupS.recordset[gNum].DLG_ID);
-            }
-*/
             //selDlg[0].DLG_ID
             //tbl_dlg 삭제
             let delDlg = await pool.request()
@@ -404,6 +396,7 @@ router.post('/updateDialog', function (req, res) {
                             .input('dialogTitle', sql.NVarChar, carTmp["dialogTitle"])
                             .input('dialogText', sql.NVarChar, carTmp["dialogText"])
                             .input('imgUrl', sql.NVarChar, carTmp["imgUrl"])
+                            .input('cardValue', sql.NVarChar, carTmp["cardValue"])
                             .input('btn1Type', sql.NVarChar, carTmp["btn1Type"])
                             .input('buttonName1', sql.NVarChar, carTmp["cButtonName1"])
                             .input('buttonContent1', sql.NVarChar, carTmp["cButtonContent1"])

@@ -2435,57 +2435,26 @@ router.post('/addDialog', function (req, res) {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
-            //var selectTextDlgId = 'SELECT ISNULL(MAX(TEXT_DLG_ID)+1,1) AS TYPE_DLG_ID FROM TBL_DLG_TEXT';
-            //var selectCarouselDlgId = 'SELECT ISNULL(MAX(CARD_DLG_ID)+1,1) AS TYPE_DLG_ID FROM TBL_DLG_CARD';
-            //var selectMediaDlgId = 'SELECT ISNULL(MAX(MEDIA_DLG_ID)+1,1) AS TYPE_DLG_ID FROM TBL_DLG_MEDIA';
-            //var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
-            //'(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @middleGroup, 2)';
             var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
                 '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, 2)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
-            var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN) VALUES ' +
-                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\')';
-            //var insertTblDlgMedia = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_VALUE,USE_YN) VALUES ' +
-            //'(@dlgId,@dialogTitle,@dialogText,@mediaImgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardValue,\'Y\')';
+            var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
+                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
             var insertTblDlgMedia = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_DIVISION,CARD_VALUE,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,@mediaImgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardDivision,@cardValue,\'Y\')';
 
             var largeGroup = array[array.length - 1]["largeGroup"];
             var middleGroup = array[array.length - 1]["middleGroup"];
             var description = array[array.length - 1]["description"];
-            //var sourceType = array[array.length - 1]["sourceType"];
             var predictIntent = array[array.length - 1]["predictIntent"];
-            /*
-            var predictIntent_ = array[array.length - 1]["predictIntent"];
-            var temp = predictIntent_.split("::");
-            var predictIntent;
-            if(temp.length==0){
-                predictIntent = array[array.length - 1]["predictIntent"];
-            }else{
-                predictIntent = temp[0];
-            }
-           */
 
             for (var i = 0; i < (array.length - 1); i++) {
 
                 let result1 = await pool.request()
                     .query(selectDlgId)
                 let dlgId = result1.recordset;
-                /*
-                for(var j = 0 ; j < (typeof luisEntities ==="string" ? 1:luisEntities.length); j++) {
-                    let result2 = await pool.request()
-                    .input('dlgId', sql.Int, dlgId[0].DLG_ID)
-                    .input('dialogText', sql.NVarChar, description)
-                    .input('dlgType', sql.NVarChar, array[i]["dlgType"])
-                    .input('dialogOrderNo', sql.Int, (i+1))
-                    .input('luisId', sql.NVarChar, luisId)
-                    .input('luisIntent', sql.NVarChar, luisIntent)
-                    .input('luisEntities', sql.NVarChar, (typeof luisEntities ==="string" ? luisEntities:luisEntities[j]))
-                    .query(insertTblDlg);
-                }
-                */
-
+                
                 let result2 = await pool.request()
                     .input('dlgId', sql.Int, dlgId[0].DLG_ID)
                     .input('dialogText', sql.NVarChar, (description.trim() == '' ? null : description.trim()))
@@ -2513,17 +2482,6 @@ router.post('/addDialog', function (req, res) {
                         .query(inserTblDlgText);
 
                 } else if (array[i]["dlgType"] == "3") {
-                    /*
-                    let result2 = await pool.request()
-                    .input('dlgId', sql.Int, dlgId[0].DLG_ID)
-                    .input('dialogText', sql.NVarChar, description)
-                    .input('dlgType', sql.NVarChar, array[i]["dlgType"])
-                    .input('dialogOrderNo', sql.Int, (i+1))
-                    .input('luisId', sql.NVarChar, luisId)
-                    .input('luisIntent', sql.NVarChar, luisIntent)
-                    .input('luisEntities', sql.NVarChar, luisEntities)
-                    .query(insertTblDlg);
-                    */
 
                     for (var j = 0; j < array[i].carouselArr.length; j++) {
                         var carTmp = array[i].carouselArr[j];
@@ -2544,6 +2502,7 @@ router.post('/addDialog', function (req, res) {
                             .input('dialogTitle', sql.NVarChar, carTmp["dialogTitle"])
                             .input('dialogText', sql.NVarChar, carTmp["dialogText"])
                             .input('imgUrl', sql.NVarChar, carTmp["imgUrl"])
+                            .input('cardValue', sql.NVarChar, carTmp["cardValue"])
                             .input('btn1Type', sql.NVarChar, carTmp["btn1Type"])
                             .input('buttonName1', sql.NVarChar, carTmp["cButtonName1"])
                             .input('buttonContent1', sql.NVarChar, carTmp["cButtonContent1"])
@@ -2558,53 +2517,11 @@ router.post('/addDialog', function (req, res) {
                             .input('buttonContent4', sql.NVarChar, carTmp["cButtonContent4"])
                             .input('cardOrderNo', sql.Int, (j + 1))
                             .query(insertTblCarousel);
-                        /*
-                        let result2 = await pool.request()
-                        .input('dlgId', sql.Int, dlgId[0].DLG_ID)
-                        .input('dialogTitle', sql.NVarChar, (carTmp["dialogTitle"] == '' ? null : carTmp["dialogTitle"]))
-                        .input('dialogText', sql.NVarChar, carTmp["dialogText"])
-                        .input('imgUrl', sql.NVarChar, carTmp["imgUrl"])
-                        .input('btn1Type', sql.NVarChar, carTmp["btn1Type"])
-                        .input('buttonName1', sql.NVarChar, (carTmp["cButtonName1"] == '' ? null : carTmp["cButtonName1"]))
-                        .input('buttonContent1', sql.NVarChar, (carTmp["cButtonContent1"] == '' ? null : carTmp["cButtonContent1"]))
-                        .input('btn2Type', sql.NVarChar, carTmp["btn2Type"])
-                        .input('buttonName2', sql.NVarChar, (carTmp["cButtonName2"] == '' ? null : carTmp["cButtonName2"]))
-                        .input('buttonContent2', sql.NVarChar, (carTmp["cButtonContent2"] == '' ? null : carTmp["cButtonContent2"]))
-                        .input('btn3Type', sql.NVarChar, (carTmp["btn3Type"] == '' ? null : carTmp["btn3Type"]))
-                        .input('buttonName3', sql.NVarChar, (carTmp["cButtonName3"] == '' ? null : carTmp["cButtonName3"]))
-                        .input('buttonContent3', sql.NVarChar, carTmp["cButtonContent3"])
-                        .input('btn4Type', sql.NVarChar, carTmp["btn4Type"])
-                        .input('buttonName4', sql.NVarChar, (carTmp["cButtonName4"] == '' ? null : carTmp["cButtonName4"]))
-                        .input('buttonContent4', sql.NVarChar, (carTmp["cButtonContent4"] == '' ? null : carTmp["cButtonContent4"]))
-                        .input('cardOrderNo', sql.Int, (j+1))
-                        .query(insertTblCarousel);
-                        */
-
                     }
 
                     tblDlgId.push(dlgId[0].DLG_ID);
 
                 } else if (array[i]["dlgType"] == "4") {
-                    /*
-                    let result1 = await pool.request()
-                    .query(selectDlgId)
-                    let dlgId = result1.recordset;
-
-                    let result2 = await pool.request()
-                    .input('dlgId', sql.Int, dlgId[0].DLG_ID)
-                    .input('dialogText', sql.NVarChar, description)
-                    .input('dlgType', sql.NVarChar, array[i]["dlgType"])
-                    .input('dialogOrderNo', sql.Int, (i+1))
-                    .input('luisId', sql.NVarChar, luisId)
-                    .input('luisIntent', sql.NVarChar, luisIntent)
-                    .input('luisEntities', sql.NVarChar, luisEntities)
-                    .query(insertTblDlg)
-
-                    let result3 = await pool.request()
-                    .query(selectMediaDlgId)
-                    let mediaDlgId = result3.recordset;
-                    */
-
                     // 공백은 Null 처리
                     for (var key in array[i]) {
                         //console.log("카드 key : " + key + " value : " + array[i]);
@@ -2650,33 +2567,6 @@ router.post('/addDialog', function (req, res) {
                 }
 
                 tblDlgId.push(dlgId[0].DLG_ID);
-                /*
-               *luis insert-utterance / intent
-               * 20180329 Jun Hyoung Park
-               
-                var endPoint = HOST + "/luis/api/v2.0/apps/";
-                var appId;
-                let pool1 = await dbConnect.getConnection(sql);
-                //let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-                let selectAppId = await pool1.request()
-                    .query(selectAppIdQuery);
-
-                for (var i = 0; i < selectAppId.recordset.length; i++) {
-                    appId = selectAppId.recordset[i].APP_ID;
-                }
-
-                var options = {
-                    headers: {
-                        'Ocp-Apim-Subscription-Key': req.session.subsKey
-                    }
-                };
-
-                options.payload = {
-                    "name": predictIntent
-                };
-                var luisIntentsRequest = syncClient.post(endPoint + appId + '/versions/0.1/intents', options);//make intent
-                /************************************************** */
-
             }
 
             res.send({ list: tblDlgId });

@@ -685,16 +685,19 @@ router.post('/selectChatAppList', function (req, res) {
 
             if (rows2.length > 0) {
                 for(var i = 0; i < rows2.length; i++){
-                    for (var j=0; j < recordList.length; j++) {
-                        if (rows2[i].APP_ID.trim() === recordList[j].APP_ID.trim()) {
-                            var item = {};
-                            rows2[i].APP_ID = rows2[i].APP_ID.trim();
-                            item = rows2[i];
-                            checkedApp.push(item);
-                            break;
+                    if(rows2[i].APP_ID==null){
+                        //nothing
+                    }else{
+                        for (var j=0; j < recordList.length; j++) {
+                            if (rows2[i].APP_ID.trim() === recordList[j].APP_ID.trim()) {
+                                var item = {};
+                                rows2[i].APP_ID = rows2[i].APP_ID.trim();
+                                item = rows2[i];
+                                checkedApp.push(item);
+                                break;
+                            }
                         }
                     }
-                    
                 }
             } else {
 
@@ -727,12 +730,13 @@ router.post('/updateChatAppList', function (req, res) {
     let removeData = JSON.parse(checkNull(req.body.removeData, ''));
     var saveDataStr = "";
     var removeDataStr = "";
+    var nullDeleteStr = "";
+    var nullDeleteCnt = 0;
 
     for (var i=0; i<saveData.length; i++) {
         saveDataStr += "INSERT INTO TBL_CHAT_RELATION_APP(CHAT_ID, APP_ID) " +
                     "     VALUES (" + chatId + ", '" + saveData[i] + "'); \n";    
-        
-        //saveDataStr += "UPDATE TBL_LUIS_APP SET CHATBOT_ID = " + chatId + " WHERE APP_ID = '" + saveData[i] + "'; \n";  
+        nullDeleteCnt++;
     }
     
     for (var i=0; i<removeData.length; i++) {
@@ -743,7 +747,7 @@ router.post('/updateChatAppList', function (req, res) {
         
         //removeDataStr += " UPDATE TBL_LUIS_APP SET CHATBOT_ID = NULL WHERE APP_ID = '" + removeData[i].APP_ID.trim() + "'; \n" ;
     }
-                        
+    nullDeleteStr += "DELETE FROM TBL_CHAT_RELATION_APP WHERE APP_ID IS NULL; \n" ;                   
                    
     (async () => {
         try {
@@ -754,6 +758,11 @@ router.post('/updateChatAppList', function (req, res) {
             
             if (removeData.length > 0) {
                 let userAppList = await pool.request().query(removeDataStr);
+            }
+
+            if (nullDeleteCnt > 0) {
+                nullDeleteCnt = 0;
+                let nullDelete = await pool.request().query(nullDeleteStr);
             }
 
             res.send({status:200 , message:'Update Success'});

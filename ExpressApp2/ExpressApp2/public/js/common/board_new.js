@@ -413,6 +413,12 @@ function getScorePanel() {
             $('#avgCorrectAnswer').text((CORRECT_QRY.length > 4 ? CORRECT_QRY.substr(0, 4) : CORRECT_QRY) + '%');
             $('#avgReply').text(scores.SEARCH_AVG + '%');
             $('#maxQueryCnt').text(scores.MAX_QRY);
+        },
+        error : function() {   // 오류가 발생했을 때 호출된다. 
+            console.log("error");
+        },
+        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
+            
         }
     })
 }
@@ -592,6 +598,12 @@ function drawNoneQuerytable(page) {
                 $('#noneQueryDivTablePaging .pagination').html('').append(data.pageList);
 
             }
+        },
+        error : function() {   // 오류가 발생했을 때 호출된다. 
+            console.log("error");
+        },
+        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
+            
         }
     });
 }
@@ -665,6 +677,12 @@ function drawfirstQuerytable(page) {
                 $('#fistQueryTablePaging .pagination').html('').append(data.pageList);
 
             }
+        },
+        error : function() {   // 오류가 발생했을 때 호출된다. 
+            console.log("error");
+        },
+        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
+            
         }
     });
 }

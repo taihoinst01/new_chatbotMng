@@ -177,7 +177,6 @@ $(document).ready(function () {
 
     // 다이얼로그 생성 모달 (다이얼로그 타입변경)
     $(document).on('change', 'select[name=dlgType]', function (e) {
-
         addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
             '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
             '</div>';
@@ -186,6 +185,10 @@ $(document).ready(function () {
             '<div class="form-group">' +
             '<label>' + language.IMAGE_URL + '</label>' +
             '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
+            '</div>' +
+            '<div class="form-group form-inline">' +
+            '<label>Card_Mobile</label>' +
+            '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
             '</div>' +
             '<div class="modal_con btnInsertDiv">' +
             '</div>' +
@@ -321,12 +324,14 @@ $(document).ready(function () {
         }
         
         //dyyoo change이벤트 후 미리보기 적용. keycode:17 - ctrl한번 누르기
+        /*
         var e = jQuery.Event( "keyup", { keyCode: 17 } ); 
         $("input[name=dialogTitle]").trigger(e);
         //$("input[name=dialogText]").trigger(e);
         $("textarea[name=dialogText]").trigger(e);
         $("input[name=imgUrl]").trigger(e);
         $("input[name=mediaUrl]").trigger(e);
+        */
     });
 
     //다이얼로그 생성 - 닫는 버튼
@@ -474,9 +479,9 @@ $(document).ready(function () {
     });
 
     //largeGroupSelect
-    getGroupSeelectBox();
+    //getGroupSeelectBox();
 });
-
+/*
 function getGroupSeelectBox() {
     $.ajax({
         type: 'POST',
@@ -505,7 +510,7 @@ function getGroupSeelectBox() {
         }
     });
 }
-
+*/
 
 //다이얼로그 생성 유효성 검사
 function dialogValidation(type) {
@@ -551,18 +556,20 @@ function writeCarouselImg(e) {
 // 다이얼로그 생성 모달 (다이얼로그 내용 입력)
 function writeDialog(e) {
     //var idx = $('textarea[name=dialogText]').index(e);
-
     var idx = $('#commonLayout .insertForm').index($(e).parents('.insertForm'));
     var icx = $('#commonLayout').find('.insertForm').index($(e).parents('.insertForm'));
     //var jcx = $(e).parents('.insertForm').find('input[name=dialogTitle]').index(e);
-
     if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 3) {
         //var jcx = $(e).parents('.insertForm').find('input[name=dialogText]').index(e);
         var jcx = $(e).parents('.insertForm').find('textarea[name=dialogText]').index(e);
         if ($(e).parent().prev().find('input[name=dialogTitle]').val() == '') {
             $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('h1').text('');
         }
-        $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('p').text(e.value);
+        var test = e.value;
+        test = test.replace(/(?:\r\n|\r|\n)/g, '\n');
+        var obj = $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('p').text(test);
+        obj.html(obj.html().replace(/\n/g,'<br/>'));
+        //$('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('p').text(e.value);
 
 
     } else if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 4) {
@@ -728,6 +735,10 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '<div class="form-group">' +
         '<label>' + language.IMAGE_URL + '</label>' +
         '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
+        '</div>' +
+        '<div class="form-group form-inline">' +
+        '<label>Card_Mobile</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
         '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
@@ -1431,6 +1442,10 @@ function openModalBox(target) {
         '<label>' + language.IMAGE_URL + '</label>' +
         '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
         '</div>' +
+        '<div class="form-group form-inline">' +
+        '<label>Card_Mobile</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
+        '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
         '<div class="clear-both"></div>' +
@@ -1595,6 +1610,10 @@ function searchDialog(dlgID) {
         '<div class="form-group">' +
         '<label>' + language.IMAGE_URL + '</label>' +
         '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
+        '</div>' +
+        '<div class="form-group form-inline">' +
+        '<label>Card_Mobile</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
         '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
@@ -1796,7 +1815,7 @@ function searchDialog(dlgID) {
                             if (tmp.dlg[j].CARD_TEXT != null) {
 
                                 //inputUttrHtml += '<p class="carousel" style="height:20px;min-height:20px;">' + /*cardtext*/ tmp.dlg[j].CARD_TEXT + '</p>';
-                                inputUttrHtml += '<p class="carousel" style="height:20px;min-height:20px;">' + /*cardtext*/ cardTextHtml + '</p>';
+                                inputUttrHtml += '<p class="carousel">' + /*cardtext*/ cardTextHtml + '</p>';
                             }
                             if (tmp.dlg[j].BTN_1_TITLE != null) {
                                 inputUttrHtml += '<ul class="wc-card-buttons"><li><button>' + /*btntitle*/ tmp.dlg[j].BTN_1_TITLE + '</button></li></ul>';
@@ -1834,8 +1853,10 @@ function searchDialog(dlgID) {
 
                             $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
                             //$("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
-                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=imgUrl]").val(tmp.dlg[j].IMG_URL);
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardValue]").val(tmp.dlg[j].CARD_VALUE).prop("selected", true);
 
                             if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find(".btnInsertDiv").append(inputHtml);
