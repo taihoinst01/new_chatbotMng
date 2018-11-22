@@ -14,8 +14,6 @@ var language;
 $(document).ready(function() {
     //다이얼로그생성모달 버튼Add From
     $('#addDialogBtn').click(function (e) {
-        //$(".insertForm:eq(0)").clone(true).appendTo(".copyForm");
-        //$(".copyForm textarea[name=dialogText]:last").val('');
 
         var insertForm = '';
         insertForm += '<hr>';
@@ -40,7 +38,6 @@ $(document).ready(function() {
         insertForm += '</div>';
         insertForm += '<div class="form-group">';
         insertForm += '<label>' + language.DIALOG_BOX_CONTENTS + '<span class="nec_ico">*</span></label>';
-        //insertForm += '<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' ">';
         insertForm += '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>';
         insertForm += '</div>';
         insertForm += '</div>';
@@ -52,7 +49,6 @@ $(document).ready(function() {
         insertForm += '</div>';
 
         $(".insertForm:last").after(insertForm);
-        //$(".insertFormWrap").append(insertForm);
         var dialogView = '';
         dialogView += '<div class="dialogView" >';
         dialogView += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
@@ -118,7 +114,11 @@ $(document).ready(function() {
                 '</tr>'
             $(this).parent().prev().find('tbody').append(inputTrHtml);
         } else {
-            alert(language.Up_to_4_buttons_can_be_added);
+            //alert(language.Up_to_4_buttons_can_be_added);
+            $('#proc_content').html(language.Up_to_4_buttons_can_be_added);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#procDialog').modal('show');
+            return;
         }
 
     });
@@ -135,8 +135,8 @@ $(document).ready(function() {
             '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
             '</div>' +
             '<div class="form-group form-inline">' +
-            '<label>Card_Mobile</label>' +
-            '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
+            '<label>' + language.CARD_MOBILE + '</label>' +
+            '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">' + language.CARDMOBIBLE_NO + '</option><option value="m^^">' + language.CARDMOBIBLE_OK + '</option></select>' +
             '</div>' +
             '<div class="modal_con btnInsertDiv">' +
             '</div>' +
@@ -180,16 +180,12 @@ $(document).ready(function() {
         if ($(e.target).val() == "2") {
 
         } else if ($(e.target).val() == "3") {
-            //var $clone = $('.carouselLayout').clone();  <div id="carouselLayout" style="display: block;">[object Object]</div>
-            //var caraousHtml = '<div class="carouselLayout" style="display: block;">' +  + '</div>'
             $('.insertForm:eq(' + idx + ') form .deleteInsertFormDiv').before(addCarouselForm);
             $('.insertForm:eq(' + idx + ') form').find('.addCarouselBtnDiv').before(carouselForm);
             $('.insertForm:eq(' + idx + ') .carouselLayout').css('display', 'block');
             $('.insertForm:eq(' + idx + ') .carouselLayout').find('.addCarouselBtn:last').closest('div').css('display', 'inline-block');
         } else if ($(e.target).val() == "4") {
-            //var mediaForm = '<div id="mediaLayout" style="display: block;">' + $mediaForm.html() + '</div>'
             $('.insertForm:eq(' + idx + ') form .deleteInsertFormDiv').before('<div class="mediaLayout" style="display:none;">' + mediaForm + '</div>');
-            //$('.insertForm:eq(' + idx + ') form').append('<div class="mediaLayout" style="display:none;">' + mediaForm + '</div>') ;
             $('.insertForm:eq(' + idx + ') .mediaLayout').css('display', 'block');
             $('.insertForm:eq(' + idx + ') .mediaLayout').find('.addMediaBtn:last').closest('div').css('display', 'inline-block');
         }
@@ -342,7 +338,6 @@ $(document).ready(function() {
 
         $('#appInsertDes').val('');
         $("#intentList option:eq(0)").attr("selected", "selected");
-        //$('#intentList').find('option:first').attr('selected', 'selected');
         initMordal('intentList', 'Select Intent');
         initMordal('entityList', 'Select Entity');
         $('#dlgLang').find('option:first').attr('selected', 'selected');
@@ -445,17 +440,14 @@ function dialogValidation(type) {
 // 다이얼로그 생성 모달 (다이얼로그 타이틀 입력)
 function writeDialogTitle(e) {
 
-    //var idx = $('input[name=dialogTitle]').index(e);
     var idx = $('#commonLayout .insertForm').index($(e).parents('.insertForm'));
     var icx = $('#commonLayout').find('.insertForm').index($(e).parents('.insertForm'));
     var jcx = $(e).parents('.insertForm').find('input[name=dialogTitle]').index(e);
 
     if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 3) {
-        //$('.dialogView:eq(' + idx + ') .carousel').html(e.value);
         $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('h1').text(e.value);
     } else if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 4) {
         $('.dialogView').children().eq(icx).find('h1').html(e.value);
-        //$('.dialogView h1').eq(idx).html(e.value);
     } else {
         $('.dialogView').children().eq(icx).find('.textMent .textTitle').html(e.value);
     }
@@ -470,12 +462,9 @@ function writeCarouselImg(e) {
 
 // 다이얼로그 생성 모달 (다이얼로그 내용 입력)
 function writeDialog(e) {
-    //var idx = $('textarea[name=dialogText]').index(e);
     var idx = $('#commonLayout .insertForm').index($(e).parents('.insertForm'));
     var icx = $('#commonLayout').find('.insertForm').index($(e).parents('.insertForm'));
-    //var jcx = $(e).parents('.insertForm').find('input[name=dialogTitle]').index(e);
     if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 3) {
-        //var jcx = $(e).parents('.insertForm').find('input[name=dialogText]').index(e);
         var jcx = $(e).parents('.insertForm').find('textarea[name=dialogText]').index(e);
         if ($(e).parent().prev().find('input[name=dialogTitle]').val() == '') {
             $('.dialogView').children().eq(icx).find('ul:eq(0)').children().eq(jcx).find('h1').text('');
@@ -490,8 +479,6 @@ function writeDialog(e) {
     } else if ($(e).parents('.insertForm').find('select[name=dlgType]').val() == 4) {
         $('.dialogView h1').eq(idx).text(e.value);
     } else {
-        //$('.dialogView .textMent p:eq(' + idx + ')').html(e.value);
-        //$('.dialogView').children().eq(icx).find('.textMent p:eq(' + idx + ')').html(e.value);
         if ($(e).parent().prev().find('input[name=dialogTitle]').val() == '') {
             $('.dialogView').children().eq(icx).find('.textMent .textTitle').text('');
         }
@@ -508,9 +495,14 @@ $(document).on('click', '.deleteInsertForm', function (e) {
 
     insertFormLength = $('.insertForm').length;
     if (insertFormLength == 1) {
-        $('#alertMsg').text(language.You_must_have_one_dialog_by_default);
-        $('#alertBtnModal').modal('show');
+        //$('#alertMsg').text(language.You_must_have_one_dialog_by_default);
+        //$('#alertBtnModal').modal('show');
         //alert(language.You_must_have_one_dialog_by_default);
+
+        $('#proc_content').html(language.You_must_have_one_dialog_by_default);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
+        return;
     } else {
         var idx = $(".deleteInsertForm").index(this);
         if (idx == 0) {
@@ -625,17 +617,19 @@ $(document).on('click', '.carouseBtn', function (e) {
             '</tr>'
         $(this).parent().prev().prev().prev().find('.cardCopyTbl tbody').append(inputTrHtml);
     } else {
-        alert("버튼은 4개까지 추가할 수 있습니다.");
+        //alert("버튼은 4개까지 추가할 수 있습니다.");
+        $('#proc_content').html(language.Up_to_4_buttons_can_be_added);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
+        return;
+        
     }
 
 });
 
 //다이얼로그생성모달 - 카드추가 복사본!!
 $(document).on('click', '.addCarouselBtn', function (e) {
-    //var $newInsertForm = $insertForm.clone();
-    //var $newDlgForm = $dlgForm.clone();
-    //var $newCarouselForm = $carouselForm.clone();
-
+    
     dlgForm = '<div class="textLayout">' +
         '<div class="form-group">' +
         '<label>' + language.DIALOG_BOX_TITLE + '</label>' +
@@ -654,8 +648,8 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
         '</div>' +
         '<div class="form-group form-inline">' +
-        '<label>Card_Mobile</label>' +
-        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
+        '<label>' + language.CARD_MOBILE + '</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">' + language.CARDMOBIBLE_NO + '</option><option value="m^^">' + language.CARDMOBIBLE_OK + '</option></select>' +
         '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
@@ -670,23 +664,19 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>';
 
     if ($(this).parents('.insertForm').find('.carouselLayout').length == 10) {
-        alert(language.Up_to_10_cards_can_be_added);
+        //alert(language.Up_to_10_cards_can_be_added);
+        $('#proc_content').html(language.Up_to_10_cards_can_be_added);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+        $('#procDialog').modal('show');
+        return;
     } else {
         var idx = $(".addCarouselBtn:visible").index(this);
         var jdx = $('select[name=dlgType]').index(($(".addCarouselBtn:visible").eq(idx).parents('form[name=dialogLayout]').find('select[name=dlgType]')));
-        //$('.addCarouselBtn').eq(0).parent().parent().remove();
-        //$(this).parents('.insertForm').after( $newInsertForm);  
-        //<div id="textLayout" style="display: block;">  </div>
-        //var caraousHtml = '<div class="carouselLayout" style="display: block;">' + $carouselForm.html() + '</div>';
         var dlgFormHtml = '<div class="textLayout" style="display: block;">' + dlgForm + '</div>';
         $(this).parent().before('<div class="clear-both"></div>').before(dlgFormHtml).before(carouselForm);
-        //$(this).parents('form[name=dialogLayout] .deleteInsertFormDiv').before('<div class="clear-both"></div>').after(dlgFormHtml).append(carouselForm);
-        //$(this).parents('.insertForm').next().find('.clear-both').after($newDlgForm);
         var claerLen = $(this).parents('form[name=dialogLayout]').children('.clear-both').length - 1;
         $(this).parents('form[name=dialogLayout]').children('.clear-both').eq(claerLen).next().css('display', 'block');
         $(this).parents('form[name=dialogLayout]').children('.clear-both').eq(claerLen).next().next().css('display', 'block');
-        //$(this).parent().parent().remove();
-        //$(this).parent().css('display', 'none');
         $(this).parents('form[name=dialogLayout]').find('.addCarouselBtn:last').closest('div').css('display', 'inline-block');
 
         var inputUttrHtml = '<li class="wc-carousel-item">';
@@ -728,10 +718,17 @@ function updateDialog() {
     $('.insertForm textarea[name=dialogText]').each(function (index) {
         if ($(this).val().trim() === "") {
             //alert(language.You_must_enter_a_Dialog_Title);
+            /*
             $('#alertMsg').text(language.You_must_enter_a_Dialog_Title);
             $('#alertBtnModal').modal('show');
             exit = true;
             return false;
+*/
+            $('#proc_content').html(language.You_must_enter_a_Dialog_Title);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#procDialog').modal('show');
+            return;
+            
         }
     });
 
@@ -743,14 +740,19 @@ function updateDialog() {
     if (exit) return;
     $('.insertForm input[name=imgUrl]').each(function (index) {
         if ($(this).val().trim() === "") {
+            /*
             $('#alertMsg').text(language.ImageURL_must_be_entered);
             $('#alertBtnModal').modal('show');
-            //alert(language.ImageURL_must_be_entered);
             exit = true;
             return false;
+            */
+            $('#proc_content').html(language.ImageURL_must_be_entered);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#procDialog').modal('show');
+            return;
         }
     });
-    if (exit) return;
+    //if (exit) return;
 
 
     for (var i = 0; i < idx; i++) {
@@ -888,3 +890,433 @@ function deleteDialog() {
     });
 }
 
+var botChatNum4Desc = 1;
+//dlg 저장
+var dlgMap = new Object();
+$(document).on("click", "#show_dlg", function () {
+    var dlgID = $(this).attr("dlg_id");
+    var pageType = $(this).attr("page_type");
+
+    $insertForm = $('#commonLayout .insertForm').eq(0).clone();
+    $dlgForm = $('#commonLayout .textLayout').eq(0).clone();
+    $carouselForm = $('#commonLayout .carouselLayout').eq(0).clone();
+    $mediaForm = $('#commonLayout .mediaLayout').eq(0).clone();
+
+    if(pageType=="qna"){
+        var tr = $(this).parent().parent();
+        var td = tr.children();
+        var show_question = td.eq(1).text();
+        var show_intent = td.eq(2).text();
+    }
+
+    carouselForm = '<div class="carouselLayout">' +
+        '<div class="form-group">' +
+        '<label>' + language.IMAGE_URL + '</label>' +
+        '<input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="' + language.Please_enter + '">' +
+        '</div>' +
+        '<div class="form-group form-inline">' +
+        '<label>Card_Mobile</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
+        '</div>' +
+        '<div class="modal_con btnInsertDiv">' +
+        '</div>' +
+        '<div class="clear-both"></div>' +
+        '<div class="btn_wrap" style="clear:both" >' +
+        '<button type="button" class="btn btn-default deleteCard"><i class="fa fa-trash"></i> ' + language.DELETE_CARD + '</button>' +
+        '</div>' +
+        '<div class="btn_wrap" style="clear:both" >' +
+        '<button type="button" class="btn btn-default carouseBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
+        '</div>' +
+        '<div class="clear-both"></div>' +
+        '</div>';
+
+    addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
+        '<button type="button" class="btn btn-default addCarouselBtn"><i class="fa fa-plus"></i> ' + language.INSERT_MORE_CARDS + '</button>' +
+        '</div>';
+
+    mediaForm = '<div class="mediaLayout">' +
+        '<label>' + language.IMAGE_URL + '<span class="nec_ico">*</span></label>' +
+        '<input type="text" name="mediaImgUrl" class="form-control" placeholder="' + language.Please_enter + '">' +
+        '<div class="form-group">' +
+        '<label>' + language.MEDIA_URL + '</label>' +
+        '<input type="text" name="mediaUrl" class="form-control" placeholder="' + language.Please_enter + '">' +
+        '</div>' +
+        '<div class="modal_con btnInsertDiv">' +
+        '</div>' +
+        '<div class="btn_wrap" style="clear:both" >' +
+        '<button type="button" class="btn btn-default addMediaBtn" ><i class="fa fa-plus"></i> ' + language.INSERT_MORE_BUTTON + '</button>' +
+        '<div class="clear-both"></div>' +
+        '</div>';
+
+    dlgForm = '<div class="textLayout">' +
+        '<div class="form-group">' +
+        '<label>' + language.DIALOG_BOX_TITLE + '</label>' +
+        '<input type="text" name="dialogTitle" class="form-control" onkeyup="writeDialogTitle(this);" placeholder="' + language.Please_enter + '">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label>' + language.DIALOG_BOX_CONTENTS + '</label>' +
+        //'<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="' + language.Please_enter + '">' +
+        '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>' +
+        '</div>' +
+        '</div>';
+
+    deleteInsertForm = '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >' +
+        '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>' +
+        '</div>';
+
+    var inputHtml = '<div><label>' + language.BUTTON + '</label></div>' +
+        '<div class="form-group col-md-13"  style="padding-left:0; margin-top: 0px;">' +
+        '<table class="cardCopyTbl" style="width:100%">' +
+        '<col width="21%"><col width="1%"><col width="35%">' +
+        '<col width="1%"><col width="35%"><col width="1%"><col width="6%">' +
+        '<thead><tr>' +
+        '<th>' + language.Type + '</th><th></th><th>' + language.NAME + '</th>' +
+        '<th></th><th>' + language.CONTENTS + '</th><th></th><th></th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+        '<tr>' +
+        '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
+        '<option value="openURL">openURL</option></select></td>' +
+        '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
+        '</tr></tbody></table></div>';
+
+    var inputTrHtml = '<tr>' +
+        '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
+        '<option value="openURL">openURL</option></select></td>' +
+        '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
+        '</tr>';
+
+    var inputMHtml = '<label>' + language.BUTTON + '</label></div>' +
+        '<div class="form-group col-md-13"  style="padding-left:0; margin-top: 0px;">' +
+        '<table class="mediaCopyTbl" style="width:100%"><col width="21%">' +
+        '<col width="1%"><col width="35%"><col width="1%"><col width="35%"><col width="1%"><col width="6%">' +
+        '<thead><tr><th>' + language.Type + '</th><th></th>' +
+        '<th>' + language.NAME + '</th><th></th><th>' + language.CONTENTS + '</th>' +
+        '<th></th><th></th></tr></thead><tbody>' +
+        '<tr><td>' +
+        '<select class="form-control" name="btnType">' +
+        '<option value="imBack" selected>imBack</option>' +
+        '<option value="openURL">openURL</option>' +
+        '</select>' +
+        '</td><td></td>' +
+        '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '">' +
+        '</td><td></td><td>' +
+        '<input type="text" name="mButtonContent" class="form-control" placeholder="' + language.Please_enter + '">' +
+        '</td><td></td><td>' +
+        '<a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a>' +
+        '</td></tr></tbody></table></div></div></div>';
+
+    var inputMTrHtml = '<tr>' +
+        '<td>' +
+        '<select class="form-control" name="btnType">' +
+        '<option value="imBack" selected>imBack</option>' +
+        '<option value="openURL">openURL</option>' +
+        '</select>' +
+        '</td><td></td>' +
+        '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><input type="text" name="mButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
+        '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
+        '</tr>';
+
+    $.ajax({
+        url: '/qna/getDlgAjax',                //주소
+        dataType: 'json',                  //데이터 형식
+        type: 'POST',                      //전송 타입
+        data: { 'dlgID': dlgID },      //데이터를 json 형식, 객체형식으로 전송
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
+        success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            var inputUttrHtml = '';
+            if (result['list'].length == 0) {
+                inputUttrHtml += '<div style="display:table-cell;vertical-align:middle; height:400px; width:900px; text-align:center;">' +
+                    language.NO_DATA +
+                    '</div>';
+            } else {
+
+                var row = result['list'];
+
+                for (var i = 0; i < row.length; i++) {
+                    botChatNum4Desc++;
+                    var val = row[i];
+
+                    var tmp = val;//val[l];
+                    for (var j = 0; j < tmp.dlg.length; j++) {
+                        var cardTextHtml = tmp.dlg[j].CARD_TEXT;
+                        var dlgTextArea = tmp.dlg[j].CARD_TEXT;;
+                        cardTextHtml = cardTextHtml.replace(/\/n/gi,'</br>');
+                        dlgTextArea = dlgTextArea.replace(/\/n/gi,'\r\n');
+                        if (tmp.dlg[j].DLG_TYPE == 2) {
+
+                            inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                            inputUttrHtml += '<div class="wc-message-content">';
+                            inputUttrHtml += '<svg class="wc-message-callout"></svg>';
+                            inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
+                            inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            inputUttrHtml += '<h1 class="textTitle">' + tmp.dlg[j].CARD_TITLE + '</h1>';
+                            inputUttrHtml += '<div class="dlg_content">';
+                            //inputUttrHtml += tmp.dlg[j].CARD_TEXT;
+                            inputUttrHtml += cardTextHtml;
+                            inputUttrHtml += '</div>';
+                            inputUttrHtml += '</div></div></div></div></div>';
+
+                            $(".insertForm form").append(dlgForm);
+                            $(".insertForm form").append(deleteInsertForm);
+
+                            $("#dialogLayout").eq(j).find("select[name=dlgType]").val("2").prop("selected", true);
+                            $("#dialogLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
+                            //$("#dialogLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
+                            $(".insertForm .textLayout").css("display", "block");
+                        } else if (tmp.dlg[j].DLG_TYPE == 3) {
+
+                            if (j == 0) {
+                                inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                                inputUttrHtml += '<div class="wc-message-content">';
+                                inputUttrHtml += '<svg class="wc-message-callout"></svg>';
+                                inputUttrHtml += '<div class="wc-carousel slideBanner" style="width: 312px;">';
+                                inputUttrHtml += '<div>';
+                                inputUttrHtml += '<button class="scroll previous" id="prevBtn0" style="display: none;" onclick="prevBtn(0,this)">';
+                                inputUttrHtml += '<img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png">';
+                                inputUttrHtml += '</button>';
+                                inputUttrHtml += '<div class="wc-hscroll-outer" >';
+                                inputUttrHtml += '<div class="wc-hscroll slideDiv" style="margin-bottom: 0px;" class="content" id="slideDiv0">';
+                                inputUttrHtml += '<ul>';
+                                //inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            }
+                            inputUttrHtml += '<li class="wc-carousel-item">';
+                            inputUttrHtml += '<div class="wc-card hero">';
+                            inputUttrHtml += '<div class="wc-container imgContainer" >';
+                            inputUttrHtml += '<img src="' + tmp.dlg[j].IMG_URL + '">';
+                            inputUttrHtml += '</div>';
+                            if (tmp.dlg[j].CARD_TITLE != null) {
+                                inputUttrHtml += '<h1>' + /*cardtitle*/ tmp.dlg[j].CARD_TITLE + '</h1>';
+                            }
+                            if (tmp.dlg[j].CARD_TEXT != null) {
+
+                                //inputUttrHtml += '<p class="carousel" style="height:20px;min-height:20px;">' + /*cardtext*/ tmp.dlg[j].CARD_TEXT + '</p>';
+                                inputUttrHtml += '<p class="carousel">' + /*cardtext*/ cardTextHtml + '</p>';
+                            }
+                            if (tmp.dlg[j].BTN_1_TITLE != null) {
+                                inputUttrHtml += '<ul class="wc-card-buttons"><li><button>' + /*btntitle*/ tmp.dlg[j].BTN_1_TITLE + '</button></li></ul>';
+                            }
+                            inputUttrHtml += '</div>';
+                            inputUttrHtml += '</li>';
+
+                            //다이얼로그가 한개일때에는 오른쪽 버튼 x
+                            if ((tmp.dlg.length - 1) == j) {
+                                inputUttrHtml += '</ul>';
+                                inputUttrHtml += '</div>';
+                                inputUttrHtml += '</div>';
+                                if ((tmp.dlg.length) > 2) {
+                                    inputUttrHtml += '<button class="scroll next" style="display: block; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                } else {
+                                    inputUttrHtml += '<button class="scroll next" style="display: none; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                }
+                                inputUttrHtml += '</div></div></div></div>';
+                            }
+
+                            if (j != 0) {
+                                $(".insertForm form").append('<div class="clear-both"></div>');
+                            }
+                            $(".insertForm form").append(dlgForm);
+                            $(".insertForm form").append(carouselForm);
+
+                            if ((tmp.dlg.length - 1) == j) {
+                                $("#dialogLayout").find(".carouselLayout").eq(j).after(addCarouselForm);
+                                $("#dialogLayout").find(".addCarouselBtnDiv").after(deleteInsertForm);
+                            }
+
+                            $("#dialogLayout").eq(j).find("select[name=dlgType]").val("3").prop("selected", true);
+                            $("#dialogLayout").find(".textLayout").eq(j).css("display", "block");
+                            $("#dialogLayout").find(".carouselLayout").eq(j).css("display", "block");
+
+                            $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=imgUrl]").val(tmp.dlg[j].IMG_URL);
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardValue]").val(tmp.dlg[j].CARD_VALUE).prop("selected", true);
+
+                            if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find(".btnInsertDiv").append(inputHtml);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(0)").val(tmp.dlg[j].BTN_1_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonName]:eq(0)").val(tmp.dlg[j].BTN_1_TITLE);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(0)").val(tmp.dlg[j].BTN_1_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_2_TYPE != null && tmp.dlg[j].BTN_2_TYPE != "") {
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find(".cardCopyTbl tbody").append(inputTrHtml);
+
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(1)").val(tmp.dlg[j].BTN_2_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonName]:eq(1)").val(tmp.dlg[j].BTN_2_TITLE);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(1)").val(tmp.dlg[j].BTN_2_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_3_TYPE != null && tmp.dlg[j].BTN_3_TYPE != "") {
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find(".cardCopyTbl tbody").append(inputTrHtml);
+
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(2)").val(tmp.dlg[j].BTN_3_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonName]:eq(2)").val(tmp.dlg[j].BTN_3_TITLE);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(2)").val(tmp.dlg[j].BTN_3_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_4_TYPE != null && tmp.dlg[j].BTN_4_TYPE != "") {
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find(".cardCopyTbl tbody").append(inputTrHtml);
+
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(3)").val(tmp.dlg[j].BTN_4_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonName]:eq(3)").val(tmp.dlg[j].BTN_4_TITLE);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(3)").val(tmp.dlg[j].BTN_4_CONTEXT);
+                            }
+                        } else if (tmp.dlg[j].DLG_TYPE == 4) {
+                            inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                            inputUttrHtml += '<div class="wc-message-content">';
+                            inputUttrHtml += '<svg class="wc-message-callout"></svg>';
+                            inputUttrHtml += '<div>';
+                            inputUttrHtml += '<div class="wc-carousel">';
+                            inputUttrHtml += '<div>';
+                            inputUttrHtml += '<button class="scroll previous" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png"></button>';
+                            inputUttrHtml += '<div class="wc-hscroll-outer">';
+                            inputUttrHtml += '<div class="wc-hscroll" style="margin-bottom: 0px;">';
+                            inputUttrHtml += '<ul style="min-width:0px">';
+                            inputUttrHtml += '<li class="wc-carousel-item wc-carousel-play">';
+                            inputUttrHtml += '<div class="wc-card hero" style="width:70%">';
+                            inputUttrHtml += '<div class="wc-card-div imgContainer">';
+                            inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
+                            inputUttrHtml += '<img src="' + /* 이미지 url */ tmp.dlg[j].MEDIA_URL + '">';
+                            inputUttrHtml += '<div class="playImg"></div>';
+                            inputUttrHtml += '<div class="hidden" alt="' + tmp.dlg[j].CARD_TITLE + '"></div>';
+                            inputUttrHtml += '<div class="hidden" alt="' + /* media url */ tmp.dlg[j].CARD_VALUE + '"></div>';
+                            inputUttrHtml += '</div>';
+                            inputUttrHtml += '<h1>' + /* title */ tmp.dlg[j].CARD_TITLE + '</h1>';
+                            inputUttrHtml += '<ul class="wc-card-buttons">';
+                            inputUttrHtml += '</ul>';
+                            inputUttrHtml += '</div>';
+                            inputUttrHtml += '</li></ul></div></div>';
+                            inputUttrHtml += '<button class="scroll next" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                            inputUttrHtml += '</div></div></div></div></div>';
+
+                            $(".insertForm form").append(dlgForm);
+                            $(".insertForm form").append(mediaForm);
+                            $("#dialogLayout .mediaLayout").after(deleteInsertForm);
+                            $("#dialogLayout").eq(j).find("select[name=dlgType]").val("4").prop("selected", true);
+                            $("#dialogLayout").find(".textLayout").eq(j).css("display", "block");
+                            $("#dialogLayout").find(".mediaLayout").eq(j).css("display", "block");
+
+                            $("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogTitle]").val(tmp.dlg[j].CARD_TITLE);
+                            //$("#dialogLayout").find(".textLayout").eq(j).find("input[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+                            $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(tmp.dlg[j].CARD_TEXT);
+
+                            $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mediaImgUrl]").val(tmp.dlg[j].MEDIA_URL);
+                            $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mediaUrl]").val(tmp.dlg[j].CARD_VALUE);
+
+                            if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find(".btnInsertDiv").append(inputMHtml);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("select[name=btnType]:eq(0)").val(tmp.dlg[j].BTN_1_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonName]:eq(0)").val(tmp.dlg[j].BTN_1_TITLE);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonContent]:eq(0)").val(tmp.dlg[j].BTN_1_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_2_TYPE != null && tmp.dlg[j].BTN_2_TYPE != "") {
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find(".mediaCopyTbl tbody").append(inputMTrHtml);
+
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("select[name=btnType]:eq(1)").val(tmp.dlg[j].BTN_2_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonName]:eq(1)").val(tmp.dlg[j].BTN_2_TITLE);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonContent]:eq(1)").val(tmp.dlg[j].BTN_2_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_3_TYPE != null && tmp.dlg[j].BTN_3_TYPE != "") {
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find(".mediaCopyTbl tbody").append(inputMTrHtml);
+
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("select[name=btnType]:eq(2)").val(tmp.dlg[j].BTN_3_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonName]:eq(2)").val(tmp.dlg[j].BTN_3_TITLE);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonContent]:eq(2)").val(tmp.dlg[j].BTN_3_CONTEXT);
+                            }
+                            if (tmp.dlg[j].BTN_4_TYPE != null && tmp.dlg[j].BTN_4_TYPE != "") {
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find(".mediaCopyTbl tbody").append(inputMTrHtml);
+
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("select[name=btnType]:eq(3)").val(tmp.dlg[j].BTN_4_TYPE).prop("selected", true);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonName]:eq(3)").val(tmp.dlg[j].BTN_4_TITLE);
+                                $("#dialogLayout").find(".mediaLayout").eq(j).find("input[name=mButtonContent]:eq(3)").val(tmp.dlg[j].BTN_4_CONTEXT);
+                            }
+
+                        }
+                        $('#updateDlgId').val(tmp.dlg[j].DLG_ID);
+                        $('#updateDlgType').val(tmp.dlg[j].DLG_TYPE);
+                        $('#updateDlgEntity').val(tmp.GROUPS);
+                    }
+                    //}
+
+
+                    //inputUttrHtml += '</div>';
+                    //inputUttrHtml += '</div>';
+                }
+            }
+            $('.dialogView').html(inputUttrHtml);
+            //$('#dialogShow').prepend(inputUttrHtml);
+
+            if(pageType=="qna"){
+                //대화상자 수정 추가
+                if(result['list'].length == 0){
+                    $('#proc_content').html(language.No_exist_answer);
+                    $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+                    $('#procDialog').modal('show');
+                    return;
+                }else{
+                    $('#description').val(result['list'][0].DLG_DESCRIPTION);
+                    $("#largeGroup").val(result['list'][0].GROUPL);
+                    $("#middleGroup").val(result['list'][0].GROUPM);
+                }
+                $('h4#myModalLabel.modal-title').text(language.Show_dlg);
+                
+
+                $('#dlgQuestion').text(show_question);
+                $('#luisIntent').text(show_intent);
+                $("#createDialog").attr('onclick', 'updateDialog()');
+            }else{
+                var $iptLuisIntent = $('input[name=predictIntent]');
+                var $selectLuisIntent = $('select[name=predictIntent]');
+
+                $selectLuisIntent.show();
+                $selectLuisIntent.removeAttr('disabled');
+
+                $iptLuisIntent.hide();
+                $iptLuisIntent.attr('disabled', 'disabled');
+
+                //대화상자 수정 추가
+                $('h4#myModalLabel.modal-title').text(language.UPDATE_DIALOG_BOX);
+                $('#description').val(result['list'][0].DLG_DESCRIPTION);
+                $('#title').val(result['list'][0].DLG_NAME);
+            
+                $("#createDialog").attr('onclick', 'updateDialog()');
+
+                //$(".insertForm .textLayout").css("display","block");
+            }
+            
+
+            $('#myModal2').modal('show');
+
+        }
+
+
+    }); // ------      ajax 끝-----------------
+
+});

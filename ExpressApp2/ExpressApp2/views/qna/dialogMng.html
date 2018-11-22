@@ -171,8 +171,8 @@
                                         <input type="text" name="imgUrl" class="form-control" onkeyup="writeCarouselImg(this);" placeholder="<%= __('Please_enter') %>">
                                     </div>
                                     <div class="form-group form-inline">
-                                        <label>Card_Mobile</label>
-                                        &nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>
+                                        <label><%= __('CARD_MOBILE') %></label>
+                                        &nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value=""><%= __('CARDMOBIBLE_NO') %></option><option value="m^^"><%= __('CARDMOBIBLE_OK') %></option></select>
                                     </div>
                                     <div class="modal_con btnInsertDiv">
                                         
@@ -318,11 +318,11 @@
                                     <p><input name="imgUrl" type="text" class="inbox02" id="imgUrl" style="width:100%" placeholder="Input image url.." /></p>
                                 </div>
                                 <!--// media , carousal 일 경우 input box 추가 layout -->
-                                    <!--
+                                    
                                 <div class="btn_wrap boline" >
-                                    <button type="button" class="btn btn_01" id="addDialogBtn"><%= __('INSERT_ADDITIONAL_DIALOG') %></button>
+                                    <button type="button" class="btn btn_01" id="addDialogBtn"><i class="fa fa-plus"></i> <%= __('INSERT_ADDITIONAL_DIALOG') %></button>
                                 </div>  
-                                -->                                
+                                                               
                             </div>  
                             <!-- source type이 API일 경우 -->
                             <div id="apiLayout" style="display:none;">
@@ -342,7 +342,7 @@
                             <!-- 대화상자  -->
                             <div class ="dialog_box03" id="dialogViewWrap">
                                 <div class="dialogView" >
-                                    <div class="wc-message wc-message-from-bot" style="width:80%;">
+                                    <div class="wc-message wc-message-from-bot" style="width:90%;">
                                         <div class="wc-message-content">
                                             <svg class="wc-message-callout"></svg>
                                             <div>

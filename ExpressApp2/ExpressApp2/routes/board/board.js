@@ -184,13 +184,11 @@ router.post('/intentScore', function (req, res) {
     selectQuery += "ROUND(AVG(CAST(A.LUIS_INTENT_SCORE AS FLOAT)), 2) AS intentScoreAVG,  \n";
     selectQuery += "MAX(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMAX , \n";
     selectQuery += "MIN(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMIN, \n";
-    //selectQuery += "CHANNEL AS channel, \n";
-    //selectQuery += "CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS regDate, \n";
     selectQuery += "COUNT(*) AS intentCount \n";
     selectQuery += "FROM	TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
     selectQuery += "WHERE	1=1 \n";
-    //selectQuery += "AND 	dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) =  B.QUERY \n";
-    selectQuery += "AND A.CUSTOMER_COMMENT_KR =  B.QUERY \n";
+    selectQuery += "AND dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) =  B.QUERY \n";
+    //selectQuery += "AND A.CUSTOMER_COMMENT_KR =  B.QUERY \n";
     selectQuery += "AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') ";
     
     if (selDate !== 'allDay') {
@@ -205,7 +203,6 @@ router.post('/intentScore', function (req, res) {
                     " AND PAGEIDX = " + currentPageNo + "; \n";
 
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
     }).then(result => {
         let rows = result.recordset
@@ -235,14 +232,14 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "FROM ( \n";
         selectQuery += "    SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY  \n";
-        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  \n";
+        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY  \n";
+        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  ) A, \n";
         selectQuery += "( \n";
         selectQuery += "    SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
-        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
+        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
+        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
         selectQuery += "    AND RESULT IN ('H')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
@@ -250,7 +247,6 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += ") C \n";
         selectQuery += "WHERE 1=1 \n";
         selectQuery += "AND C.REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
-        //selectQuery += "AND CONVERT(date, '" + startDate + "') <= C.REG_DATE AND C.REG_DATE  <= CONVERT(date, '" + endDate + "') \n";
         if (selDate !== 'allDay') {
             selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
         }
@@ -258,24 +254,20 @@ router.post('/getScorePanel', function (req, res) {
             selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
         }
         selectQuery += ") AS CORRECT_QRY \n";
-
-        //selectQuery += "    , CASE WHEN COUNT(*) != 0 THEN (SELECT (ROUND((SELECT CAST(COUNT(RESULT) AS FLOAT) FROM TBL_QUERY_ANALYSIS_RESULT WHERE RESULT='H')  ";
-        //selectQuery += "      / (SELECT CAST(COUNT(RESULT) AS FLOAT) FROM TBL_QUERY_ANALYSIS_RESULT WHERE RESULT='D') * 100, 2) * 100) ) ELSE 0 END AS SEARCH_AVG \n";
-
         selectQuery += "    ,  (SELECT CASE WHEN COUNT(*) != 0 THEN ROUND(SUM(C.답변율)/ COUNT(*), 2) ELSE 0 END    \n";
         selectQuery += "        FROM ( \n"; 
         selectQuery += "SELECT  ROUND(CAST(B.REPONSECNT AS FLOAT) / CAST(A.TOTALCNT AS FLOAT) * 100,2) AS 답변율, A.CHANNEL AS CHANNEL, A.Dimdate AS REG_DATE \n";
         selectQuery += "FROM (";
         selectQuery += "    SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY   \n";
-        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY   \n";
+        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY   \n";
+        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY   \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  ) A, \n";
         selectQuery += "( \n";
         selectQuery += "    SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
-        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
+        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
+        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
         selectQuery += "    AND RESULT IN ('S')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
@@ -283,7 +275,6 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += ") C \n";
         selectQuery += "WHERE 1=1 \n";
         selectQuery += "AND C.REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
-        //selectQuery += "AND CONVERT(date, '" + startDate + "') <= C.REG_DATE AND C.REG_DATE  <= CONVERT(date, '" + endDate + "') \n";
         if (selDate !== 'allDay') {
             selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
         }
@@ -295,7 +286,6 @@ router.post('/getScorePanel', function (req, res) {
 
         selectQuery += "    , ISNULL((SELECT MAX(B.CNT) FROM (SELECT COUNT(*) AS CNT FROM TBL_HISTORY_QUERY WHERE 1=1 ";
         selectQuery += "AND REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
-        //selectQuery += "AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') ";
     if (selDate !== 'allDay') {
         selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
     }
@@ -306,7 +296,6 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "FROM   TBL_HISTORY_QUERY \n";
         selectQuery += "WHERE  1=1 \n";
         selectQuery += "AND REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
-        //selectQuery += "AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') ";
     
     if (selDate !== 'allDay') {
         selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
@@ -314,9 +303,8 @@ router.post('/getScorePanel', function (req, res) {
     if (selChannel !== 'all') {
         selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
     }
-    
+    //console.log("panel=="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset;
@@ -358,7 +346,6 @@ router.post('/getOftQuestion', function (req, res) {
     selectQuery += "           FROM TBL_HISTORY_QUERY\n";
     selectQuery += "          WHERE 1=1 \n";
     selectQuery += "            and REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
-    //selectQuery += "            AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') \n";
 
 if (selDate !== 'allDay') {
     selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
@@ -369,8 +356,8 @@ if (selChannel !== 'all') {
     selectQuery += "          GROUP BY CUSTOMER_COMMENT_KR, CHANNEL\n";
     selectQuery += "          ) HI\n";
     selectQuery += "     LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN\n";
-    //selectQuery += "       ON dbo.FN_REPLACE_REGEX(HI.customer_comment_kr) = AN.query\n";
-    selectQuery += "       ON HI.customer_comment_kr = AN.query\n";
+    selectQuery += "       ON dbo.FN_REPLACE_REGEX(HI.customer_comment_kr) = AN.query\n";
+    //selectQuery += "       ON HI.customer_comment_kr = AN.query\n";
     selectQuery += "     LEFT OUTER JOIN (SELECT LUIS_INTENT,LUIS_ENTITIES,MIN(DLG_ID) AS DLG_ID FROM TBL_DLG_RELATION_LUIS GROUP BY LUIS_INTENT, LUIS_ENTITIES) RE \n";
     selectQuery += "       ON AN.LUIS_INTENT = RE.LUIS_INTENT  \n";
     selectQuery += "      AND AN.LUIS_ENTITIES = RE.LUIS_ENTITIES \n";
@@ -387,7 +374,6 @@ if (selChannel !== 'all') {
     selectQuery += "ORDER BY 질문수 DESC; \n";
     
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset;
@@ -458,9 +444,8 @@ router.post('/nodeQuery', function (req, res) {
         selectQuery += ") AA  WHERE  RESULT NOT IN ('H') AND TRAIN_FLAG = 'N' \n ) tbp \n" +
                     " WHERE 1=1 \n" +
                     " AND PAGEIDX = " + currentPage + "; \n";
-    
+    console.log("node qry==="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset
@@ -521,14 +506,12 @@ router.post('/firstQueryBar', function (req, res) {
                 selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
             }
         selectQuery += "        GROUP BY user_number, customer_comment_kr, customer_comment_en, reg_date, channel \n";
-        //selectQuery += "    )   AS history INNER join tbl_query_analysis_result as analysis on dbo.FN_REPLACE_REGEX(history.customer_comment_kr) = analysis.query  \n";
         selectQuery += "    )   AS history INNER join tbl_query_analysis_result as analysis on history.customer_comment_kr = analysis.query  \n";
         selectQuery += "    WHERE history.Row = 1 \n";
         selectQuery += ") A \n";
         selectQuery += "GROUP BY INTENT \n";
 
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset
@@ -602,7 +585,6 @@ router.post('/firstQueryTable', function (req, res) {
                        " AND PAGEIDX = " + currentPageNo + "; \n";
     
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
           let rows = result.recordset
@@ -705,7 +687,6 @@ router.post('/getQueryByEachTime', function (req, res) {
 
 
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
             let rows = result.recordset
