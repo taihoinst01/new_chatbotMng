@@ -57,6 +57,10 @@ $(document).ready(function() {
         }
     });
 
+    $('#entityTypeFilter').change(function() {
+        makeEntityTable();
+    });
+
     //hierarchy, composite 생성->child entity 추가 버튼
     $('#addEntityValBtn').click(function(){
 
@@ -233,6 +237,7 @@ function makeEntityTable() {
         'searchEntity' : $('#searchStr').val(),
         'entityType' : $('#entityTypeSelBox').val(),
         'selPage' : $('#currentPage').val(),
+        'entityFilter' : $('#entityTypeFilter').val()
     };
     
     $.ajax({
@@ -243,22 +248,27 @@ function makeEntityTable() {
             $('#entityListBody').html('');
             $('#pagination').html('');
             var entityBodyHtml = '';
-            if(data.entityList.length > 0){
-                for(var i = 0; i < data.entityList.length; i++){
-                    entityBodyHtml += "<tr>";
-                    entityBodyHtml += "<td style='text-align: left; padding-left:1%;'><a href='#' name='selEntity' onclick='return false;' >" + data.entityList[i].ENTITY_NAME + "</a></td>";
-                    entityBodyHtml += "<td style='text-align: left; padding-left:0.5%;'>" + getEntityType(data.entityList[i].ENTITY_TYPE) + "</td>";
-                    entityBodyHtml += "<td style='text-align: right; padding-right:1.5%;'>";
-                    entityBodyHtml += "<input type='hidden' id='entityHiddenName' name='entityHiddenName' value='" + data.entityList[i].ENTITY_NAME + "' />";
-                    entityBodyHtml += "<input type='hidden' id='entityHiddenId' name='entityHiddenId' value='" + data.entityList[i].ENTITY_ID + "' />";
-                    entityBodyHtml += "<input type='hidden' id='entityHiddenType' name='entityHiddenType' value='" + data.entityList[i].ENTITY_TYPE + "' />";
-                    entityBodyHtml += "<a href='#' id='delEntityBtn' name='delEntityBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                    entityBodyHtml += "</td>";
-                    entityBodyHtml += "</tr>";
+            if (data.error) {
+                $('#alertMsg').text('예상치 못한 오류가 발생했습니다. 관리자에게 문의해주세요.');
+                $('#alertBtnModal').modal('show');
+            } else {
+                if(data.entityList.length > 0){
+                    for(var i = 0; i < data.entityList.length; i++){
+                        entityBodyHtml += "<tr>";
+                        entityBodyHtml += "<td style='text-align: left; padding-left:1%;'><a href='#' name='selEntity' onclick='return false;' >" + data.entityList[i].ENTITY_NAME + "</a></td>";
+                        entityBodyHtml += "<td style='text-align: left; padding-left:0.5%;'>" + getEntityType(data.entityList[i].ENTITY_TYPE) + "</td>";
+                        entityBodyHtml += "<td style='text-align: right; padding-right:1.5%;'>";
+                        entityBodyHtml += "<input type='hidden' id='entityHiddenName' name='entityHiddenName' value='" + data.entityList[i].ENTITY_NAME + "' />";
+                        entityBodyHtml += "<input type='hidden' id='entityHiddenId' name='entityHiddenId' value='" + data.entityList[i].ENTITY_ID + "' />";
+                        entityBodyHtml += "<input type='hidden' id='entityHiddenType' name='entityHiddenType' value='" + data.entityList[i].ENTITY_TYPE + "' />";
+                        entityBodyHtml += "<a href='#' id='delEntityBtn' name='delEntityBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+                        entityBodyHtml += "</td>";
+                        entityBodyHtml += "</tr>";
+                    }
+                    //<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>
+                    $('#entityListBody').html(entityBodyHtml);
+                    $('#pagination').html('').append(data.pageList);
                 }
-                //<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>
-                $('#entityListBody').html(entityBodyHtml);
-                $('#pagination').html('').append(data.pageList);
             }
         }
     });

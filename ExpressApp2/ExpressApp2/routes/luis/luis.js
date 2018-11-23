@@ -1032,60 +1032,111 @@ router.get('/entityList', function (req, res) {
 
 
 router.post('/selectEntityList', function (req, res) {
+    try {
+        var userId = req.session.sid;
+        var selAppId = req.session.selAppId;
+        var searchEntity = req.body.searchEntity == undefined ? '':req.body.searchEntity;
+        var entityType = req.body.entityType;
+        var selPage = req.body.selPage;
+        var entityFilter = req.body.entityFilter;
 
-    var userId = req.session.sid;
-    var selAppId = req.session.selAppId;
-    var searchEntity = req.body.searchEntity == undefined ? '':req.body.searchEntity;
-    var entityType = req.body.entityType;
-    var selPage = req.body.selPage;
+        //var entityList1 = req.session.entityList.slice(0, req.session.entityList.length);
+        //var entityList2 = req.session.entityList.slice(0);
+        var entityList = req.session.entityList.slice();
 
-    //var entityList1 = req.session.entityList.slice(0, req.session.entityList.length);
-    //var entityList2 = req.session.entityList.slice(0);
-    var entityList = req.session.entityList.slice();
-
-    for (var i=0; i<entityList.length; i++) {
-        //APP_ID, ENTITY_NAME, ENTITY_ID, ENTITY_TYPE
-        var chkEntity = false;
-        if (entityList[i].APP_ID != selAppId) {
-            chkEntity = true;
-        }
-        else 
-        {
-            if (entityType == 'ALL') {
-                if (searchEntity != '') {
-                    if (entityList[i].ENTITY_NAME.toUpperCase().indexOf(searchEntity.toUpperCase()) == -1) {
-                        chkEntity = true;
-                    }   
-                }
-            } 
+        for (var i=0; i<entityList.length; i++) {
+            //APP_ID, ENTITY_NAME, ENTITY_ID, ENTITY_TYPE
+            var chkEntity = false;
+            if (entityList[i].APP_ID != selAppId) {
+                chkEntity = true;
+            }
             else 
             {
-                if (entityType != entityList[i].ENTITY_TYPE) {
-                    chkEntity = true;
-                } else {
+                if (entityType == 'ALL') {
                     if (searchEntity != '') {
                         if (entityList[i].ENTITY_NAME.toUpperCase().indexOf(searchEntity.toUpperCase()) == -1) {
                             chkEntity = true;
                         }   
                     }
+                } 
+                else 
+                {
+                    if (entityType != entityList[i].ENTITY_TYPE) {
+                        chkEntity = true;
+                    } else {
+                        if (searchEntity != '') {
+                            if (entityList[i].ENTITY_NAME.toUpperCase().indexOf(searchEntity.toUpperCase()) == -1) {
+                                chkEntity = true;
+                            }   
+                        }
+                    }
                 }
             }
+            if (chkEntity) entityList.splice(i--, 1);
         }
-        if (chkEntity) entityList.splice(i--, 1);
-    }
 
-    if(entityList.length > 0){
-        var listLength = entityList.length;
-        var pageStartInex = 0;
-        if ((selPage-1)*10 > listLength) {
-            entityList = entityList.splice(0, listLength<11?listLength:10);
+        if(entityList.length > 0){
+            var listLength = entityList.length;
+            var pageStartInex = 0;
+            var tmpList = [];
+
+            if (listLength > 1) {
+                var sortField_type = 'ENTITY_TYPE';
+                var sortField_name = 'ENTITY_NAME';
+                entityList.sort(function(a, b){ 
+                    if (a[sortField_type] == b[sortField_type]) {
+                        var aTmp = a[sortField_name].toLowerCase();
+                        var bTmp = b[sortField_name].toLowerCase();
+
+                        if(aTmp<bTmp) 
+                            return -1;
+                        if(aTmp>bTmp) 
+                            return 1;
+                        return 0;
+                        //return a[sortField_name][0].toLowerCase() - b[sortField_name][0].toLowerCase();
+                    } else {
+                        return a[sortField_type] - b[sortField_type];
+                    }
+                });
+            }
+            var startIdx = -1;
+            var endIdx = -1;
+            if (listLength > 1) {
+                for (var i=0; i<listLength; i++) {
+                    if (entityList[i].ENTITY_TYPE == entityFilter && startIdx == -1) {
+                        startIdx = i;
+                    }
+                    if (i == 0) {
+                        continue;
+                    }
+                    if (entityList[i].ENTITY_TYPE != entityFilter && entityList[i-1].ENTITY_TYPE == entityFilter) {
+                        endIdx = i;
+                    }
+                }
+                if (startIdx != -1) {
+                    if (endIdx == -1) 
+                    {
+                        endIdx = listLength-1;
+                    }
+                    var tmpArr = entityList.splice(startIdx, endIdx+1);
+                    Array.prototype.push.apply(tmpArr,entityList); 
+                    //tmpArr.concat(entityList).forEach(function(entity) {});
+                    entityList = tmpArr;
+                }
+            }
+
+            if ((selPage-1)*10 > listLength) {
+                entityList = entityList.splice(0, listLength<11?listLength:10);
+            }
+            else {
+                entityList = entityList.splice((selPage-1)*10, 10);
+            }
+            res.send({entityList : entityList, pageList : paging.pagination(selPage, listLength)});
+        } else {
+            res.send({entityList : entityList});
         }
-        else {
-            entityList = entityList.splice((selPage-1)*10, 10);
-        }
-        res.send({entityList : entityList, pageList : paging.pagination(selPage, listLength)});
-    } else {
-        res.send({entityList : entityList});
+    } catch(e) {
+        res.send({ error : true, entityList : []});
     }
 });
 
