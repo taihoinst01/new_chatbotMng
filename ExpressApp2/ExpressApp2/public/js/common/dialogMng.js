@@ -404,191 +404,7 @@ $(document).on('click', '.smallGroup', function () {
     $('#currentPage').val(1);
     selectDlgByFilter(group);
 });
-/*
-/** 대그룹 혹은 중그룹 클릭시 하위 그룹 검색 
-$(document).on('click', '.checktoggle', function (e) {
 
-    // 대그룹 클릭시 중그룹 검색
-    if ($(this).hasClass('largeGroup')) {
-
-        if ($(this).parent().hasClass('active')) {
-
-            $(this).parent().next().slideToggle(200);
-            $(this).parent().toggleClass('active').toggleClass('bgcolor');
-
-        } else {
-            if ($(this).parent().next().children().size() == 0) {
-                searchGroup($(this).prev().text(), 'searchMedium');
-            }
-
-            $('.largeGroup').parent().removeClass('active').removeClass('bgcolor');
-            $('.largeGroup').parent().next().slideUp(200);
-            $('.currentGroupL').removeClass('currentGroupL');
-
-            $(this).prev().addClass('currentGroupL');
-            $(this).parent().addClass('active').addClass('bgcolor');
-            $(this).parent().next().slideDown(200);
-
-            if (searchGroupM !== '') {
-                if ($('#selBoxBody').find('label[for=' + searchGroupL + ']').parents('li')
-                    .find('label[for=' + searchGroupM + ']').parent().next().css('display') !== 'block') {
-                    if (searchGroupM !== '') {
-                        $('#selBoxBody').find('label[for=' + searchGroupL + ']').parents('li')
-                            .find('label[for=' + searchGroupM + ']').next().trigger('click');
-                    }
-                }
-            }
-
-        }
-    }
-
-    // 중분류 클릭시 소분류 검색
-    if ($(this).hasClass('mediumGroup')) {
-
-        if ($(this).parent().hasClass('active')) {
-            $(this).parent().next().slideToggle(200);
-            $(this).parent().toggleClass('active').toggleClass('bgcolor');
-        } else {
-            if ($(this).parent().next().children().size() == 0) {
-                searchGroup($(this).prev().text(), 'searchSmall', 0, $('.groupL.currentGroupL').text());
-            }
-
-            $('.mediumGroup').parent().removeClass('active').removeClass('bgcolor');
-            $('.mediumGroup').parent().next().slideUp(200);
-            $('.currentGroupM').removeClass('currentGroupM');
-
-            $(this).prev().addClass('currentGroupM');
-            $(this).parent().addClass('active').addClass('bgcolor');
-            $(this).parent().next().slideDown(200);
-        }
-    }
-});
-
-function searchGroup(groupName, group, type, groupL) {
-    $.tiAjax({
-        type: 'POST',
-        url: '/learning/searchGroup',
-        data: { 'groupName': groupName, 'group': group, 'searchType': type, 'groupL': groupL, 'searchTxt': $('#iptDialog').val() },
-        isloading: true,
-        success: function (data) {
-            if (type == 1) {
-
-                if (group == 'searchMedium') {
-
-                    var item = '<option value="">' + language.Middle_group + '</option>';
-
-                    for (var i = 0; i < data.groupList.length; i++) {
-                        if (searchGroupL !== '') {
-                            //if (groupName === searchGroupL) {
-                            item += '<option>' + data.groupList[i].mediumGroup + '</option>';
-                            //}
-                        } else {
-                            item += '<option>' + data.groupList[i].mediumGroup + '</option>';
-                        }
-                    }
-                    $('#searchGroupM').html('');
-                    $('#searchGroupS').html('');
-                    $('#searchGroupS').html('<option value="">' + language.Small_group + '</option>');
-                    $('#searchGroupM').append(item);
-
-                    //$('#selBoxBody').find('label[for=' + groupName + ']').next().trigger('click');
-
-                    if (data.groupList.length > 0) {
-                        var item2 = '';
-
-                        for (var i = 0; i < data.groupList.length; i++) {
-                            item2 += '<li class="selectArea">' +
-                                '<div class="heading selectArea">' +
-                                '<label class="selectArea groupM" for="' + data.groupList[i].mediumGroup + '">' + data.groupList[i].mediumGroup + '</label>' +
-                                '<span class="checktoggle mediumGroup selectArea"></span></div>' +
-                                '<ul class="checklist2 selectArea ' + data.groupList[i].mediumGroup + ' ' + groupName + '">' +
-                                '</ul>' +
-                                '</li>';
-
-                        }
-                    }
-                    $('#' + groupName).empty();
-                    $('#' + groupName).append(item2);
-                    $('.checklist2').hide();
-
-
-                } else if (group == 'searchSmall') {
-                    var item = '<option value="">' + language.Small_group + '</option>';
-
-                    for (var i = 0; i < data.groupList.length; i++) {
-                        if (searchGroupM !== '') {
-                            //if (data.groupList[i].smallGroup === searchGroupM) {
-                            item += '<option>' + data.groupList[i].smallGroup + '</option>';
-                            //}
-                        } else {
-                            item += '<option>' + data.groupList[i].smallGroup + '</option>';
-                        }
-                    }
-
-                    $('#searchGroupS').html('');
-                    $('#searchGroupS').append(item);
-
-                    //$('#selBoxBody').find('label[for=' + $('#searchGroupL').val() + ']').parents('li')
-                    //                .find('label[for=' + groupName + ']').next().trigger('click');
-
-                    if (data.groupList.length > 0) {
-                        var item2 = '';
-
-                        for (var i = 0; i < data.groupList.length; i++) {
-
-                            item2 += '<li class="smallGroup">' +
-                                '<label for="check2 groupS" class="menuName">' + data.groupList[i].smallGroup + '</label>' +
-                                '</li>';
-                        }
-                    }
-                    $('.' + groupName + '.' + groupL).empty();
-                    $('.' + groupName + '.' + groupL).append(item2);
-
-
-                }
-            } else {
-
-                if (group == 'searchMedium') {
-
-                    if (data.groupList.length > 0) {
-                        var item2 = '';
-
-                        for (var i = 0; i < data.groupList.length; i++) {
-                            item2 += '<li class="selectArea">' +
-                                '<div class="heading selectArea">' +
-                                '<label class="selectArea groupM" for="' + data.groupList[i].mediumGroup + '">' + data.groupList[i].mediumGroup + '</label>' +
-                                '<span class="checktoggle mediumGroup selectArea"></span></div>' +
-                                '<ul class="checklist2 selectArea ' + data.groupList[i].mediumGroup + ' ' + groupName + '">' +
-                                '</ul>' +
-                                '</li>';
-
-                        }
-                    }
-                    $('#' + groupName).empty();
-                    $('#' + groupName).append(item2);
-                    $('.checklist2').hide();
-
-                } else if (group == 'searchSmall') {
-
-                    if (data.groupList.length > 0) {
-                        var item2 = '';
-
-                        for (var i = 0; i < data.groupList.length; i++) {
-
-                            item2 += '<li class="smallGroup">' +
-                                '<label for="check2 groupS" class="menuName">' + data.groupList[i].smallGroup + '</label>' +
-                                '</li>';
-                        }
-                    }
-                    $('.' + groupName + '.' + groupL).empty();
-                    $('.' + groupName + '.' + groupL).append(item2);
-                }
-            }
-
-        }
-    });
-}
-*/
 //dialog 페이지 첫 로딩때도 실행
 var sourceType2 = $('#sourceType2').val();
 var searchTitleTxt = '';
@@ -617,6 +433,7 @@ function selectDlgByTxt(groupType, sourceType) {
             $('#dialogTbltbody').html('');
             var item = '';
             var type_name = "";
+            var dlgNameHtml = "";
             if (data.list.length > 0) {
                 for (var i = 0; i < data.list.length; i++) {
                     if(data.list[i].DLG_TYPE==2){
@@ -628,9 +445,15 @@ function selectDlgByTxt(groupType, sourceType) {
                     }else{
                         type_name = "NONE";
                     }
+
+                    if(data.list[i].DLG_NAME==null){
+                        dlgNameHtml = "";
+                    }else{
+                        dlgNameHtml = data.list[i].DLG_NAME;
+                    }
                     item += '<tr>' +
                         '<td>' + data.list[i].NUM + '</td>' +
-                        '<td class="txt_left">' + data.list[i].DLG_NAME + '</td>' +
+                        '<td class="txt_left">' + dlgNameHtml + '</td>' +
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +

@@ -545,7 +545,7 @@ function getQueryByEachTime() {
 
 
                 //BAR CHART
-                var bar = new Morris.Line({
+                var bar = new Morris.Bar({
                     element: 'timeOfDay_div',
                     resize: true,
                     data: jsonList,
@@ -576,28 +576,37 @@ function drawNoneQuerytable(page) {
         type: 'POST',
         data: getFilterVal(page),
         success: function (data) {
-            if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
-            } else {
-                var list = data.list;
-                var noneList = "";
-
-                for (var i = 0; i < list.length; i++) {
-                    noneList += "<tr><td>" + list[i].intent + "</td>";
-                    noneList += "<td>" + list[i].korQuery + "</td>";
-                    noneList += "<td>" + list[i].channel + "</td>";
-                    noneList += "<td>" + list[i].queryCnt + "</td>";
-                    noneList += "<td>" + list[i].queryDate + "</td>";
-                    noneList += "<td>" + list[i].result + "</td>";
-                    noneList += "<td>" + list[i].textResult + "</td>";
-                    noneList += "<td>" + list[i].cardResult + "</td>";
-                    noneList += "<td>" + list[i].cardBtnResult + "</td></tr>";
+            if(data.length==0){
+                $("#noneQueryDiv").html('<tr><td colspan=9>dfafdsa</td></tr>');
+                $('#noneQueryDivTablePaging .pagination').html('').append('');
+            }else{
+                if (data.error_code != null && data.error_message != null) {
+                    alert(data.error_message);
+                } else {
+                    var list = data.list;
+                    var noneList = "";
+    
+                    for (var i = 0; i < list.length; i++) {
+                        noneList += "<tr><td>" + list[i].intent + "</td>";
+                        noneList += "<td>" + list[i].korQuery + "</td>";
+                        noneList += "<td>" + list[i].channel + "</td>";
+                        noneList += "<td>" + list[i].queryCnt + "</td>";
+                        noneList += "<td>" + list[i].queryDate + "</td>";
+                        noneList += "<td>" + list[i].result + "</td>";
+                        noneList += "<td>" + list[i].textResult + "</td>";
+                        noneList += "<td>" + list[i].cardResult + "</td>";
+                        noneList += "<td>" + list[i].cardBtnResult + "</td></tr>";
+                    }
+    
+                    $("#noneQueryDiv").html(noneList);
+                    $('#noneQueryDivTablePaging .pagination').html('').append(data.pageList);
+    
                 }
-
-                $("#noneQueryDiv").html(noneList);
-                $('#noneQueryDivTablePaging .pagination').html('').append(data.pageList);
-
             }
+
+
+
+            
         },
         error : function() {   // 오류가 발생했을 때 호출된다. 
             console.log("error");

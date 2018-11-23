@@ -187,8 +187,8 @@ router.post('/intentScore', function (req, res) {
     selectQuery += "COUNT(*) AS intentCount \n";
     selectQuery += "FROM	TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
     selectQuery += "WHERE	1=1 \n";
-    selectQuery += "AND dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) =  B.QUERY \n";
-    //selectQuery += "AND A.CUSTOMER_COMMENT_KR =  B.QUERY \n";
+    //selectQuery += "AND dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) =  B.QUERY \n";
+    selectQuery += "AND A.CUSTOMER_COMMENT_KR =  B.QUERY \n";
     selectQuery += "AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') ";
     
     if (selDate !== 'allDay') {
@@ -232,14 +232,14 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "FROM ( \n";
         selectQuery += "    SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY  \n";
-        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  \n";
+        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY  \n";
+        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  ) A, \n";
         selectQuery += "( \n";
         selectQuery += "    SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
-        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
+        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
+        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
         selectQuery += "    AND RESULT IN ('H')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
@@ -260,14 +260,14 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "FROM (";
         selectQuery += "    SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY   \n";
-        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY   \n";
+        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY   \n";
+        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY   \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  ) A, \n";
         selectQuery += "( \n";
         selectQuery += "    SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate \n";
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
-        selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
-        //selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
+        //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
+        selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
         selectQuery += "    AND RESULT IN ('S')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
@@ -356,8 +356,8 @@ if (selChannel !== 'all') {
     selectQuery += "          GROUP BY CUSTOMER_COMMENT_KR, CHANNEL\n";
     selectQuery += "          ) HI\n";
     selectQuery += "     LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN\n";
-    selectQuery += "       ON dbo.FN_REPLACE_REGEX(HI.customer_comment_kr) = AN.query\n";
-    //selectQuery += "       ON HI.customer_comment_kr = AN.query\n";
+    //selectQuery += "       ON dbo.FN_REPLACE_REGEX(HI.customer_comment_kr) = AN.query\n";
+    selectQuery += "       ON HI.customer_comment_kr = AN.query\n";
     selectQuery += "     LEFT OUTER JOIN (SELECT LUIS_INTENT,LUIS_ENTITIES,MIN(DLG_ID) AS DLG_ID FROM TBL_DLG_RELATION_LUIS GROUP BY LUIS_INTENT, LUIS_ENTITIES) RE \n";
     selectQuery += "       ON AN.LUIS_INTENT = RE.LUIS_INTENT  \n";
     selectQuery += "      AND AN.LUIS_ENTITIES = RE.LUIS_ENTITIES \n";
@@ -428,8 +428,8 @@ router.post('/nodeQuery', function (req, res) {
         selectQuery += "     GROUP BY CUSTOMER_COMMENT_KR, CHANNEL \n";
         selectQuery += ") HI \n";
         selectQuery += "LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN \n";
-        //selectQuery += "     ON dbo.FN_REPLACE_REGEX(HI.CUSTOMER_COMMENT_KR) = LOWER(AN.QUERY) \n";
-        selectQuery += "     ON HI.CUSTOMER_COMMENT_KR = LOWER(AN.QUERY) \n";
+        selectQuery += "     ON dbo.FN_REPLACE_REGEX(HI.CUSTOMER_COMMENT_KR) = LOWER(AN.QUERY) \n";
+        //selectQuery += "     ON HI.CUSTOMER_COMMENT_KR = LOWER(AN.QUERY) \n";
         selectQuery += "LEFT OUTER JOIN (SELECT LUIS_INTENT,LUIS_ENTITIES,MIN(DLG_ID) AS DLG_ID FROM TBL_DLG_RELATION_LUIS GROUP BY LUIS_INTENT, LUIS_ENTITIES) RE \n";
         selectQuery += "     ON AN.LUIS_INTENT = RE.LUIS_INTENT \n";
         selectQuery += "     AND AN.LUIS_ENTITIES = RE.LUIS_ENTITIES \n";

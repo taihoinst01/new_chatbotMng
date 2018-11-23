@@ -1066,6 +1066,12 @@ $(document).on("click", "#show_dlg", function () {
                     for (var j = 0; j < tmp.dlg.length; j++) {
                         var cardTextHtml = tmp.dlg[j].CARD_TEXT;
                         var dlgTextArea = tmp.dlg[j].CARD_TEXT;;
+                        var cardTitleHtml = "";
+                        if(tmp.dlg[j].CARD_TITLE==null){
+                            cardTitleHtml = "";
+                        }else{
+                            cardTitleHtml = tmp.dlg[j].CARD_TITLE;
+                        }
                         cardTextHtml = cardTextHtml.replace(/\/n/gi,'</br>');
                         dlgTextArea = dlgTextArea.replace(/\/n/gi,'\r\n');
                         if (tmp.dlg[j].DLG_TYPE == 2) {
@@ -1075,7 +1081,7 @@ $(document).on("click", "#show_dlg", function () {
                             inputUttrHtml += '<svg class="wc-message-callout"></svg>';
                             inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
                             inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
-                            inputUttrHtml += '<h1 class="textTitle">' + tmp.dlg[j].CARD_TITLE + '</h1>';
+                            inputUttrHtml += '<h1 class="textTitle">' + cardTitleHtml + '</h1>';
                             inputUttrHtml += '<div class="dlg_content">';
                             //inputUttrHtml += tmp.dlg[j].CARD_TEXT;
                             inputUttrHtml += cardTextHtml;
@@ -1113,7 +1119,7 @@ $(document).on("click", "#show_dlg", function () {
                             inputUttrHtml += '<img src="' + tmp.dlg[j].IMG_URL + '">';
                             inputUttrHtml += '</div>';
                             if (tmp.dlg[j].CARD_TITLE != null) {
-                                inputUttrHtml += '<h1>' + /*cardtitle*/ tmp.dlg[j].CARD_TITLE + '</h1>';
+                                inputUttrHtml += '<h1>' + /*cardtitle*/ cardTitleHtml + '</h1>';
                             }
                             if (tmp.dlg[j].CARD_TEXT != null) {
 
@@ -1208,7 +1214,7 @@ $(document).on("click", "#show_dlg", function () {
                             inputUttrHtml += '<div class="hidden" alt="' + tmp.dlg[j].CARD_TITLE + '"></div>';
                             inputUttrHtml += '<div class="hidden" alt="' + /* media url */ tmp.dlg[j].CARD_VALUE + '"></div>';
                             inputUttrHtml += '</div>';
-                            inputUttrHtml += '<h1>' + /* title */ tmp.dlg[j].CARD_TITLE + '</h1>';
+                            inputUttrHtml += '<h1>' + /* title */ cardTitleHtml + '</h1>';
                             inputUttrHtml += '<ul class="wc-card-buttons">';
                             inputUttrHtml += '</ul>';
                             inputUttrHtml += '</div>';

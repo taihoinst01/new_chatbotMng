@@ -162,7 +162,7 @@ aria-hidden="true">
                 -->
                 <div class="form-group fr" style="width:10%; margin-top:45px">
                     <button type="button" class="btn btn_01 fr" id="searchDialogBtn">
-                        <%= __('SEARCH') %>
+                        <i class="fa fa-search"></i> <%= __('SEARCH') %>
                     </button>
                 </div>
             </form>
@@ -180,10 +180,10 @@ aria-hidden="true">
         <div class="modal-footer">
             <div class="btn_wrap">
                 <button type="button" class="btn btn_01" onclick="selectDialog()">
-                    <%= __('SELECT') %>
+                    <i class="fa fa-check"></i> <%= __('SELECT') %>
                 </button>
                 <button type="button" class="btn btn-default searchDialogClose" data-dismiss="modal">
-                    <%= __('CANCEL') %>
+                    <i class="fa fa-times"></i> <%= __('CANCEL') %>
                 </button>
             </div>
         </div>
@@ -200,11 +200,11 @@ aria-hidden="true">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle">알림</span></h4>
+                <h4 class="modal-title" id="myModalLabel"><span id="alertTitle"><%= __('ALERT') %></span></h4>
             </div>
             <div class="modal-body"><span id="alertMsg"></span></div>
             <div class="modal-footer" >
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn">확인</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="alertCloseBtn"><i class="fa fa-check"> </i> <%= __('OK') %></button>
             </div>
         </div>
     </div>

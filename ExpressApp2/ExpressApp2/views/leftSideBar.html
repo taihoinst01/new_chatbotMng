@@ -249,10 +249,28 @@
                 <h4 class="modal-title" id="myModalLabel">TIIZ Manager</h4>
             </div>
             <div class="modal-body">
-                메뉴에 접근할 권한이 없습니다.
+                <%= __('NOACCESSAUTH') %>
             </div>
             <div class="modal-footer" id="delete_footer_button">
-                <button type="button" class="btn btn-primary" id="noPermission"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn btn-primary" id="noPermission" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="luisSyncModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static"
+    data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">TIIZ Manager</h4>
+            </div>
+            <div class="modal-body">
+                LUIS 와 동기화를 진행합니다. 데이터양과 환경에 따라 시간이 걸릴 수 있습니다
+            </div>
+            <div class="modal-footer" id="delete_footer_button">
+                <button type="button" class="btn btn-primary" id="luisSync"><i class="fa fa-window-restore"></i> Start Sync</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
             </div>
         </div>
     </div>
@@ -360,6 +378,7 @@
 
         
         $('#synchronizeLuis').click(function () {
+            /*
             var width = 0;
             var height = 0;
             var left = 0;
@@ -377,6 +396,8 @@
 
             var url = "/luis/synchronizeLuis";
             $(location).attr('href', url);
+            */
+            $('#luisSyncModal').modal('show');
         });
 
 
@@ -491,7 +512,26 @@
             }
         });
 
+        $('#luisSync').click(function () {
+            $('#luisSyncModal').modal('hide');
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
 
+            width = 50;
+            height = 50;
+
+            top = ($(window).height() - height) / 2 + $(window).scrollTop();
+            left = ($(window).width() - width) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({ position: 'absolute' }).css({ left: left, top: top });
+            $("#loadingBar").css("display", "block");
+
+            var url = "/luis/synchronizeLuis";
+            $(location).attr('href', url);
+        });
     });
 
 
