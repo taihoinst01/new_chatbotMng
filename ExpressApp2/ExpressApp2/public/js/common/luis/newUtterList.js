@@ -70,19 +70,6 @@ $(document).ready(function() {
     });
     */
 
-    $("#searchDialogBtn").on('click', function () {
-
-        if ($('input[name=serachDlg]').val() == '' && $('#searchLargeGroup').val() == '') {
-            
-            $('#alertMsg').text(language.Select_search_word_or_group);
-            $('#alertBtnModal').modal('show');
-            //alert(language.Select_search_word_or_group);
-        } else {
-            $("#searchDlgResultDiv").html("");
-
-            searchDialog(contextEntityData);
-        }
-    });
 
     $(".searchDialogClose").on('click', function () {
         $('input[name=serachDlg]').val('');
@@ -138,6 +125,8 @@ $(document).on("keypress", "#searchQnaText", function(e){
         }
     }
 });
+
+
 
 //엔티티 가져오기
 function getEntityList(intentName, intentId) {
@@ -545,23 +534,34 @@ function prevBtn(botChatNum, e) {
 function selectDialog() {
     
     var successFlagg = false;
+    var multieChk = false;
+    var chkCnt = 0;
     $("input[name=searchDlgChk]").each(function (n) {
         var chk = $(this).parent().hasClass('checked');
         if (chk == true) {
-            var cloneDlg = $(this).parent().parent().next().children().clone();
-            if (contextEntityData == '') {
-                $('#dlgViewDiv').html('');
-                $('#dlgViewDiv').append(cloneDlg);
+            if (chkCnt > 0) {
+                multieChk = true;
+                return false;
             } else {
-                $('#dlgViewDiv_' + contextEntityData).html('');
-                $('#dlgViewDiv_' + contextEntityData).append(cloneDlg);
+                chkCnt++;
+                var cloneDlg = $(this).parent().parent().next().children().clone();
+                if (contextEntityData == '') {
+                    $('#dlgViewDiv').html('');
+                    $('#dlgViewDiv').append(cloneDlg);
+                } else {
+                    $('#dlgViewDiv_' + contextEntityData).html('');
+                    $('#dlgViewDiv_' + contextEntityData).append(cloneDlg);
+                }
+                successFlagg = true;
             }
-
-            successFlagg = true;
-            return false;
         }
     });
-
+    if (multieChk) {
+        
+        $('#alertMsg').text('1개만 선택 가능합니다.');
+        $('#alertBtnModal').modal('show');
+        return false;
+    }
     if (successFlagg == false) {
         
         $('#alertMsg').text(language.Please_select_a_dialogue);

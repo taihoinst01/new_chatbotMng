@@ -2212,6 +2212,7 @@ router.post('/searchDialog', function (req, res) {
 
 
 
+
 router.post('/searchDialogByIntent', function (req, res) {
     var searchIntentGroup = req.body.searchIntentGroup;
     /*
@@ -2220,7 +2221,25 @@ router.post('/searchDialogByIntent', function (req, res) {
     var searchSmallGroup = req.body.searchSmallGroup;
     */
     var serachDlg = req.body.serachDlg.trim();
-
+    var tblDlgSearch = "SELECT A.RNUM, A.LUIS_INTENT, A.DLG_ID, B.DLG_ORDER_NO, B.DLG_TYPE, B.DLG_LANG \n";
+    tblDlgSearch += "FROM (\n";
+    tblDlgSearch += "    SELECT RANK() OVER(ORDER BY LUIS_ENTITIES) AS RNUM, LUIS_INTENT, DLG_ID \n";
+    tblDlgSearch += "      FROM TBL_DLG_RELATION_LUIS  \n";
+    tblDlgSearch += "    WHERE 1=1\n";
+    if (serachDlg) {
+        //tblDlgSearch += "    AND B.LUIS_INTENT like '%" + serachDlg + "%'\n";
+    } 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            tblDlgSearch += "    AND B.LUIS_INTENT = '" + searchIntentGroup + "'\n";
+        } else {
+            tblDlgSearch += "    AND B.DLG_INTENT IS NULL\n";
+        }
+    }
+    tblDlgSearch += ")A, TBL_DLG B \n"
+    tblDlgSearch += "WHERE A.DLG_ID = B.DLG_ID \n"
+    tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"
+    /*
     var tblDlgSearch = "SELECT RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
     tblDlgSearch += "FROM (\n";
     tblDlgSearch += "SELECT RANK() OVER(ORDER BY GroupS) AS RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
@@ -2229,17 +2248,17 @@ router.post('/searchDialogByIntent', function (req, res) {
     if (serachDlg) {
 
         tblDlgSearch += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup ) {
-            if (searchIntentGroup != "NONE") {
-                tblDlgSearch += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                tblDlgSearch += "AND DLG_INTENT IS NULL\n";
-            }
+    } 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            tblDlgSearch += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+        } else {
+            tblDlgSearch += "AND DLG_INTENT IS NULL\n";
         }
     }
     tblDlgSearch += ")A \n ORDER BY DLG_ID"
+    */
+
 
     var dlgText = "SELECT DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
     dlgText += "FROM TBL_DLG_TEXT\n";
@@ -2251,16 +2270,16 @@ router.post('/searchDialogByIntent', function (req, res) {
 
     if (serachDlg) {
 
-        dlgText += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgText += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgText += "AND DLG_INTENT IS NULL\n";
-            }
+        dlgText += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+    } 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            dlgText += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+        } else {
+            dlgText += "AND DLG_INTENT IS NULL\n";
         }
     }
+
     dlgText += ") \n ORDER BY DLG_ID";
 
     var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n";
@@ -2278,15 +2297,13 @@ router.post('/searchDialogByIntent', function (req, res) {
 
     if (serachDlg) {
 
-        dlgCard += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgCard += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgCard += "AND DLG_INTENT IS NULL\n";
-            }
+        dlgCard += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+    } 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            dlgCard += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+        } else {
+            dlgCard += "AND DLG_INTENT IS NULL\n";
         }
     }
     dlgCard += ") \n ORDER BY DLG_ID";
@@ -2306,15 +2323,13 @@ router.post('/searchDialogByIntent', function (req, res) {
 
     if (serachDlg) {
 
-        dlgMedia += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
-    } else {
-
-        if (searchIntentGroup) {
-            if (searchIntentGroup != "NONE") {
-                dlgMedia += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
-            } else {
-                dlgMedia += "AND DLG_INTENT IS NULL\n";
-            }
+        dlgMedia += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+    } 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            dlgMedia += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+        } else {
+            dlgMedia += "AND DLG_INTENT IS NULL\n";
         }
     }
     dlgMedia += ") \n ORDER BY DLG_ID";
@@ -2343,20 +2358,23 @@ router.post('/searchDialogByIntent', function (req, res) {
 
                 var row = {};
                 row.RNUM = rows[i].RNUM;
-                row.GroupS = rows[i].GroupS;
                 row.DLG_ID = rows[i].DLG_ID;
                 row.DLG_TYPE = rows[i].DLG_TYPE;
                 row.DLG_ORDER_NO = rows[i].DLG_ORDER_NO;
-                row.GroupL = rows[i].GroupL;
-                row.GroupM = rows[i].GroupM;
+                //row.GroupL = rows[i].GroupL;
+                //row.GroupM = rows[i].GroupM;
+                //row.GroupS = rows[i].GroupS;
                 row.dlg = [];
 
+                var isExist = false;
                 let dlg_type = rows[i].DLG_TYPE;
                 if (dlg_type == 2) {
                     for (var j = 0; j < rowsText.length; j++) {
                         let textDlgId = rowsText[j].DLG_ID;
                         if (row.DLG_ID == textDlgId) {
                             row.dlg.push(rowsText[j]);
+                            isExist = true;
+                            break;
                         }
                     }
                 } else if (dlg_type == 3) {
@@ -2364,6 +2382,8 @@ router.post('/searchDialogByIntent', function (req, res) {
                         var cardDlgId = rowsCard[j].DLG_ID;
                         if (row.DLG_ID == cardDlgId) {
                             row.dlg.push(rowsCard[j]);
+                            isExist = true;
+                            break;
                         }
                     }
                 } else if (dlg_type == 4) {
@@ -2371,10 +2391,14 @@ router.post('/searchDialogByIntent', function (req, res) {
                         var mediaDlgId = rowsMedia[j].DLG_ID;
                         if (row.DLG_ID == mediaDlgId) {
                             row.dlg.push(rowsMedia[j]);
+                            isExist = true;
+                            break;
                         }
                     }
                 }
-                result.push(row);
+                if (isExist) {
+                    result.push(row);
+                }
             }
 
             res.send({ list: result });
@@ -2391,6 +2415,7 @@ router.post('/searchDialogByIntent', function (req, res) {
         console.log(err);
     })
 });
+
 
 
 router.post('/addDialog', function (req, res) {
