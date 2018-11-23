@@ -43,7 +43,7 @@
             <section class="content">
                 <div class="box  color-palette-box">
                     <div class="box-body">
-
+<!-- fileimport 테스트
                             <div class="form-group w50 fl" style="width: 250px;">
                                 <span id="uploadInfoText" class="invoiceR_uploadText">Drag & Drop files here</span>
                                 <form id="uploadFileForm" action="/luis/uploadFile" method="post" enctype="multipart/form-data">
@@ -52,8 +52,7 @@
 
                                 </form>
                             </div>
-
-
+-->
 
 
 
@@ -88,7 +87,14 @@
                                 <thead>
                                     <tr>
                                         <th style='text-align: left; padding-left:1%;'><%= __('ENTITY_NAME') %></th>
-                                        <th style='text-align: left; padding-left:1%;'><%= __('Type') %></th>
+                                        <th style='text-align: left; padding-left:0%;'>
+                                            <select id="entityTypeFilter" class="form-control" style ='width:30%;'>
+                                                <option value="1"><%= __('SIMPLE_ENTITY') %></option>
+                                                <option value="3"><%= __('HIERARCHY_ENTITY') %></option>
+                                                <option value="4"><%= __('COMPOSITE_ENTITY') %></option>
+                                                <option value="5"><%= __('CLOSED_LIST_ENTITY') %></option>
+                                            </select>
+                                        </th><!--<%= __('Type') %>-->
                                         <th></th>
                                     </tr>
                                 </thead>

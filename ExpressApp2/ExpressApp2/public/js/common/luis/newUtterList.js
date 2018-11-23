@@ -98,17 +98,17 @@ $(document).on('click','.li_paging',function(e){
 });
 
 //dlg검색 클릭
-$(document).on('click','a[name=addReplyBtn]',function(e){
-    var utterAppId = $(this).parent().find('#hiddenappId').val();
+$(document).on('click','a[name=selEntity]',function(e){
+    var utterAppId = $(this).parents('tr').find('#hiddenappId').val();
     $('#selectUtterAppId').val(utterAppId);
-    var utterIntent = $(this).parent().find('#hiddenIntent').val();
+    var utterIntent = $(this).parents('tr').find('#hiddenIntent').val();
     $('#selectUtterIntent').val(utterIntent);
-    var utterSeq = $(this).parent().find('#hiddenSeq').val();
+    var utterSeq = $(this).parents('tr').find('#hiddenSeq').val();
     $('#selectUtterSeq').val(utterSeq);
-    var utterEntities = $(this).parent().find('#hiddenEntity').val();
+    var utterEntities = $(this).parents('tr').find('#hiddenEntity').val();
     $('#selectUtterEntities').val(utterEntities);
 
-    var contextEntity = $(this).parent().find('input[name=hiddenEntity]').val();
+    var contextEntity = $(this).parents('tr').find('input[name=hiddenEntity]').val();
     openModalBox(contextEntity);
     
 });
@@ -178,7 +178,7 @@ function makeQnaTable() {
                     entityBodyHtml += "<input type='hidden' id='hiddenIntent' name='hiddenIntent' value='" + data.qnaList[i].INTENT + "' />";
                     entityBodyHtml += "<input type='hidden' id='hiddenappId' name='hiddenappId' value='" + data.qnaList[i].APP_ID + "' />";
                     //entityBodyHtml += "<input type='hidden' id='entityHiddenId' name='entityHiddenId' value='" + data.qnaList[i].Q_ID + "' />";
-                    entityBodyHtml += "<a href='#' id='addReplyBtn' name='addReplyBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-edit' style='font-size: 25px;'></span></a>";
+                    //entityBodyHtml += "<a href='#' name='addReplyBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-edit' style='font-size: 25px;'></span></a>";
                     entityBodyHtml += "</td>";
                     entityBodyHtml += "</tr>";
                 }
