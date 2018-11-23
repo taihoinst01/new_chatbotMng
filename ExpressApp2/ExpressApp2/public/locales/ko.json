@@ -401,6 +401,7 @@
 	"UPDATE_ID": "수정ID",
 	"UPDATE_DATE": "수정일자",
 	"CHOOSE_AUTH": "권한선택",
+	"NOACCESSAUTH": "메뉴에 접근권한이 없습니다",
 	"============= 관리자설정-권한그룹관리 =============": "",
 	"AUTHGROUP_LIST": "권한그룹 목록",
 	"AUTHGROUP_NAME": "권한이름",
