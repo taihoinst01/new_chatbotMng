@@ -301,5 +301,6 @@
 	"ALERT_CHNG_FAIL": "SECRET NUMBER CHANGE FAIL. TRY AGAIN.",
 	"ALERT_WRONG_ACCESS": "UNVALID ACCESS. Please login.",
 	"ALERT_WRONG_ACCESS2": "UNVALID ACCESS. ",
+	"ALERT_CAN_SELECT_ONE": "Please select one dialog.",
 	"============= The end =============": ""
 }

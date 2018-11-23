@@ -442,5 +442,6 @@
 	"ALERT_CHNG_FAIL": "비밀번호 변경에 실패했습니다. 다시 시도해주세요.",
 	"ALERT_WRONG_ACCESS": "비정상 접근입니다. 로그인 해주세요.",
 	"ALERT_WRONG_ACCESS2": "비정상 접근입니다.",
+	"ALERT_CAN_SELECT_ONE": "답변은 1개만 선택 가능합니다.",
 	"============= The end =============": ""
 }

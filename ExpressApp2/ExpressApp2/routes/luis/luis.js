@@ -2343,7 +2343,21 @@ router.post('/upload', function (req, res) {
  * FILE UPLOAD
  ****************************************************************************************/
 
- /*
+ 
+var appRoot = require('app-root-path').path;
+var multer = require("multer");
+//var commonDB = require(appRoot + '/public/js/common.db.js');
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'uploads/');
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        }
+    }),
+});
+
 router.post('/uploadFile', upload.any(), function (req, res) {
     sync.fiber(function () {
         var files = req.files;
@@ -2616,7 +2630,7 @@ router.post('/uploadFile', upload.any(), function (req, res) {
 });
 
 
-*/
+
 
 
 
