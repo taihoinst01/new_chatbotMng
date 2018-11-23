@@ -323,6 +323,7 @@ function selectGroup(selectId, str1, str2) {
 
 
 
+
 function searchDialog(contextEntityData) {
     var formData = $("form[name=searchForm]").serialize();
     $.ajax({
@@ -330,6 +331,29 @@ function searchDialog(contextEntityData) {
         dataType: 'json',
         type: 'POST',
         data: formData,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ($(window).height() - height) / 2 + $(window).scrollTop();
+            left = ($(window).width() - width) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({ position: 'absolute' }).css({ left: left, top: top });
+            $("#loadingBar").css("z-index", 9999);
+            $("#loadingBar").css("display", "block");
+            $(".dialog_result strong").html(" " + "..." + " ");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display", "none");
+        },
         success: function (result) {
 
             var inputUttrHtml = '';

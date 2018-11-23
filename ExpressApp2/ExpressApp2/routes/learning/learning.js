@@ -2231,9 +2231,9 @@ router.post('/searchDialogByIntent', function (req, res) {
     } 
     if (searchIntentGroup) {
         if (searchIntentGroup != "NONE") {
-            tblDlgSearch += "    AND B.LUIS_INTENT = '" + searchIntentGroup + "'\n";
+            //tblDlgSearch += "    AND LUIS_INTENT = '" + searchIntentGroup + "'\n";
         } else {
-            tblDlgSearch += "    AND B.DLG_INTENT IS NULL\n";
+            //tblDlgSearch += "    AND DLG_INTENT IS NULL\n";
         }
     }
     tblDlgSearch += ")A, TBL_DLG B \n"
@@ -2397,7 +2397,16 @@ router.post('/searchDialogByIntent', function (req, res) {
                     }
                 }
                 if (isExist) {
-                    result.push(row);
+                    var isDupleDlg = false;
+                    for (var k=0; k<result.length; k++) {
+                        if (result[k].DLG_ID == row.DLG_ID) {
+                            isDupleDlg = true;
+                            break;
+                        }
+                    }
+                    if (!isDupleDlg) {
+                        result.push(row);
+                    }
                 }
             }
 
