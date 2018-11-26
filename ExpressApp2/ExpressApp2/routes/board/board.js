@@ -303,7 +303,7 @@ router.post('/getScorePanel', function (req, res) {
     if (selChannel !== 'all') {
         selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
     }
-    //console.log("panel=="+selectQuery);
+    console.log("panel=="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
@@ -444,7 +444,7 @@ router.post('/nodeQuery', function (req, res) {
         selectQuery += ") AA  WHERE  RESULT NOT IN ('H') AND TRAIN_FLAG = 'N' \n ) tbp \n" +
                     " WHERE 1=1 \n" +
                     " AND PAGEIDX = " + currentPage + "; \n";
-    console.log("node qry==="+selectQuery);
+    
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {

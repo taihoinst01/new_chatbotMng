@@ -37,17 +37,15 @@ $(document).ready(function() {
 
     $('#addSmallTalk').click(function() {
         var answerCnt = $("input[id='s_answer_array']").length;
-        var answerArrayData = new Array(answerCnt);
         var answerData = "";
-        for(var i=0; i<answerCnt; i++){
+        for(var i=0; i<answerCnt - 1; i++){
             answerData = answerData + $("input[id='s_answer_array']")[i].value;
-            if(i == answerCnt - 1){
+            if(i == answerCnt - 2){
                 answerData = answerData;
             }else{
-                answerData = answerData + "&**&";
+                answerData = answerData + "|||";
             }
         }
-        //alert("answerData==="+answerData);
         $('#s_answer').val(answerData);
         smallTalkProc('ADD');
     });
@@ -72,7 +70,21 @@ $(document).ready(function() {
         $(this).parents(".control-group").remove();
     });
 
+    // question 입력
+    $('input[name=s_query]').keypress(function (e) {
 
+        if (e.keyCode == 13) {	//	Enter Key
+            $('input[name=s_query]').attr('readonly', true);
+            var queryText = $(this).val();
+            if (queryText.trim() == "" || queryText.trim() == null) {
+                $('input[name=s_query]').attr('readonly', false);
+                return false;
+            }
+            getEntityFromQ(queryText);
+            
+            $("input[name=s_query]").attr("readonly", false);
+        }
+    });
 });
 
 //Banned Word List 테이블 페이지 버튼 클릭
@@ -107,12 +119,15 @@ function makeSmallTalkTable(page) {
             if (data.rows) {
 
                 var tableHtml = "";
+                var answerText = "";
                 for (var i = 0; i < data.rows.length; i++) {
+                    answerText = data.rows[i].S_ANSWER;
+                    answerText = answerText.replace('|||','</br>');
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="CANCEL_ST_SEQ" id="CANCEL_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
                     tableHtml += '<td class="txt_left tex01"><a href="#">' + data.rows[i].S_QUERY + '</a></td>';
-                    tableHtml += '<td>' + data.rows[i].S_ANSWER + '</td>';
+                    tableHtml += '<td class="txt_left">' + answerText + '</td>';
                     tableHtml += '</tr>';
                 }
 
@@ -140,8 +155,10 @@ function smallTalkProc(procType) {
     var data = new Object();
     data.statusFlag = procType;
     data.S_QUERY = $('#s_query').val();
-    data.INTENT = $('#INTENT').val();
+    //data.INTENT = $('#INTENT').val();
+    data.INTENT = "smalltalk";
     data.S_ANSWER = $('#s_answer').val();
+    data.S_ENTITY = $('#s_entity').val();
     saveArr.push(data);
  
     var jsonData = JSON.stringify(saveArr);
@@ -201,6 +218,70 @@ function cancelSmallTalkProc(procType) {
         }
     });
 }
+
+function getEntityFromQ(queryText) {
+    
+    $.ajax({
+        url: '/smallTalkMng/getEntityAjax',                //주소
+        dataType: 'json',                  //데이터 형식
+        type: 'POST',                      //전송 타입
+        data: { 'iptUtterance': queryText },
+
+        success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            var entities = result['entities'];
+            //for (var k = 0; k < queryTextArr.length; k++) {
+                if (entities[0] != null) {
+                    entities[0] = entities[0].split(",");
+                } else {
+                    entities[0] = [];
+                }
+
+                if (result['result'] == true) {
+                    var utter = utterHighlight(result.commonEntities[0], queryText);
+
+                    $('input[name="s_query"').val(queryText);
+                    $('input[name="s_query"').attr("disabled", true);
+                    var inputUttrHtml = '';
+                    inputUttrHtml += '<table><tr>';
+                    inputUttrHtml += '<td class="txt_left clickUtter">' + utter + '</td>';
+                    inputUttrHtml += '<td><a href="#"><span class="fa  fa-trash utterDelete"><span class="hc">삭제</span></span></a></td>';
+                    inputUttrHtml += '</tr></table>';
+
+                    $('#squeryEntity').html(inputUttrHtml);
+                }
+            //}
+        } //function끝
+
+    }); // ------      ajax 끝-----------------
+}
+
+function utterHighlight(entities, utter) {
+    var result = utter;
+    var entity_data = "";
+    var entity_comm = ",";
+    if (entities) {
+        for (var i = 0; i < entities.length; i++) {
+            result = result.replace(entities[i].ENTITY_VALUE, '<span class="highlight">' + entities[i].ENTITY_VALUE + '</span>');
+            
+            if(i => entities.length){
+                entity_comm = "";
+            }
+            entity_data = entity_data + entities[i].ENTITY_VALUE + entity_comm;
+        }
+        $('#s_entity').val(entity_data);
+    }
+    return result;
+}
+
+// Utterance 삭제
+$(document).on('click', '.utterDelete', function () {
+
+    $('input[name="s_query"').attr("disabled", false);
+    $('#squeryEntity').html("Question Entity");
+    $('#s_entity').val();
+    $('input[name="s_query"').text("");
+
+});
 
 function iCheckBoxTrans() {
     $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
