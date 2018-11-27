@@ -99,8 +99,6 @@
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
-                <!--selChatInfo.chatbot.appList.length-->
-                <!--selChatAppLength-->
                 <%
                                 for(var k=0; k<selChatInfo.chatbot.appList.length; k++) {
                                                                 %>
@@ -132,22 +130,6 @@
                     <i class="fa fa-handshake-o"></i> <span><%= __('QNA_CONNECT') %></span>
                 </a>
             </li>
-            <!--
-                               <li class=" treeview">
-                                   <a href="#">
-                                       <i class="fa fa-desktop"></i> <span><%= __('LEARNING') %></span>
-                                       <span class="pull-right-container">
-                                           <i class="fa fa-angle-left pull-right"></i>
-                                       </span>
-                                   </a>
-                                   <ul class="treeview-menu">
-                                       <li><a href="/learning/recommend"><i class="fa  fa-circle-o"></i><%= __('RECOMMENDATION') %></a></li>
-                                       <li><a href="/learning/utterances"><i class="fa fa-circle-o"></i> <%= __('UTTERANCE_SETTING') %></a></li>
-                                       <li><a href="/learning/dialog"><i class="fa fa-circle-o"></i> <%= __('DIALOG_SETTING') %></a></li>
-                                       <li><a href="/learning/entities"><i class="fa fa-circle-o"></i> <%= __('ENTITY_SETTING') %></a></li>
-                                   </ul>
-                               </li>
--->
             <li class=" treeview">
                 <!--<li class="active treeview">-->
                 <a href="#">
@@ -164,12 +146,24 @@
                             <%= __('NOANSWER_TITLE') %></a></li>
                     <li><a href="/qna/dialogMng"><i class="fa fa-circle-o"></i>
                             <%= __('DIALOG_MNG_TITLE') %></a></li>
-                    <li><a href="/smallTalkMng/smallTalkMng"><i class="fa fa-circle-o"></i>
-                            <%= __('SmallTalk_Title') %></a></li>
-                    <li><a href="/learning/entities"><i class="fa fa-circle-o"></i>
-                            <%= __('ENTITY_SETTING') %></a></li>
                 </ul>
             </li>
+            <li class=" treeview">
+                    <!--<li class="active treeview">-->
+                    <a href="#">
+                        <i class="fa fa-coffee"></i> <span>
+                            <%= __('SmallTalk_Title') %></span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="/smallTalkMng/smallTalkMng"><i class="fa fa-circle-o"></i>
+                                <%= __('SmallTalk_Title') %></a></li>
+                        <li><a href="/learning/entities"><i class="fa fa-circle-o"></i>
+                                <%= __('ENTITY_SETTING') %></a></li>
+                    </ul>
+                </li>
 
             <li class=" treeview">
                 <!--<li class="active treeview">-->
@@ -266,7 +260,7 @@
                 <h4 class="modal-title" id="myModalLabel">TIIZ Manager</h4>
             </div>
             <div class="modal-body">
-                LUIS 와 동기화를 진행합니다. 데이터양과 환경에 따라 시간이 걸릴 수 있습니다
+                    <%= __('LUIS_SYNCING') %>
             </div>
             <div class="modal-footer" id="delete_footer_button">
                 <button type="button" class="btn btn-primary" id="luisSync"><i class="fa fa-window-restore"></i> Start Sync</button>

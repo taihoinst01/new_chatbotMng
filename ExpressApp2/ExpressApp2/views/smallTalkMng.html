@@ -10,20 +10,7 @@
     <%include  ./common/commonLib.html%>
         
         <script type="text/javascript" src="/js/common/smallTalkMng.js"></script>
-        <link rel='stylesheet' href='/css/botchat.css' />
-        <link rel="stylesheet" type="text/css" href="/css/dialog.css" />
-        <style type="text/css">
-            .dlgCardMordal a:link, .dlgCardMordal a:visited, .dlgCardMordal a:hover, .dlgCardMordal a:active, .dlgCardMordal a:focus { 
-                font-weight: bold !important;
-                color: #6d6161 !important;
-            } 
-    
-            .dropdown-menu {
-                left: 0px !important; top: 60% !important;
-            }
-    
-        </style>
-
+        
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -61,7 +48,7 @@
                                             <div class="form-group col-lg-4 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
                                                 <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
                                                 <button type="button" id="createSmallTalkBtn" class="btn btn-default "><i class="fa fa-plus"></i> SmallTalk 등록</button> 
-                                                <button type="button" class="btn btn-default" id="cancelSmallTalkBtnModal"><i class="fa fa-trash"></i> SmallTalk 삭제</button>
+                                                <button type="button" class="btn btn-default" id="deleteSmallTalkBtnModal"><i class="fa fa-trash"></i> SmallTalk 삭제</button>
                                             </div>
                                          </div>
                                          
@@ -156,49 +143,31 @@
                         <button type="button" class="btn btn_danger answer-remove"><i class="fa fa-minus"></i> <%= __('DELETE') %></button>
                     </div>
                 </div>
-            <div class="modal-footer" id="footer_button">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                     <button type="button" class="btn btn_01" id="addSmallTalk"><i class="fa fa-edit"></i> Save</button>
             </div>
         </div>
     </div>
 </div>
+</div>
 
-<div class="modal fade" id="cancelSmallTalkModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="procSmallTalk" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel"><%= __('SmallTalk_Title') %></h4>
+                <h4 class="modal-title" id="myModalLabel"><%= __("SmallTalk_Title") %></h4>
             </div>
-            <div class="modal-body">
-                <p id="cancel_content"></p>
-            </div>
-            <div class="modal-footer" id="delete_footer_button">
-                <p id="footer_button"></p>
+            <div class="modal-body"><p id="proc_content"></p></div>
+            <div class="modal-footer" id="footer_button">
+                
             </div>
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="procSmallTalk" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel"><%= __("SmallTalk_Title") %></h4>
-                </div>
-                <div class="modal-body"><p id="proc_content"></p></div>
-                <div class="modal-footer" id="footer_button">
-                    
-                </div>
-            </div>
-        </div>
-    </div>
 
 </body>
 

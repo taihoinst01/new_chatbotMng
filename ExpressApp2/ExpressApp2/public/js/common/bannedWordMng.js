@@ -137,6 +137,7 @@ function makeBannedWordTable(newPage) {
 
 function procBandWord(procType) {
     var saveArr = new Array();
+    var data = new Object();
 
     if (procType === 'NEW') {
 
@@ -146,15 +147,14 @@ function procBandWord(procType) {
         data.BANNED_WORD_TYPE = $('#BANNED_WORD_TYPE').val();
         saveArr.push(data);
     } else if (procType === 'DEL') {
-        var data = new Object();
-        data.statusFlag = procType;
-        //data.DEL_SEQ = $('#DEL_SEQ').val();
         $("input[name=DEL_SEQ]:checked").each(function() {
+            data.statusFlag = procType;
+            data = new Object();
             var test = $(this).val();
             console.log(test);
             data.DEL_SEQ = test;
+            saveArr.push(data);
         });
-        saveArr.push(data);
     }
 
     var jsonData = JSON.stringify(saveArr);

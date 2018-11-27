@@ -292,10 +292,10 @@
 	"CARDMOBIBLE_NO": "버튼 미적용",
 	"============= 질문답변관리-smalltalk 관리 =============": "",
 	"SmallTalk_Title": "SmallTalk 관리",
-	"SmallTalk_Cancel": "SmallTalk 등록취소",
+	"SmallTalk_Delete": "SmallTalk 삭제",
 	"SmallTalk_DIALOG_TITLE": "SmallTalk 대화상자",
-	"SmallTalk_CANCEL_CONFIRM": "정말로 취소하시겠습니까? 복구할 수 없습니다.",
-	"SmallTalk_CANCEL_COUNT": "취소할 대상은 한 개 이상이어야 합니다.",
+	"SmallTalk_DELETE_CONFIRM": "정말로 삭제하시겠습니까? 복구할 수 없습니다.",
+	"SmallTalk_DELETE_COUNT": "삭제할 대상은 한 개 이상이어야 합니다.",
 	"============= 질문답변관리-단어설정 =============": "",
 	"ENTITY_SETTING": "단어설정",
 	"Entity definition": "엔티티 정의",
@@ -448,5 +448,7 @@
 	"ALERT_WRONG_ACCESS": "비정상 접근입니다. 로그인 해주세요.",
 	"ALERT_WRONG_ACCESS2": "비정상 접근입니다.",
 	"ALERT_CAN_SELECT_ONE": "답변은 1개만 선택 가능합니다.",
+	"LUIS_SYNCING": "LUIS 동기화중입니다. 데이터양에 따라서 시간이 걸릴 수 있습니다.",
 	"============= The end =============": ""
+	
 }

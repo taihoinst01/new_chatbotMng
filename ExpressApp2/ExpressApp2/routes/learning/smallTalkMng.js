@@ -29,7 +29,7 @@ router.post('/selectSmallTalkList', function (req, res) {
                             " (SELECT ROW_NUMBER() OVER(ORDER BY SEQ DESC) AS NUM, \n" +
                             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
                             "         CEILING((ROW_NUMBER() OVER(ORDER BY SEQ DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                            "         SEQ, S_QUERY, INTENT, S_ANSWER \n" +
+                            "         SEQ, S_QUERY, INTENT, ENTITY, S_ANSWER \n" +
                            "          FROM TBL_SMALLTALK \n" +
                            "          WHERE 1=1 \n";
                            if (req.body.searchQuestiontText !== '') {
@@ -37,7 +37,7 @@ router.post('/selectSmallTalkList', function (req, res) {
                         }
 
                         if (req.body.searchIntentText !== '') {
-                            QueryStr += "AND INTENT like '" + req.body.searchIntentText + "%' \n";
+                            QueryStr += "AND ENTITY like '" + req.body.searchIntentText + "%' \n";
                         }
                         QueryStr +="  ) tbp WHERE PAGEIDX = " + currentPage + "; \n";
 
@@ -134,19 +134,32 @@ router.post('/cancelSmallTalkProc', function (req, res) {
 router.post('/smallTalkProc', function (req, res) {
     var dataArr = JSON.parse(req.body.saveArr);
     var insertStr = "";
+    var deleteStr = "";
     var userId = req.session.sid;
+    console.log("dataArr.length=="+dataArr.length);
 
     for (var i = 0; i < dataArr.length; i++) {
-        insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
-        "VALUES (";
-        insertStr += " '" + dataArr[i].S_QUERY + "', '" + dataArr[i].INTENT + "', '" + dataArr[i].ENTITY + "', '" + dataArr[i].S_ANSWER + "','2',GETDATE());";
+        if (dataArr[i].statusFlag === 'ADD') {
+            insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
+            "VALUES (";
+            insertStr += " '" + dataArr[i].S_QUERY + "', '" + dataArr[i].INTENT + "', '" + dataArr[i].ENTITY + "', '" + dataArr[i].S_ANSWER + "','2',GETDATE());";
+        }else if (dataArr[i].statusFlag === 'DEL') {
+            deleteStr += "DELETE FROM TBL_SMALLTALK WHERE SEQ = '" + dataArr[i].DELETE_ST_SEQ + "'; ";
+        }else{
+
+        }
     }
+   
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             if (insertStr !== "") {
                 let insertSmallTalk= await pool.request().query(insertStr);
+            }
+
+            if (deleteStr !== "") {
+                let deleteSmallTalk = await pool.request().query(deleteStr);
             }
             res.send({ status: 200, message: 'Save Success' });
 

@@ -17,22 +17,25 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     //삭제 버튼 confirm
-    $('#cancelSmallTalkBtnModal').click(function() {
-        var del_count = $("#CANCEL_ST_SEQ:checked").length;
-         
+    $('#deleteSmallTalkBtnModal').click(function() {
+        var del_count = $("#DELETE_ST_SEQ:checked").length;
+
         if(del_count > 0){
-            $('#cancel_content').html(language.SmallTalk_CANCEL_CONFIRM);
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button><button type="button" class="btn btn-primary" id="cancelSmallTalkBtn"><i class="fa fa-edit"></i> '+ language.SmallTalk_Cancel +'</button>');
+            $('#proc_content').html(language.SmallTalk_DELETE_CONFIRM);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button><button type="button" class="btn btn-primary" id="deleteSmallTalkBtn"><i class="fa fa-edit"></i> '+ language.SmallTalk_Delete +'</button>');
+            $('#procSmallTalk').modal('show');
         }else{
-            $('#cancel_content').html(language.SmallTalk_CANCEL_COUNT);
+            $('#proc_content').html(language.SmallTalk_DELETE_COUNT);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
+            $('#procSmallTalk').modal('show');
+            //alert(language.SmallTalk_CANCEL_COUNT);
         }
-        $('#cancelSmallTalkModal').modal('show');
     });
 
     //삭제 버튼
-    $(document).on("click", "#cancelSmallTalkBtn", function () {
-        cancelSmallTalkProc('DEL');
+    $(document).on("click", "#deleteSmallTalkBtn", function () {
+        //cancelSmallTalkProc('DEL');
+        smallTalkProc('DEL');
     });
 
     $('#addSmallTalk').click(function() {
@@ -43,7 +46,7 @@ $(document).ready(function() {
             if(i == answerCnt - 2){
                 answerData = answerData;
             }else{
-                answerData = answerData + "|||";
+                answerData = answerData + "^";
             }
         }
         $('#s_answer').val(answerData);
@@ -122,11 +125,12 @@ function makeSmallTalkTable(page) {
                 var answerText = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     answerText = data.rows[i].S_ANSWER;
-                    answerText = answerText.replace('|||','</br>');
+                    //answerText = answerText.replace(/^/gi,'</br>');
+                    answerText = answerText.split("^").join("</br>");
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
-                    tableHtml += '<td><input type="checkbox" class="flat-red" name="CANCEL_ST_SEQ" id="CANCEL_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
-                    tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
-                    tableHtml += '<td class="txt_left tex01"><a href="#">' + data.rows[i].S_QUERY + '</a></td>';
+                    tableHtml += '<td><input type="checkbox" class="flat-red" name="DELETE_ST_SEQ" id="DELETE_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
+                    tableHtml += '<td>' + data.rows[i].ENTITY + '</td>';
+                    tableHtml += '<td class="txt_left tex01">' + data.rows[i].S_QUERY + '</td>';
                     tableHtml += '<td class="txt_left">' + answerText + '</td>';
                     tableHtml += '</tr>';
                 }
@@ -153,13 +157,34 @@ function makeSmallTalkTable(page) {
 function smallTalkProc(procType) {
     var saveArr = new Array();
     var data = new Object();
-    data.statusFlag = procType;
-    data.S_QUERY = $('#s_query').val();
-    //data.INTENT = $('#INTENT').val();
-    data.INTENT = "smalltalk";
-    data.S_ANSWER = $('#s_answer').val();
-    data.S_ENTITY = $('#s_entity').val();
-    saveArr.push(data);
+
+    var testArr = new Array();
+
+    if(procType=="ADD"){
+        data.statusFlag = procType;
+        data.S_QUERY = $('#s_query').val();
+        //data.INTENT = $('#INTENT').val();
+        data.INTENT = "smalltalk";
+        data.S_ANSWER = $('#s_answer').val();
+        data.ENTITY = $('#s_entity').val();
+        saveArr.push(data);
+    }else if(procType=="DEL"){
+        //data.statusFlag = procType;
+        
+        $("input[name=DELETE_ST_SEQ]:checked").each(function() {
+            data = new Object();
+            data.statusFlag = procType;
+            data.DELETE_ST_SEQ = "";
+            var test = $(this).val();
+            data.DELETE_ST_SEQ = test;
+            
+            saveArr.push(data);
+        });
+       
+    }else{
+
+    }
+    
  
     var jsonData = JSON.stringify(saveArr);
     var params = {
@@ -174,49 +199,20 @@ function smallTalkProc(procType) {
             if (data.status === 200) {
                 //alert(language['REGIST_SUCC']);
                 $('#proc_content').html(language.REGIST_SUCC);
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="reloadPage();"><i class="fa fa-times"></i> Close</button>');
                 $('#procSmallTalk').modal('show');
-                window.location.reload();
+                //window.location.reload();
             } else {
                 //alert(language['It_failed']);
                 $('#proc_content').html(language.It_failed);
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="reloadPage();"><i class="fa fa-times"></i> Close</button>');
                 $('#procSmallTalk').modal('show');
             }
         }
     });
 }
-
-function cancelSmallTalkProc(procType) {
-    var saveArr = new Array();
-    var data = new Object();
-    data.statusFlag = procType;
-    //data.DEL_SEQ = $('#DEL_SEQ').val();
-    $("input[name=CANCEL_ST_SEQ]:checked").each(function() {
-        var test = $(this).val();
-        console.log(test);
-        data.CANCEL_ST_SEQ = test;
-    });
-    saveArr.push(data);
- 
-    var jsonData = JSON.stringify(saveArr);
-    var params = {
-        'saveArr': jsonData
-    };
-    $.ajax({
-        type: 'POST',
-        datatype: "JSON",
-        data: params,
-        url: '/smallTalkMng/cancelSmallTalkProc',
-        success: function (data) {
-            if (data.status === 200) {
-                alert(language['REGIST_SUCC']);
-                window.location.reload();
-            } else {
-                alert(language['It_failed']);
-            }
-        }
-    });
+function reloadPage(){
+    window.location.reload();
 }
 
 function getEntityFromQ(queryText) {
@@ -263,7 +259,9 @@ function utterHighlight(entities, utter) {
         for (var i = 0; i < entities.length; i++) {
             result = result.replace(entities[i].ENTITY_VALUE, '<span class="highlight">' + entities[i].ENTITY_VALUE + '</span>');
             
-            if(i => entities.length){
+            if(i < entities.length -1){
+                
+            }else{
                 entity_comm = "";
             }
             entity_data = entity_data + entities[i].ENTITY_VALUE + entity_comm;
@@ -303,10 +301,10 @@ function iCheckBoxTrans() {
         checkboxClass: 'icheckbox_flat-green',
         radioClass   : 'iradio_flat-green'
     }).on('ifChecked', function(event) {
-        $('input[name=CANCEL_ST_SEQ]').parent().iCheck('check');
+        $('input[name=DELETE_ST_SEQ]').parent().iCheck('check');
         
     }).on('ifUnchecked', function() {
-        $('input[name=CANCEL_ST_SEQ]').parent().iCheck('uncheck');
+        $('input[name=DELETE_ST_SEQ]').parent().iCheck('uncheck');
         
     });
 }

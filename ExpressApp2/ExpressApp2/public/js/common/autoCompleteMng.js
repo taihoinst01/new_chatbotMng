@@ -146,20 +146,19 @@ function makeAutoCompleteTable(newPage) {
 
 function procAutoComplete(procType) {
     var saveArr = new Array();
-
+    var data = new Object();
     if (procType === 'NEW') {
-
         var data = new Object();
         data.statusFlag = procType;
         data.CONTENT = $('#CONTENT').val();
         saveArr.push(data);
     } else if (procType === 'DEL') {
-        var data = new Object();
-        data.statusFlag = procType;
-        //data.DEL_SEQ = $('#DEL_SEQ').val();
         $("input[name=DEL_SEQ]:checked").each(function() {
+            data.statusFlag = procType;
+            data = new Object();
             var test = $(this).val();
             data.DEL_SEQ = test;
+            saveArr.push(data);
         });
         saveArr.push(data);
     } else if (procType === 'UPDATE') {
