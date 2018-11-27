@@ -137,9 +137,9 @@ router.post('/smallTalkProc', function (req, res) {
     var userId = req.session.sid;
 
     for (var i = 0; i < dataArr.length; i++) {
-        insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, S_ANSWER, DLG_TYPE, REG_DT) " +
+        insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
         "VALUES (";
-        insertStr += " '" + dataArr[i].S_QUERY + "', '" + dataArr[i].INTENT + "', '" + dataArr[i].S_ANSWER + "','2',GETDATE());";
+        insertStr += " '" + dataArr[i].S_QUERY + "', '" + dataArr[i].INTENT + "', '" + dataArr[i].ENTITY + "', '" + dataArr[i].S_ANSWER + "','2',GETDATE());";
     }
 
     (async () => {
@@ -162,4 +162,113 @@ router.post('/smallTalkProc', function (req, res) {
         // ... error handler
     })
 });
+
+router.post('/getEntityAjax', function (req, res, next) {
+
+    //view에 있는 data 에서 던진 값을 받아서
+    //var iptUtterance = req.body['iptUtterance[]'];
+    var iptUtterance = req.body.iptUtterance;
+    var entitiesArr = [];
+    var commonEntitiesArr = [];
+
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            //res.send({result:true, iptUtterance:iptUtterance, entities:entities, selBox:rows2, commonEntities: commonEntities});
+            //    for (var i = 0; i < (typeof iptUtterance !== 'string' ? iptUtterance.length : 1); i++) {
+                //var iptUtterTmp = (typeof iptUtterance === 'string' ? iptUtterance : iptUtterance[i]);
+                var iptUtterTmp = iptUtterance;
+                let result1 = await pool.request()
+                    .input('iptUtterance', sql.NVarChar, iptUtterTmp)
+                    .query('SELECT RESULT FROM dbo.FN_ENTITY_ORDERBY_ADD(@iptUtterance)')
+
+                let rows = result1.recordset;
+
+                if (rows[0]['RESULT'] != '') {
+                    var entities = rows[0]['RESULT'];
+                    var entityArr = entities.split(',');
+    
+                    var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY IN (";
+                    for (var j = 0; j < entityArr.length; j++) {
+                        queryString2 += "'";
+                        queryString2 += entityArr[j];
+                        queryString2 += "'";
+                        queryString2 += (j != entityArr.length - 1) ? "," : "";
+                    }
+                    queryString2 += ")";
+                    let result3 = await pool.request()
+                        .query(queryString2)
+                    
+                    let rows3 = result3.recordset
+                    var commonEntities = [];
+                    for (var j = 0; j < rows3.length; j++) {
+                        // 중복되는 엔티티가 있는 경우 길이가 긴 것이 우선순위를 갖음
+                        if (iptUtterTmp.indexOf(rows3[j].ENTITY_VALUE) != -1) {
+                            // 첫번째 엔티티는 등록
+                            var isCommonAdd = false;
+                            if (commonEntities.length == 0) {
+                                isCommonAdd = true;
+                            } else {
+                                for (var k = 0; k < commonEntities.length; k++) {
+                                    var longEntity = '';
+                                    var shortEntity = '';
+                                    var isAdd = false;
+                                    if (rows3[j].ENTITY_VALUE.length >= commonEntities[k].ENTITY_VALUE.length) {
+                                        longEntity = rows3[j].ENTITY_VALUE;
+                                        shortEntity = commonEntities[k].ENTITY_VALUE;
+                                        isAdd = true;
+                                    } else {
+                                        longEntity = commonEntities[k].ENTITY_VALUE;
+                                        shortEntity = rows3[j].ENTITY_VALUE;
+                                    }
+                                    if (longEntity.indexOf(shortEntity) != -1) {
+                                        if (isAdd) {
+                                            commonEntities.splice(k, 1);
+                                            isCommonAdd = true;
+                                            break;
+                                        }
+                                    } else {
+                                        isAdd = true;
+                                    }
+                                    if (isAdd && k == commonEntities.length - 1) {
+                                        isCommonAdd = true;
+                                    }
+                                }
+                            }
+                            if (isCommonAdd) {
+                                var item = {};
+                                item.ENTITY_VALUE = rows3[j].ENTITY_VALUE;
+                                item.ENTITY = rows3[j].ENTITY;
+                                commonEntities.push(item);
+                            }
+                        }
+
+                    }
+                    entitiesArr.push(entities);
+                    commonEntitiesArr.push(commonEntities);
+
+                } else {
+                    entitiesArr.push(null);
+                    commonEntitiesArr.push(null);
+
+                }
+            //}
+
+            res.send({ result: true, entities: entitiesArr, commonEntities: commonEntitiesArr });
+
+        } catch (err) {
+            // ... error checks
+            console.log(err);
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+
+});
+
 module.exports = router;

@@ -54,7 +54,8 @@ router.post('/selectHistoryList', function (req, res) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
-    var selChannel = req.body.selChannel;
+    //var selChannel = req.body.selChannel;
+    var selResult = req.body.selResult;
     var currentPage = checkNull(req.body.currentPage, 1);
 
     if (chkBoardParams(req.body, req.session.channelList)) {
@@ -70,7 +71,7 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
                 QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
                 QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESPONSE_TIME, A.REG_DATE \n";
+                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.REG_DATE \n";
                 QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
                 QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
                 QueryStr += "                  ) AS LUIS_INTENT \n";
@@ -95,8 +96,13 @@ router.post('/selectHistoryList', function (req, res) {
                 } else if (selDate == 'select') {
                     QueryStr += "AND CONVERT(date, @startDate) <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, @endDate) ";
                 }
+                /*
                 if (selChannel !== 'all') {
                     QueryStr += "AND	CHANNEL = @selChannel \n";
+                }
+                */
+                if (selResult !== 'all') {
+                    QueryStr += "AND	RESULT = @selResult \n";
                 }
         
                 /**중복행 제거 부분 주석 */
@@ -107,13 +113,14 @@ router.post('/selectHistoryList', function (req, res) {
                 //QueryStr += "                         ) \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
-    
+
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
                         .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
                         .input('startDate', sql.NVarChar, startDate)
                         .input('endDate', sql.NVarChar, endDate)
-                        .input('selChannel', sql.NVarChar, selChannel)
+                        //.input('selChannel', sql.NVarChar, selChannel)
+                        .input('selResult', sql.NVarChar, selResult)
                         .input('currentPage', sql.NVarChar, currentPage)
                         .query(QueryStr);
     
@@ -152,7 +159,7 @@ router.post('/selectHistoryDetail', function (req, res) {
             QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
             QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
             QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-            QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESPONSE_TIME, A.REG_DATE \n";
+            QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.REG_DATE \n";
             QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
             QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
             QueryStr += "                  ) AS LUIS_INTENT \n";
@@ -210,57 +217,6 @@ function checkNull(val, newVal) {
     }
 }
 
-router.post('/procTemplate', function (req, res) {
-    var dataArr = JSON.parse(req.body.saveArr);
-    var saveStr = "";
-    var updateAllStr = "";
-    var updateStr = "";
-    var deleteStr = "";
-    var userId = req.session.sid;
-
-    for (var i = 0; i < dataArr.length; i++) {
-        if (dataArr[i].statusFlag === 'NEW') {
-            saveStr += "INSERT INTO TBL_CHATBOT_TEMPLATE (HEADER_COLOR, BODY_COLOR, POPHEADER_COLOR, BOT_COLOR, USER_COLOR, ICON_IMG, BACKGROUND_IMG, CHATBOT_NAME, REG_DT, USE_YN) " +
-                "VALUES (";
-            saveStr += " '" + dataArr[i].HEADER_COLOR + "', '" + dataArr[i].BODY_COLOR + "', '" + dataArr[i].POPHEADER_COLOR + "', '" + dataArr[i].BOT_COLOR + "', '" + dataArr[i].USER_COLOR + "', '" + dataArr[i].ICON_IMG + "', '" + dataArr[i].BACKGROUND_IMG + "', '" + dataArr[i].CHATBOT_NAME + "', GETDATE() , 'N');";
-        } else if (dataArr[i].statusFlag === 'UPDATE_USEYN') {
-            updateAllStr += "UPDATE TBL_CHATBOT_TEMPLATE SET USE_YN ='N' WHERE CHATBOT_NAME = '" + dataArr[i].CHATBOT_NAME + "';";
-            updateStr += "UPDATE TBL_CHATBOT_TEMPLATE SET USE_YN ='Y' WHERE SEQ = '" + dataArr[i].USEYN_SEQ + "'; ";
-        } else { //DEL
-            deleteStr += "DELETE FROM TBL_CHATBOT_TEMPLATE WHERE SEQ = '" + dataArr[i].DEL_SEQ + "'; ";
-        }
-    }
-
-    (async () => {
-        try {
-            let pool = await dbConnect.getConnection(sql);
-            if (saveStr !== "") {
-                let insertTemplate = await pool.request().query(saveStr);
-            }
-            if (updateStr !== "") {
-                let updateTemplateAll = await pool.request().query(updateAllStr);
-                let updateTemplate = await pool.request().query(updateStr);
-            }
-            if (deleteStr !== "") {
-                let deleteBannedWord = await pool.request().query(deleteStr);
-            }
-
-            res.send({ status: 200, message: 'Save Success' });
-
-        } catch (err) {
-            console.log(err);
-            res.send({ status: 500, message: 'Save Error' });
-        } finally {
-            sql.close();
-        }
-    })()
-
-    sql.on('error', err => {
-        // ... error handler
-    })
-});
-
-
 function is_number(v) {
     var reg = /^(\s|\d)+$/;
     return reg.test(v);
@@ -271,7 +227,7 @@ function chkBoardParams(bodyReq, channelList) {
     var startDate = bodyReq.startDate;
     var endDate = bodyReq.endDate;
     var selDate = bodyReq.selDate;
-    var selChannel = bodyReq.selChannel;
+    //var selChannel = bodyReq.selChannel;
 
     var dataIsOk = false;
     //var chkDate = "SELECT CONVERT(date, '" + startDate + "') AS CHK1, CONVERT(date, '" + endDate + "') AS CHK2";
@@ -334,6 +290,7 @@ function chkBoardParams(bodyReq, channelList) {
                 dataIsOk = true;
             }
         }
+/*
         if (typeof selChannel == 'undefined') {
             dataIsOk = true;
         } else if (selChannel.trim() == '') {
@@ -345,6 +302,7 @@ function chkBoardParams(bodyReq, channelList) {
                 dataIsOk = true;
             }
         }
+*/
         return dataIsOk;
     }
     catch (err) {

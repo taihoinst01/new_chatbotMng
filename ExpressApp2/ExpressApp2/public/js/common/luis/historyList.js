@@ -24,11 +24,6 @@ $(document).ready(function() {
         $('#searchStr').val(searchInputStr);
         makeHistoryTable(1);
     });
-/*
-    $(document).on("click", "#useTemplateeBtn", function () {
-        procTemplate("UPDATE_USEYN");
-    });
-*/
 });
 
 $(document).on('click', '#historyTablePaging .li_paging', function (e) {
@@ -58,7 +53,8 @@ function getFilterVal(page) {
             'startDate' : 'ALL', 
             'endDate' : 'ALL', 
             'selDate' : $('#selDate').val(),
-            'selChannel' : $('#selChannel').val(),
+            //'selChannel' : $('#selChannel').val(),
+            'selResult' : $('#selResult').val(),
         };
     } else {
         
@@ -74,7 +70,8 @@ function getFilterVal(page) {
                 'startDate' : startDate, 
                 'endDate' : endDate, 
                 'selDate' : $('#selDate').val(),
-                'selChannel' : $('#selChannel').val(),
+                //'selChannel' : $('#selChannel').val(),
+                'selResult' : $('#selResult').val(),
             };
         } else {
             return false;
@@ -127,13 +124,23 @@ function makeHistoryTable(newPage) {
                 if (data.rows.length > 0) {
 
                     var tableHtml = "";
+                    var resultText = "";
                     for (var i = 0; i < data.rows.length; i++) {
+                        if(data.rows[i].RESULT=="H"){
+                            resultText = language.ANSWER_OK;
+                        }else if(data.rows[i].RESULT=="D"){
+                            resultText = language.ANSWER_NO;
+                        }else if(data.rows[i].RESULT=="F"){
+                            resultText = language.ANSWER_SUGGEST;
+                        }else{
+                            resultText = "";
+                        }
                         
                         tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
                         tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>'
                         tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>'
                         tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
-                        tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
+                        tableHtml += '<td>' + resultText + '</td>'
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
                         tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
                         tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
@@ -198,12 +205,23 @@ function getHistoryDetail(sId) {
                 if (data.rows.length > 0) {
 
                     var tableHtml = "";
+                    var resultText = "";
                     for (var i = 0; i < data.rows.length; i++) {
+
+                        if(data.rows[i].RESULT=="H"){
+                            resultText = language.ANSWER_OK;
+                        }else if(data.rows[i].RESULT=="D"){
+                            resultText = language.ANSWER_NO;
+                        }else if(data.rows[i].RESULT=="F"){
+                            resultText = language.ANSWER_SUGGEST;
+                        }else{
+                            resultText = "";
+                        }
                         
                         tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
                         tableHtml += '<td>'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
                         tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
-                        tableHtml += '<td>' + data.rows[i].CHANNEL + '</td>'
+                        tableHtml += '<td>' + resultText + '</td>'
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
                         tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
                         tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
