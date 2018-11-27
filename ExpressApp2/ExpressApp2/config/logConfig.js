@@ -2,7 +2,10 @@ var winston = require('winston');
 var winstonDaily = require('winston-daily-rotate-file');
 var moment = require('moment');
 
-const _logDir = 'C:/logs/server/LOGFILE.log';
+var appRoot = require('app-root-path').path;
+
+//const _logDir = 'C:/logs/server/LOGFILE.log';
+const _logDir = appRoot + '/ExpressApp2/ExpressApp2/logs/LOGFILE_';
 //const _logDir = 'C:/Users/cbadmin/Desktop/ExpressApp2/ExpressApp2/logs/LOGFILE.log';
 
 module.exports.CreateLogger = function () {
@@ -13,7 +16,7 @@ module.exports.CreateLogger = function () {
         //prepend: true,  
         datePattern: 'YYYY-MM-DD',
         json: false,
-        filename: _logDir,
+        filename: _logDir + '.txt',
         timestamp: function () {    
             return moment().format('YYYY-MM-DD HH:mm:ss.SSS ZZ')
         },
