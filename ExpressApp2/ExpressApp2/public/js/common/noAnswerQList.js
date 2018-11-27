@@ -168,7 +168,7 @@ $(document).on('click','#goUtterBtn',function(e){
     var selVal = $('#intentListSelect').val();
     var selText = $('#intentListSelect option:selected').text();
     if (selVal == "NONE") {
-        $('#alertMsg').text('인텐트를 선택해 주세요.');
+        $('#alertMsg').text(language.ALERT_SELECT_INTENT);
         $('#alertBtnModal').modal('show');
         return false;
     } else {
@@ -180,7 +180,8 @@ $(document).on('click','#goUtterBtn',function(e){
             isloading : true,
             success: function(data){
                 if (!data.result) {
-                    alert('다시 시도해 주세요.');
+                    $('#alertMsg').text(language.ALERT_ERROR);
+                    $('#alertBtnModal').modal('show');
                 } else {
                     var selIndex = data.selIndex;
                     var selQry = $('#selQry').val();
@@ -244,14 +245,19 @@ function deleteNoAnswerQ(){
         }
         $.ajax({
                 type: 'POST',
-                data : {'seq' : arry+''},
-                url : '/learning/deleteNoAnswerQ',
+                data : {seq : arry},
+                url : '/qna/deleteNoAnswerQ',
                 isloading : true,
                 success: function(data){
-                    $('#alertMsg').text('삭제되었습니다');
-                    $('#alertBtnModal').modal('show');
-                    $('#currentPage').val(1)
-                    noAnswerQListAjax();
+                    if (data.result) {
+                        $('#alertMsg').text(language.Deleted);
+                        $('#alertBtnModal').modal('show');
+                        $('#currentPage').val(1)
+                        noAnswerQListAjax();
+                    } else {
+                        $('#alertMsg').text(language.It_failed);
+                        $('#alertBtnModal').modal('show');
+                    }
                 }
             });
     }
@@ -263,7 +269,7 @@ function noAnswerQSearch() {
     var searchRecommendText = $('input[name=searchRecommendText]').val();
 
     if(!searchRecommendText) {
-        $('#alertMsg').text('검색어를 입력해주시기 바랍니다.');
+        $('#alertMsg').text(language.Enter_search_word);
         $('#alertBtnModal').modal('show');
     } else {
         noAnswerQListAjax();

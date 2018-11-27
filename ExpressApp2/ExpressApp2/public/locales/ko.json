@@ -263,6 +263,7 @@
 	"Last_month": "최근1달",
 	"Learning recommendation sentence": "학습 추천 문장",
 	"Registration Date": "등록 날짜",
+	"ALERT_SELECT_INTENT": "인텐트를 선택해 주세요.",
 	"============= 질문답변관리-대화상자관리 =============": "",
 	"DIALOG_MNG_TITLE": "대화상자관리",
 	"DIALOG_BOX_TYPE": "대화상자 타입",
