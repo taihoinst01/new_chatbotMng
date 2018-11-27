@@ -1760,7 +1760,7 @@ function saveUtterance() {
         'intentName' : $('#hiddenIntentName').val(),
         'labelArr' : utterArr,
         'newUtterArr' : newArr,
-        'addClosedList' : addClosedList,
+        'addClosedList' : addClosedList
     };
 
     $.ajax({

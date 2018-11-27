@@ -647,7 +647,9 @@ function makeRelation() {
     });
 
     var inputUtterArray = new Array();
+    var selIndex = -1;
     $('#qnaListBody tr').each(function () {
+        selIndex++;
         var tmpSeq = $(this).find('#hiddenSeq').val()
         if (tmpSeq == selectUtterSeq) {
             inputUtterArray.push($(this).find('a[name=selEntity]').text());
@@ -695,19 +697,19 @@ function makeRelation() {
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display", "none");
         },
-        success: function (result) {
-            if (!result) {
-                
-                $('#alertMsg').text("failed");
+        success: function (data) {
+            if (!data.result) {
+                $('#alertMsg').text(language.It_failed);
                 $('#alertBtnModal').modal('show');
                 //alert("failed");
                 return false;
             }
             else {
-                $('#alertMsg').text("language.Added");
+                $('#alertMsg').text(language.Added);
                 $('#alertBtnModal').modal('show');
+                $('#qnaListBody tr').eq(selIndex).remove();
                 //alert(language.Added);
-                location.reload();
+                //location.reload();
             }
         }
     });

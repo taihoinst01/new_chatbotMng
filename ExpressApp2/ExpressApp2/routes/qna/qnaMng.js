@@ -699,7 +699,7 @@ router.post('/selectNoAnswerQList', function (req, res) {
                 "						                                     SELECT CUSTOMER_COMMENT_KR AS QUERY_KR \n" +
                 "						                                       FROM TBL_HISTORY_QUERY \n" +
                 "						                                      GROUP BY CUSTOMER_COMMENT_KR ) TBH \n" +
-                "                         WHERE RESULT NOT IN ('H')  \n" +
+                "                         WHERE RESULT NOT IN ('H', 'R')     \n" +
             //    "                           AND TRAIN_FLAG = 'N'  \n" +
                 "                           AND QUERY = dbo.fn_replace_regex(TBH.QUERY_KR)  \n";
 
@@ -789,18 +789,20 @@ router.post('/selectNoAnswerQList', function (req, res) {
 
 
 router.post('/deleteNoAnswerQ', function (req, res) {
-    var seqs = req.body.seq;
-    var arryseq = seqs.split(',');
     (async () => {
         try {
+            var arryseq = req.body.seq;
+            //var arryseq = seqs.split(',');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             for (var i = 0; i < arryseq.length; i++) {
-                var deleteQueryString1 = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET TRAIN_FLAG = 'Y' WHERE seq='" + arryseq[i] + "'";
-                let result5 = await pool.request().query(deleteQueryString1);
+                var deleteQueryString1 = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET RESULT = 'R' WHERE seq=@seq";
+                let result5 = await pool.request()
+                            .input('seq', sql.NVarChar, arryseq[i])
+                            .query(deleteQueryString1);
             }
-            res.send();
+            res.send({result : true});
         } catch (err) {
-            res.send();
+            res.send({result : false});
         } finally {
             sql.close();
         }

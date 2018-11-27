@@ -62,6 +62,7 @@
 	"Last_month": "Last month",
 	"Learning recommendation sentence": "Learning recommendation sentence",
 	"Registration Date": "Registration Date",
+	"ALERT_SELECT_INTENT": "Please select an intent.",
 	"============= Learning > UTTERANCES =============": "",
 	"A_recommendation": "A recommendation",
 	"Dialogue": "DIALOGUE",

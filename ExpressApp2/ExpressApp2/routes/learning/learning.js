@@ -4719,6 +4719,35 @@ router.post('/relationUtterAjax', function (req, res) {
                
             }
 
+
+            if (req.body.utters.length > 0) {
+                var selecNoAnswerQry = {
+                    selectQry:
+                        ` SELECT SEQ
+                        FROM TBL_QUERY_ANALYSIS_RESULT, ( 
+                                                            SELECT dbo.fn_replace_regex(CUSTOMER_COMMENT_KR)   AS QUERY_KR 
+                                                            FROM TBL_HISTORY_QUERY 
+                                                            WHERE @findQry = CUSTOMER_COMMENT_KR
+                                                            GROUP BY CUSTOMER_COMMENT_KR  ) TBH 
+                        WHERE RESULT NOT IN ('H', 'R')  
+                        AND QUERY = TBH.QUERY_KR `,
+                    updateQry : `
+                        UPDATE TBL_QUERY_ANALYSIS_RESULT SET RESULT = 'H' WHERE SEQ = @updateSeq
+                    `
+                };
+
+                let resultSel1 = await pool.request()
+                        .input('findQry', sql.NVarChar, req.body.utters[0])
+                        .query(selecNoAnswerQry.selectQry)
+                let rows = resultSel1.recordset;
+                if (rows.length > 0) {
+                    let updateQry1 = await pool.request()
+                        .input('updateSeq', sql.NVarChar, rows[0].SEQ)
+                        .query(selecNoAnswerQry.updateQry)
+
+                }
+            }
+
             for (var j = 0; j < (typeof dlgId === "string" ? 1 : dlgId.length); j++) {
                 var updateQQ = await pool.request()
                     .input('dlgId', sql.NVarChar, (typeof dlgId === "string" ? dlgId : dlgId[j]))
@@ -4726,7 +4755,6 @@ router.post('/relationUtterAjax', function (req, res) {
                     .query(updateNewUtter);
                 return res.send({ result: true });
             }
-            
             /********************************************* */
             //console.log(result1);
             //console.log(result2);
