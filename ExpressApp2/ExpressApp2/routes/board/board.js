@@ -240,7 +240,7 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
         //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
         selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
-        selectQuery += "    AND RESULT IN ('H')  \n";
+        selectQuery += "    AND B.RESULT IN ('H')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
         selectQuery += "    AND                A.Dimdate = B.Dimdate \n";
@@ -268,7 +268,7 @@ router.post('/getScorePanel', function (req, res) {
         selectQuery += "    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
         //selectQuery += "    WHERE dbo.FN_REPLACE_REGEX(A.CUSTOMER_COMMENT_KR) = B.QUERY    \n";
         selectQuery += "    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    \n";
-        selectQuery += "    AND RESULT IN ('S')  \n";
+        selectQuery += "    AND B.RESULT IN ('S')  \n";
         selectQuery += "    GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) ) B \n";
         selectQuery += "    WHERE  A.CHANNEL = B.CHANNEL \n";
         selectQuery += "    AND                A.Dimdate = B.Dimdate \n";
@@ -303,7 +303,7 @@ router.post('/getScorePanel', function (req, res) {
     if (selChannel !== 'all') {
         selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
     }
-    console.log("panel=="+selectQuery);
+    //console.log("panel=="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
