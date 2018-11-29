@@ -51,13 +51,14 @@ router.get('/historyList', function (req, res) {
 router.post('/selectHistoryList', function (req, res) {
 
     var searchQuestion = req.body.searchQuestion;
+    var searchUserId = req.body.searchUserId;
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
     //var selChannel = req.body.selChannel;
     var selResult = req.body.selResult;
     var currentPage = checkNull(req.body.currentPage, 1);
-
+    
     if (chkBoardParams(req.body, req.session.channelList)) {
         logger.info('[에러]대시보드 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
         res.send({ status: "PARAM_ERROR" });
@@ -71,7 +72,7 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
                 QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
                 QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.REG_DATE \n";
+                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE \n";
                 QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
                 QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
                 QueryStr += "                  ) AS LUIS_INTENT \n";
@@ -90,7 +91,14 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "                  ) TBL_B \n";
                 QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
                 QueryStr += "              AND REPLACE(A.CUSTOMER_COMMENT_KR, ' ', '') = TBL_B.TRANS_COMMENT \n";
-                QueryStr += "              AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
+                if (searchQuestion !== '') {
+                    QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
+                }
+
+                if (searchUserId !== '') {
+                    QueryStr += "     AND A.USER_ID LIKE @searchUserId \n";
+                }
+                
                 if (selDate == 'today') {
                     QueryStr += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
                 } else if (selDate == 'select') {
@@ -113,10 +121,10 @@ router.post('/selectHistoryList', function (req, res) {
                 //QueryStr += "                         ) \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
-
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
                         .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
+                        .input('searchUserId', sql.NVarChar, '%' + searchUserId + '%')
                         .input('startDate', sql.NVarChar, startDate)
                         .input('endDate', sql.NVarChar, endDate)
                         //.input('selChannel', sql.NVarChar, selChannel)
@@ -125,7 +133,7 @@ router.post('/selectHistoryList', function (req, res) {
                         .query(QueryStr);
     
                 let rows = result1.recordset;
-    
+                
                 if (rows.length > 0) {
                     res.send({ rows: rows, pageList: paging.pagination(currentPage, rows[0].TOTCNT), status : true });
                 } else {
@@ -159,7 +167,7 @@ router.post('/selectHistoryDetail', function (req, res) {
             QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
             QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
             QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-            QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.REG_DATE \n";
+            QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE \n";
             QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
             QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
             QueryStr += "                  ) AS LUIS_INTENT \n";
