@@ -270,11 +270,14 @@ function getUpdateSmallTalk(utterance, answer, seq){
 function smallTalkProc(procType) {
     var saveArr = new Array();
     var data = new Object();
+    var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;
+    var sQuery = "";
 
     if(procType=="ADD"){
+        $('#s_query').val().replace(/ /g, '');
+        sQuery = $('#s_query').val().replace(regExp, "");
         data.statusFlag = procType;
-        data.S_QUERY = $('#s_query').val();
-        //data.INTENT = $('#INTENT').val();
+        data.S_QUERY = sQuery;
         data.INTENT = "smalltalk";
         data.S_ANSWER = $('#s_answer').val();
         data.ENTITY = $('#s_entity').val();
