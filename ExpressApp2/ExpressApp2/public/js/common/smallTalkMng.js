@@ -44,7 +44,7 @@ $(document).ready(function() {
             makeAnswerData("NEW");
             smallTalkProc('ADD');
         }else{
-            $('#proc_content').html("필수 입력값이 등록되지 않았습니다.");
+            $('#proc_content').html(language.IS_REQUIRED);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
             $('#procSmallTalk').modal('show');
         }
@@ -57,7 +57,7 @@ $(document).ready(function() {
             makeAnswerData("UPDATE");
             smallTalkProc('UPDATE');
         }else{
-            $('#proc_content').html("필수 입력값이 등록되지 않았습니다.");
+            $('#proc_content').html(language.IS_REQUIRED);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
             $('#procSmallTalk').modal('show');
         }
@@ -71,16 +71,6 @@ $(document).ready(function() {
         $("#smallTalkForm")[0].reset();
         //window.location.reload();
         $('#smallTalkMngModal').modal('show');
-    });
-
-    $(".add-more").click(function(){ 
-        var html = $(".copy").html();
-        $(".after-add-more").after(html);
-    });
-
-
-    $("body").on("click",".answer-remove",function(){ 
-        $(this).parents(".control-group").remove();
     });
 
     // question 입력
@@ -115,7 +105,7 @@ $(document).ready(function() {
 $(document).on("click", "a[name=delAnswerBtn]", function(e){
     if ($('.answerValDiv  input[name=answerValue]').length < 2) {
         
-        $('#proc_content').html("1개 이상 입력해야 합니다.");
+        $('#proc_content').html(language.SmallTalk_ONE_ITEM);
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
         $('#procSmallTalk').modal('show');
         $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
@@ -129,7 +119,7 @@ $(document).on("click", "a[name=delAnswerBtn]", function(e){
 $(document).on("click", "a[name=update_delAnswerBtn]", function(e){
     if ($('.updateAnswerValDiv  input[name=update_answerValue]').length < 2) {
         //alert('1개 이상 입력해야 합니다.');
-        $('#proc_content').html("1개 이상 입력해야 합니다.");
+        $('#proc_content').html(language.SmallTalk_ONE_ITEM);
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
         $('#procSmallTalk').modal('show');
         $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
@@ -264,7 +254,8 @@ function getUpdateSmallTalk(utterance, answer, seq){
             updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
         }
     }else{
-
+        updateAnswerStr += "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + i + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "' value='" + ori_answer + "'>";
+        updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
     }
 
     $('#ori_utterance').text(ori_uttrance);
@@ -481,6 +472,4 @@ function dialogValidation(type){
         }
         return result;
     }
-    
-       
 }

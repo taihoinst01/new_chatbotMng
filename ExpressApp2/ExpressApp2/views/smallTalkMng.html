@@ -130,10 +130,10 @@
                     <div class="form-group" >
                         <label for="inputEmail3"><i class="fa fa-asterisk"></i> Answer</label>
                         <button type="button" class="btn btn_01" id="addAnswerValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
-                        * 답변은 세개까지 가능합니다
+                        * <%= __('SmallTalk_3ITEM') %>
                         <div class="answerValDiv">
                             <div style="margin-top:4px;">
-                                <input name="answerValue" id="answerValue" type="text" tabindex="2" class="form-control" style=" float: left; width:80%;" placeholder=" <%= __('Please_enter') %>" onkeyup="dialogValidation();">
+                                <input name="answerValue" id="answerValue" type="text" tabindex="2" class="form-control" style=" float: left; width:80%;" placeholder=" <%= __('Please_enter') %>">
                                 <a href="#" name="delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a>
                             </div>
                         </div>
@@ -163,13 +163,13 @@
                         <input type="hidden" name="update_seq" id="update_seq">
                         <div class="form-group">
                             <label for="inputEmail3" ><i class="fa fa-asterisk"></i> Question</label>
-                            <p class="form-control-static" id="ori_utterance">원래문장</p>
+                            <p class="form-control-static" id="ori_utterance"><%= __('SmallTalk_ORI_UTTERANCE') %></p>
                             
                         </div>
                         <div class="form-group" >
                             <label for="inputEmail3"><i class="fa fa-asterisk"></i> Answer</label>
                             <button type="button" class="btn btn_01" id="update_addAnswerValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
-                            * 답변은 세개까지 가능합니다
+                            * <%= __('SmallTalk_3ITEM') %>
                             <div class="updateAnswerValDiv">
                                 
                             </div>
