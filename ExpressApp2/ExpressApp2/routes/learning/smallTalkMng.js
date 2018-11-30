@@ -18,6 +18,10 @@ router.get('/smallTalkMng', function (req, res) {
     res.render('smallTalkMng');
 });
 
+router.get('/smallTalkEntity', function (req, res) {
+    res.render('smallTalkEntity');
+});
+
 router.post('/selectSmallTalkList', function (req, res) {
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
@@ -101,43 +105,12 @@ function checkNull(val, newVal) {
     }
 }
 
-router.post('/cancelSmallTalkProc', function (req, res) {
-    var menuArr = JSON.parse(req.body.saveArr);
-    var updateStr = "";
-    var userId = req.session.sid;
-
-    for (var i = 0; i < menuArr.length; i++) {
-        updateStr += "UPDATE TBL_DLG_RELATION_LUIS SET ST_FLAG='F' WHERE RELATION_ID = '" + menuArr[i].CANCEL_ST_SEQ + "'; ";
-    }
-
-    (async () => {
-        try {
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            if (updateStr !== "") {
-                let updateSmallTalk= await pool.request().query(updateStr);
-            }
-            res.send({ status: 200, message: 'Save Success' });
-
-        } catch (err) {
-            console.log(err);
-            res.send({ status: 500, message: 'Save Error' });
-        } finally {
-            sql.close();
-        }
-    })()
-
-    sql.on('error', err => {
-        // ... error handler
-    })
-});
-
 router.post('/smallTalkProc', function (req, res) {
     var dataArr = JSON.parse(req.body.saveArr);
     var insertStr = "";
     var deleteStr = "";
     var userId = req.session.sid;
-    console.log("dataArr.length=="+dataArr.length);
-
+    
     for (var i = 0; i < dataArr.length; i++) {
         if (dataArr[i].statusFlag === 'ADD') {
             insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
@@ -145,6 +118,8 @@ router.post('/smallTalkProc', function (req, res) {
             insertStr += " '" + dataArr[i].S_QUERY + "', '" + dataArr[i].INTENT + "', '" + dataArr[i].ENTITY + "', '" + dataArr[i].S_ANSWER + "','2',GETDATE());";
         }else if (dataArr[i].statusFlag === 'DEL') {
             deleteStr += "DELETE FROM TBL_SMALLTALK WHERE SEQ = '" + dataArr[i].DELETE_ST_SEQ + "'; ";
+        }else if (dataArr[i].statusFlag === 'UPDATE') {
+            deleteStr += "UPDATE TBL_SMALLTALK SET S_ANSWER='" + dataArr[i].S_ANSWER + "' WHERE SEQ = '" + dataArr[i].SEQ + "'; ";
         }else{
 
         }
@@ -178,8 +153,6 @@ router.post('/smallTalkProc', function (req, res) {
 
 router.post('/getEntityAjax', function (req, res, next) {
 
-    //view에 있는 data 에서 던진 값을 받아서
-    //var iptUtterance = req.body['iptUtterance[]'];
     var iptUtterance = req.body.iptUtterance;
     var entitiesArr = [];
     var commonEntitiesArr = [];
@@ -188,13 +161,10 @@ router.post('/getEntityAjax', function (req, res, next) {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            //res.send({result:true, iptUtterance:iptUtterance, entities:entities, selBox:rows2, commonEntities: commonEntities});
-            //    for (var i = 0; i < (typeof iptUtterance !== 'string' ? iptUtterance.length : 1); i++) {
-                //var iptUtterTmp = (typeof iptUtterance === 'string' ? iptUtterance : iptUtterance[i]);
                 var iptUtterTmp = iptUtterance;
                 let result1 = await pool.request()
                     .input('iptUtterance', sql.NVarChar, iptUtterTmp)
-                    .query('SELECT RESULT FROM dbo.FN_ENTITY_ORDERBY_ADD(@iptUtterance)')
+                    .query('SELECT RESULT FROM dbo.FN_SMALLTALK_ENTITY_ORDERBY_ADD(@iptUtterance)')
 
                 let rows = result1.recordset;
 
@@ -202,7 +172,7 @@ router.post('/getEntityAjax', function (req, res, next) {
                     var entities = rows[0]['RESULT'];
                     var entityArr = entities.split(',');
     
-                    var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_COMMON_ENTITY_DEFINE WHERE ENTITY IN (";
+                    var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY IN (";
                     for (var j = 0; j < entityArr.length; j++) {
                         queryString2 += "'";
                         queryString2 += entityArr[j];
@@ -210,6 +180,7 @@ router.post('/getEntityAjax', function (req, res, next) {
                         queryString2 += (j != entityArr.length - 1) ? "," : "";
                     }
                     queryString2 += ")";
+
                     let result3 = await pool.request()
                         .query(queryString2)
                     
@@ -282,6 +253,305 @@ router.post('/getEntityAjax', function (req, res, next) {
         // ... error handler
     })
 
+});
+
+/*
+* entity mng
+*/
+router.post('/entities', function (req, res) {
+
+    var currentPage = req.body.currentPage;
+
+    (async () => {
+        try {
+
+            var entitiesQueryString = "SELECT tbp.* \n"
+                + "  FROM ( SELECT ROW_NUMBER() OVER(ORDER BY api_group DESC) AS NUM, \n"
+                + "                COUNT('1') OVER(PARTITION BY '1') AS TOTCNT,  \n"
+                + "                CEILING((ROW_NUMBER() OVER(ORDER BY api_group DESC))/ convert(numeric ,10)) PAGEIDX, \n"
+                + "                entity_value, entity, api_group \n"
+                + "           from (   \n"
+                + "                SELECT DISTINCT entity, API_GROUP ,  \n"
+                + "                       STUFF(( SELECT '[' + b.entity_value + ']' \n"
+                + "                                 FROM TBL_SMALLTALK_ENTITY_DEFINE b \n"
+                + "                                WHERE b.entity = a.entity FOR XML PATH('') ),1,1,'[') AS entity_value  \n"
+                + "                  FROM TBL_SMALLTALK_ENTITY_DEFINE a \n"
+                + "                 WHERE API_GROUP != 'OCR TEST' \n"
+                + "              GROUP BY entity, API_GROUP) TBL_SMALLTALK_ENTITY_DEFINE \n"
+                + "         ) tbp \n"
+                + "WHERE PAGEIDX = @currentPage; \n"
+                
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(entitiesQueryString);
+
+            let rows = result1.recordset;
+
+            var result = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+
+                var entitiyValue = rows[i].entity_value;
+                var entity = rows[i].entity;
+
+                item.ENTITY_VALUE = entitiyValue;
+                item.ENTITY = entity;
+
+                result.push(item);
+            }
+            if (rows.length > 0) {
+                res.send({ list: result, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
+            } else {
+                res.send({ list: result });
+            }
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+router.post('/deleteEntity', function (req, res) {
+
+    var delEntityDefine = req.body.delEntityDefine;
+    
+    (async () => {
+        try {
+
+            var deleteAppStr = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            let result1 = await pool.request().query(deleteAppStr);
+
+            res.send({ status: 200, message: 'delete Entity Success' });
+            
+        } catch (err) {
+            console.log(err);
+            console.log("res 500");
+            res.send({ status: 500, message: 'delete Entity Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+    })
+
+});
+
+
+
+//엔티티 추가
+router.post('/insertEntity', function (req, res) {
+
+    var entityList = req.body;
+    var entityTemp = [];
+    if (entityList.entityDefine) {
+        var tmpObj = new Object();
+        tmpObj.entityDefine = entityList.entityDefine;
+        tmpObj.entityValue = entityList.entityValue;
+        entityTemp.push(tmpObj);
+        entityList = entityTemp;
+    }
+    //var entityList = JSON.parse(req.body.entityObj);
+    (async () => {
+        try {
+            var entityInputStr = "";
+            entityInputStr += " SELECT COUNT(*) as count FROM TBL_SMALLTALK_ENTITY_DEFINE \n";
+            entityInputStr += "  WHERE 1=1 \n";
+            entityInputStr += "    AND ENTITY = '" + entityList[0].entityDefine + "' \n";
+            entityInputStr += "    AND ( ";
+            for (var i = 0; i < entityList.length; i++) {
+                if (i !== 0) { entityInputStr += "     OR " }
+                entityInputStr += "ENTITY_VALUE = '" + entityList[i].entityValue + "' \n";
+            }
+            entityInputStr += "); \n";
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            let result0 = await pool.request().query(entityInputStr);
+           
+            let rows = result0.recordset;
+
+            if (rows[0].count == 0) {
+
+                var entityInputStr = "";
+                for (var i = 0; i < entityList.length; i++) {
+                    entityInputStr += " INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY, ENTITY_VALUE) \n";
+                    entityInputStr += " VALUES ('" + entityList[i].entityDefine + "', '" + entityList[i].entityValue + "'); \n";
+                }
+
+                let result1 = await pool.request().query(entityInputStr);
+
+                res.send({ status: 200, message: 'insert Success' });
+            } else {
+                res.send({ status: 'Duplicate', message: 'Duplicate entities exist' });
+            }
+
+        } catch (err) {
+            console.log(err);
+            res.send({ status: 500, message: 'insert Entity Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+    })
+
+});
+
+//엔티티 수정
+router.post('/updateEntity', function (req, res) {
+
+    var entity = req.body.entityDefine;
+    var updEntityValue = req.body.entityValue;
+    var oriEntityValue = [];
+    var insertValue = [];
+    var deleteValue = [];
+    var intentInfo = [];
+    var entityCheck = false;
+
+    var appName = req.session.appName;
+    var subsKey = req.session.subsKey;
+
+    var options = {
+        headers: {
+            'Ocp-Apim-Subscription-Key': subsKey
+        }
+    };
+
+    var client = new Client();
+
+    var selEntityQuery = "SELECT ENTITY_VALUE, ENTITY \n";
+    selEntityQuery += "FROM TBL_SMALLTALK_ENTITY_DEFINE\n";
+    selEntityQuery += "WHERE ENTITY = @entity";
+
+    var delEntityQuery = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY_VALUE = @entityValue";
+
+    var insertEntityQuery = "INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY_VALUE,ENTITY)\n";
+    insertEntityQuery += "VALUES(@entityValue, @entity)";
+
+    (async () => {
+        try {
+            let appPool = await appDbConnect.getAppConnection(appSql, req.session.appName, req.session.dbValue);
+
+            let selEntity = await appPool.request()
+                .input('entity', sql.NVarChar, entity)
+                .query(selEntityQuery);
+
+            var selEntityRecord = selEntity.recordset;
+
+            for (var i = 0; i < selEntityRecord.length; i++) {
+                oriEntityValue.push(selEntityRecord[i].ENTITY_VALUE);
+            }
+
+            deleteValue = JSON.parse(JSON.stringify(oriEntityValue));
+            insertValue = JSON.parse(JSON.stringify(updEntityValue));
+
+            for (var i = 0; i < selEntityRecord.length; i++) {
+                for (var j = 0; j < updEntityValue.length; j++) {
+                    if (oriEntityValue[i] == updEntityValue[j]) {
+                        deleteValue.splice(deleteValue.indexOf(oriEntityValue[i]), 1);
+                        insertValue.splice(insertValue.indexOf(updEntityValue[i]), 1);
+                        break;
+                    }
+                }
+            }
+
+            if (insertValue.length > 0 || deleteValue.length > 0) {
+                for (var i = 0; i < insertValue.length; i++) {
+
+                    let insertEntity = await appPool.request()
+                                .input('entityValue', sql.NVarChar, insertValue[i])
+                                .input('entity', sql.NVarChar, entity)
+                                .query(insertEntityQuery);
+                            break;
+                }
+
+                for (var delNum = 0; delNum < deleteValue.length; delNum++) {
+                    let delEntity = await appPool.request()
+                                    .input('entityValue', sql.NVarChar, deleteValue[delNum])
+                                    .query(delEntityQuery);
+                }
+            }
+            res.send({ status: 200 });
+        } catch (err) {
+            console.log(err);
+            res.send({ status: 500, message: 'insert Entity Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+    })
+
+
+});
+
+//엔티티 검색
+router.post('/searchEntities', function (req, res) {
+
+    var currentPage = req.body.currentPage;
+    var searchEntities = req.body.searchEntities;
+
+    (async () => {
+        try {
+
+            var entitiesQueryString = "SELECT tbp.* \n FROM "
+                + "    (SELECT ROW_NUMBER() OVER(ORDER BY api_group DESC) AS NUM, \n"
+                + "            COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"
+                + "            CEILING((ROW_NUMBER() OVER(ORDER BY api_group DESC))/ convert(numeric ,10)) PAGEIDX, \n"
+                + "            entity_value, entity, api_group from (SELECT DISTINCT entity, API_GROUP , \n"
+                + "            STUFF(( SELECT '[' + b.entity_value + ']' \n "
+                + "                      FROM TBL_SMALLTALK_ENTITY_DEFINE b \n"
+                + "                     WHERE b.entity = a.entity \n "
+                + "                       AND b.API_GROUP = a.API_GROUP FOR XML PATH('') ),1,1,'[') AS entity_value \n"
+                + "      FROM TBL_SMALLTALK_ENTITY_DEFINE a \n"
+                + "     WHERE API_GROUP != 'OCR TEST' \n"
+                + "       AND (entity like @searchEntities or entity_value like @searchEntities) \n"
+                + "  GROUP BY entity, API_GROUP) a \n"
+                + "      ) tbp  \n"
+                + "WHERE PAGEIDX = 1 \n";
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request().input('currentPage', sql.Int, currentPage).input('searchEntities', sql.NVarChar, '%' + searchEntities + '%').query(entitiesQueryString);
+
+            let rows = result1.recordset;
+
+            var result = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+
+                var entitiyValue = rows[i].entity_value;
+                var entity = rows[i].entity;
+
+                item.ENTITY_VALUE = entitiyValue;
+                item.ENTITY = entity;
+
+                result.push(item);
+            }
+            if (rows.length > 0) {
+                res.send({ list: result, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
+            } else {
+                res.send({ list: result });
+            }
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
 });
 
 module.exports = router;

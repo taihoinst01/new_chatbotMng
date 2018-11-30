@@ -177,12 +177,12 @@ function selectAll() {
                         getOftQuestionHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.Answers_to_Frequently_Asked_Questions + '</h3></div> ';
                         getOftQuestionHtml += '		       <div class="Tbl_wrap">';
                         getOftQuestionHtml += '			    <table class="table table-hover" summary="자주 묻는 질문에 대한 답변 top 10">';
-                        getOftQuestionHtml += '				<colgroup><col width="2%"/><col width="50%"/><col width="8%"/><col width="5%"/></colgroup>';
+                        getOftQuestionHtml += '				<colgroup><col width="2%"/><col width="50%"/><col width="20%"/><col width="8%"/><col width="10%"/></colgroup>';
                         getOftQuestionHtml += '				<thead>';
                         getOftQuestionHtml += '				      <tr class="text-center">';
                         getOftQuestionHtml += '					  <th> </th>';
-                        //getOftQuestionHtml += '					  <th>' + language.Intent_name + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.HangulQuestion + '</th>';
+                        getOftQuestionHtml += '					  <th>' + language.Intent_name + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.channel + '</th>';
                         getOftQuestionHtml += '					  <th>' + language.QuestionCount + '</th>';
                         getOftQuestionHtml += '				      </tr>';
@@ -243,15 +243,15 @@ function selectAll() {
                         drawNoneQuerytableHtml += '			</colgroup>';
                         drawNoneQuerytableHtml += '			<thead>';
                         drawNoneQuerytableHtml += '			      <tr>';
-                        drawNoneQuerytableHtml += '				  <th>' + language.Intent_name + '</th>';
+                        //drawNoneQuerytableHtml += '				  <th>' + language.Intent_name + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.HangulQuestion + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.channel + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.QuestionCount + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.Date + '</th>';
-                        drawNoneQuerytableHtml += '				  <th>' + language.Result + '</th>';
-                        drawNoneQuerytableHtml += '				  <th>' + language.TEXT_response + '</th>';
-                        drawNoneQuerytableHtml += '				  <th>' + language.CARD_response + '</th>';
-                        drawNoneQuerytableHtml += '				  <th>' + language.CARDBTN_response + '</th>';
+                        //drawNoneQuerytableHtml += '				  <th>' + language.Result + '</th>';
+                        //drawNoneQuerytableHtml += '				  <th>' + language.TEXT_response + '</th>';
+                        //drawNoneQuerytableHtml += '				  <th>' + language.CARD_response + '</th>';
+                        //drawNoneQuerytableHtml += '				  <th>' + language.CARDBTN_response + '</th>';
                         drawNoneQuerytableHtml += '			      </tr>';
                         drawNoneQuerytableHtml += '			</thead>';
                         drawNoneQuerytableHtml += '			<tbody id="noneQueryDiv">';
@@ -295,16 +295,13 @@ function selectAll() {
                         drawfirstQuerytableHtml += '	<div class="box-body">';
                         drawfirstQuerytableHtml += '	       <div class="Tbl_wrap">';
                         drawfirstQuerytableHtml += '		    <table class="table table-hover" summary="">';
-                        drawfirstQuerytableHtml += '			<colgroup><col width="35%"/><col width="5%"/><col width="8%"/><col width="15%"/><col width="5%"/><col width="5%"/></colgroup>';
+                        drawfirstQuerytableHtml += '			<colgroup><col width="60%"/><col width="10%"/><col width="5%"/><col width="15%"/></colgroup>';
                         drawfirstQuerytableHtml += '			<thead>';
                         drawfirstQuerytableHtml += '			    <tr>';
-                        //drawfirstQuerytableHtml += '				<th>' + language.Intent_name + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.HangulQuestion + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.channel + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.QuestionCount + '</th>';
                         drawfirstQuerytableHtml += '				<th>' + language.Date + '</th>';
-                        drawfirstQuerytableHtml += '				<th>' + language.Type + '</th>';
-                        drawfirstQuerytableHtml += '				<th>' + language.Result + '</th>';
                         drawfirstQuerytableHtml += '			    </tr>';
                         drawfirstQuerytableHtml += '			</thead>';
                         drawfirstQuerytableHtml += '			<tbody id="fistQueryTable">';
@@ -327,22 +324,6 @@ function selectAll() {
             $('#loadingModal').modal('hide');
         }
     });
-    /*
-        //INTENT SCORE 평균/최소/최대
-        drawScoreList();
-        //자주 묻는 질문에 대한 답변 top 10
-        getOftQuestion();
-        //응답(평균/최대/최소)/평균 머무르는 시간
-        getResponseTime();
-        //시간대 별 질문수
-        getQueryByEachTime();
-        //미답변 질문
-        drawNoneQuerytable();
-        //고객 별 첫 질문 bar
-        drawFirstQuery();
-        //고객 별 첫 질문 table
-        drawfirstQuerytable();  
-        */
 }
 
 
@@ -472,6 +453,7 @@ function getOftQuestion() {
                 scoreList += "<tr><td>" + Number(i + 1) + "</td>";
                 //scoreList += "<td>" + tableList[i].INTENT + "</td>";
                 scoreList += "<td class=\"text-left\">" + tableList[i].KORQ + "</td>";
+                scoreList += "<td>" + tableList[i].INTENT + "</td>";
                 scoreList += "<td>" + tableList[i].CHANNEL + "</td>";
                 scoreList += "<td>" + tableList[i].QNUM + "</td>";
                 scoreList += "</tr>";
@@ -587,15 +569,17 @@ function drawNoneQuerytable(page) {
                     var noneList = "";
     
                     for (var i = 0; i < list.length; i++) {
-                        noneList += "<tr><td>" + list[i].intent + "</td>";
+                        noneList += "<tr>";
+                        //noneList += "<tr><td>" + list[i].intent + "</td>";
                         noneList += "<td>" + list[i].korQuery + "</td>";
                         noneList += "<td>" + list[i].channel + "</td>";
                         noneList += "<td>" + list[i].queryCnt + "</td>";
                         noneList += "<td>" + list[i].queryDate + "</td>";
-                        noneList += "<td>" + list[i].result + "</td>";
-                        noneList += "<td>" + list[i].textResult + "</td>";
-                        noneList += "<td>" + list[i].cardResult + "</td>";
-                        noneList += "<td>" + list[i].cardBtnResult + "</td></tr>";
+                        //noneList += "<td>" + list[i].result + "</td>";
+                        //noneList += "<td>" + list[i].textResult + "</td>";
+                        //noneList += "<td>" + list[i].cardResult + "</td>";
+                        //noneList += "<td>" + list[i].cardBtnResult + "</td>";
+                        noneList += "</tr>";
                     }
     
                     $("#noneQueryDiv").html(noneList);
@@ -679,8 +663,7 @@ function drawfirstQuerytable(page) {
                     firstList += "<td>" + list[i].channel + "</td>";
                     firstList += "<td>" + list[i].query_cnt + "</td>";
                     firstList += "<td>" + list[i].query_date + "</td>";
-                    firstList += "<td>" + list[i].message_type + "</td>";
-                    firstList += "<td>" + list[i].intent_score + "</td></tr>";
+                    firstList += "</tr>";
                 }
                 $("#fistQueryTable").html(firstList);
                 $('#fistQueryTablePaging .pagination').html('').append(data.pageList);
