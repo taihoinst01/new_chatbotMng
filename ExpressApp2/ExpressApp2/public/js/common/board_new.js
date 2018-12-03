@@ -419,13 +419,21 @@ function drawScoreList(page) {
             } else {
                 var list = data.list;
                 var scoreList = "";
+                var minData = 0;
+                var maxData = 0;
 
                 for (var i = 0; i < list.length; i++) {
+                    minData = list[i].intentScoreMIN;
+                    maxData = list[i].intentScoreMAX;
+
+                    minData = minData.toFixed(4);
+                    maxData = maxData.toFixed(4);
+
                     scoreList += "<tr><td class=\"text-left\">" + list[i].intentName + "</td>";
                     scoreList += "<td>" + list[i].intentCount + "</td>";
                     scoreList += "<td>" + list[i].intentScoreAVG + "</td>";
-                    scoreList += "<td>" + list[i].intentScoreMIN + "</td>";
-                    scoreList += "<td>" + list[i].intentScoreMAX + "</td></tr>";
+                    scoreList += "<td>" + minData + "</td>";
+                    scoreList += "<td>" + maxData + "</td></tr>";
                 }
 
                 $("#scoreTableBody").html(scoreList);
