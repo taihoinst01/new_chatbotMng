@@ -8,6 +8,7 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
     <%include  ./common/commonLib.html%>
+    <link rel='stylesheet' href='/css/utterances.css' />
         
         <script type="text/javascript" src="/js/common/smallTalkMng.js"></script>
         
@@ -105,7 +106,7 @@
                         })
 
                     </script>
-<div class="modal fade" id="smallTalkMngModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="smallTalkMngModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -115,44 +116,76 @@
                 <h4 class="modal-title" id="myModalLabel"><%= __('SmallTalk_Title') %></h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" name="smallTalkForm" id="smallTalkForm">
+                <form name="smallTalkForm" id="smallTalkForm" method="post">
                     <input type="hidden" name="s_answer" id="s_answer">
                     <input type="hidden" name="s_entity" id="s_entity">
                     <div class="form-group">
-                        <label for="inputEmail3" class="col-sm-2 control-label"><i class="fa fa-asterisk"></i> Question</label>
-                        <div class="col-sm-10">
+                        <label for="inputEmail3" ><i class="fa fa-asterisk"></i> Question</label>
+                        
                             <input type="text" class="form-control" id="s_query" name="s_query" placeholder="<%= __('Please_enter_a_sentence') %>" spellcheck="false"
                             autocomplete='off'>
                             <p id="squeryEntity" name="squeryEntity" style="margin-top:10px">Question Entity</p>
-                        </div>
+                        
                     </div>
-                    <div class="form-group">
-                        <label for="inputEmail3" class="col-sm-2 control-label"><i class="fa fa-asterisk"></i> Answer</label>
-                        <div class="col-sm-10">
-                            <div class="control-group after-add-more form-inline">
-                                <input type="text" class="form-control" id="s_answer_array" name="s_answer_array" style="width:88%" placeholder="<%= __('Please_enter_a_sentence') %>">
-                                <button type="button" class="btn btn_01 add-more" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
+                    <div class="form-group" >
+                        <label for="inputEmail3"><i class="fa fa-asterisk"></i> Answer</label>
+                        <button type="button" class="btn btn_01" id="addAnswerValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
+                        * <%= __('SmallTalk_3ITEM') %>
+                        <div class="answerValDiv">
+                            <div style="margin-top:4px;">
+                                <input name="answerValue" id="answerValue" type="text" tabindex="2" class="form-control" style=" float: left; width:80%;" placeholder=" <%= __('Please_enter') %>">
+                                <a href="#" name="delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a>
                             </div>
                         </div>
                     </div>
                     
                 </form>
-                <div class="copy hide">
-                    <div class="control-group form-inline" style="margin-top:10px">
-                        <input type="text" class="form-control" id="s_answer_array" name="s_answer_array" style="width:88%" placeholder="<%= __('Please_enter_a_sentence') %>">
-                        <button type="button" class="btn btn_danger answer-remove"><i class="fa fa-minus"></i> <%= __('DELETE') %></button>
-                    </div>
-                </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
-                    <button type="button" class="btn btn_01" id="addSmallTalk"><i class="fa fa-edit"></i> Save</button>
+                    <button type="button" class="btn btn-default addDialogCancel" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CLOSE') %></button>
+                    <button type="button" class="btn btn_01" id="addSmallTalk"><i class="fa fa-edit"></i> <%= __('SAVE') %></button>
             </div>
         </div>
     </div>
 </div>
 </div>
+<div class="modal fade" id="smallTalkUpdateModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel"><%= __('SmallTalk_Title') %></h4>
+                </div>
+                <div class="modal-body">
+                    <form name="updateSmallTalkForm" id="updateSmallTalkForm" method="post">
+                        <input type="hidden" name="update_s_answer" id="update_s_answer">
+                        <input type="hidden" name="update_seq" id="update_seq">
+                        <div class="form-group">
+                            <label for="inputEmail3" ><i class="fa fa-asterisk"></i> Question</label>
+                            <p class="form-control-static" id="ori_utterance"><%= __('SmallTalk_ORI_UTTERANCE') %></p>
+                            
+                        </div>
+                        <div class="form-group" >
+                            <label for="inputEmail3"><i class="fa fa-asterisk"></i> Answer</label>
+                            <button type="button" class="btn btn_01" id="update_addAnswerValBtn" ><i class="fa fa-plus"></i> <%= __('ADD') %></button>
+                            * <%= __('SmallTalk_3ITEM') %>
+                            <div class="updateAnswerValDiv">
+                                
+                            </div>
+                        </div>
+                        
+                    </form>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('CLOSE') %></button>
+                        <button type="button" class="btn btn_01" id="updateSmallTalk"><i class="fa fa-edit"></i> <%= __('UPDATE') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>   
 
-<div class="modal fade" id="procSmallTalk" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="procSmallTalk" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

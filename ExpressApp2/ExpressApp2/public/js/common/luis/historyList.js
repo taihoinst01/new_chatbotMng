@@ -61,11 +61,13 @@ $(document).on("change", "#selDate", function () {
 function getFilterVal(page) {
 
     var searchQuestion = $('#searchStr').val();
+    var searchUserId = $('#searchUserId').val();
 
     var filterVal;
     if ($('#datePickerDiv').css('display') == 'none') {
         filterVal = {
             'searchQuestion' : searchQuestion,
+            'searchUserId' : searchUserId,
             'currentPage': page,
             'startDate' : 'ALL', 
             'endDate' : 'ALL', 
@@ -83,6 +85,7 @@ function getFilterVal(page) {
 
             filterVal = {
                 'searchQuestion' : searchQuestion,
+                'searchUserId' : searchUserId,
                 'currentPage': page,
                 'startDate' : startDate, 
                 'endDate' : endDate, 
@@ -142,6 +145,7 @@ function makeHistoryTable(newPage) {
 
                     var tableHtml = "";
                     var resultText = "";
+                    var userIdText = "";
                     for (var i = 0; i < data.rows.length; i++) {
                         if(data.rows[i].RESULT=="H"){
                             resultText = language.ANSWER_OK;
@@ -152,18 +156,28 @@ function makeHistoryTable(newPage) {
                         }else{
                             resultText = "";
                         }
+
+                        if(data.rows[i].USER_ID=="null"||data.rows[i].USER_ID=="NULL"){
+                            userIdText = "";
+                        }else if(data.rows[i].USER_ID==""||data.rows[i].USER_ID==null){
+                            userIdText = "";
+                        }else{
+                            userIdText = data.rows[i].USER_ID;
+                        }
                         
-                        tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
-                        tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>'
-                        tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>'
-                        tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
-                        tableHtml += '<td>' + resultText + '</td>'
-                        tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
-                        tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
-                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
-                        tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
-                        tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
-                        tableHtml += '<tr>'
+                        tableHtml += '<tr name="userTr">';
+                        tableHtml += '<td>' + data.rows[i].NUM + '</td>';
+                        tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>';
+                        tableHtml += '<td>' + userIdText + '</td>';
+                        tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>';
+                        tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
+                        tableHtml += '<td>' + resultText + '</td>';
+                        tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>';
+                        tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>';
+                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>';
+                        tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>';
+                        tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>';
+                        tableHtml += '</tr>';
                     }
     
                     saveTableHtml = tableHtml;
@@ -176,6 +190,7 @@ function makeHistoryTable(newPage) {
                 } else {
                     saveTableHtml = '<tr><td colspan="11" class="text-center">No Data</td></tr>';
                     $('#historyBody').html(saveTableHtml);
+                    $('#historyTablePaging').html('');
                 }
             }
         }
@@ -223,6 +238,7 @@ function getHistoryDetail(sId) {
 
                     var tableHtml = "";
                     var resultText = "";
+                    var userIdText = "";
                     for (var i = 0; i < data.rows.length; i++) {
 
                         if(data.rows[i].RESULT=="H"){
@@ -234,9 +250,18 @@ function getHistoryDetail(sId) {
                         }else{
                             resultText = "";
                         }
+
+                        if(data.rows[i].USER_ID=="null"||data.rows[i].USER_ID=="NULL"){
+                            userIdText = "";
+                        }else if(data.rows[i].USER_ID==""||data.rows[i].USER_ID==null){
+                            userIdText = "";
+                        }else{
+                            userIdText = data.rows[i].USER_ID;
+                        }
                         
                         tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
                         tableHtml += '<td>'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
+                        tableHtml += '<td>' + userIdText + '</td>';
                         tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
                         tableHtml += '<td>' + resultText + '</td>'
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
@@ -244,7 +269,7 @@ function getHistoryDetail(sId) {
                         tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
                         tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
                         tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
-                        tableHtml += '<tr>'
+                        tableHtml += '</tr>'
                     }
     
                     saveTableHtml = tableHtml;

@@ -39,18 +39,28 @@ $(document).ready(function() {
     });
 
     $('#addSmallTalk').click(function() {
-        var answerCnt = $("input[id='s_answer_array']").length;
-        var answerData = "";
-        for(var i=0; i<answerCnt - 1; i++){
-            answerData = answerData + $("input[id='s_answer_array']")[i].value;
-            if(i == answerCnt - 2){
-                answerData = answerData;
-            }else{
-                answerData = answerData + "^";
-            }
+        var validation_result = dialogValidation("NEW");
+        if(validation_result=="success"){
+            makeAnswerData("NEW");
+            smallTalkProc('ADD');
+        }else{
+            $('#proc_content').html(language.IS_REQUIRED);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
+            $('#procSmallTalk').modal('show');
         }
-        $('#s_answer').val(answerData);
-        smallTalkProc('ADD');
+    });
+
+    $('#updateSmallTalk').click(function() {
+        
+        var validation_result = dialogValidation("UPDATE");
+        if(validation_result=="success"){
+            makeAnswerData("UPDATE");
+            smallTalkProc('UPDATE');
+        }else{
+            $('#proc_content').html(language.IS_REQUIRED);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
+            $('#procSmallTalk').modal('show');
+        }
     });
 
     $('#searchDlgBtn').click(function (e) {
@@ -61,16 +71,6 @@ $(document).ready(function() {
         $("#smallTalkForm")[0].reset();
         //window.location.reload();
         $('#smallTalkMngModal').modal('show');
-    });
-
-    $(".add-more").click(function(){ 
-        var html = $(".copy").html();
-        $(".after-add-more").after(html);
-    });
-
-
-    $("body").on("click",".answer-remove",function(){ 
-        $(this).parents(".control-group").remove();
     });
 
     // question 입력
@@ -88,6 +88,46 @@ $(document).ready(function() {
             $("input[name=s_query]").attr("readonly", false);
         }
     });
+
+    $('.addDialogCancel').click(function(){
+        $('#smallTalkForm')[0].reset();
+        var inputAnsweryStr = "<div style='margin-top:4px;'><input name='answerValue'  tabindex='1' id='answerValue' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "'>";
+        inputAnsweryStr += '<a href="#" name="delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
+        $('.answerValDiv').html(inputAnsweryStr);
+
+        $('input[name="s_query"').attr("disabled", false);
+        $('#squeryEntity').html("Question Entity");
+        $('#s_entity').val();
+        $('input[name="s_query"').val("");
+    });
+});
+
+$(document).on("click", "a[name=delAnswerBtn]", function(e){
+    if ($('.answerValDiv  input[name=answerValue]').length < 2) {
+        
+        $('#proc_content').html(language.SmallTalk_ONE_ITEM);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
+        $('#procSmallTalk').modal('show');
+        $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
+    } else {
+        $(this).parent().remove();
+        $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
+        //dialogValidation('NEW');
+    }
+});
+
+$(document).on("click", "a[name=update_delAnswerBtn]", function(e){
+    if ($('.updateAnswerValDiv  input[name=update_answerValue]').length < 2) {
+        //alert('1개 이상 입력해야 합니다.');
+        $('#proc_content').html(language.SmallTalk_ONE_ITEM);
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
+        $('#procSmallTalk').modal('show');
+        $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+    } else {
+        $(this).parent().remove();
+        $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+        //dialogValidation('UPDATE');
+    }
 });
 
 //Banned Word List 테이블 페이지 버튼 클릭
@@ -130,7 +170,7 @@ function makeSmallTalkTable(page) {
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="DELETE_ST_SEQ" id="DELETE_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].ENTITY + '</td>';
-                    tableHtml += '<td class="txt_left tex01">' + data.rows[i].S_QUERY + '</td>';
+                    tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+data.rows[i].S_QUERY+'\',\''+data.rows[i].S_ANSWER+'\','+data.rows[i].SEQ+')">' + data.rows[i].S_QUERY + '</a></td>';
                     tableHtml += '<td class="txt_left">' + answerText + '</td>';
                     tableHtml += '</tr>';
                 }
@@ -148,22 +188,96 @@ function makeSmallTalkTable(page) {
             } else {
                 saveTableHtml = '<tr><td colspan="5" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#smallTalktbody').html(saveTableHtml);
+                $('#smallTalkTablePaging .pagination').html('');
             }
 
         }
     });
 }
 
+$(document).on("click", "#addAnswerValBtn", function(e){
+    var answerLength = $('.answerValDiv  input[name=answerValue]').length+1;
+    var inputAnswerStr = "";
+    if(answerLength > 3){
+        //$('#addAnswerValBtn').attr("disabled", "disabled");
+        //$('#addAnswerValBtn').addClass("disable");
+    }else{
+        inputAnswerStr = "<div style='margin-top:4px;'><input name='answerValue' id='answerValue' tabindex='" + answerLength + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "'>";
+        inputAnswerStr += '<a href="#" name="delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
+        $('.answerValDiv').append(inputAnswerStr);
+        $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
+        //dialogValidation('NEW');
+    }
+});
+
+$(document).on("click", "#update_addAnswerValBtn", function(e){
+    var update_answerLength = $('.updateAnswerValDiv  input[name=update_answerValue]').length;
+    var updateAnswerStr = "";
+    if(update_answerLength > 2){
+        //$('#update_addAnswerValBtn').attr("disabled", "disabled");
+        //$('#update_addAnswerValBtn').addClass("disable");
+    }else{
+        updateAnswerStr = "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + update_answerLength + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "'>";
+        updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
+        $('.updateAnswerValDiv').append(updateAnswerStr);
+        $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+        //dialogValidation('UPDATE');
+    }
+});
+
+function makeAnswerData(type){
+    var answerData = "";
+    if(type=="NEW"){
+        $('.answerValDiv  input[name=answerValue]').each(function() {
+            answerData = answerData + $(this).val() + "^";
+        });
+        answerData = answerData.slice(0, -1);
+        $('#s_answer').val(answerData);
+    }else{//update
+        $('.updateAnswerValDiv  input[name=update_answerValue]').each(function() {
+            answerData = answerData + $(this).val() + "^";
+        });
+        answerData = answerData.slice(0, -1);
+        $('#update_s_answer').val(answerData);
+    }
+}
+
+function getUpdateSmallTalk(utterance, answer, seq){
+    var ori_uttrance = utterance;
+    var ori_answer = answer;
+    var check = ori_answer.includes('^');
+    var updateAnswerStr = "";
+    if(check==true){
+        var answerSplit = ori_answer.split('^');
+        for ( var i=0; i< answerSplit.length; i++ ) {
+            updateAnswerStr += "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + i + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "' value='" + answerSplit[i] + "'>";
+            updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
+        }
+    }else{
+        updateAnswerStr += "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + i + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "' value='" + ori_answer + "'>";
+        updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
+    }
+
+    $('#ori_utterance').text(ori_uttrance);
+    $('#update_seq').val(seq);
+    $('.updateAnswerValDiv').html(updateAnswerStr);
+    $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+
+    $('#smallTalkUpdateModal').modal('show');
+
+}
+
 function smallTalkProc(procType) {
     var saveArr = new Array();
     var data = new Object();
-
-    var testArr = new Array();
+    var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;
+    var sQuery = "";
 
     if(procType=="ADD"){
+        $('#s_query').val().replace(/ /g, '');
+        sQuery = $('#s_query').val().replace(regExp, "");
         data.statusFlag = procType;
-        data.S_QUERY = $('#s_query').val();
-        //data.INTENT = $('#INTENT').val();
+        data.S_QUERY = sQuery;
         data.INTENT = "smalltalk";
         data.S_ANSWER = $('#s_answer').val();
         data.ENTITY = $('#s_entity').val();
@@ -180,7 +294,14 @@ function smallTalkProc(procType) {
             
             saveArr.push(data);
         });
-       
+    }else if(procType=="UPDATE"){
+        data = new Object();
+        data.statusFlag = procType;
+        data.S_ANSWER = $('#update_s_answer').val();
+        data.SEQ = $('#update_seq').val();
+
+        saveArr.push(data);
+        
     }else{
 
     }
@@ -259,15 +380,16 @@ function utterHighlight(entities, utter) {
         for (var i = 0; i < entities.length; i++) {
             result = result.replace(entities[i].ENTITY_VALUE, '<span class="highlight">' + entities[i].ENTITY_VALUE + '</span>');
             
-            if(i < entities.length -1){
+            if(i < entities.length){
                 
             }else{
                 entity_comm = "";
             }
             entity_data = entity_data + entities[i].ENTITY_VALUE + entity_comm;
         }
-        $('#s_entity').val(entity_data);
+        entity_data = entity_data.slice(0, -1);
     }
+    $('#s_entity').val(entity_data);
     return result;
 }
 
@@ -277,7 +399,7 @@ $(document).on('click', '.utterDelete', function () {
     $('input[name="s_query"').attr("disabled", false);
     $('#squeryEntity').html("Question Entity");
     $('#s_entity').val();
-    $('input[name="s_query"').text("");
+    $('input[name="s_query"').val("");
 
 });
 
@@ -307,4 +429,50 @@ function iCheckBoxTrans() {
         $('input[name=DELETE_ST_SEQ]').parent().iCheck('uncheck');
         
     });
+}
+
+//모달창 입력값에 따른 save 버튼 활성화 처리
+function dialogValidation(type){
+    if(type=="NEW"){
+        var defineText = $('#s_query').val().trim();
+        var valueText = true;
+        var result = "false";
+        
+        $('.answerValDiv  input[name=answerValue]').each(function() {
+            if ($(this).val().trim() === "") {
+                valueText = false;
+                return;
+            }
+        });
+
+        if(defineText != "" && valueText) {
+            //$('#addSmallTalk').removeClass("disable");
+            //$('#addSmallTalk').attr("disabled", false);
+            result = "success";
+        } else {
+            //$('#addSmallTalk').attr("disabled", "disabled");
+            //$('#addSmallTalk').addClass("disable");
+        }
+
+        return result;
+    }else{ //update
+        //var defineText = $('#update_answerValue').val().trim();
+        var valueText = true;
+        var result = "false";
+
+        $('.updateAnswerValDiv  input[name=update_answerValue]').each(function() {
+            if ($(this).val().trim() === "") {
+                valueText = false;
+                return;
+            }
+        });
+
+        if(valueText) {
+            result = "success";
+        } else {
+            //$('#updateSmallTalk').attr("disabled", "disabled");
+            //$('#updateSmallTalk').addClass("disable");
+        }
+        return result;
+    }
 }
