@@ -2221,8 +2221,9 @@ router.post('/searchDialogByIntent', function (req, res) {
     var searchSmallGroup = req.body.searchSmallGroup;
     */
     var serachDlg = req.body.serachDlg.trim();
-    var tblDlgSearch = "SELECT DLG_INTENT,, DLG_ID, DLG_ORDER_NO, DLG_TYPE, DLG_LANG FROM TBL_DLG ORDER BY DLG_ORDER_NO, DLG_ID;"; 
-    /*var tblDlgSearch = "SELECT A.RNUM, A.LUIS_INTENT, A.DLG_ID, B.DLG_ORDER_NO, B.DLG_TYPE, B.DLG_LANG \n";
+    //var tblDlgSearch = "SELECT DLG_INTENT,, DLG_ID, DLG_ORDER_NO, DLG_TYPE, DLG_LANG FROM TBL_DLG ORDER BY DLG_ORDER_NO, DLG_ID;"; 
+    /*
+    var tblDlgSearch = "SELECT A.RNUM, A.LUIS_INTENT, A.DLG_ID, B.DLG_ORDER_NO, B.DLG_TYPE, B.DLG_LANG \n";
     tblDlgSearch += "FROM (\n";
     tblDlgSearch += "    SELECT RANK() OVER(ORDER BY LUIS_ENTITIES) AS RNUM, LUIS_INTENT, DLG_ID \n";
     tblDlgSearch += "      FROM TBL_DLG_RELATION_LUIS  \n";
@@ -2239,13 +2240,14 @@ router.post('/searchDialogByIntent', function (req, res) {
     }
     tblDlgSearch += ")A, TBL_DLG B \n"
     tblDlgSearch += "WHERE A.DLG_ID = B.DLG_ID \n"
-    tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"*/
-    /*
+    tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"
+    */
     var tblDlgSearch = "SELECT RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
     tblDlgSearch += "FROM (\n";
     tblDlgSearch += "SELECT RANK() OVER(ORDER BY GroupS) AS RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
     tblDlgSearch += "FROM TBL_DLG \n";
     tblDlgSearch += "WHERE 1=1\n";
+    
     if (serachDlg) {
 
         tblDlgSearch += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
@@ -2258,7 +2260,7 @@ router.post('/searchDialogByIntent', function (req, res) {
         }
     }
     tblDlgSearch += ")A \n ORDER BY DLG_ID"
-    */
+    
 
 
     var dlgText = "SELECT DLG_ID,TEXT_DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
