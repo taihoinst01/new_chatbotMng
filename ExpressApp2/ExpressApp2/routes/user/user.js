@@ -298,7 +298,10 @@ router.post('/updateUserAppList', function (req, res) {
     var saveDataStr = "";
     var removeDataStr = "";
 
+    
     for (var i=0; i<saveData.length; i++) {
+        
+        console.log(saveData[i]);
         saveDataStr += "INSERT INTO TBL_USER_RELATION_APP(USER_ID, APP_ID, CHAT_ID) " +
                     "     VALUES ('" + userId + "', " + saveData[i] + ", " + saveData[i] + "); \n";    
     }

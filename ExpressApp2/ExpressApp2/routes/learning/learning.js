@@ -2221,7 +2221,8 @@ router.post('/searchDialogByIntent', function (req, res) {
     var searchSmallGroup = req.body.searchSmallGroup;
     */
     var serachDlg = req.body.serachDlg.trim();
-    var tblDlgSearch = "SELECT A.RNUM, A.LUIS_INTENT, A.DLG_ID, B.DLG_ORDER_NO, B.DLG_TYPE, B.DLG_LANG \n";
+    var tblDlgSearch = "SELECT DLG_INTENT,, DLG_ID, DLG_ORDER_NO, DLG_TYPE, DLG_LANG FROM TBL_DLG ORDER BY DLG_ORDER_NO, DLG_ID;"; 
+    /*var tblDlgSearch = "SELECT A.RNUM, A.LUIS_INTENT, A.DLG_ID, B.DLG_ORDER_NO, B.DLG_TYPE, B.DLG_LANG \n";
     tblDlgSearch += "FROM (\n";
     tblDlgSearch += "    SELECT RANK() OVER(ORDER BY LUIS_ENTITIES) AS RNUM, LUIS_INTENT, DLG_ID \n";
     tblDlgSearch += "      FROM TBL_DLG_RELATION_LUIS  \n";
@@ -2238,7 +2239,7 @@ router.post('/searchDialogByIntent', function (req, res) {
     }
     tblDlgSearch += ")A, TBL_DLG B \n"
     tblDlgSearch += "WHERE A.DLG_ID = B.DLG_ID \n"
-    tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"
+    tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"*/
     /*
     var tblDlgSearch = "SELECT RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
     tblDlgSearch += "FROM (\n";
@@ -2260,14 +2261,14 @@ router.post('/searchDialogByIntent', function (req, res) {
     */
 
 
-    var dlgText = "SELECT DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
+    var dlgText = "SELECT DLG_ID,TEXT_DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
     dlgText += "FROM TBL_DLG_TEXT\n";
     dlgText += "WHERE USE_YN = 'Y'\n"
     dlgText += "AND DLG_ID IN (\n"
     dlgText += "SELECT DISTINCT DLG_ID\n"
     dlgText += "FROM TBL_DLG\n"
     dlgText += "WHERE 1=1\n";
-
+    
     if (serachDlg) {
 
         dlgText += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
@@ -2334,6 +2335,7 @@ router.post('/searchDialogByIntent', function (req, res) {
     }
     dlgMedia += ") \n ORDER BY DLG_ID";
 
+    
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
@@ -2357,8 +2359,9 @@ router.post('/searchDialogByIntent', function (req, res) {
             for (var i = 0; i < rows.length; i++) {
 
                 var row = {};
-                row.RNUM = rows[i].RNUM;
+                //row.RNUM = rows[i].RNUM;
                 row.DLG_ID = rows[i].DLG_ID;
+                row.DLG_TEXT_ID = rows[i].DLG_ID;
                 row.DLG_TYPE = rows[i].DLG_TYPE;
                 row.DLG_ORDER_NO = rows[i].DLG_ORDER_NO;
                 //row.GroupL = rows[i].GroupL;

@@ -7,11 +7,13 @@ var dbConnect = require('../../config/dbConnect');
 var paging = require('../../config/paging');
 var util = require('../../config/util');
 var Client = require('node-rest-client').Client;
+var Excel = require('exceljs');
+var appRoot = require('app-root-path').path;
 
 const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
-
+const _logDir = appRoot + '/ExpressApp2/ExpressApp2/excelDownload/';
 //log start
 var Logger = require("../../config/logConfig");
 var logger = Logger.CreateLogger();
@@ -45,6 +47,47 @@ router.get('/historyList', function (req, res) {
     }).catch(err => {
         res.status(500).send({ message: "${err}"})
         sql.close();
+    });
+});
+
+router.post('/excelDownload',function(req, res){
+    
+    var workbook = new Excel.Workbook();
+    var worksheet = workbook.addWorksheet('My Sheet');
+    var count = "100";
+    worksheet.columns = [
+        { header: '번호', key: 'num'},
+        { header: '질문 내용', key: 'question'},
+        { header: '중복 갯수', key: 'overlapCount' },
+        { header: '코드', key: 'code' },
+        { header: '답변 시간', key: 'resultTime' },
+        { header: '날짜', key: 'date' },
+        { header: '의도', key: 'intent' },
+        { header: '단어', key: 'text' },
+        { header: '답변 아이디', key: 'id' },
+    ];
+
+        var QueryStr = "";
+        QueryStr += "";
+
+    for(var i=0; i<1; i++)
+    {
+        worksheet.addRow({
+            num: ""
+            ,question: ""
+            ,overlapCount: ""
+            ,code: ""
+            ,resultTime:""
+            ,date:""
+            ,intent:""
+            ,text:""
+            ,id:""
+        });
+    }
+    
+    workbook.xlsx.writeFile(_logDir+req.session.appName+"_"+req.session.sid+".xlsx").then(function() {
+        res.send({result: "성공하였습니다."});
+        console.log("success");
     });
 });
 
