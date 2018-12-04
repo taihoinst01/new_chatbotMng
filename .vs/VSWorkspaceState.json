@@ -3,13 +3,17 @@
     "",
     "\\ExpressApp2",
     "\\ExpressApp2\\ExpressApp2",
-    "\\ExpressApp2\\ExpressApp2\\config",
-    "\\ExpressApp2\\ExpressApp2\\obj",
     "\\ExpressApp2\\ExpressApp2\\public",
+    "\\ExpressApp2\\ExpressApp2\\public\\js",
+    "\\ExpressApp2\\ExpressApp2\\public\\js\\common",
+    "\\ExpressApp2\\ExpressApp2\\public\\js\\common\\luis",
     "\\ExpressApp2\\ExpressApp2\\routes",
-    "\\ExpressApp2\\ExpressApp2\\routes\\board",
-    "\\ExpressApp2\\ExpressApp2\\views"
+    "\\ExpressApp2\\ExpressApp2\\routes\\learning",
+    "\\ExpressApp2\\ExpressApp2\\routes\\luis",
+    "\\ExpressApp2\\ExpressApp2\\routes\\menu",
+    "\\ExpressApp2\\ExpressApp2\\routes\\qna",
+    "\\ExpressApp2\\ExpressApp2\\routes\\user"
   ],
-  "SelectedNode": "\\ExpressApp2\\ExpressApp2\\views\\leftSideBar.html",
+  "SelectedNode": "\\ExpressApp2\\ExpressApp2\\obj",
   "PreviewInSolutionExplorer": false
 }

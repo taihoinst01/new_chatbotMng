@@ -271,18 +271,19 @@ function initUserList() {
 
 function deleteUser() {
     if ($('tr div[class*=checked]').length < 1) {
-        //alert(language['NO_SELECTED_CELL']);
+        alert(language['NO_SELECTED_CELL']);
         $('#procDialog').modal('hide');
         $('#proc_content').html(language.NO_SELECTED_CELL);
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
         $('#procDialog').modal('show');
     } else {
         $('tr div[class*=checked]').each(function() {
+            
             $(this).parent().prev().text('DEL');
             var checkAdmin = $(this).parent().next().text();
             $('#procDialog').modal('hide');
             $('#proc_content').html(language.IS_DELETE_CONFIRM);
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-trash"></i> ' + language.DELETE +'</button><button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
             $('#procDialog').modal('show');
         });
     }
@@ -360,7 +361,7 @@ function saveUser() {
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
-    
+             
                 var data = new Object() ;
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();
@@ -418,7 +419,7 @@ function saveUser() {
                 //alert(language['It_failed']);
             }
         }
-    });    
+    });
 }
 
 function goReloadPage(){

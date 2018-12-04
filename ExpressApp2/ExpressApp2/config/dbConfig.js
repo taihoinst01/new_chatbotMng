@@ -1,9 +1,9 @@
 
 var dbConfig = {
-    //user: 'tiizchatbotv3',
-    //password: 'qwer!asdF1',
-    //server: 'tiizchatbotv3.database.windows.net',
-    //database: 'TIIZChatBotManager',
+    /*user: 'tiizchatbotv3',
+    password: 'qwer!asdF1',
+    server: 'tiizchatbotv3.database.windows.net',
+    database: 'TIIZChatBotManager',*/
     user: 'cjempl',
     password: 'empl369!@',
     server: 'cjemployeedb.database.windows.net',

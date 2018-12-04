@@ -16,7 +16,24 @@ $(document).ready(function() {
 
     makeHistoryTable(1);    
 });
+//엑셀 다운로드
+$(document).on('click','#excelDownload',function(){
+    
+    $.ajax({
+        url: '/historyMng/excelDownload',
+        dataType: 'json',
+        type: 'POST',
+        success: function(data) {
+            //alert('다운로드가 완료되었습니다.');
+            alert('success : '+ data.result);
+        },error : function(e)
+        {
+            alert('error : ' + e);
+        }
+    });
 
+    
+});
 $(document).ready(function() {
 
     $('#searchDlgBtn').click(function() {
