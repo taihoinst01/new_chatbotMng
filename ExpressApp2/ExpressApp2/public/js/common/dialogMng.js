@@ -65,36 +65,6 @@ $(document).ready(function () {
     });
     
 });
-/*
-function getGroupSeelectBox() {
-    $.ajax({
-        type: 'POST',
-        url: '/learning/getGroupSelectBox',
-        isloading: true,
-        success: function (data) {
-            var groupL = data.groupL;
-            var groupM = data.groupM;
-
-            var groupHtml = "";
-
-            for (var i = 0; i < groupL.length; i++) {
-                groupHtml += '<option value="' + groupL[i].GROUPL + '">' + groupL[i].GROUPL + '</option>';
-            }
-
-            $("#largeGroup").html(groupHtml);
-
-            groupHtml = "";
-            for (var i = 0; i < groupM.length; i++) {
-                groupHtml += '<option value="' + groupM[i].GROUPM + '">' + groupM[i].GROUPM + '</option>';
-            }
-
-            $("#middleGroup").html(groupHtml);
-            $("#predictIntent").html(groupHtml);
-
-        }
-    });
-}
-*/
 
 //오른쪽 버튼 클릭시 슬라이드
 function nextBtn(botChatNum) {
@@ -138,12 +108,13 @@ function createDialog() {
             return false;
         }
     });
+
+    if (exit) return;
+
     //dialogText textarea 값 치환
     var temp = $("#dialogText").val();
     temp = temp.replace(/(?:\r\n|\r|\n)/g, '/n');
     $("#dialogText").val(temp);
-
-    if (exit) return;
 
     $('.insertForm input[name=mediaImgUrl]').each(function (index) {
         if ($(this).val().trim() === "") {
@@ -457,7 +428,7 @@ function selectDlgByTxt(groupType, sourceType) {
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
-                        '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ');return false;"><span class="fa fa-trash"></span></a></td>' +
+                        '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ',\'common\');return false;"><span class="fa fa-trash"></span></a></td>' +
                         '</tr>';
 
                 }

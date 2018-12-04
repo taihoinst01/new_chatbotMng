@@ -15,13 +15,9 @@
 
     <%include  ../common/commonLib.html%>
     <link rel='stylesheet' href='/css/botchat.css' />
-    <script type="text/javascript" src="/js/common/dialogMng.js"></script>
+    <script type="text/javascript" src="/js/common/initDialogMng.js"></script>
     <script type="text/javascript" src="/js/common/dialogCommon.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/dialog.css" />
-    <!-- 
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel="stylesheet" type="text/css" href="/css/paging.css" />
-    <link rel='stylesheet' href='/css/botchat.css' /> -->
     
     <style type="text/css">
         .dlgCardMordal a:link, .dlgCardMordal a:visited, .dlgCardMordal a:hover, .dlgCardMordal a:active, .dlgCardMordal a:focus { 
@@ -48,7 +44,7 @@
     <%include  ../leftSideBar.html%>
 
     <div class="content-wrapper">
-            <section class="content-header"><h1><%= __('DIALOG_MNG_TITLE') %></h1>  </section>
+            <section class="content-header"><h1>초기메세지 관리</h1>  </section>
 
             <!-- Main content -->
             <section class="content">
@@ -73,14 +69,16 @@
                                     <!-- 학습 추천 테이블 --> 
                                     <div class="Tbl_wrap">
                                         <table class="Tbl" summary="학습 추천 결과">
-                                            <colgroup><col width="5%"/><col width="35%"/><col width="40%"/><col width="10"/><col width="10%"/></colgroup>
+                                            <colgroup><col width="10%"/><col width="30%"/><col width="35%"/><col width="10"/><col width="10%"/><col width="5%"/></colgroup>
                                             <input type="hidden" name="sourceType" id="tblSourceType" value="D">
                                                   <tr>
+                                                    <!--<th></th>-->
+                                                    <th>DLG_GROUP</th>
+                                                    <th><%= __('TITLE') %></th>
+                                                    <th><%= __('DESC') %></th>
+                                                    <th><%= __('DIALOG_BOX_TYPE') %></th>
+                                                    <th>Order No.</th>
                                                     <th></th>
-                                                      <th><%= __('TITLE') %></th>
-                                                      <th><%= __('DESC') %></th>
-                                                      <th><%= __('DIALOG_BOX_TYPE') %></th>
-                                                      <th></th>
                                                   </tr>
                                                 <tbody id="dialogTbltbody">
                                                     
@@ -115,8 +113,6 @@
                         <div class="col-md-6" style="padding:0">  
                             <form name="appInsertForm" id="appInsertForm">
                                 <input type="hidden" name="middleGroup" id="middleGroup">
-                                <input type="hidden" name="dlgGroup" id="dlgGroup" value="2">
-                                <input type="hidden" name="dlgOrderNo" id="dlgOrderNo" value="1000">
                                 <h5><span class="col01 fa fa-chevron-right"></span> <%= __('GROUP_INFORMATION') %></h5>          
                                 <div class="clear-both"></div>
                                 <div class="form-group" >
@@ -130,6 +126,18 @@
                                     <label><%= __('DESC') %></label>
                                     <!--<textarea class="form-control" name="description" id="description" rows="3" placeholder="<%= __('Please_enter') %>"></textarea>-->
                                     <input type="text" name="description" id="description" class="form-control" placeholder="<%= __('Please_enter') %>">
+                                </div> 
+                                <div class="clear-both"></div>
+                                <div class="form-group form-inline" >
+                                    <label>구분/순서</label>&nbsp;
+                                    <!--<textarea class="form-control" name="description" id="description" rows="3" placeholder="<%= __('Please_enter') %>"></textarea>-->
+                                    <select id="dlgGroup" name="dlgGroup" class="form-control">
+                                        <option value="1" selected>Welcome Message</option>
+                                        <option value="5">Sorry Message</option>
+                                        <option value="6">Suggest Message(질문)</option>
+                                        <option value="7">Suggest Message(완료)</option>
+                                    </select>
+                                    <input type="number" name="dlgOrderNo" id="dlgOrderNo" class="form-control" placeholder="only number">
                                 </div>  
                             </form>
                             <div id="commonLayout" class="dialog_w">
@@ -141,7 +149,6 @@
                                             <select class="form-control" name="dlgType"> 
                                                 <option value="2"><%= __('TEXT_TYPE') %></option>
                                                 <option value="3"><%= __('CARD_TYPE') %></option>
-                                                <option value="4"><%= __('MEDIA_TYPE') %></option>
                                             </select>  
                                             <div class="clear-both"></div>  
                                                                                                                          
@@ -162,7 +169,6 @@
                                     </div>                                                                                        
                                     <div class="form-group">
                                         <label><%= __('DIALOG_BOX_CONTENTS') %><span class="nec_ico">*</span></label>
-                                        <!--<input type="text" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>">-->
                                         <textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder="<%= __('Please_enter') %>" rows="5"></textarea>
                                     </div>                                     
                                 </div>
@@ -382,25 +388,6 @@
     </div> 
     <!-- // 신규 대화상자 생성 -->
 
-
-    <!-- 팝업_미리보기 -->
-    <div class="modal fade" id="dialogShowMordal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
-            <div class="modal-dialog">
-                    <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                                    <h4 class="modal-title" id="myModalLabel"><%= __('CARD_LIST') %></h4>
-                                </div>
-                                <div class="form-group" id="dialogShow" >
-                                </div>                                                                 
-                                <div class="modal-footer">
-                                    <div class="btn_wrap">
-                                        <button type="button" class="btn btn_01" data-dismiss="modal" ><i class="fa fa-check"></i> <%= __('OK') %></button>
-                                    </div>
-                                </div>
-                    </div>
-            </div>
-    </div>
     <div class="modal fade" id="procDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

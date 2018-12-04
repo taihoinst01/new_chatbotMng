@@ -483,7 +483,9 @@ function writeDialog(e) {
             $('.dialogView').children().eq(icx).find('.textMent .textTitle').text('');
         }
         var test = e.value;
+        //alert("test111==="+test);
         test = test.replace(/(?:\r\n|\r|\n)/g, '\n');
+        //alert("test222==="+test);
         var obj = $('.dialogView').children().eq(icx).find('.textMent .dlg_content').text(test);
         obj.html(obj.html().replace(/\n/g,'<br/>'));
     }
@@ -861,8 +863,10 @@ function updateDialog() {
 }
 
 var deleteDlgId = "";
-function deleteDialogModal(dlgId) {
+var deleteDlgType = "";
+function deleteDialogModal(dlgId, type) {
     deleteDlgId = dlgId;
+    deleteDlgType = type;
     $('#proc_content').html(language.IS_DELETE_CONFIRM);
     $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button><button type="button" class="btn btn-primary" id="deleteDialogBtn" onClick="deleteDialog();"><i class="fa fa-trash"></i> ' + language.DELETE +'</button>');
     $('#procDialog').modal('show');
@@ -881,10 +885,19 @@ function deleteDialog() {
             $('#proc_content').html(language.Deleted);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
             $('#procDialog').modal('show');
-            $('.createDlgModalClose').click();
-            var groupType = $('.selected').text();
-            var sourceType = $('#tblSourceType').val();
-            selectDlgByTxt(groupType, sourceType);
+            
+            if(deleteDlgType=="common"){
+                $('.createDlgModalClose').click();
+                var groupType = $('.selected').text();
+                var sourceType = $('#tblSourceType').val();
+                selectDlgByTxt(groupType, sourceType);
+            }else if(deleteDlgType=="init"){
+                
+                makeInitDlgTable();
+            }else{
+
+            }
+            
         }
 
     });
@@ -1098,7 +1111,15 @@ $(document).on("click", "#show_dlg", function () {
                             $("#dialogLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
                             $(".insertForm .textLayout").css("display", "block");
                         } else if (tmp.dlg[j].DLG_TYPE == 3) {
-
+                            var cardImgUrl = "";
+                            if(tmp.dlg[j].IMG_URL==""||tmp.dlg[j].IMG_URL=="null"){
+                                cardImgUrl = "";
+                            }else if(tmp.dlg[j].IMG_URL==null){
+                                cardImgUrl = "";
+                            }else{
+                                cardImgUrl = '<img src="' + tmp.dlg[j].IMG_URL + '">';
+                            }
+                            console.log("cardImgUrl=="+cardImgUrl);
                             if (j == 0) {
                                 inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
                                 inputUttrHtml += '<div class="wc-message-content">';
@@ -1116,7 +1137,8 @@ $(document).on("click", "#show_dlg", function () {
                             inputUttrHtml += '<li class="wc-carousel-item">';
                             inputUttrHtml += '<div class="wc-card hero">';
                             inputUttrHtml += '<div class="wc-container imgContainer" >';
-                            inputUttrHtml += '<img src="' + tmp.dlg[j].IMG_URL + '">';
+                            //inputUttrHtml += '<img src="' + tmp.dlg[j].IMG_URL + '">';
+                            inputUttrHtml += cardImgUrl;
                             inputUttrHtml += '</div>';
                             if (tmp.dlg[j].CARD_TITLE != null) {
                                 inputUttrHtml += '<h1>' + /*cardtitle*/ cardTitleHtml + '</h1>';
@@ -1297,6 +1319,15 @@ $(document).on("click", "#show_dlg", function () {
                 $('#dlgQuestion').text(show_question);
                 $('#luisIntent').text(show_intent);
                 $("#createDialog").attr('onclick', 'updateDialog()');
+            }else if(pageType=="initDlg"){
+                //대화상자 수정 추가
+                $('h4#myModalLabel.modal-title').text(language.Show_dlg);
+
+                $('select[name=dlgGroup]').val(result['list'][0].DLG_GROUP).prop("selected", true);
+                $('#description').val(result['list'][0].DLG_DESCRIPTION);
+                $('#title').val(result['list'][0].DLG_NAME);
+                $('#dlgOrderNo').val(result['list'][0].DLG_ORDER_NO);
+                $("#createDialog").attr('onclick', 'updateInitDialog()');
             }else{
                 var $iptLuisIntent = $('input[name=predictIntent]');
                 var $selectLuisIntent = $('select[name=predictIntent]');
