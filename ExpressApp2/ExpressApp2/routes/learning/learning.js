@@ -2470,7 +2470,7 @@ router.post('/addDialog', function (req, res) {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
             var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
-                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, 2)';
+                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
@@ -2479,23 +2479,31 @@ router.post('/addDialog', function (req, res) {
                 '(@dlgId,@dialogTitle,@dialogText,@mediaImgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardDivision,@cardValue,\'Y\')';
 
             var largeGroup = array[array.length - 1]["largeGroup"];
-            var middleGroup = array[array.length - 1]["middleGroup"];
+            var dlgGroup = array[array.length - 1]["dlgGroup"];
             var description = array[array.length - 1]["description"];
             var predictIntent = array[array.length - 1]["predictIntent"];
+            var dialogOrderNo = array[array.length - 1]["dlgOrderNo"];
 
             for (var i = 0; i < (array.length - 1); i++) {
-
+                var insertDlgOrderNo = 0;
                 let result1 = await pool.request()
                     .query(selectDlgId)
                 let dlgId = result1.recordset;
+
+                if(dialogOrderNo==1000){
+                    insertDlgOrderNo = i+1;
+                }else{
+                    insertDlgOrderNo = dialogOrderNo;
+                }
                 
                 let result2 = await pool.request()
                     .input('dlgId', sql.Int, dlgId[0].DLG_ID)
                     .input('dialogText', sql.NVarChar, (description.trim() == '' ? null : description.trim()))
                     .input('dlgType', sql.NVarChar, array[i]["dlgType"])
-                    .input('dialogOrderNo', sql.Int, (i + 1))
+                    //.input('dialogOrderNo', sql.Int, (i + 1))
+                    .input('dialogOrderNo', sql.Int, insertDlgOrderNo)
                     .input('largeGroup', sql.NVarChar, largeGroup)
-                    //.input('middleGroup', sql.NVarChar, middleGroup)
+                    .input('dlgGroup', sql.NVarChar, dlgGroup)
                     .input('predictIntent', sql.NVarChar, predictIntent)
                     .query(insertTblDlg);
                 //.input('luisEntities', sql.NVarChar, (typeof luisEntities ==="string" ? luisEntities:luisEntities[j]))
