@@ -6,21 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/common/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/common/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/common/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="/common/css/skin-blue.min.css">
-    <link rel="stylesheet" href="/common/css/default.css">
-    <!--[if lt IE 9]>
-    <script src="common/js/html5shiv.min.js"></script>
-    <script src="common/js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <script src="/common/js/jquery.min.js"></script>
-    <script src="/common/js/bootstrap.min.js"></script>
-    <script src="/common/js/adminlte.min.js"></script>
-    <script src="/common/js/jquery-2.2.4.min.js"  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="/common/js/icheck.min.js"></script>
-
+    <%include  ./common/commonLib.html%>
+    
     <script type="text/javascript" src="/js/common/login.js"></script>
 </head>
     
@@ -54,8 +41,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="loadingLoginModalMain" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
-    aria-labelledby="myModalLabel">
+  <div class="modal fade" id="loadingLoginModalMain" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
