@@ -23,6 +23,11 @@
         <script src="/common/js/daterangepicker.js"></script>
         <script src="/common/js/bootstrap-datepicker.min.js"></script>
         <script src="/common/js/morris.min.js"></script>
+
+        
+        <script src="/common/js/excel/exceljs.js"></script>
+        <script src="/common/js/excel/FileSaver.js"></script>
+
         <style type="text/css">
            
         </style>
@@ -54,6 +59,16 @@
                             <input type="hidden" name='currentPage' id="currentPage" value="1" />
                         <div class="box  color-palette-box">
                                 <div class="box-body">
+                                    
+                                        <div class="modal-body search_op">
+
+                                            <div class="form-group col-lg-2 fr"  style=" margin-top:45px;text-align:right; padding-right:0em;">
+                                                <button type="button" id="excelDownload" class="btn btn_01 "></i> <%= __('Excel Download') %></button>
+                                            </div>
+                                            <div class="form-group col-lg-2 fr"  style=" margin-top:45px;text-align:right; left:120px; padding-right:0.5em;">
+                                                <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
+                                            </div>
+                                        </div>
                                         <div class="modal-body search_op">
                                             <div class="form-group col-lg-4"  style=" padding-left:0px !important" >
                                                 <label>
@@ -103,18 +118,12 @@
                                                     <option value="E">ERROR</option>
                                                 </select>
                                             </div>
-                                            <div class="form-group col-lg-3"  style=" padding-left:0px !important" >
+                                            
+                                            <div class="form-group col-lg-3"  style=" padding-left:0px !important; width:15%;" >
                                                 <label>
                                                     <%= __('USER_ID') %>
                                                 </label>
                                                 <input type="text" name="searchUserId" id="searchUserId" class="form-control" placeholder=" <%= __('Enter_search_word') %>">
-                                            </div>
-
-                                                <div class="form-group col-lg-2 fr"  style=" margin-top:45px;text-align:right; padding-right:0px;">
-                                                    <button type="button" id="excelDownload" class="btn btn_01 "></i> <%= __('Excel Download') %></button>
-                                                </div>
-                                            <div class="form-group col-lg-2 fr"  style=" margin-top:45px;text-align:right; left:120px; padding-right:0px;">
-                                                <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
                                             </div>
                                         </div>
                                          

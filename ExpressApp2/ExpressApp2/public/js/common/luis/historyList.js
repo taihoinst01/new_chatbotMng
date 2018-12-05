@@ -18,22 +18,104 @@ $(document).ready(function() {
 });
 //엑셀 다운로드
 $(document).on('click','#excelDownload',function(){
-    
+
+    var saveTableHtml = "";
+    var param = getFilterVal();
+    if (param == false) {
+        alert('날짜 형식을 확인해주세요.');
+        return false;
+    } 
+
     $.ajax({
-        url: '/historyMng/excelDownload',
-        dataType: 'json',
         type: 'POST',
-        success: function(data) {
-            //alert('다운로드가 완료되었습니다.');
-            alert('success : '+ data.result);
-        },error : function(e)
-        {
-            alert('error : ' + e);
+        data: param,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
+        url: '/historyMng/selectHistoryListAll',
+        success: function (data) {
+            if (status) {
+                $('#alertMsg').text(language.ALERT_ERROR);
+                $('#alertBtnModal').modal('show');
+            } else {
+                if (data.rows.length > 0) {
+
+                    var filePath = data.fildPath_;
+                    var workbook = new ExcelJS.Workbook();
+                     
+                    workbook.creator = data.appName;
+                    workbook.lastModifiedBy = data.userId;
+                    workbook.created = new Date();
+                    workbook.modified = new Date();
+                    workbook.lastPrinted = new Date();
+
+                    
+                    var worksheet = workbook.addWorksheet('History Log');
+
+                    //var count = "100";
+                    worksheet.columns = [
+                        { header: '번호', key: 'num', width: 7, style: {numFmt: "0000"}},
+                        { header: '질문 내용', key: 'question', width: 40, style: {alignment: {wrapText: true} }},
+                        { header: '중복 갯수', key: 'overlapCount', width: 8},
+                        { header: '코드', key: 'code', width: 20},
+                        { header: '답변 시간', key: 'resultTime', width: 10 },
+                        { header: '날짜', key: 'date', width: 25 },
+                        { header: '의도', key: 'intent', width: 25, style: {alignment: {wrapText: true} } },
+                        { header: '단어', key: 'text', width: 25, style: {alignment: {wrapText: true} } },
+                        { header: '답변 아이디', key: 'id', width: 10 }
+                    ];
+
+                    var firstRow = worksheet.getRow(1);
+                    firstRow.font = { name: 'New Times Roman', family: 4, size: 10, bold: true, color: {argb:'80EF1C1C'} };
+                    firstRow.alignment = { vertical: 'middle', horizontal: 'center'};
+                    firstRow.height = 20;
+                    worksheet.autoFilter = {
+                        from: 'C1',
+                        to: 'I1'
+                    }
+
+                    for (var i = 0; i < data.rows.length; i++) {
+                        worksheet.addRow({
+                            num: data.rows[i].NUM
+                            , question: data.rows[i].CUSTOMER_COMMENT_KR
+                            , overlapCount: data.rows[i].SAME_CNT
+                            , code: data.rows[i].CHATBOT_COMMENT_CODE
+                            , resultTime: data.rows[i].RESPONSE_TIME
+                            , date: data.rows[i].REG_DATE
+                            , intent: data.rows[i].LUIS_INTENT
+                            , text: data.rows[i].LUIS_ENTITIES
+                            , id: data.rows[i].DLG_ID
+                        });
+                    }
+
+                    var buff = workbook.xlsx.writeBuffer().then(function (data) {
+                        var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+                        saveAs(blob, filePath);
+                    });
+                }
+            }
         }
     });
-
-    
 });
+
 $(document).ready(function() {
 
     $('#searchDlgBtn').click(function() {
@@ -68,7 +150,7 @@ function getFilterVal(page) {
         filterVal = {
             'searchQuestion' : searchQuestion,
             'searchUserId' : searchUserId,
-            'currentPage': page,
+            'currentPage': (typeof page!= 'undefined')?page:1,
             'startDate' : 'ALL', 
             'endDate' : 'ALL', 
             'selDate' : $('#selDate').val(),
@@ -86,7 +168,7 @@ function getFilterVal(page) {
             filterVal = {
                 'searchQuestion' : searchQuestion,
                 'searchUserId' : searchUserId,
-                'currentPage': page,
+                'currentPage': (typeof page!= 'undefined')?page:1,
                 'startDate' : startDate, 
                 'endDate' : endDate, 
                 'selDate' : $('#selDate').val(),

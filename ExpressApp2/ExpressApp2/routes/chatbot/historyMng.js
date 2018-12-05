@@ -13,7 +13,7 @@ var appRoot = require('app-root-path').path;
 const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
-const _logDir = appRoot + '/ExpressApp2/ExpressApp2/excelDownload/';
+const _excelDir = appRoot + '/ExpressApp2/ExpressApp2/excelDownload/';
 //log start
 var Logger = require("../../config/logConfig");
 var logger = Logger.CreateLogger();
@@ -50,46 +50,115 @@ router.get('/historyList', function (req, res) {
     });
 });
 
-router.post('/excelDownload',function(req, res){
+router.post('/selectHistoryListAll', function (req, res) {
+
+    var searchQuestion = req.body.searchQuestion;
+    var searchUserId = req.body.searchUserId;
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    //var selChannel = req.body.selChannel;
+    var selResult = req.body.selResult;
+
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + '-' + pad(minutes, 2) + '-' + pad(secconds, 2);
+
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
     
-    var workbook = new Excel.Workbook();
-    var worksheet = workbook.addWorksheet('My Sheet');
-    var count = "100";
-    worksheet.columns = [
-        { header: '번호', key: 'num'},
-        { header: '질문 내용', key: 'question'},
-        { header: '중복 갯수', key: 'overlapCount' },
-        { header: '코드', key: 'code' },
-        { header: '답변 시간', key: 'resultTime' },
-        { header: '날짜', key: 'date' },
-        { header: '의도', key: 'intent' },
-        { header: '단어', key: 'text' },
-        { header: '답변 아이디', key: 'id' },
-    ];
+    if (chkBoardParams(req.body, req.session.channelList)) {
+        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
+        res.send({ status: "PARAM_ERROR" });
+    } else {
+        (async () => {
+            try {
+    
+                var QueryStr = "";
+                QueryStr += "  SELECT tbx.* \n";
+                QueryStr += "    FROM ( \n";
+                QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
+                QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
+                QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
+                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE \n";
+                QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
+                QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
+                QueryStr += "                  ) AS LUIS_INTENT \n";
+                QueryStr += "                  ,(CASE RTRIM(A.LUIS_ENTITIES) WHEN '' THEN 'NONE' \n";
+                QueryStr += "                         ELSE ISNULL(A.LUIS_ENTITIES, 'NONE') END \n";
+                QueryStr += "                  ) AS LUIS_ENTITIES \n";
+                QueryStr += "                  ,(CASE RTRIM(A.DLG_ID) WHEN '' THEN 'NONE' \n";
+                QueryStr += "                         ELSE ISNULL(A.DLG_ID, 'NONE') END \n";
+                QueryStr += "                  ) AS DLG_ID, A.SID, TBL_B.SAME_CNT \n";
+                QueryStr += "             FROM TBL_HISTORY_QUERY A, \n";
+                QueryStr += "                  ( \n";
+                QueryStr += "			         SELECT REPLACE(CUSTOMER_COMMENT_KR, ' ', '') AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
+                QueryStr += "                  	   FROM TBL_HISTORY_QUERY\n";
+                QueryStr += "        			  WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
+                QueryStr += "                  GROUP BY REPLACE(CUSTOMER_COMMENT_KR, ' ', '')\n";
+                QueryStr += "                  ) TBL_B \n";
+                QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
+                QueryStr += "              AND REPLACE(A.CUSTOMER_COMMENT_KR, ' ', '') = TBL_B.TRANS_COMMENT \n";
+                if (searchQuestion !== '') {
+                    QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
+                }
 
-        var QueryStr = "";
-        QueryStr += "";
-
-    for(var i=0; i<1; i++)
-    {
-        worksheet.addRow({
-            num: ""
-            ,question: ""
-            ,overlapCount: ""
-            ,code: ""
-            ,resultTime:""
-            ,date:""
-            ,intent:""
-            ,text:""
-            ,id:""
-        });
+                if (searchUserId !== '') {
+                    QueryStr += "     AND A.USER_ID LIKE @searchUserId \n";
+                }
+                
+                if (selDate == 'today') {
+                    QueryStr += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+                } else if (selDate == 'select') {
+                    QueryStr += "AND CONVERT(date, @startDate) <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, @endDate) ";
+                }
+                if (selResult !== 'all') {
+                    QueryStr += "AND	RESULT = @selResult \n";
+                }
+        
+                QueryStr += "     ) tbx\n";
+                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                let result1 = await pool.request()
+                        .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
+                        .input('searchUserId', sql.NVarChar, '%' + searchUserId + '%')
+                        .input('startDate', sql.NVarChar, startDate)
+                        .input('endDate', sql.NVarChar, endDate)
+                        //.input('selChannel', sql.NVarChar, selChannel)
+                        .input('selResult', sql.NVarChar, selResult)
+                        .query(QueryStr);
+                
+                let rows = result1.recordset;
+                
+                if (rows.length > 0) {
+                    res.send({ rows: rows
+                            , fildPath_: fildPath_
+                            , appName : req.session.appName
+                            , userId : req.session.sid
+                            , status : true 
+                    });
+                } else {
+                    res.send({
+                        rows : [],
+                        status : true
+                    });
+                }
+            } catch (err) {
+                res.send({ rows: [], status : false});
+            } finally {
+                sql.close();
+            }
+        })()
     }
-    
-    workbook.xlsx.writeFile(_logDir+req.session.appName+"_"+req.session.sid+".xlsx").then(function() {
-        res.send({result: "성공하였습니다."});
-        console.log("success");
-    });
 });
+
+
+
+
+
 
 router.post('/selectHistoryList', function (req, res) {
 
@@ -103,7 +172,7 @@ router.post('/selectHistoryList', function (req, res) {
     var currentPage = checkNull(req.body.currentPage, 1);
     
     if (chkBoardParams(req.body, req.session.channelList)) {
-        logger.info('[에러]대시보드 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
+        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
         res.send({ status: "PARAM_ERROR" });
     } else {
         (async () => {
@@ -174,7 +243,7 @@ router.post('/selectHistoryList', function (req, res) {
                         .input('selResult', sql.NVarChar, selResult)
                         .input('currentPage', sql.NVarChar, currentPage)
                         .query(QueryStr);
-    
+                
                 let rows = result1.recordset;
                 
                 if (rows.length > 0) {
@@ -361,5 +430,9 @@ function chkBoardParams(bodyReq, channelList) {
     }
 }
 
+function pad(n, width) {
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+}
 
 module.exports = router;
