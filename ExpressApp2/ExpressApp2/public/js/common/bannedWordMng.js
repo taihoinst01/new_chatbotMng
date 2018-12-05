@@ -81,7 +81,7 @@ $(document).ready(function() {
 //Banned Word List 테이블 페이지 버튼 클릭
 $(document).on('click', '#bannedWordTablePaging .li_paging', function (e) {
     if (!$(this).hasClass('active')) {
-        makeBannedWordTable($(this).text());
+        makeBannedWordTable($(this).val());
     }
 });
 

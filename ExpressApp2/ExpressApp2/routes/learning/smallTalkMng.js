@@ -33,7 +33,7 @@ router.post('/selectSmallTalkList', function (req, res) {
                             " (SELECT ROW_NUMBER() OVER(ORDER BY SEQ DESC) AS NUM, \n" +
                             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
                             "         CEILING((ROW_NUMBER() OVER(ORDER BY SEQ DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                            "         SEQ, S_QUERY, INTENT, ENTITY, S_ANSWER \n" +
+                            "         SEQ, S_QUERY, INTENT, ENTITY, S_ANSWER, USE_YN \n" +
                            "          FROM TBL_SMALLTALK \n" +
                            "          WHERE 1=1 \n";
                            if (req.body.searchQuestiontText !== '') {
@@ -119,7 +119,7 @@ router.post('/smallTalkProc', function (req, res) {
         }else if (dataArr[i].statusFlag === 'DEL') {
             deleteStr += "DELETE FROM TBL_SMALLTALK WHERE SEQ = '" + dataArr[i].DELETE_ST_SEQ + "'; ";
         }else if (dataArr[i].statusFlag === 'UPDATE') {
-            deleteStr += "UPDATE TBL_SMALLTALK SET S_ANSWER='" + dataArr[i].S_ANSWER + "' WHERE SEQ = '" + dataArr[i].SEQ + "'; ";
+            deleteStr += "UPDATE TBL_SMALLTALK SET S_ANSWER='" + dataArr[i].S_ANSWER + "', USE_YN='" + dataArr[i].USE_YN + "' WHERE SEQ = '" + dataArr[i].SEQ + "'; ";
         }else{
 
         }

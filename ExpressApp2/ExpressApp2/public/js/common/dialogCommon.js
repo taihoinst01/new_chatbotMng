@@ -1300,7 +1300,7 @@ $(document).on("click", "#show_dlg", function () {
             }
             $('.dialogView').html(inputUttrHtml);
             //$('#dialogShow').prepend(inputUttrHtml);
-
+alert("pageType==="+pageType);
             if(pageType=="qna"){
                 //대화상자 수정 추가
                 if(result['list'].length == 0){
@@ -1321,7 +1321,7 @@ $(document).on("click", "#show_dlg", function () {
                 $("#createDialog").attr('onclick', 'updateDialog()');
             }else if(pageType=="initDlg"){
                 //대화상자 수정 추가
-                $('h4#myModalLabel.modal-title').text(language.Show_dlg);
+                $('h4#myModalLabel.modal-title').text(language.INITDLG_UPDATE_TITLE);
 
                 $('select[name=dlgGroup]').val(result['list'][0].DLG_GROUP).prop("selected", true);
                 $('#description').val(result['list'][0].DLG_DESCRIPTION);
@@ -1357,3 +1357,31 @@ $(document).on("click", "#show_dlg", function () {
     }); // ------      ajax 끝-----------------
 
 });
+
+//오른쪽 버튼 클릭시 슬라이드
+function nextBtn(botChatNum) {
+
+    $("#slideDiv" + botChatNum).animate({ scrollLeft: ($("#slideDiv" + botChatNum).scrollLeft() + 312) }, 500, function () {
+
+        if ($("#slideDiv" + botChatNum).scrollLeft() ==
+            ($("#slideDiv" + botChatNum).find(".wc-carousel-item").length - 2) * 156) {
+            $("#nextBtn" + botChatNum).hide();
+        }
+
+    });
+
+    $("#prevBtn" + botChatNum).show();
+}
+
+//왼쪽 버튼 클릭시 슬라이드
+function prevBtn(botChatNum) {
+
+    $("#slideDiv" + botChatNum).animate({ scrollLeft: ($("#slideDiv" + botChatNum).scrollLeft() - 312) }, 500, function () {
+
+        if ($("#slideDiv" + botChatNum).scrollLeft() == 0) {
+            $("#prevBtn" + botChatNum).hide();
+        }
+    });
+
+    $("#nextBtn" + botChatNum).show();
+}

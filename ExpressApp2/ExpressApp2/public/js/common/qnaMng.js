@@ -868,7 +868,7 @@ function changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex
 //테이블 페이지 버튼 클릭
 $(document).on('click', '#qnaListTablePaging .li_paging', function (e) {
     if (!$(this).hasClass('active')) {
-        makeQnaListTable($(this).text());
+        makeQnaListTable($(this).val());
     }
 });
 

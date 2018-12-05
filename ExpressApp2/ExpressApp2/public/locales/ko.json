@@ -292,8 +292,19 @@
 	"CARD_MOBILE": "Mobile 버튼 적용",
 	"CARDMOBIBLE_OK": "버튼 적용",
 	"CARDMOBIBLE_NO": "버튼 미적용",
+	"============= 질문답변관리-init dialogue 관리 =============": "",
+	"INITDLG_TITLE": "초기메세지관리",
+	"DLG_GROUP": "답변그룹",
+	"WELCOME_MESSAGE": "Welcome Message",
+	"SORRY_MESSAGE": "Sorry Message",
+	"SUGGEST_MESSAGE1": "Suggest Message(질문)",
+	"SUGGEST_MESSAGE2": "Suggest Message(완료)",
+	"ORDER_NO": "노출순서",
+	"INITDLG_INPUT_TITLE": "초기메세지 등록",
+	"INITDLG_UPDATE_TITLE": "초기메세지 수정",
 	"============= 질문답변관리-smalltalk 관리 =============": "",
 	"SmallTalk_Title": "SmallTalk 관리",
+	"SmallTalk_Insert": "SmallTalk 등록",
 	"SmallTalk_Delete": "SmallTalk 삭제",
 	"SmallTalk_DIALOG_TITLE": "SmallTalk 대화상자",
 	"SmallTalk_DELETE_CONFIRM": "정말로 삭제하시겠습니까? 복구할 수 없습니다.",
@@ -302,6 +313,7 @@
 	"SmallTalk_ONE_ITEM": "1개 이상 입력해야 합니다.",
 	"SmallTalk_ORI_UTTERANCE": "원래문장",
 	"SmallTalk_3ITEM": "답변은 세개까지 가능합니다",
+	"Enter_Connection_entity": "단어를 입력하세요",
 	"============= 질문답변관리-단어설정 =============": "",
 	"ENTITY_SETTING": "단어설정",
 	"Entity definition": "엔티티 정의",
@@ -461,5 +473,4 @@
 	"ALERT_CAN_SELECT_ONE": "답변은 1개만 선택 가능합니다.",
 	"LUIS_SYNCING": "LUIS 동기화를 시작합니다. 데이터양에 따라서 시간이 걸릴 수 있습니다.",
 	"============= The end =============": ""
-	
 }

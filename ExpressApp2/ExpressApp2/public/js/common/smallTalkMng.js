@@ -133,7 +133,7 @@ $(document).on("click", "a[name=update_delAnswerBtn]", function(e){
 //Banned Word List 테이블 페이지 버튼 클릭
 $(document).on('click', '#smallTalkTablePaging .li_paging', function (e) {
     if (!$(this).hasClass('active')) {
-        makeSmallTalkTable($(this).text());
+        makeSmallTalkTable($(this).val());
     }
 });
 
@@ -165,13 +165,13 @@ function makeSmallTalkTable(page) {
                 var answerText = "";
                 for (var i = 0; i < data.rows.length; i++) {
                     answerText = data.rows[i].S_ANSWER;
-                    //answerText = answerText.replace(/^/gi,'</br>');
-                    answerText = answerText.split("^").join("</br>");
+                    answerText = answerText.split("$").join("</br>");
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="DELETE_ST_SEQ" id="DELETE_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].ENTITY + '</td>';
-                    tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+data.rows[i].S_QUERY+'\',\''+data.rows[i].S_ANSWER+'\','+data.rows[i].SEQ+')">' + data.rows[i].S_QUERY + '</a></td>';
+                    tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+data.rows[i].S_QUERY+'\',\''+data.rows[i].S_ANSWER+'\','+data.rows[i].SEQ+',\''+data.rows[i].USE_YN+'\')">' + data.rows[i].S_QUERY + '</a></td>';
                     tableHtml += '<td class="txt_left">' + answerText + '</td>';
+                    tableHtml += '<td>' + data.rows[i].USE_YN + '</td>';
                     tableHtml += '</tr>';
                 }
 
@@ -229,26 +229,26 @@ function makeAnswerData(type){
     var answerData = "";
     if(type=="NEW"){
         $('.answerValDiv  input[name=answerValue]').each(function() {
-            answerData = answerData + $(this).val() + "^";
+            answerData = answerData + $(this).val() + "$";
         });
         answerData = answerData.slice(0, -1);
         $('#s_answer').val(answerData);
     }else{//update
         $('.updateAnswerValDiv  input[name=update_answerValue]').each(function() {
-            answerData = answerData + $(this).val() + "^";
+            answerData = answerData + $(this).val() + "$";
         });
         answerData = answerData.slice(0, -1);
         $('#update_s_answer').val(answerData);
     }
 }
 
-function getUpdateSmallTalk(utterance, answer, seq){
+function getUpdateSmallTalk(utterance, answer, seq, use_yn){
     var ori_uttrance = utterance;
     var ori_answer = answer;
-    var check = ori_answer.includes('^');
+    var check = ori_answer.includes('$');
     var updateAnswerStr = "";
     if(check==true){
-        var answerSplit = ori_answer.split('^');
+        var answerSplit = ori_answer.split('$');
         for ( var i=0; i< answerSplit.length; i++ ) {
             updateAnswerStr += "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + i + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "' value='" + answerSplit[i] + "'>";
             updateAnswerStr += '<a href="#" name="update_delAnswerBtn" class="answer_delete" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></div>';
@@ -262,6 +262,7 @@ function getUpdateSmallTalk(utterance, answer, seq){
     $('#update_seq').val(seq);
     $('.updateAnswerValDiv').html(updateAnswerStr);
     $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+    $('select[name=useYn]').val(use_yn).prop("selected", true);
 
     $('#smallTalkUpdateModal').modal('show');
 
@@ -299,6 +300,7 @@ function smallTalkProc(procType) {
         data.statusFlag = procType;
         data.S_ANSWER = $('#update_s_answer').val();
         data.SEQ = $('#update_seq').val();
+        data.USE_YN = $('#useYn').val();
 
         saveArr.push(data);
         

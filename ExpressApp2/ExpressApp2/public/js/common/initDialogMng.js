@@ -60,13 +60,13 @@ function makeInitDlgTable() {
                     }
 
                     if(data.list[i].DLG_GROUP==1){
-                        dlgGroupHtml = "Welcome Message";
+                        dlgGroupHtml = language.WELCOME_MESSAGE;
                     }else if(data.list[i].DLG_GROUP==5){
-                        dlgGroupHtml = "Sorry Message";
+                        dlgGroupHtml = language.SORRY_MESSAGE;
                     }else if(data.list[i].DLG_GROUP==6){
-                        dlgGroupHtml = "Suggest Message(질문)";
+                        dlgGroupHtml = language.SUGGESS_MESSAGE1;
                     }else if(data.list[i].DLG_GROUP==7){
-                        dlgGroupHtml = "Suggest Message(완료)";
+                        dlgGroupHtml = language.SUGGESS_MESSAGE2;
                     }else{
                         dlgGroupHtml = "NONE";
                     }
@@ -299,15 +299,14 @@ function createDialog() {
     var idx = $('form[name=dialogLayout]').length;
     var array = [];
     var exit = false;
-/*
-order no 공백 체크할 것
+
+
     if($('#dlgOrderNo').val().length < 1){
         alert(language.IS_REQUIRED);
         exit = true;
-        return;
-        //return false;
+        return false;
     }
-*/
+
     //$('.insertForm input[name=dialogText]').each(function (index) {
     $('.insertForm textarea[name=dialogText]').each(function (index) {
         if ($(this).val().trim() === "") {

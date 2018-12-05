@@ -66,34 +66,6 @@ $(document).ready(function () {
     
 });
 
-//오른쪽 버튼 클릭시 슬라이드
-function nextBtn(botChatNum) {
-
-    $("#slideDiv" + botChatNum).animate({ scrollLeft: ($("#slideDiv" + botChatNum).scrollLeft() + 312) }, 500, function () {
-
-        if ($("#slideDiv" + botChatNum).scrollLeft() ==
-            ($("#slideDiv" + botChatNum).find(".wc-carousel-item").length - 2) * 156) {
-            $("#nextBtn" + botChatNum).hide();
-        }
-
-    });
-
-    $("#prevBtn" + botChatNum).show();
-}
-
-//왼쪽 버튼 클릭시 슬라이드
-function prevBtn(botChatNum) {
-
-    $("#slideDiv" + botChatNum).animate({ scrollLeft: ($("#slideDiv" + botChatNum).scrollLeft() - 312) }, 500, function () {
-
-        if ($("#slideDiv" + botChatNum).scrollLeft() == 0) {
-            $("#prevBtn" + botChatNum).hide();
-        }
-    });
-
-    $("#nextBtn" + botChatNum).show();
-}
-
 function createDialog() {
 
     var idx = $('form[name=dialogLayout]').length;

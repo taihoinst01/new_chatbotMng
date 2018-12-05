@@ -417,7 +417,7 @@ router.post('/nodeQuery', function (req, res) {
         selectQuery += " ) tbp \n";
         selectQuery += " WHERE 1=1 AND PAGEIDX = " + currentPage + "; \n";
         
-                    console.log("nodeQuery==="+selectQuery);
+                    //console.log("nodeQuery==="+selectQuery);
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
