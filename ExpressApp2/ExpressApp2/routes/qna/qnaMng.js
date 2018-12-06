@@ -143,7 +143,7 @@ router.post('/getDlgAjax', function (req, res) {
     var dlgID = req.body.dlgID;
    
     var selectDlgType = " SELECT DLG_TYPE \n" +
-        " , DLG_NAME, DLG_DESCRIPTION , DLG_GROUP, DLG_ORDER_NO, GROUPL , GROUPM, GROUPS, '' as MissingEntities \n" +
+        " , DLG_NAME, DLG_DESCRIPTION , DLG_GROUP, DLG_ORDER_NO, GROUPL , GROUPM, GROUPS, '' as MissingEntities, RELATION_NUM \n" +
         " FROM TBL_DLG \n" +
         " WHERE DLG_ID=" + dlgID + " \n";
 
@@ -210,6 +210,7 @@ router.post('/getDlgAjax', function (req, res) {
                 row.GROUPL = rows[i].GROUPL;
                 row.GROUPM = rows[i].GROUPM;
                 row.GROUPS = rows[i].GROUPS;
+                row.RELATION_NUM = rows[i].RELATION_NUM;
                 row.DLG_ID = dlgID;
                 row.DLG_RELATION = [];
                 row.dlg = [];
@@ -261,6 +262,7 @@ router.post('/updateDialog', function (req, res) {
     var dlgIdReq = req.body.dlgId;
     var dlgType = req.body.dlgType;
     var entity = req.body.entity;
+    var relationNum = req.body.relationNum;
 
     //var data = req.body['updateData[]'];
     var data = req.body.updateData;
@@ -300,7 +302,7 @@ router.post('/updateDialog', function (req, res) {
     var delDlgMediaQuery = "DELETE FROM TBL_DLG_MEDIA WHERE DLG_ID = @dlgId";
     var delDlgQuery = "DELETE FROM TBL_DLG WHERE DLG_ID = @dlgId"
 
-    var selDlgQuery = "SELECT DLG_ID, DLG_LANG, DLG_GROUP, DLG_TYPE, DLG_ORDER_NO, GROUPS\n";
+    var selDlgQuery = "SELECT DLG_ID, DLG_LANG, DLG_GROUP, DLG_TYPE, DLG_ORDER_NO, GROUPS, RELATION_NUM \n";
     selDlgQuery += "FROM TBL_DLG\n";
     selDlgQuery += "WHERE DLG_ID = @dlgId";
 
@@ -311,13 +313,16 @@ router.post('/updateDialog', function (req, res) {
 
     var updDlgOrderQuery = "UPDATE TBL_DLG SET DLG_ORDER_NO = @order WHERE DLG_ID = @dlgId";
 
+    
+    var updRelationQuery = "UPDATE TBL_DLG_RELATION_LUIS SET DLG_ID = @newDlgId WHERE DLG_ID = @dlgIdBefore";
+
     //var updDlgRelationQuery = "UPDATE TBL_DLG_RELATION_LUIS SET LUIS_ID = @luisId, LUIS_INTENT = @luisIntent WHERE DLG_ID = @dlgId";
     (async () => {
         try {
 
             var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
-            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN,GROUPL,GROUPM,GROUPS,DLG_GROUP) VALUES ' +
-                '(@dlgId,@dialogTitle,@dialogDesc,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2)';
+            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN,GROUPL,GROUPM,GROUPS,DLG_GROUP,RELATION_NUM) VALUES ' +
+                '(@dlgId,@dialogTitle,@dialogDesc,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2,@relationNum)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
@@ -374,10 +379,12 @@ router.post('/updateDialog', function (req, res) {
                     .input('dialogTitle', sql.NVarChar, title)
                     .input('dialogDesc', sql.NVarChar, description)
                     .input('dlgType', sql.NVarChar, array[i]["dlgType"])
-                    .input('dialogOrderNo', sql.Int, (i + 1))
+                    //.input('dialogOrderNo', sql.Int, (i + 1))
+                    .input('dialogOrderNo', sql.Int, selDlg[0].DLG_ORDER_NO)
                     .input('groupl', sql.NVarChar, luisId)
                     .input('groupm', sql.NVarChar, luisIntent)
                     .input('groups', sql.NVarChar, entity)
+                    .input('relationNum', sql.NVarChar, selDlg[0].RELATION_NUM)
                     .query(insertTblDlg)
 
                 if (array[i]["dlgType"] == "2") {
@@ -453,7 +460,9 @@ router.post('/updateDialog', function (req, res) {
                         .query(insertTblDlgMedia)
 
                 }
-
+                /*
+                //order_no 부분 2018-12-06 작업중  주석 수정예정
+                //유두연주임 
                 if (i != 0) {
                     let insertTblRelationRes = await pool.request()
                         .input('luisId', sql.NVarChar, luisId)
@@ -463,10 +472,18 @@ router.post('/updateDialog', function (req, res) {
                         .input('dlgQuestion', sql.NVarChar, dlgQuestion)
                         .query(insertTblRelation)
                 }
-
-                tblDlgId.push(i == 0 ? parseInt(dlgIdReq) : dlgId[0].DLG_ID);
+                
+                //tblDlgId.push(i == 0 ? parseInt(dlgIdReq) : dlgId[0].DLG_ID);
+                */
+               let updateTblRelationRes = await pool.request()
+                    .input('newDlgId', sql.Int, dlgId[0].DLG_ID)
+                    .input('dlgIdBefore', sql.Int, dlgIdReq)
+                    .query(updRelationQuery)
             }
 
+            /*
+            //order_no 부분 2018-12-06 작업중 불필요해보여서 주석
+            //유두연주임 
 
             for (var oNum = 0; oNum < order.length; oNum++) {
                 if (order[oNum] == tblDlgId[0]) {
@@ -496,18 +513,17 @@ router.post('/updateDialog', function (req, res) {
                         .query(updDlgOrderQuery);
                 }
             }
-
+            */
             res.send({ "res": true });
 
         } catch (err) {
-            console.log(err);
+            res.send({ "res": false });
         } finally {
             sql.close();
         }
     })()
 
     sql.on('error', err => {
-
     })
 });
 

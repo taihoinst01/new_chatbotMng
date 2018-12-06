@@ -58,7 +58,8 @@ $(document).ready(function() {
         dialogView += '<div class="format-markdown">';
         dialogView += '<div class="textMent">';
         dialogView += '<h1 class="textTitle">' + language.Please_enter_a_title + '</h1>';
-        dialogView += '<p>' + language.Please_enter_your_content + '</p>';
+        //dialogView += '<p>' + language.Please_enter_your_content + '</p>';
+        dialogView += '<div class="dlg_content">' + language.Please_enter_your_content + '</div>';
         dialogView += '</div>';
         dialogView += '</div>';
         dialogView += '</div>';
@@ -707,6 +708,7 @@ function updateDialog() {
     var dlgId = $('#updateDlgId').val();
     var dlgType = $('#updateDlgType').val();
     var entity = $('#updateDlgEntity').val();
+    var relationNum = $('#updateDlgRelationNo').val();
 
     var idx = $('form[name=dialogLayout]').length;
     var array = [];
@@ -844,7 +846,7 @@ function updateDialog() {
         url: '/qna/updateDialog',                //주소
         dataType: 'json',                  //데이터 형식
         type: 'POST',                      //전송 타입
-        data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
+        data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity, 'relationNum' : relationNum},      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
             
@@ -1290,6 +1292,7 @@ $(document).on("click", "#show_dlg", function () {
                         $('#updateDlgId').val(tmp.dlg[j].DLG_ID);
                         $('#updateDlgType').val(tmp.dlg[j].DLG_TYPE);
                         $('#updateDlgEntity').val(tmp.GROUPS);
+                        $('#updateDlgRelationNo').val(tmp.RELATION_NUM);
                     }
                     //}
 
@@ -1300,7 +1303,7 @@ $(document).on("click", "#show_dlg", function () {
             }
             $('.dialogView').html(inputUttrHtml);
             //$('#dialogShow').prepend(inputUttrHtml);
-alert("pageType==="+pageType);
+//alert("pageType==="+pageType);
             if(pageType=="qna"){
                 //대화상자 수정 추가
                 if(result['list'].length == 0){

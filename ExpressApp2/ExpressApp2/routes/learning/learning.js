@@ -1797,7 +1797,7 @@ router.post('/selectGroup', function (req, res) {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             var queryText = "";
             if (selectId == "searchIntentGroup") {
-                queryText = "SELECT DISTINCT ISNULL(DLG_INTENT, 'NONE') AS 'DLG_INTENT' FROM TBL_DLG ";
+                queryText = "SELECT DISTINCT ISNULL(DLG_INTENT, 'NONE') AS 'DLG_INTENT' FROM TBL_DLG WHERE DLG_GROUP = 2 ";
             } else if (selectId == "searchLargeGroup") {
                 queryText = "SELECT DISTINCT GroupL AS 'GROUP' FROM TBL_DLG WHERE GroupL IS NOT NULL";
             } else if (selectId == "searchMediumGroup") {
@@ -2242,97 +2242,112 @@ router.post('/searchDialogByIntent', function (req, res) {
     tblDlgSearch += "WHERE A.DLG_ID = B.DLG_ID \n"
     tblDlgSearch += " ORDER BY A.RNUM, B.DLG_ORDER_NO, A.DLG_ID; \n"
     */
+
+    /*
     var tblDlgSearch = "SELECT RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
-    tblDlgSearch += "FROM (\n";
-    tblDlgSearch += "SELECT RANK() OVER(ORDER BY GroupS) AS RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
-    tblDlgSearch += "FROM TBL_DLG \n";
-    tblDlgSearch += "WHERE 1=1\n";
+    tblDlgSearch += "  FROM (\n";
+    tblDlgSearch += "     SELECT RANK() OVER(ORDER BY GroupS) AS RNUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM \n";
+    tblDlgSearch += "       FROM TBL_DLG \n";
+    tblDlgSearch += "      WHERE 1=1\n";
     
     if (serachDlg) {
-
-        tblDlgSearch += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
+        //tblDlgSearch += "AND DLG_INTENT like '%" + serachDlg + "%'\n";
     } 
     if (searchIntentGroup) {
         if (searchIntentGroup != "NONE") {
-            tblDlgSearch += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+            tblDlgSearch += "       AND DLG_INTENT = '" + searchIntentGroup + "'\n";
         } else {
-            tblDlgSearch += "AND DLG_INTENT IS NULL\n";
+            tblDlgSearch += "       AND DLG_INTENT IS NULL\n";
         }
     }
     tblDlgSearch += ")A \n ORDER BY DLG_ID"
-    
+    */
+    var tblDlgSearch = `
+       SELECT RELATION_NUM, GroupS, DLG_ID, DLG_TYPE, DLG_ORDER_NO, GroupL, GroupM
+         FROM TBL_DLG
+        WHERE 1=1 
+          AND DLG_GROUP = 2 
+    `;
 
+    if (searchIntentGroup) {
+        if (searchIntentGroup != "NONE") {
+            tblDlgSearch += "  AND DLG_INTENT = '" + searchIntentGroup + "' \n";
+        } else {
+            tblDlgSearch += "  AND DLG_INTENT IS NULL \n";
+        }
+    }
+    tblDlgSearch += " ORDER BY RELATION_NUM, DLG_ORDER_NO;";
 
     var dlgText = "SELECT DLG_ID,TEXT_DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
-    dlgText += "FROM TBL_DLG_TEXT\n";
-    dlgText += "WHERE USE_YN = 'Y'\n"
-    dlgText += "AND DLG_ID IN (\n"
-    dlgText += "SELECT DISTINCT DLG_ID\n"
-    dlgText += "FROM TBL_DLG\n"
-    dlgText += "WHERE 1=1\n";
+    dlgText += "   FROM TBL_DLG_TEXT\n";
+    dlgText += "  WHERE USE_YN = 'Y'\n"
+    dlgText += "    AND DLG_ID IN (\n"
+    dlgText += "       SELECT DISTINCT DLG_ID\n"
+    dlgText += "         FROM TBL_DLG\n"
+    dlgText += "        WHERE 1=1\n";
     
     if (serachDlg) {
 
-        dlgText += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+        dlgText += "         AND CARD_TEXT like '%" + serachDlg + "%'\n";
     } 
     if (searchIntentGroup) {
         if (searchIntentGroup != "NONE") {
-            dlgText += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+            dlgText += "         AND DLG_INTENT = '" + searchIntentGroup + "'\n";
         } else {
-            dlgText += "AND DLG_INTENT IS NULL\n";
+            dlgText += "         AND DLG_INTENT IS NULL\n";
         }
     }
 
     dlgText += ") \n ORDER BY DLG_ID";
 
     var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n";
-    dlgCard += "BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
-    dlgCard += "BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
-    dlgCard += "BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
-    dlgCard += "CARD_ORDER_NO, CARD_VALUE,\n";
-    dlgCard += "USE_YN, '3' AS DLG_TYPE \n";
-    dlgCard += "FROM TBL_DLG_CARD\n";
-    dlgCard += "WHERE USE_YN = 'Y'\n";
-    dlgCard += "AND DLG_ID IN (\n";
-    dlgCard += "SELECT DISTINCT DLG_ID\n";
-    dlgCard += "FROM TBL_DLG\n";
-    dlgCard += "WHERE 1=1\n";
+    dlgCard += "          BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
+    dlgCard += "          BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
+    dlgCard += "          BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
+    dlgCard += "          CARD_ORDER_NO, CARD_VALUE,\n";
+    dlgCard += "          USE_YN, '3' AS DLG_TYPE \n";
+    dlgCard += "   FROM TBL_DLG_CARD\n";
+    dlgCard += "  WHERE USE_YN = 'Y'\n";
+    dlgCard += "    AND DLG_ID IN (\n";
+    dlgCard += "              SELECT DISTINCT DLG_ID\n";
+    dlgCard += "                FROM TBL_DLG\n";
+    dlgCard += "               WHERE 1=1\n";
 
     if (serachDlg) {
 
-        dlgCard += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+        dlgCard += "                 AND CARD_TEXT like '%" + serachDlg + "%'\n";
     } 
     if (searchIntentGroup) {
         if (searchIntentGroup != "NONE") {
-            dlgCard += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+            dlgCard += "                 AND DLG_INTENT = '" + searchIntentGroup + "'\n";
         } else {
-            dlgCard += "AND DLG_INTENT IS NULL\n";
+            dlgCard += "                 AND DLG_INTENT IS NULL\n";
         }
     }
     dlgCard += ") \n ORDER BY DLG_ID";
 
     var dlgMedia = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, MEDIA_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n";
-    dlgMedia += "BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
-    dlgMedia += "BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
-    dlgMedia += "BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
-    dlgMedia += "CARD_VALUE,\n";
-    dlgMedia += "USE_YN, '4' AS DLG_TYPE \n";
-    dlgMedia += "FROM TBL_DLG_MEDIA\n";
-    dlgMedia += "WHERE USE_YN = 'Y'\n";
-    dlgMedia += "AND DLG_ID IN (\n";
-    dlgMedia += "SELECT DISTINCT DLG_ID\n";
-    dlgMedia += "FROM TBL_DLG\n";
-    dlgMedia += "WHERE 1=1\n";
+    dlgMedia += "         BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n";
+    dlgMedia += "         BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n";
+    dlgMedia += "         BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n";
+    dlgMedia += "         CARD_VALUE,\n";
+    dlgMedia += "         USE_YN, '4' AS DLG_TYPE \n";
+    dlgMedia += "   FROM TBL_DLG_MEDIA\n";
+    dlgMedia += "  WHERE USE_YN = 'Y'\n";
+    dlgMedia += "    AND DLG_ID IN (\n";
+    dlgMedia += "              SELECT DISTINCT DLG_ID\n";
+    dlgMedia += "                FROM TBL_DLG\n";
+    dlgMedia += "               WHERE 1=1\n";
 
     if (serachDlg) {
 
-        dlgMedia += "AND CARD_TEXT like '%" + serachDlg + "%'\n";
+        dlgMedia += "                 AND CARD_TEXT like '%" + serachDlg + "%'\n";
     } 
     if (searchIntentGroup) {
         if (searchIntentGroup != "NONE") {
-            dlgMedia += "AND DLG_INTENT = '" + searchIntentGroup + "'\n";
+            dlgMedia += "                 AND DLG_INTENT = '" + searchIntentGroup + "'\n";
         } else {
-            dlgMedia += "AND DLG_INTENT IS NULL\n";
+            dlgMedia += "                 AND DLG_INTENT IS NULL\n";
         }
     }
     dlgMedia += ") \n ORDER BY DLG_ID";
@@ -2361,7 +2376,7 @@ router.post('/searchDialogByIntent', function (req, res) {
             for (var i = 0; i < rows.length; i++) {
 
                 var row = {};
-                //row.RNUM = rows[i].RNUM;
+                row.RNUM = rows[i].RELATION_NUM ;
                 row.DLG_ID = rows[i].DLG_ID;
                 row.DLG_TEXT_ID = rows[i].DLG_ID;
                 row.DLG_TYPE = rows[i].DLG_TYPE;
@@ -2404,7 +2419,7 @@ router.post('/searchDialogByIntent', function (req, res) {
                 if (isExist) {
                     var isDupleDlg = false;
                     for (var k=0; k<result.length; k++) {
-                        if (result[k].DLG_ID == row.DLG_ID) {
+                         if (result[k].DLG_ID == row.DLG_ID) {
                             isDupleDlg = true;
                             break;
                         }
@@ -2473,9 +2488,18 @@ router.post('/addDialog', function (req, res) {
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            /*
+            //dyyoo 2018-12-05작업 시작
+            */
+            var selectRelationNum = 'SELECT ISNULL(MAX(RELATION_NUM)+1,1) AS RELATION_NUM FROM TBL_DLG;';
+            /*
+            //dyyoo 2018-12-05작업 끝
+            */
+
             var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
-            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
-                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup)';
+            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP, RELATION_NUM) VALUES ' +
+                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup, @relationNum)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
@@ -2489,11 +2513,18 @@ router.post('/addDialog', function (req, res) {
             var predictIntent = array[array.length - 1]["predictIntent"];
             var dialogOrderNo = array[array.length - 1]["dlgOrderNo"];
 
+            
+            let resultRNum = await pool.request()
+                .query(selectRelationNum);
+            var relationNum = resultRNum.recordset;
+
             for (var i = 0; i < (array.length - 1); i++) {
                 var insertDlgOrderNo = 0;
                 let result1 = await pool.request()
                     .query(selectDlgId)
                 let dlgId = result1.recordset;
+
+                
 
                 if(dialogOrderNo==1000){
                     insertDlgOrderNo = i+1;
@@ -2510,6 +2541,7 @@ router.post('/addDialog', function (req, res) {
                     .input('largeGroup', sql.NVarChar, largeGroup)
                     .input('dlgGroup', sql.NVarChar, dlgGroup)
                     .input('predictIntent', sql.NVarChar, predictIntent)
+                    .input('relationNum', sql.Int, relationNum)
                     .query(insertTblDlg);
                 //.input('luisEntities', sql.NVarChar, (typeof luisEntities ==="string" ? luisEntities:luisEntities[j]))
 

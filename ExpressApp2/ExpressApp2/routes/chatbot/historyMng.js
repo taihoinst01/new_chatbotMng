@@ -67,7 +67,7 @@ router.post('/selectHistoryListAll', function (req, res) {
     var hour = date.getHours();
     var minutes = date.getMinutes();
     var secconds = date.getSeconds()
-    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + '-' + pad(minutes, 2) + '-' + pad(secconds, 2);
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
 
     var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
     
