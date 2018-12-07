@@ -96,13 +96,13 @@ router.post('/selectHistoryListAll', function (req, res) {
                 QueryStr += "                  ) AS DLG_ID, A.SID, TBL_B.SAME_CNT \n";
                 QueryStr += "             FROM TBL_HISTORY_QUERY A, \n";
                 QueryStr += "                  ( \n";
-                QueryStr += "			         SELECT REPLACE(CUSTOMER_COMMENT_KR, ' ', '') AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
+                QueryStr += "			         SELECT CUSTOMER_COMMENT_KR AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
                 QueryStr += "                  	   FROM TBL_HISTORY_QUERY\n";
-                QueryStr += "        			  WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
-                QueryStr += "                  GROUP BY REPLACE(CUSTOMER_COMMENT_KR, ' ', '')\n";
+                QueryStr += "                  	   WHERE CUSTOMER_COMMENT_KR != '건의사항입력' \n";
+                QueryStr += "                  GROUP BY CUSTOMER_COMMENT_KR\n";
                 QueryStr += "                  ) TBL_B \n";
                 QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
-                QueryStr += "              AND REPLACE(A.CUSTOMER_COMMENT_KR, ' ', '') = TBL_B.TRANS_COMMENT \n";
+                QueryStr += "              AND A.CUSTOMER_COMMENT_KR = TBL_B.TRANS_COMMENT \n";
                 if (searchQuestion !== '') {
                     QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
                 }
@@ -196,13 +196,13 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "                  ) AS DLG_ID, A.SID, TBL_B.SAME_CNT \n";
                 QueryStr += "             FROM TBL_HISTORY_QUERY A, \n";
                 QueryStr += "                  ( \n";
-                QueryStr += "			         SELECT REPLACE(CUSTOMER_COMMENT_KR, ' ', '') AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
+                QueryStr += "			         SELECT CUSTOMER_COMMENT_KR AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
                 QueryStr += "                  	   FROM TBL_HISTORY_QUERY\n";
-                QueryStr += "        			  WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
-                QueryStr += "                  GROUP BY REPLACE(CUSTOMER_COMMENT_KR, ' ', '')\n";
+                QueryStr += "                  	   WHERE CUSTOMER_COMMENT_KR != '건의사항입력' \n";
+                QueryStr += "                  GROUP BY CUSTOMER_COMMENT_KR\n";
                 QueryStr += "                  ) TBL_B \n";
                 QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
-                QueryStr += "              AND REPLACE(A.CUSTOMER_COMMENT_KR, ' ', '') = TBL_B.TRANS_COMMENT \n";
+                QueryStr += "              AND A.CUSTOMER_COMMENT_KR = TBL_B.TRANS_COMMENT \n";
                 if (searchQuestion !== '') {
                     QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
                 }
@@ -233,6 +233,7 @@ router.post('/selectHistoryList', function (req, res) {
                 //QueryStr += "                         ) \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
+              
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
                         .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
