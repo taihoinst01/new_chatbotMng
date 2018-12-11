@@ -571,6 +571,48 @@ $(document).on('click', '.deleteCard', function (e) {
 
 });
 
+
+
+//제목 td mouse hover event
+$(document).on('mouseover', 'td[name=dlgTitleTd]', function (e) {
+    var cardTitle = $(this).parent().find('input[name=cardTitle]').val();
+    var cardText = $(this).parent().find('input[name=cardText]').val();
+    var sWidth = window.innerWidth;
+    var sHeight = window.innerHeight;
+
+    var oWidth = $('.popupLayer').width();
+    var oHeight = $('.popupLayer').height();
+
+    // 레이어가 나타날 위치를 셋팅한다.
+    var divLeft = e.clientX + 10;
+    var divTop = e.clientY + 5;
+
+    // 레이어가 화면 크기를 벗어나면 위치를 바꾸어 배치한다.
+    if( divLeft + oWidth > sWidth ) divLeft -= oWidth;
+    if( divTop + oHeight > sHeight ) divTop -= oHeight;
+
+    // 레이어 위치를 바꾸었더니 상단기준점(0,0) 밖으로 벗어난다면 상단기준점(0,0)에 배치하자.
+    if( divLeft < 0 ) divLeft = 0;
+    if( divTop < 0 ) divTop = 0;
+
+    $('#dlgTitle').text(cardTitle);
+    $('#dlgText').text(cardText);
+    $('#divInfo').css({
+        "top": divTop,
+        "left": divLeft,
+        "position": "absolute"
+    }).show();
+});
+
+
+$(document).on('mouseout', 'td[name=dlgTitleTd]', function (e) {
+    $('#dlgTitle').text('');
+    $('#dlgText').text('');
+    $('#divInfo').hide();
+});
+
+
+
 //다이얼로그생성모달 - 버튼삭제
 $(document).on('click', '.btn_delete', function (e) {
 
@@ -732,7 +774,6 @@ function updateDialog() {
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
             $('#procDialog').modal('show');
             return;
-            
         }
     });
 

@@ -2678,7 +2678,7 @@ router.post('/getDlgAjax', function (req, res) {
     }
 
     var selectDlgType = " SELECT DLG_TYPE \n" +
-        " , DLG_DESCRIPTION , GROUPL , GROUPM, GROUPS, '' as MissingEntities \n" +
+        " , DLG_DESCRIPTION , GROUPL , GROUPM, GROUPS, '' as MissingEntities, RELATION_NUM \n" +
         " FROM TBL_DLG \n" +
         " WHERE DLG_ID=" + dlgID + " \n";
 
@@ -2799,6 +2799,7 @@ router.post('/getDlgAjax', function (req, res) {
         console.log(err);
     })
 });
+
 
 router.post('/deleteDialog', function (req, res) {
     var dlgId = req.body.dlgId;

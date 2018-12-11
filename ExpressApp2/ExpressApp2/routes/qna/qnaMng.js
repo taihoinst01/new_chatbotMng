@@ -142,17 +142,18 @@ router.post('/getDlgAjax', function (req, res) {
     var entity = [];
     var dlgID = req.body.dlgID;
    
-    var selectDlgType = " SELECT DLG_TYPE \n" +
+    
+    var selectDlgType = " SELECT DLG_ID, DLG_TYPE \n" +
         " , DLG_NAME, DLG_DESCRIPTION , DLG_GROUP, DLG_ORDER_NO, GROUPL , GROUPM, GROUPS, '' as MissingEntities, RELATION_NUM \n" +
         " FROM TBL_DLG \n" +
-        " WHERE DLG_ID=" + dlgID + " \n";
-
+        " WHERE DLG_ID = @dlgID \n";
+        //" WHERE RELATION_NUM IN ( SELECT RELATION_NUM FROM TBL_DLG WHERE DLG_ID= @dlgID ) \n";
 
     var dlgText = "SELECT DLG_ID, CARD_TITLE, CARD_TEXT, USE_YN, '2' AS DLG_TYPE \n"
         + "FROM TBL_DLG_TEXT\n"
         + "WHERE 1=1 \n"
         + "AND USE_YN = 'Y'\n"
-        + "AND DLG_ID = " + dlgID + " \n";
+        + "AND DLG_ID = @dlgID \n";
     + "ORDER BY DLG_ID";
 
     var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n"
@@ -164,7 +165,7 @@ router.post('/getDlgAjax', function (req, res) {
         + "FROM TBL_DLG_CARD\n"
         + "WHERE 1=1\n"
         + "AND USE_YN = 'Y'\n"
-        + "AND DLG_ID = " + dlgID + " \n";
+        + "AND DLG_ID = @dlgID \n";
     + "ORDER BY DLG_ID";
 
     var dlgMedia = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, MEDIA_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n"
@@ -176,26 +177,15 @@ router.post('/getDlgAjax', function (req, res) {
         + "FROM TBL_DLG_MEDIA\n"
         + "WHERE 1=1\n"
         + "AND USE_YN = 'Y'\n"
-        + "AND DLG_ID = " + dlgID + " \n";
+        + "AND DLG_ID = @dlgID \n";
     + "ORDER BY DLG_ID";
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            let dlgTextResult = await pool.request()
-                .query(dlgText);
-            let rowsText = dlgTextResult.recordset;
-
-            let dlgCardResult = await pool.request()
-                .query(dlgCard);
-            let rowsCard = dlgCardResult.recordset;
-
-            let dlgMediaResult = await pool.request()
-                .query(dlgMedia);
-            let rowsMedia = dlgMediaResult.recordset;
-
             let result1 = await pool.request()
+                .input('dlgId', sql.Int, dlgID)
                 .query(selectDlgType)
             let rows = result1.recordset;
             var result = [];
@@ -211,9 +201,26 @@ router.post('/getDlgAjax', function (req, res) {
                 row.GROUPM = rows[i].GROUPM;
                 row.GROUPS = rows[i].GROUPS;
                 row.RELATION_NUM = rows[i].RELATION_NUM;
-                row.DLG_ID = dlgID;
+                
+                row.DLG_ID = rows[i].DLG_ID;
+                //row.DLG_ID = dlgID;
                 row.DLG_RELATION = [];
                 row.dlg = [];
+
+                let dlgTextResult = await pool.request()
+                    .input('dlgId', sql.Int, row.DLG_ID)
+                    .query(dlgText);
+                let rowsText = dlgTextResult.recordset;
+
+                let dlgCardResult = await pool.request()
+                    .input('dlgId', sql.Int, row.DLG_ID)
+                    .query(dlgCard);
+                let rowsCard = dlgCardResult.recordset;
+
+                let dlgMediaResult = await pool.request()
+                    .input('dlgId', sql.Int, row.DLG_ID)
+                    .query(dlgMedia);
+                let rowsMedia = dlgMediaResult.recordset;
                 
                 let dlg_type = rows[i].DLG_TYPE;
                 if (dlg_type == 2) {
@@ -316,6 +323,18 @@ router.post('/updateDialog', function (req, res) {
     
     var updRelationQuery = "UPDATE TBL_DLG_RELATION_LUIS SET DLG_ID = @newDlgId WHERE DLG_ID = @dlgIdBefore";
 
+    var getDlgOrder = `
+        SELECT DLG_ID, DLG_ORDER_NO, DLG_DESCRIPTION
+          FROM TBL_DLG 
+         WHERE RELATION_NUM IN ( SELECT RELATION_NUM FROM TBL_DLG WHERE DLG_ID=@dlgId )
+         ORDER BY DLG_ORDER_NO;
+    `;
+    var updateOrderQry = `
+        UPDATE TBL_DLG 
+        SET DLG_ORDER_NO = @newOrder 
+        WHERE DLG_ID = @dlgNUM;
+    `;
+
     //var updDlgRelationQuery = "UPDATE TBL_DLG_RELATION_LUIS SET LUIS_ID = @luisId, LUIS_INTENT = @luisIntent WHERE DLG_ID = @dlgId";
     (async () => {
         try {
@@ -339,7 +358,31 @@ router.post('/updateDialog', function (req, res) {
             var description = array[array.length - 1]["description"];
             var dlgQuestion = array[array.length - 1]["dlgQuestion"];
 
+
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            
+            let selDlgOrder = await pool.request()
+                .input('dlgId', sql.Int, dlgIdReq)
+                .query(getDlgOrder);
+            var getDlgInfo = selDlgOrder.recordset;
+            var afterOrderArr = [];
+            var dlgOrderNum = 0;
+            var chkSameDlg = false;
+            //같은 relationNum의 dlg order의 순서 확인
+            for (var i=0; i<getDlgInfo.length; i++) {
+                if (getDlgInfo[i].DLG_ID == dlgIdReq) {
+                    chkSameDlg = true;
+                    dlgOrderNum++;
+                    continue;
+                }
+                if (!chkSameDlg) {
+                    dlgOrderNum++;
+                } else {
+                    afterOrderArr.push(getDlgInfo[i]);
+                }
+            }
+
 
             let selDlgRes = await pool.request()
                 .input('dlgId', sql.Int, dlgIdReq)
@@ -375,12 +418,12 @@ router.post('/updateDialog', function (req, res) {
                 let dlgId = result1.recordset;
 
                 let result2 = await pool.request()
-                    .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID)
+                    .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID+i)
                     .input('dialogTitle', sql.NVarChar, title)
                     .input('dialogDesc', sql.NVarChar, description)
                     .input('dlgType', sql.NVarChar, array[i]["dlgType"])
                     //.input('dialogOrderNo', sql.Int, (i + 1))
-                    .input('dialogOrderNo', sql.Int, selDlg[0].DLG_ORDER_NO)
+                    .input('dialogOrderNo', sql.Int, dlgOrderNum++)
                     .input('groupl', sql.NVarChar, luisId)
                     .input('groupm', sql.NVarChar, luisIntent)
                     .input('groups', sql.NVarChar, entity)
@@ -390,7 +433,7 @@ router.post('/updateDialog', function (req, res) {
                 if (array[i]["dlgType"] == "2") {
 
                     let result4 = await pool.request()
-                        .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID)
+                        .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID+i)
                         .input('dialogTitle', sql.NVarChar, array[i]["dialogTitle"])
                         .input('dialogText', sql.NVarChar, array[i]["dialogText"])
                         .query(inserTblDlgText);
@@ -406,7 +449,7 @@ router.post('/updateDialog', function (req, res) {
                         carTmp["btn4Type"] = (carTmp["cButtonContent4"] != "") ? carTmp["btn4Type"] : "";
 
                         let result2 = await pool.request()
-                            .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID)
+                            .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID+i)
                             .input('dialogTitle', sql.NVarChar, carTmp["dialogTitle"])
                             .input('dialogText', sql.NVarChar, carTmp["dialogText"])
                             .input('imgUrl', sql.NVarChar, carTmp["imgUrl"])
@@ -439,7 +482,7 @@ router.post('/updateDialog', function (req, res) {
                         cardDivision = "play";
                     }
                     let result4 = await pool.request()
-                        .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID)
+                        .input('dlgId', sql.Int, i == 0 ? dlgIdReq : dlgId[0].DLG_ID+i)
                         .input('dialogTitle', sql.NVarChar, array[i]["dialogTitle"])
                         .input('dialogText', sql.NVarChar, array[i]["dialogText"])
                         .input('imgUrl', sql.NVarChar, array[i]["mediaImgUrl"])
@@ -479,6 +522,13 @@ router.post('/updateDialog', function (req, res) {
                     .input('newDlgId', sql.Int, dlgId[0].DLG_ID)
                     .input('dlgIdBefore', sql.Int, dlgIdReq)
                     .query(updRelationQuery)
+            }
+
+            for (var i=0; i<afterOrderArr.length; i++) {
+                let updateTblDlgOrder = await pool.request()
+                    .input('newOrder', sql.Int, dlgOrderNum++)
+                    .input('dlgNUM', sql.Int, afterOrderArr[i].DLG_ID)
+                    .query(updateOrderQry)
             }
 
             /*
@@ -700,13 +750,15 @@ router.post('/dialogList', function (req, res) {
             var sourceType = req.body.sourceType;
             var groupType = req.body.groupType;
             var dlg_desQueryString = "select tbp.* from \n" +
-                "(select ROW_NUMBER() OVER(ORDER BY DLG_ID DESC) AS NUM, \n" +
-                "      DLG_ID, \n" +
+                "(select ROW_NUMBER() OVER(ORDER BY RELATION_NUM DESC, DLG_ORDER_NO, A.DLG_ID DESC) AS NUM, \n" +
+                "      A.DLG_ID, \n" +
                 "COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n" +
-                "CEILING((ROW_NUMBER() OVER(ORDER BY DLG_ID DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                "DLG_NAME, DLG_DESCRIPTION, DLG_TYPE \n" +
-                "FROM TBL_DLG \n" +
-                "WHERE DLG_GROUP = 2 \n";
+                "CEILING((ROW_NUMBER() OVER(ORDER BY RELATION_NUM DESC, DLG_ORDER_NO, A.DLG_ID DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
+                "DLG_NAME, DLG_DESCRIPTION, DLG_TYPE, DLG_ORDER_NO, RELATION_NUM, B.CARD_TITLE, B.CARD_TEXT \n" +
+                "FROM TBL_DLG A, TBL_DLG_TEXT B \n" +
+                "WHERE 1=1 \n" +
+                "AND DLG_GROUP = 2 \n" +
+                "  AND B.DLG_ID = A.DLG_ID \n";
             if (req.body.searchTitleTxt !== '') {
                 dlg_desQueryString += "AND DLG_NAME like '%" + req.body.searchTitleTxt + "%' \n";
             }
@@ -719,6 +771,7 @@ router.post('/dialogList', function (req, res) {
             let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(dlg_desQueryString);
             let rows = result1.recordset;
 
+            /*
             var result = [];
             for (var i = 0; i < rows.length; i++) {
                 var item = {};
@@ -737,11 +790,11 @@ router.post('/dialogList', function (req, res) {
 
                 result.push(item);
             }
-            
+            */
             if (rows.length > 0) {
-                res.send({ list: result, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
+                res.send({ list: rows, pageList: paging.pagination(currentPage, rows[0].TOTCNT) });
             } else {
-                res.send({ list: result });
+                res.send({ list: [] });
             }
         } catch (err) {
             console.log(err)

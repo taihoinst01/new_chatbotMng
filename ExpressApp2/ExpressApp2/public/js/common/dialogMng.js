@@ -396,9 +396,16 @@ function selectDlgByTxt(groupType, sourceType) {
                     }
                     item += '<tr>' +
                         '<td>' + data.list[i].NUM + '</td>' +
-                        '<td class="txt_left">' + dlgNameHtml + '</td>' +
+                        '<td class="txt_left" name="dlgTitleTd">' + 
+                        '<span name="titleSpan">' +
+                        '<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' +
+                         dlgNameHtml + '</span>' +
+                        '<input type="hidden" name="cardTitle" value="' + (data.list[i].CARD_TITLE==null?'':data.list[i].CARD_TITLE) + '" />' +
+                        '<input type="hidden" name="cardText" value="' + (data.list[i].CARD_TEXT==null?'':data.list[i].CARD_TEXT) + '" />' +
+                        '</td>' +
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        
                         '<td>' + type_name + '</td>' +
                         '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ',\'common\');return false;"><span class="fa fa-trash"></span></a></td>' +
                         '</tr>';

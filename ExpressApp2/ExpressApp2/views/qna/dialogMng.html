@@ -33,6 +33,23 @@
             left: 0px !important; top: 60% !important;
         }
 
+        #divInfo {
+            position:absolute;
+            display:none;
+            background-color:#ffffff;
+            border:solid 2px #d0d0d0;
+            max-width:500px;
+            max-height:400px;
+            min-width: 10%;
+            height:fit-content;
+            padding:10px;
+            border-radius: 10px;
+            z-index: 1025;
+        }
+        #divInfo th {
+            padding:0.5em;
+        }
+
     </style>
     
 
@@ -73,14 +90,14 @@
                                     <!-- 학습 추천 테이블 --> 
                                     <div class="Tbl_wrap">
                                         <table class="Tbl" summary="학습 추천 결과">
-                                            <colgroup><col width="5%"/><col width="35%"/><col width="40%"/><col width="10"/><col width="10%"/></colgroup>
+                                            <colgroup><col width="5%"/><col width="25%"/><col width="40%"/><col width="10"/><col width="10%"/></colgroup>
                                             <input type="hidden" name="sourceType" id="tblSourceType" value="D">
                                                   <tr>
-                                                    <th></th>
-                                                      <th><%= __('TITLE') %></th>
-                                                      <th><%= __('DESC') %></th>
-                                                      <th><%= __('DIALOG_BOX_TYPE') %></th>
-                                                      <th></th>
+                                                        <th></th>
+                                                        <th><%= __('TITLE') %></th>
+                                                        <th><%= __('DESC') %></th>
+                                                        <th><%= __('DIALOG_BOX_TYPE') %></th>
+                                                        <th></th>
                                                   </tr>
                                                 <tbody id="dialogTbltbody">
                                                     
@@ -321,7 +338,8 @@
                                 </div>
                                 <!--// media , carousal 일 경우 input box 추가 layout -->
                                     
-                                <div class="btn_wrap boline" style='display:none;'>
+                                <!--<div class="btn_wrap boline" style='display:none;'> 작업중두연20181210-->
+                                <div class="btn_wrap boline" >
                                     <button type="button" class="btn btn_01" id="addDialogBtn"><i class="fa fa-plus"></i> <%= __('INSERT_ADDITIONAL_DIALOG') %></button>
                                 </div>  
                                                                
@@ -421,8 +439,25 @@
     
     <!-- //팝업_미리보기 -->
 
+    <div id="divInfo">
+        <table>
+            <col width="20%">
+            <col width="80%">
+            <tr style="border-bottom:1pt solid black; padding-bottom: 0.1em;">
+                <th><%= __("TITLE") %></th>
+                <td id="dlgTitle"></td>
+            </tr>
+            <tr>
+                <th><%= __("REPLY") %></th>
+                <td id="dlgText"></td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 
     
     
 </html>
+
+    

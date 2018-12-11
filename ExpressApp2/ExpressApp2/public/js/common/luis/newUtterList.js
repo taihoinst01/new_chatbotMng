@@ -33,16 +33,15 @@ $(document).ready(function() {
 
 
     $("#searchDialogBtn").on('click', function () {
-
-        if ($('input[name=serachDlg]').val() == '' && $('#searchLargeGroup').val() == '') {
-            
-            $('#alertMsg').text(language.Select_search_word_or_group);
-            $('#alertBtnModal').modal('show');
-            //alert(language.Select_search_word_or_group);
-        } else {
-            $("#searchDlgResultDiv").html("");
-
-            searchDialog(contextEntityData);
+        searchBtnFnc();
+    });
+        
+    //dlg search input enter
+    $('input[name=serachDlg]').keypress(function(e){
+        if (e.keyCode === 13) {	//	Enter Key
+            if ($('input[name=serachDlg]').val().trim() != '') {
+                $("#searchDialogBtn").trigger('click');
+            }
         }
     });
 
@@ -112,7 +111,6 @@ $(document).on('click','a[name=selEntity]',function(e){
     openModalBox(contextEntity);
     
 });
-
 //검색 input 엔터 감지
 $(document).on("keypress", "#searchQnaText", function(e){
     if (e.keyCode === 13) {	//	Enter Key
@@ -325,6 +323,7 @@ function selectGroup(selectId, str1, str2) {
 
 
 function searchDialog(contextEntityData) {
+    $('#searchDialogBtn').off('click');
     var formData = $("form[name=searchForm]").serialize();
     $.ajax({
         url: '/learning/searchDialogByIntent',
@@ -353,6 +352,10 @@ function searchDialog(contextEntityData) {
         complete: function () {
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display", "none");
+
+            $("#searchDialogBtn").on('click', function () {
+                searchBtnFnc();
+            });
         },
         success: function (result) {
 
@@ -716,4 +719,18 @@ function makeRelation() {
     
 
     
+}
+
+
+function searchBtnFnc() {
+    if ($('input[name=serachDlg]').val() == '' && $('#searchLargeGroup').val() == '') {
+        
+        $('#alertMsg').text(language.Select_search_word_or_group);
+        $('#alertBtnModal').modal('show');
+        //alert(language.Select_search_word_or_group);
+    } else {
+        $("#searchDlgResultDiv").html("");
+
+        searchDialog(contextEntityData);
+    }
 }
