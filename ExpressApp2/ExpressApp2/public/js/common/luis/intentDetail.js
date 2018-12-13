@@ -27,6 +27,7 @@ Array.prototype.move = function(from,to){
 };
 
 $(document).ready(function() {
+    
     makeUtteranceTable();
 
     if ($('#createQuery').val() != -1) {
@@ -62,12 +63,42 @@ $(document).ready(function() {
 });
 
 // input 엔터 감지
-$(document).on("keypress", "input[name=matchUtterText]", function(e){ 
-    if (e.keyCode === 13) {	//	Enter Key
+$(document).on("keydown", "input[name=matchUtterText]", function(e){ 
+    
+    var nowIndex = $(this).parents('tr').find('input[name=matchUtterText]').index(this);
+    var inputLength = $(this).parents('tr').find('input[name=matchUtterText]').length;
+
+    if (e.shiftKey && e.keyCode === 13) {
+
+    } else if (e.keyCode === 13) {	//	Enter Key
         if ($(this).parent().find('select[name=multiMatchUtterSel]').length < 2) {
             if ($(this).val().trim() != '' && rememberUtterInput != $(this).val().trim()) {
                 //$(this).focusout();
                 $(this).trigger('blur');
+            }
+        }
+    } else if (e.shiftKey && e.keyCode === 9) {
+        e.preventDefault();
+        while(1) {
+            var goalIndex = (nowIndex==0)?inputLength-1:nowIndex-1;
+            if ($(this).parents('tr').find('input[name=matchUtterText]').eq(goalIndex).prop('disabled')) {
+                nowIndex--;
+                continue;
+            } else {
+                $(this).parents('tr').find('input[name=matchUtterText]').eq(goalIndex).focus();
+                break;
+            }
+        }
+    } else if(e.keyCode === 9){ //tab
+        e.preventDefault();
+        while(1) {
+            var goalIndex = ((nowIndex+1)==inputLength)?0:nowIndex+1;
+            if ($(this).parents('tr').find('input[name=matchUtterText]').eq(goalIndex).prop('disabled')) {
+                nowIndex++;
+                continue;
+            } else {
+                $(this).parents('tr').find('input[name=matchUtterText]').eq(goalIndex).focus();
+                break;
             }
         }
     }
@@ -194,11 +225,11 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                 if (isMatch) {
                     var matchObj = new Object();
                     matchObj.startIndex = index;
-                    matchObj.endIndex = innerIndex;
+                    matchObj.endIndex = index+innerIndex;
                     indexArr.push(matchObj);
                     //
                     chkMatch.push(inputStr);
-                    var tmpIndex = index + ',' + innerIndex;
+                    var tmpIndex = index + ',' + matchObj.endIndex;
                     chkMatchIndex.push(tmpIndex);
                 }
             });
@@ -232,6 +263,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         //--------------------------------------------------------------------------------------------------------------
         var utterBodyHtml = '';
         if (chkMatch.length > 1) {
+            $(this).parent().find('span[name=alertSpan]').text("");
             rememberUtterInput = $(this).val();
             utterBodyHtml += "<select name='multiMatchUtterSel' class='form-control'  >";
             var j=0;
@@ -259,13 +291,14 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
 
         } else if (chkMatch.length > 0) {
             if (!chkLabeled) {
+                $(this).parent().find('span[name=alertSpan]').text("");
                 if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 1) {
                     $(this).parent().find('select[name=multiMatchUtterSel]').remove();
                 }
 
                 rememberUtterInput = $(this).val();
-                var matchStartIndex = chkMatchIndex[0].split(",")[0];
-                var matchEndIndex = chkMatchIndex[0].split(",")[1];
+                var matchStartIndex = chkMatchIndex[0].split(",")[0]*1;
+                var matchEndIndex = chkMatchIndex[0].split(",")[1]*1;
                 var colorIndexArr = [0, 1, 2, 3, 4];
                 $(this).parents('tr').prev().find('span[name=utterText]').each(function(){
                     var classValue = $(this).attr('class');
@@ -297,6 +330,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                 }
                 for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
                     var tmpClass = $(this).parents('tr').prev().find('span[name=utterText]').eq(i).attr('class');
+                    if (typeof tmpClass == 'undefined') {
+                        tmpClass = '';
+                    }
                     if (tmpClass.indexOf('span_color_') != -1) {
                         if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
                             colorIndexArr.splice(i--, 1);
@@ -314,8 +350,18 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
 
                     if ($(this).parent().find('div[name=indentDiv]').length>0) {
                         var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+                        var minIndex = -1;
+                        var maxIndex = -1;
                         for (var k=nowIndex-1; k >= 0; k--) {
                             if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                minIndex = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val()==""?-1:$('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                maxIndex = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val()==""?-1:$('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                break;
+                            }
+                        }
+                        for (var k=nowIndex; k >= 0; k--) {
+                            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                /*
                                 var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
                                 var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
                                 startInx = startInx==""?matchStartIndex:startInx*1;
@@ -323,8 +369,21 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                                 if (startInx <= matchStartIndex) {
                                     $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
                                 }
-                                if (endInx >= matchEndIndex) {
-                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                                if (endInx <= matchEndIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(matchEndIndex);
+                                }
+                                */
+                               $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(minIndex);
+                               $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(maxIndex);
+                                break;
+                            } else {
+                                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                if (minIndex == -1 || minIndex >= startInx) {
+                                    minIndex = startInx;
+                                }
+                                if (maxIndex == -1 || endInx >= maxIndex) {
+                                    maxIndex = endInx;
                                 }
                             }
                         }
@@ -338,6 +397,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             }
         } else {
             console.log("매칭되는것 없음 ");
+            $(this).parent().find('span[name=alertSpan]').text(language.ALERT_NO_MATCHING_WORDS);
         }
         //--------------------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------
@@ -376,7 +436,7 @@ function changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex
             }
         }
     }
-    for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
+    for (var i=(matchEndIndex*1)+1; i<matchStartIndex; i++) {
         var tmpClass = $('tr[name=utterMainTr]').eq(trIndex).find('span[name=utterText]').eq(i).attr('class');
         if (tmpClass.indexOf('span_color_') != -1) {
             if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
@@ -471,7 +531,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
             utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
             $(this).parent().append(utterBodyHtml);
             break;
         case 3:
@@ -488,7 +548,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
             utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
             $(this).parent().append(utterBodyHtml);
             break;
         case 4:
@@ -502,7 +562,7 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
             utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
             utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
             $(this).parent().append(utterBodyHtml);
             break;
             /*
@@ -532,9 +592,10 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
 
 //entity name sel
 $(document).on("change", "select[name=entitySelBox]", function(e){
+    $(this).parent().find('input[name=matchUtterText]').prop('disabled', false);
     var entityType = $(this).parent().find('select[name=entityTypeForLabel]').val();
 
-    
+
     $(this).parent().find('input[name=matchUtterText]').val('');
     var startIndex = $(this).parent().find('input[name=startIndex]').val();
     var endIndex = $(this).parent().find('input[name=endIndex]').val();
@@ -574,35 +635,55 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
             var utterBodyHtml = "";
             for (var j=0; j<compositeList.length; j++) {
                 if (compositeList[j].ENTITY_NAME == $(this).val()) {
-                    var childList = compositeList[j].CHILD_ENTITY_LIST;
+                    var childList = compositeList[j].CHILD_ENTITY_LIST.slice();
                     for (var k=0; k<childList.length; k++) {
+
+                        var childTypeStr = "";
+                        var chkChildType = false;
+                        for (var h=0; h<simpleList.length; h++) {
+                            if (simpleList[h].ENTITY_ID == childList[k].CHILDREN_ID) {
+                                chkChildType = true;
+                                break;
+                            }
+                        }
+                        if (chkChildType) {
+                            childTypeStr = "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                        } else {
+                            childTypeStr = "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                        }
+
                         utterBodyHtml += "<div name='labelInfoDiv'>";
                         
                         utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
                         utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                        utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
-                        utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                        utterBodyHtml += childTypeStr;
+                        //utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
                         //utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
                         //utterBodyHtml += "<option value='5'>" + language.CLOSED_LIST_ENTITY + "</option>";
                         utterBodyHtml += "</select>";
             
                         utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-                        utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+                        //utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+                        utterBodyHtml += "<option value='" + childList[k].CHILDREN_NAME + "'>" + childList[k].CHILDREN_NAME + "</option>";
+                        /*
                         for (var q=0; q<childList.length; q++) {
                             utterBodyHtml += "<option value='" + childList[q].CHILDREN_NAME + "'>" + childList[q].CHILDREN_NAME + "</option>";
                         }
+                        */
                         utterBodyHtml += "</select>";
                         utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='' />";
                         utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
                         utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
                         utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                        utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                        utterBodyHtml += "<span name='alertSpan' ></span>";
                         utterBodyHtml += "</div>";
                     }
-                    $(this).parents('td').append(utterBodyHtml);
+                    $(this).parents('div[name=labelInfoDiv]').after(utterBodyHtml);
                     break;
                 }
             }
+            $(this).parent().find('input[name=matchUtterText]').prop('disabled', true);
             break;
         case 5:
             makeChildSelBox ($(this), entityType);
@@ -809,7 +890,7 @@ $(document).on("click", "a[name=addUtter]", function(e){
     utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
     utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
     utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-    utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+    utterBodyHtml += "<span name='alertSpan'></span>";
     utterBodyHtml += "</div>";
     $(this).parents('tr').next().children().eq(1).append(utterBodyHtml);
 
@@ -836,10 +917,11 @@ $(document).on("click", "a[name=delLabelBtn]", function(e){
 
     var startIndexTmp = $(this).parent().find('input[name=startIndex]').val();
     var endIndexTmp = $(this).parent().find('input[name=endIndex]').val();
-    for (var i=startIndexTmp; i<=endIndexTmp; i++) {
-        $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+    if (startIndexTmp != "" && endIndexTmp != "") {
+        for (var i=startIndexTmp; i<=endIndexTmp; i++) {
+            $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+        }
     }
-
     $(this).parents('div[name=labelInfoDiv]').remove();
 });
 
@@ -1097,7 +1179,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -1111,8 +1193,9 @@ function makeLabelingTr(entityLabel) {
                         if (hierarchyList[j].ENTITY_ID == entityLabel[i].id) {
                             utterBodyHtml += "<div name='labelInfoDiv'>";
     
+                            var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                             if (chkComposit) {
-                                if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                if (isInside ) {
                                     utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
                                 } else {
                                     chkComposit = false;
@@ -1122,7 +1205,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
                             utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
                             utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
-                            if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                            if (!isInside ) {
                                 utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
                             }
                             //utterBodyHtml += "<option value='5'>closed list</option>";
@@ -1138,7 +1221,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -1156,15 +1239,14 @@ function makeLabelingTr(entityLabel) {
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
-                            
                             utterBodyHtml += "<select name='entitySelBox' class='form-control' >";
                             utterBodyHtml += "<option value='" + entityLabel[i].id + "'></option>";
                             utterBodyHtml += "</select>";
-                            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+                            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' disabled/>";
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -1210,9 +1292,9 @@ function makeLabelingTr(entityLabel) {
                                 if (hierarchyList[j].CHILD_ENTITY_LIST[k].CHILDREN_ID == entityLabel[i].id) {
                                     utterBodyHtml += "<div name='labelInfoDiv'>";
     
-
+                                    var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                                     if (chkComposit) {
-                                        if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                        if (isInside ) {
                                             utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
                                         } else {
                                             chkComposit = false;
@@ -1222,7 +1304,7 @@ function makeLabelingTr(entityLabel) {
                                     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
                                     utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
                                     utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
-                                    if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
+                                    if (!isInside ) {
                                         utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
                                     }
                                     //utterBodyHtml += "<option value='4'>composite</option>";
@@ -1240,7 +1322,7 @@ function makeLabelingTr(entityLabel) {
                                     utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                                     utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                                     utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                                    utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                                    utterBodyHtml += "<span name='alertSpan' ></span>";
                                     utterBodyHtml += "</div>";
                                     break;
                                 }
@@ -1290,6 +1372,9 @@ function changeEntitySel() {
         }
         
         $(this).parent().find('input[name=matchUtterText]').val(utterStr);
+
+        //composit child인지
+        var isComChild = ($(this).parents('div[name=labelInfoDiv]').find('div[name=indentDiv]').length>0)
 
         var optionHtml = '';
         switch($(this).parent().find('select[name=entityTypeForLabel]').val()) {
@@ -1408,7 +1493,7 @@ function changeEntitySel() {
                 break;
                 */
             case '6':
-            /*
+            
                 for (var i=0; i<hierarchyList.length; i++) {
                     if (entityLabel[i].entityName.indexOf((hierarchyList[j].ENTITY_NAME + '::')) != -1 ) {
                         for (var k=0; k<hierarchyList[j].CHILD_ENTITY_LIST.length; k++) {
@@ -1426,10 +1511,15 @@ function changeEntitySel() {
                     }
                 }
                 $(this).html(optionHtml);
-                */
+                
                 break;
             default:
                 break;
+        }
+        if (isComChild) {
+            //entityChildSelBox
+            $(this).prev().prop('disabled', true);
+            $(this).prop('disabled', true);
         }
     });
 }
@@ -1582,6 +1672,7 @@ function saveUtterance() {
     var addClosedList = [];
     var isOk = false;
     var isNew = false;
+    var isMatching = false;
     $('tr').each(function(){
         if (trIndex == 0) {
             trIndex++;
@@ -1604,27 +1695,39 @@ function saveUtterance() {
         {
             var entityLabels = [];
             $(this).find('div[name=labelInfoDiv]').each(function(){
-                
+                if ($(this).find('span[name=alertSpan]').text().trim() != '') {
+                    isMatching = true;
+                }
                 var labelObj = new Object();
                 var selEntity;
                 var startIndex;
                 var endIndex;
                 var childName = '';
+
+                var chkCompositeChild = false;
                 var utterEntityType = $(this).find('select[name=entityTypeForLabel]').val();
                 switch (utterEntityType) {
                     case '1':
-                        
+                        if ($(this).find('div[name=indentDiv]').length) {
+                            chkCompositeChild = true;
+                        }
                         selEntity = $(this).find('select[name=entitySelBox]').val();
                         startIndex = $(this).find('input[name=startIndex]').val();
                         endIndex = $(this).find('input[name=endIndex]').val();
                         break;
                     case '3':
+                        if ($(this).find('div[name=indentDiv]').length) {
+                            chkCompositeChild = true;
+                        }
                         selEntity = $(this).find('select[name=entitySelBox]').val();
                         startIndex = $(this).find('input[name=startIndex]').val();
                         endIndex = $(this).find('input[name=endIndex]').val();
                         
-                        if ($(this).find('select[name=entityChildSelBox]').val() != "NONE") {
-                            selEntity = selEntity + "::" + $(this).find('select[name=entityChildSelBox]').val();
+                        if ($(this).find('select[name=entityChildSelBox]').length) {
+                        //if ($(this).find('select[name=entityChildSelBox]').val() != "NONE" && $(this).parents('tr').find('div[name=indentDiv]').length ==0) {
+                            if ($(this).find('select[name=entityChildSelBox]').val() != "NONE") {
+                                selEntity = selEntity + "::" + $(this).find('select[name=entityChildSelBox]').val();
+                            }
                         }
                         break;
 
@@ -1737,13 +1840,26 @@ function saveUtterance() {
                 if (!isNew) {
                     labelObj.entityName = selEntity;
                     labelObj.childName = childName;
-    
+                    var startStr = $(this).parents('tr').prev().find('#indexVal_' + startIndex).val();
+                    var endStr = $(this).parents('tr').prev().find('#indexVal_' + endIndex).val();
+                    if (typeof startStr == 'undefined') {
+                        isMatching = true;
+                        return true;
+                    }
                     var startInx = $(this).parents('tr').prev().find('#indexVal_' + startIndex).val().split(',')[1];
                     var endInx = $(this).parents('tr').prev().find('#indexVal_' + endIndex).val().split(',')[2];
     
                     labelObj.startCharIndex = startInx;
                     labelObj.endCharIndex = endInx;
-                    entityLabels.push(labelObj)
+
+                    
+                    if (chkCompositeChild) {
+                        var childTmpObj = entityLabels.pop();
+                        entityLabels.push(labelObj);
+                        entityLabels.push(childTmpObj);
+                    } else {
+                        entityLabels.push(labelObj)
+                    }
                 }
             });
             uterObj.entityLabels = entityLabels;
@@ -1756,12 +1872,19 @@ function saveUtterance() {
         //alert('list type의 child Entity를 선택해 주세요.');
         return false;
     }
+    if (isMatching) {
+        $('#alertMsg').text(language.ALERT_NO_MATCHING_WORDS);
+        $('#alertBtnModal').modal('show');
+        return false;
+    }
     var params = {
         'intentName' : $('#hiddenIntentName').val(),
         'labelArr' : utterArr,
         'newUtterArr' : newArr,
         'addClosedList' : addClosedList
     };
+    console.log(params);
+    //return false;
 
     $.ajax({
         type: 'POST',
@@ -1804,7 +1927,21 @@ function saveUtterance() {
             }
             else 
             {
-                $('#alertMsg').text(data.message);
+                var luisResult = data.luisResult;
+                var outputTxtPre = "";
+                var outputTxtAfter = "";
+                var failCnt = 0;
+                console.log(luisResult);
+                for (var i=0; i<luisResult.length; i++ ) {
+                    if (luisResult[i].statusCode != 201) {
+                        failCnt++;
+                        console.log(i)
+                        outputTxtAfter += "[" + luisResult[i].body.UtteranceText + "] " + language.ALERT_THIS_UTTER_FAILED + ' <br/>';
+                    } 
+                }
+                outputTxtPre = language.SUCCESS + " : " + (luisResult.length - failCnt) + ", " + language.FAIL + " : " + failCnt + " <br/>";
+                
+                $('#alertMsg').html(outputTxtPre + outputTxtAfter);
                 $('#alertBtnModal').modal('show');
                 //alert(data.message);
                 //updateUtter();
@@ -1870,3 +2007,5 @@ $(document).on("click", "#alertCloseBtn", function () {
         }
     }
 });
+
+
