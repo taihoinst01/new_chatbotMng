@@ -318,6 +318,42 @@ router.post('/getScorePanel', function (req, res) {
         });
 });
 
+router.post('/getCountPanel', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+
+    var selectQuery = "";
+        selectQuery += "SELECT \n";
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'H' THEN 1 END ) SUCCESS, \n";
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'D' THEN 1 END ) FAIL, \n";
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'G' THEN 1 END ) SUGGEST, \n";
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'E' THEN 1 END ) ERROR \n"; 
+        selectQuery += "FROM TBL_HISTORY_QUERY \n";
+        selectQuery += "WHERE 1=1 \n";
+        selectQuery += "AND REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
+        if (selDate !== 'allDay') {
+            selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+        }
+        if (selChannel !== 'all') {
+            selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
+        }
+        //console.log("selectQuery===="+selectQuery);
+    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
+        return pool.request().query(selectQuery)
+        }).then(result => {
+          let rows = result.recordset;
+          
+          res.send({list : rows});
+          sql.close();
+        }).catch(err => {
+            
+          res.status(500).send({ message: "${err}"})
+          sql.close();
+        });
+});
+
 router.post('/getOftQuestion', function (req, res) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;

@@ -112,6 +112,7 @@ $(document).ready(function () {
 function selectAll() {
 
     getScorePanel();
+    getCountPanel();
     /*
     * 로그인한 사람에 따라서 Dashboard 가 다르게 나온다.
     * 2018.08.28 Jun Hyoung Park
@@ -397,6 +398,33 @@ function getScorePanel() {
         },
         error : function() {   // 오류가 발생했을 때 호출된다. 
             console.log("error");
+        },
+        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
+            
+        }
+    })
+}
+
+//HISTORY 에서 SUCCESS, FAIL, ERROR, SUGGEST
+function getCountPanel() {
+    $.ajax({
+        url: '/board/getCountPanel',
+        dataType: 'json',
+        type: 'POST',
+        data: getFilterVal(),
+        success: function (data) {
+            var boardCount = data.list[0];
+            $('#successCount').text(boardCount.SUCCESS);
+            $('#failCount').text(boardCount.FAIL);
+            $('#errorCount').text(boardCount.ERROR);
+            $('#suggestCount').text(boardCount.SUGGEST);
+        },
+        error : function() {   // 오류가 발생했을 때 호출된다. 
+            console.log("error");
+            $('#successCount').text("0");
+            $('#failCount').text("0");
+            $('#errorCount').text("0");
+            $('#suggestCount').text("0");
         },
         complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
             
