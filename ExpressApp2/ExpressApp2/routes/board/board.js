@@ -329,9 +329,11 @@ router.post('/getCountPanel', function (req, res) {
         selectQuery += "    COUNT(CASE WHEN RESULT = 'H' THEN 1 END ) SUCCESS, \n";
         selectQuery += "    COUNT(CASE WHEN RESULT = 'D' THEN 1 END ) FAIL, \n";
         selectQuery += "    COUNT(CASE WHEN RESULT = 'G' THEN 1 END ) SUGGEST, \n";
-        selectQuery += "    COUNT(CASE WHEN RESULT = 'E' THEN 1 END ) ERROR \n"; 
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'E' THEN 1 END ) ERROR, \n"; 
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'Q' THEN 1 END ) SAPWORD, \n"; 
+        selectQuery += "    COUNT(CASE WHEN RESULT = 'I' THEN 1 END ) SAPPASSWORDINIT \n"; 
         selectQuery += "FROM TBL_HISTORY_QUERY \n";
-        selectQuery += "WHERE 1=1 \n";
+        selectQuery += "WHERE CUSTOMER_COMMENT_KR != '건의사항입력' \n";
         selectQuery += "AND REG_DATE  between CONVERT(date, '" + startDate + "') AND CONVERT(date, '" + endDate + "') \n";
         if (selDate !== 'allDay') {
             selectQuery += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
