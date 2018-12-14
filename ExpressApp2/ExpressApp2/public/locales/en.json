@@ -304,5 +304,7 @@
 	"ALERT_WRONG_ACCESS": "UNVALID ACCESS. Please login.",
 	"ALERT_WRONG_ACCESS2": "UNVALID ACCESS. ",
 	"ALERT_CAN_SELECT_ONE": "Please select one dialog.",
+	"ALERT_NO_MATCHING_WORDS": "No matching words",
+	"ALERT_THIS_UTTER_FAILED": "failed.",
 	"============= The end =============": ""
 }
