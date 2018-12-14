@@ -124,6 +124,8 @@ function selectAll() {
     var drawNoneQuerytableHtml = "";
     var drawFirstQueryHtml = "";
     var drawfirstQuerytableHtml = "";
+
+    
     
     $.ajax({
         type: 'POST',
@@ -131,11 +133,13 @@ function selectAll() {
         success: function (data) {
 
             if (data.records > 0) {
-
+                
                 for (var i = 0; i < data.rows.length; i++) {
                     //INTENT SCORE 평균/최소/최대
+                    console.log()
+                    
                     if (data.rows[i].BOARD_URL == "drawScoreList") {
-
+                        
                         drawScoreListHtml += '<section class="col-lg-5">';
                         drawScoreListHtml += '  <div class="box  color-palette-box">';
                         drawScoreListHtml += '	<div class="box-body">';
@@ -164,6 +168,7 @@ function selectAll() {
                         drawScoreListHtml += '			    </div>';
                         drawScoreListHtml += '			</div>';
                         drawScoreListHtml += '	</div>';
+                        drawScoreListHtml += '	<div class="overlay" id="overlay_drawScoreList"><i class="fa fa-refresh fa-spin"></i></div>';
                         drawScoreListHtml += '  </div>';
                         drawScoreListHtml += '</section>';
                         $('#drawScoreListHtml').html(drawScoreListHtml);
@@ -194,6 +199,7 @@ function selectAll() {
                         getOftQuestionHtml += '			    </table>';
                         getOftQuestionHtml += '			</div>';
                         getOftQuestionHtml += '	</div>';
+                        getOftQuestionHtml += '	<div class="overlay" id="overlay_getOftQuestion"><i class="fa fa-refresh fa-spin"></i></div>';
                         getOftQuestionHtml += '   </div>';
                         getOftQuestionHtml += '</section>';
                         $('#getOftQuestionHtml').html(getOftQuestionHtml);
@@ -203,15 +209,16 @@ function selectAll() {
                     //응답(평균/최대/최소)/평균 머무르는 시간
                     if (data.rows[i].BOARD_URL == "getResponseTime") {
 
-                        getResponseTimeHtml += '<div class="box  color-palette-box">';
+                        getResponseTimeHtml += '   <div class="box  color-palette-box">';
                         getResponseTimeHtml += '<canvas id="areaChart" style="height:0"></canvas>';
-                        getResponseTimeHtml += '		<div class="box-body">';
-                        getResponseTimeHtml += '			       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.RESPONSE_AVG_MAX_MIN_STAYTIME + '</h3></div> ';
+                        getResponseTimeHtml += '	<div class="box-body">';
+                        getResponseTimeHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.RESPONSE_AVG_MAX_MIN_STAYTIME + '</h3></div> ';
                         getResponseTimeHtml += '				<div class="chart-responsive">';
                         getResponseTimeHtml += '				  <div class="chart" id="responseTimeDiv" style="height: 300px;"></div>';
                         getResponseTimeHtml += '				</div>';
-                        getResponseTimeHtml += '		</div>';
-                        getResponseTimeHtml += '</div>';
+                        getResponseTimeHtml += '	</div>';
+                        getResponseTimeHtml += '	<div class="overlay" id="overlay_getResponseTime"><i class="fa fa-refresh fa-spin"></i></div>';
+                        getResponseTimeHtml += '   </div>';
                         $('#getResponseTimeHtml').html(getResponseTimeHtml);
                         getResponseTime();
                     }
@@ -226,6 +233,7 @@ function selectAll() {
                         getQueryByEachTimeHtml += '				  <div class="chart" id="timeOfDay_div" style="height: 300px;"></div>';
                         getQueryByEachTimeHtml += '				</div>';
                         getQueryByEachTimeHtml += '		</div>';
+                        getQueryByEachTimeHtml += '	<div class="overlay" id="overlay_getQueryByEachTime"><i class="fa fa-refresh fa-spin"></i></div>';
                         getQueryByEachTimeHtml += '</div>';
                         $('#getQueryByEachTimeHtml').html(getQueryByEachTimeHtml);
                         getQueryByEachTime();
@@ -244,15 +252,10 @@ function selectAll() {
                         drawNoneQuerytableHtml += '			</colgroup>';
                         drawNoneQuerytableHtml += '			<thead>';
                         drawNoneQuerytableHtml += '			      <tr>';
-                        //drawNoneQuerytableHtml += '				  <th>' + language.Intent_name + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.HangulQuestion + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.channel + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.QuestionCount + '</th>';
                         drawNoneQuerytableHtml += '				  <th>' + language.Date + '</th>';
-                        //drawNoneQuerytableHtml += '				  <th>' + language.Result + '</th>';
-                        //drawNoneQuerytableHtml += '				  <th>' + language.TEXT_response + '</th>';
-                        //drawNoneQuerytableHtml += '				  <th>' + language.CARD_response + '</th>';
-                        //drawNoneQuerytableHtml += '				  <th>' + language.CARDBTN_response + '</th>';
                         drawNoneQuerytableHtml += '			      </tr>';
                         drawNoneQuerytableHtml += '			</thead>';
                         drawNoneQuerytableHtml += '			<tbody id="noneQueryDiv">';
@@ -266,6 +269,7 @@ function selectAll() {
                         drawNoneQuerytableHtml += '		    </div>';
                         drawNoneQuerytableHtml += '		</div>';
                         drawNoneQuerytableHtml += '	</div>';
+                        drawNoneQuerytableHtml += '	<div class="overlay" id="overlay_drawNoneQuerytable"><i class="fa fa-refresh fa-spin"></i></div>';
                         drawNoneQuerytableHtml += '</div>';
                         $('#drawNoneQuerytableHtml').html(drawNoneQuerytableHtml);
                         drawNoneQuerytable();
@@ -282,6 +286,7 @@ function selectAll() {
                         drawFirstQueryHtml += '			  <div class="chart" id="fistQueryDiv" style="height:300px;" ></div>';
                         drawFirstQueryHtml += '			</div>';
                         drawFirstQueryHtml += '	</div>';
+                        drawFirstQueryHtml += '	<div class="overlay" id="overlay_drawFirstQuery"><i class="fa fa-refresh fa-spin"></i></div>';
                         drawFirstQueryHtml += '   </div>';
                         drawFirstQueryHtml += '</section>';
                         $('#drawFirstQueryHtml').html(drawFirstQueryHtml);
@@ -315,6 +320,7 @@ function selectAll() {
                         drawfirstQuerytableHtml += '			</ul>';
                         drawfirstQuerytableHtml += '		    </div>';
                         drawfirstQuerytableHtml += '		</div>';
+                        drawfirstQuerytableHtml += '	<div class="overlay" id="overlay_drawfirstQuerytable"><i class="fa fa-refresh fa-spin"></i></div>';
                         drawfirstQuerytableHtml += '      </div>';
                         drawfirstQuerytableHtml += '</section>';
                         $('#drawfirstQuerytableHtml').html(drawfirstQuerytableHtml);
@@ -449,6 +455,7 @@ function drawScoreList(page) {
             if (data.error_code != null && data.error_message != null) {
                 alert(data.error_message);
             } else {
+                $("#overlay_drawScoreList").remove();
                 var list = data.list;
                 var scoreList = "";
                 var minData = 0;
@@ -485,6 +492,7 @@ function getOftQuestion() {
         if (data.error_code != null && data.error_message != null) {
             alert(data.error_message);
         } else {
+            $("#overlay_getOftQuestion").remove();
             var tableList = data.list;
 
             var scoreList = "";
@@ -517,6 +525,7 @@ function getResponseTime() {
             if (data.error_code != null && data.error_message != null) {
                 alert(data.error_message);
             } else {
+                $("#overlay_getResponseTime").remove();
                 //BAR CHART
                 var bar = new Morris.Bar({
                     element: 'responseTimeDiv',
@@ -551,6 +560,7 @@ function getQueryByEachTime() {
             if (data.error_code != null && data.error_message != null) {
                 alert(data.error_message);
             } else {
+                $("#overlay_getQueryByEachTime").remove();
                 //BAR CHART
                 var arrList = data.list;
                 var jsonList = [];
@@ -598,6 +608,7 @@ function drawNoneQuerytable(page) {
         type: 'POST',
         data: getFilterVal(page),
         success: function (data) {
+            $("#overlay_drawNoneQuerytable").remove();
             if(data.length==0){
                 $("#noneQueryDiv").html('<tr><td colspan=9>dfafdsa</td></tr>');
                 $('#noneQueryDivTablePaging .pagination').html('').append('');
@@ -653,7 +664,7 @@ function drawFirstQuery() {
             if (data.error_code != null && data.error_message != null) {
                 alert(data.error_message);
             } else {
-
+                $("#overlay_drawFirstQuery").remove();
                 var jsonList = [];
                 for (var i = 0; i < data.list.length; i++) {
 
@@ -693,6 +704,7 @@ function drawfirstQuerytable(page) {
             if (data.error_code != null && data.error_message != null) {
                 alert(data.error_message);
             } else {
+                $("#overlay_drawfirstQuerytable").remove();
                 var list = data.list;
                 var firstList = "";
 
