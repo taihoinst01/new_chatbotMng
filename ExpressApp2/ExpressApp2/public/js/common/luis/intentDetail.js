@@ -701,7 +701,7 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
 });
 
 
-function makeChildSelBox (selObj, entityType) {
+function makeChildSelBox(selObj, entityType) {
     var selEntity = $(selObj).val();
     var utterBodyHtml = '';
     switch(entityType*1) {
@@ -947,6 +947,8 @@ $(document).on("click", "a[name=delUtterBtn]", function(e){
         }
         else 
         {
+            var delIndex = $('#utteranceTblBody tr').index($(this).parents('tr'));
+
             var params = {
                 'utterId' : utterId,
                 'intentId' : intentId
@@ -975,8 +977,10 @@ $(document).on("click", "a[name=delUtterBtn]", function(e){
                     }
                     else 
                     {
-                        $(this).parents('tr').next().remove();
-                        $(this).parents('tr').remove();
+                        $('#utteranceTblBody tr').eq(delIndex+1).remove();
+                        $('#utteranceTblBody tr').eq(delIndex).remove();
+                        //$(this).parents('tr').next().remove();
+                        //$(this).parents('tr').remove();
                         //alert(data.message);
                         $('#alertMsg').text(data.message);
                         $('#alertBtnModal').modal('show');
@@ -1419,7 +1423,7 @@ function changeEntitySel() {
                 }
 
                 $(this).html(optionHtml);
-
+                var chkChildExists = false;
                 if ($(this).parent().find('select[name=entityChildSelBox]').val() == ''  ) {
                     childHtml += "<option value='NONE' >" + language.SELECT_NOTHING + "</option>";
                     for (var k=0; k<hierarchyList[rememberId].CHILD_ENTITY_LIST.length; k++) {
@@ -1430,6 +1434,7 @@ function changeEntitySel() {
                     childHtml += "<option value='NONE' >" + language.SELECT_NOTHING + "</option>";
                     for (var k=0; k<hierarchyList[rememberId].CHILD_ENTITY_LIST.length; k++) {
                         if (hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_ID == $(this).next().val()) {
+                            chkChildExists = true;
                             childHtml += "<option value='" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "' selected>" + hierarchyList[rememberId].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
                         }
                         else {
@@ -1439,7 +1444,9 @@ function changeEntitySel() {
                 }
                 $(this).next().css('display', 'inline');
                 $(this).next().html(childHtml);
-
+                if (chkChildExists) {
+                    $(this).next().prop('disabled', true);
+                }
                 
                 break;
             case '4':
@@ -1638,6 +1645,7 @@ function getEntityList(intentName, intentId) {
     $.ajax({
         type: 'POST',
         url: '/luis/getEntityList',
+        data: {'isAll' : 'NOTALL'},
         success: function(data) {
             if (data.error) {
                 $('#alertMsg').text(data.message);

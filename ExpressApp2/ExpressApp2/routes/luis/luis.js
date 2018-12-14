@@ -643,15 +643,20 @@ router.post('/deleteIntent', function (req, res) {
     var deleteIntentName = req.body.deleteIntentName;
     var deleteIntentId = req.body.deleteIntentId;
     var intentList = req.session.intentList;
-    var deleteIntentQry = "";
     var tmpLuisObj;
+
+    var deleteIntentQry = ``;
+
+    var deleteRelationQry = `
+                                DELETE FROM TBL_DLG_RELATION_LUIS WHERE LUIS_INTENT = @delIntent;
+                            `;
     try {
 
         tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/intents/' + deleteIntentId, options);
             
         if (tmpLuisObj.statusCode == 200) {
-            deleteIntentQry = " DELETE FROM TBL_LUIS_INTENT \n";
-            deleteIntentQry += " WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @deleteIntentId; ";
+            deleteIntentQry = ` DELETE FROM TBL_LUIS_INTENT 
+                                 WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @deleteIntentId; `;
 
             try {
                 (async () => {
@@ -668,6 +673,10 @@ router.post('/deleteIntent', function (req, res) {
                             break;
                         }
                     } 
+                    
+                    let deleteRelation = await pool.request()
+                                                .input('delIntent', sql.NVarChar, deleteIntentName)
+                                                .query(deleteRelationQry);
 /*
                     deleteChildEntityQry = " DELETE FROM TBL_LUIS_CHILD_ENTITY \n ";
                     deleteChildEntityQry += " WHERE 1=1 AND ENTITY_ID = @entityId; ";
@@ -917,7 +926,8 @@ router.post('/selectUtterList', function (req, res) {
 router.post('/getEntityList', function (req, res) {
     
     var userId = req.session.sid;
-
+    var selAppId = req.session.selAppId;
+    var isAll = req.body.isAll;
     var entityList = req.session.entityList.slice();
     var childList = req.session.entityChildList;
 
@@ -927,6 +937,9 @@ router.post('/getEntityList', function (req, res) {
     var closedList = [];
     try {
         for (var i=0; i<entityList.length; i++) {
+            if (isAll != "ALL") {
+                if (entityList[i].APP_ID !=selAppId) continue;
+            }
             var editChild = [];
             switch(entityList[i].ENTITY_TYPE) {
                 case '1':
@@ -2238,13 +2251,18 @@ router.post('/getNewUtterList', function (req, res){
     selectQnAMngQry += "     FROM TBL_QNAMNG \n";
     selectQnAMngQry += "    WHERE USE_YN = 'Y' \n";
     selectQnAMngQry += "      AND DLG_ID IS NULL \n";
-    //selectQnAMngQry += "     AND DLG_QUESTION LIKE '%@searchQna%';\n";
+    selectQnAMngQry += "      AND INTENT NOT IN ( \n";
+    selectQnAMngQry += "		                 SELECT LUIS_INTENT\n";
+    selectQnAMngQry += "		                   FROM TBL_DLG_RELATION_LUIS \n";
+    selectQnAMngQry += "	 		             ) \n";
+    selectQnAMngQry += "      AND DLG_QUESTION LIKE '%@searchQna%' \n";
+    selectQnAMngQry += " ORDER BY INTENT, REG_DT DESC; \n";
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let selectQnA = await pool.request()
-                //.input('searchQna', sql.NVarChar, searchQnA)
+                .input('searchQna', sql.NVarChar, searchQnA)
                 .query(selectQnAMngQry);
 
             var qnaListDb = selectQnA.recordset;

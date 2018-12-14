@@ -29,6 +29,14 @@ $(document).ready(function () {
     
 })
 
+$(document).keyup(function(e) {
+    if (e.keyCode == 27) { // escape key maps to keycode `27`
+        if ($('.entityValDiv').css('display')=='block') {
+            $('.entityValDiv').hide();
+        }
+   }
+});
+
 $(document).mouseup(function(e) {
     if ($('.entityValDiv').css('display') != 'none') {
 

@@ -88,6 +88,7 @@ $(document).ready(function() {
 
 });
 
+
 //페이징 클릭
 $(document).on('click','.li_paging',function(e){
     if(!$(this).hasClass('active')){
@@ -125,6 +126,12 @@ $(document).on("keypress", "#searchQnaText", function(e){
 });
 
 
+$(document).on("change", "select[name=utterSelBox]", function(e){
+    var newUtter =  $(this).find(':selected').text();
+    var newEntity =  $(this).find(':selected').val();
+    $(this).parents('tr').find('a[name=selEntity]').text('').text(newUtter);
+    $(this).parents('tr').find('td').eq(3).text('').text(newEntity);
+});
 
 //엔티티 가져오기
 function getEntityList(intentName, intentId) {
@@ -132,6 +139,7 @@ function getEntityList(intentName, intentId) {
     $.ajax({
         type: 'POST',
         url: '/luis/getEntityList',
+        data: {'isAll' : 'ALL'},
         success: function(data) {
             if (data.error) {
                 $('#alertMsg').text(data.message);
@@ -165,9 +173,22 @@ function makeQnaTable() {
             var entityBodyHtml = '';
             if(data.qnaList.length > 0){
                 for(var i = 0; i < data.qnaList.length; i++){
+                    var j=i+1
+                    var selDupleIntent = "<select name='utterSelBox' class='form-control'  >";
+                    selDupleIntent += "<option value='" + data.qnaList[i].ENTITY + "'>" + data.qnaList[i].DLG_QUESTION + "</option>";
+                    for (; j<data.qnaList.length; j++) {
+                        if (data.qnaList[i].INTENT == data.qnaList[j].INTENT) {
+                            selDupleIntent += "<option value='" + data.qnaList[j].ENTITY + "'>" + data.qnaList[j].DLG_QUESTION + "</option>";
+                        } else {
+                            break;
+                        }
+                    }
+                    selDupleIntent += "</select>";
+
                     entityBodyHtml += "<tr>";
                     entityBodyHtml += "<td style='text-align: left; padding-left:1%;'><a href='#' name='selEntity' onclick='return false;' >" + data.qnaList[i].DLG_QUESTION + "</a></td>";
-                    entityBodyHtml += "<td style='text-align: left; padding-left:1%;'>" + data.qnaList[i].INTENT + "</td>";
+                    entityBodyHtml += "<td style=' padding-left:1%;'>" + data.qnaList[i].INTENT + "</td>";
+                    entityBodyHtml += "<td style='text-align: left; padding-left:1%;'>" + selDupleIntent + "</td>";
                     entityBodyHtml += "<td style='text-align: left; padding-left:1%;'>" + data.qnaList[i].ENTITY + "</td>";
                     entityBodyHtml += "<td style='text-align: left; padding-left:1%;'>" + data.qnaList[i].REG_DT + "</td>";
                     entityBodyHtml += "<td style='text-align: right; padding-right:1.5%;'>";
@@ -179,6 +200,9 @@ function makeQnaTable() {
                     //entityBodyHtml += "<a href='#' name='addReplyBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-edit' style='font-size: 25px;'></span></a>";
                     entityBodyHtml += "</td>";
                     entityBodyHtml += "</tr>";
+                    if (i+1 != j) {
+                        i = j;
+                    }
                 }
                 //<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>
                 $('#qnaListBody').html(entityBodyHtml);
@@ -672,7 +696,6 @@ function makeRelation() {
     //var predictIntent = $('#dlgViewDiv').find($('input[name=predictIntent]'))[0].value;//안 쓰겠지만 지우면 고칠게 많아질듯...차후 변경
 
     //console.log('d');
-    //return false;
 
     $.ajax({
         url: '/learning/relationUtterAjax',
@@ -734,3 +757,4 @@ function searchBtnFnc() {
         searchDialog(contextEntityData);
     }
 }
+

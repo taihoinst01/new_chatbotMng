@@ -73,14 +73,14 @@ $(document).on("click", "a[name=addUtter]", function(e){
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-    utterBodyHtml += "<option value='1' selected>Simple</option>";
-    utterBodyHtml += "<option value='3'>hierarchy</option>";
-    utterBodyHtml += "<option value='4'>composite</option>";
-    //utterBodyHtml += "<option value='5'>closed list</option>";
+    utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+    utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+    utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+    //utterBodyHtml += "<option value='5'>" + language.CLOSED_LIST_ENTITY + "</option>";
     utterBodyHtml += "</select>";
 
     utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
-    utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+    utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
     for (var j=0; j<simpleList.length; j++) {
         utterBodyHtml += "<option value='" + simpleList[j].ENTITY_NAME + "'>" + simpleList[j].ENTITY_NAME + "</option>";
     }
@@ -89,7 +89,7 @@ $(document).on("click", "a[name=addUtter]", function(e){
     utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
     utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
     utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-    utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+    utterBodyHtml += "<span name='alertSpan'></span>";
     utterBodyHtml += "</div>";
     $(this).parents('tr').next().children().eq(1).append(utterBodyHtml);
 
@@ -124,14 +124,15 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
     $(this).val($(this).val().trim());
     if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
         if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
-            //alert('엔티티를 선택해 주세요.');
-            $('#alertMsg').text('엔티티를 선택해 주세요.');
+            $('#alertMsg').text(language.ALERT_ENTITY_SELECT);
             $('#alertBtnModal').modal('show');
+            //alert('엔티티를 선택해 주세요.');
             $(this).val('');
             return false;
         }
         $(this).parent().find('input[name=startIndex]').val('');
         $(this).parent().find('input[name=endIndex]').val('');
+    
         if (rememberUtterStart != "") {
             for (var i=rememberUtterStart; i<=rememberUtterEnd; i++) {
                 $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
@@ -180,11 +181,11 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                 if (isMatch) {
                     var matchObj = new Object();
                     matchObj.startIndex = index;
-                    matchObj.endIndex = innerIndex;
+                    matchObj.endIndex = index+innerIndex;
                     indexArr.push(matchObj);
                     //
                     chkMatch.push(inputStr);
-                    var tmpIndex = index + ',' + innerIndex;
+                    var tmpIndex = index + ',' + matchObj.endIndex;
                     chkMatchIndex.push(tmpIndex);
                 }
             });
@@ -218,6 +219,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         //--------------------------------------------------------------------------------------------------------------
         var utterBodyHtml = '';
         if (chkMatch.length > 1) {
+            $(this).parent().find('span[name=alertSpan]').text("");
             rememberUtterInput = $(this).val();
             utterBodyHtml += "<select name='multiMatchUtterSel' class='form-control'  >";
             var j=0;
@@ -244,15 +246,15 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex);
 
         } else if (chkMatch.length > 0) {
-            console.log("매칭되는것 1개 ");
             if (!chkLabeled) {
+                $(this).parent().find('span[name=alertSpan]').text("");
                 if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 1) {
                     $(this).parent().find('select[name=multiMatchUtterSel]').remove();
                 }
 
                 rememberUtterInput = $(this).val();
-                var matchStartIndex = chkMatchIndex[0].split(",")[0];
-                var matchEndIndex = chkMatchIndex[0].split(",")[1];
+                var matchStartIndex = chkMatchIndex[0].split(",")[0]*1;
+                var matchEndIndex = chkMatchIndex[0].split(",")[1]*1;
                 var colorIndexArr = [0, 1, 2, 3, 4];
                 $(this).parents('tr').prev().find('span[name=utterText]').each(function(){
                     var classValue = $(this).attr('class');
@@ -284,6 +286,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                 }
                 for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
                     var tmpClass = $(this).parents('tr').prev().find('span[name=utterText]').eq(i).attr('class');
+                    if (typeof tmpClass == 'undefined') {
+                        tmpClass = '';
+                    }
                     if (tmpClass.indexOf('span_color_') != -1) {
                         if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
                             colorIndexArr.splice(i--, 1);
@@ -301,8 +306,18 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
 
                     if ($(this).parent().find('div[name=indentDiv]').length>0) {
                         var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+                        var minIndex = -1;
+                        var maxIndex = -1;
                         for (var k=nowIndex-1; k >= 0; k--) {
                             if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                minIndex = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val()==""?-1:$('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                maxIndex = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val()==""?-1:$('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                break;
+                            }
+                        }
+                        for (var k=nowIndex; k >= 0; k--) {
+                            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                                /*
                                 var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
                                 var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
                                 startInx = startInx==""?matchStartIndex:startInx*1;
@@ -310,8 +325,21 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                                 if (startInx <= matchStartIndex) {
                                     $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
                                 }
-                                if (endInx >= matchEndIndex) {
-                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                                if (endInx <= matchEndIndex) {
+                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(matchEndIndex);
+                                }
+                                */
+                               $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(minIndex);
+                               $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(maxIndex);
+                                break;
+                            } else {
+                                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                                if (minIndex == -1 || minIndex >= startInx) {
+                                    minIndex = startInx;
+                                }
+                                if (maxIndex == -1 || endInx >= maxIndex) {
+                                    maxIndex = endInx;
                                 }
                             }
                         }
@@ -325,6 +353,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             }
         } else {
             console.log("매칭되는것 없음 ");
+            $(this).parent().find('span[name=alertSpan]').text(language.ALERT_NO_MATCHING_WORDS);
         }
         //--------------------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------
@@ -463,10 +492,10 @@ function makeLabelingTr(entityLabel) {
                                 }
                             }
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1' selected>Simple</option>";
-                            utterBodyHtml += "<option value='3'>hierarchy</option>";
+                            utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
                             if (!chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
-                                utterBodyHtml += "<option value='4'>composite</option>";
+                                utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
                             }
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
@@ -478,7 +507,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -492,10 +521,21 @@ function makeLabelingTr(entityLabel) {
                         if (hierarchyList[j].ENTITY_ID == entityLabel[i].id) {
                             utterBodyHtml += "<div name='labelInfoDiv'>";
     
+                            var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
+                            if (chkComposit) {
+                                if (isInside ) {
+                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                } else {
+                                    chkComposit = false;
+                                }
+                            }
+
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1'>Simple</option>";
-                            utterBodyHtml += "<option value='3' selected>hierarchy</option>";
-                            utterBodyHtml += "<option value='4'>composite</option>";
+                            utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
+                            if (!isInside ) {
+                                utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                            }
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
@@ -509,7 +549,7 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -521,21 +561,20 @@ function makeLabelingTr(entityLabel) {
                             utterBodyHtml += "<div name='labelInfoDiv'>";
     
                             utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                            utterBodyHtml += "<option value='1'>Simple</option>";
-                            utterBodyHtml += "<option value='3'>hierarchy</option>";
-                            utterBodyHtml += "<option value='4' selected>composite</option>";
+                            utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                            utterBodyHtml += "<option value='4' selected>" + language.COMPOSITE_ENTITY + "</option>";
                             //utterBodyHtml += "<option value='5'>closed list</option>";
                             utterBodyHtml += "</select>";
     
-                            
                             utterBodyHtml += "<select name='entitySelBox' class='form-control' >";
                             utterBodyHtml += "<option value='" + entityLabel[i].id + "'></option>";
                             utterBodyHtml += "</select>";
-                            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+                            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' disabled/>";
                             utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                             utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                             utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                            utterBodyHtml += "<span name='alertSpan' ></span>";
                             utterBodyHtml += "</div>";
                         }
                     }
@@ -581,10 +620,22 @@ function makeLabelingTr(entityLabel) {
                                 if (hierarchyList[j].CHILD_ENTITY_LIST[k].CHILDREN_ID == entityLabel[i].id) {
                                     utterBodyHtml += "<div name='labelInfoDiv'>";
     
+                                    var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
+                                    if (chkComposit) {
+                                        if (isInside ) {
+                                            utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                        } else {
+                                            chkComposit = false;
+                                        }
+                                    }
+
                                     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
-                                    utterBodyHtml += "<option value='1'>Simple</option>";
-                                    utterBodyHtml += "<option value='3' selected>hierarchy</option>";
-                                    utterBodyHtml += "<option value='4'>composite</option>";
+                                    utterBodyHtml += "<option value='1'>" + language.SIMPLE_ENTITY + "</option>";
+                                    utterBodyHtml += "<option value='3' selected>" + language.HIERARCHY_ENTITY + "</option>";
+                                    if (!isInside ) {
+                                        utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                                    }
+                                    //utterBodyHtml += "<option value='4'>composite</option>";
                                     //utterBodyHtml += "<option value='5'>closed list</option>";
                                     utterBodyHtml += "</select>";
             
@@ -599,7 +650,7 @@ function makeLabelingTr(entityLabel) {
                                     utterBodyHtml += "<input type='hidden' name='startIndex' value='" + entityLabel[i].startTokenIndex + "' />";
                                     utterBodyHtml += "<input type='hidden' name='endIndex' value='" + entityLabel[i].endTokenIndex + "'  />";
                                     utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
-                                    utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+                                    utterBodyHtml += "<span name='alertSpan' ></span>";
                                     utterBodyHtml += "</div>";
                                     break;
                                 }
@@ -645,6 +696,7 @@ function getEntityList(intentName, intentId) {
     $.ajax({
         type: 'POST',
         url: '/luis/getEntityList',
+        data: {'isAll' : 'NOTALL'},
         success: function(data) {
             if (data.error) {
                 //alert(data.message);
@@ -751,15 +803,22 @@ $(document).on("click", "#saveUtterModal", function(e){
                 var startIndex;
                 var endIndex;
                 var childName = '';
+
+                var chkCompositeChild = false;
                 var utterEntityType = $(this).find('select[name=entityTypeForLabel]').val();
                 switch (utterEntityType) {
                     case '1':
-                        
+                        if ($(this).find('div[name=indentDiv]').length) {
+                            chkCompositeChild = true;
+                        }
                         selEntity = $(this).find('select[name=entitySelBox]').val();
                         startIndex = $(this).find('input[name=startIndex]').val();
                         endIndex = $(this).find('input[name=endIndex]').val();
                         break;
                     case '3':
+                        if ($(this).find('div[name=indentDiv]').length) {
+                            chkCompositeChild = true;
+                        }
                         selEntity = $(this).find('select[name=entitySelBox]').val();
                         startIndex = $(this).find('input[name=startIndex]').val();
                         endIndex = $(this).find('input[name=endIndex]').val();
@@ -785,7 +844,13 @@ $(document).on("click", "#saveUtterModal", function(e){
     
                     labelObj.startCharIndex = startInx;
                     labelObj.endCharIndex = endInx;
-                    entityLabels.push(labelObj)
+                    if (chkCompositeChild) {
+                        var childTmpObj = entityLabels.pop();
+                        entityLabels.push(labelObj);
+                        entityLabels.push(childTmpObj);
+                    } else {
+                        entityLabels.push(labelObj)
+                    }
                 }
             });
             uterObj.entityLabels = entityLabels;
@@ -853,6 +918,304 @@ function changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex
         $('tr[name=utterMainTr]').eq(trIndex).next().find('div[name=labelInfoDiv]').eq(divIndex).find('input[name=endIndex]').val(matchEndIndex);
     }
 }
+
+
+
+/**
+ * 
+ * 신규작업 유두연주임 20181214
+ * 
+ */
+
+//entity name sel
+$(document).on("change", "select[name=entitySelBox]", function(e){
+    $(this).parent().find('input[name=matchUtterText]').prop('disabled', false);
+    var entityType = $(this).parent().find('select[name=entityTypeForLabel]').val();
+
+
+    $(this).parent().find('input[name=matchUtterText]').val('');
+    var startIndex = $(this).parent().find('input[name=startIndex]').val();
+    var endIndex = $(this).parent().find('input[name=endIndex]').val();
+    if (startIndex != '' && endIndex != '') {
+        for (var i=startIndex; i<=endIndex; i++) {
+            $(this).parents('tr').prev().find('#utterText_' + i).removeClass();//.removeAttr('class');
+        }
+    }
+    if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 0) {
+        $(this).parent().find('select[name=multiMatchUtterSel]').remove();
+    }
+
+    switch(entityType*1) {
+        case 3:
+
+            makeChildSelBox ($(this), entityType);
+
+            $(this).parent().find('select[name=entityChildSelBox]').show();
+            $(this).parent().find('select[name=entityChildSelBox]').children('option').each(function() {
+                if ($(this).is(':selected'))
+                { 
+                    $(this).removeAttr('selected');
+                    return false;
+                }
+            });
+            $(this).parent().find('select[name=entityChildSelBox]').children().eq(0).prop('selected', 'selected');
+            break;
+        case 4:
+            while (1) {
+                if ($(this).parents('div').next().find('div[name=indentDiv]').length > 0 ) {
+                    $(this).parents('div').next().find('div[name=indentDiv]').parent().remove();
+                } else {
+                    break;
+                }
+            }
+
+            var utterBodyHtml = "";
+            for (var j=0; j<compositeList.length; j++) {
+                if (compositeList[j].ENTITY_NAME == $(this).val()) {
+                    var childList = compositeList[j].CHILD_ENTITY_LIST.slice();
+                    for (var k=0; k<childList.length; k++) {
+
+                        var childTypeStr = "";
+                        var chkChildType = false;
+                        for (var h=0; h<simpleList.length; h++) {
+                            if (simpleList[h].ENTITY_ID == childList[k].CHILDREN_ID) {
+                                chkChildType = true;
+                                break;
+                            }
+                        }
+                        if (chkChildType) {
+                            childTypeStr = "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                        } else {
+                            childTypeStr = "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                        }
+
+                        utterBodyHtml += "<div name='labelInfoDiv'>";
+                        
+                        utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                        utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
+                        utterBodyHtml += childTypeStr;
+                        //utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='3'>" + language.HIERARCHY_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='4'>" + language.COMPOSITE_ENTITY + "</option>";
+                        //utterBodyHtml += "<option value='5'>" + language.CLOSED_LIST_ENTITY + "</option>";
+                        utterBodyHtml += "</select>";
+            
+                        utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+                        //utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+                        utterBodyHtml += "<option value='" + childList[k].CHILDREN_NAME + "'>" + childList[k].CHILDREN_NAME + "</option>";
+                        /*
+                        for (var q=0; q<childList.length; q++) {
+                            utterBodyHtml += "<option value='" + childList[q].CHILDREN_NAME + "'>" + childList[q].CHILDREN_NAME + "</option>";
+                        }
+                        */
+                        utterBodyHtml += "</select>";
+                        utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='' />";
+                        utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+                        utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+                        utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+                        utterBodyHtml += "<span name='alertSpan' ></span>";
+                        utterBodyHtml += "</div>";
+                    }
+                    $(this).parents('div[name=labelInfoDiv]').after(utterBodyHtml);
+                    break;
+                }
+            }
+            $(this).parent().find('input[name=matchUtterText]').prop('disabled', true);
+            break;
+        case 5:
+            makeChildSelBox ($(this), entityType);
+            $(this).parent().find('select[name=entityChildSelBox]').show();
+            $(this).parent().find('select[name=entityChildSelBox]').children('option').each(function() {
+                if ($(this).is(':selected'))
+                { 
+                    $(this).removeAttr('selected');
+                    return false;
+                }
+            });
+            $(this).parent().find('select[name=entityChildSelBox]').children().eq(0).prop('selected', 'selected');
+            break;
+    }
+});
+
+
+function makeChildSelBox(selObj, entityType) {
+    var selEntity = $(selObj).val();
+    var utterBodyHtml = '';
+    switch(entityType*1) {
+        case 3:
+        
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+            for (var j=0; j<hierarchyList.length; j++) {
+                if (selEntity == hierarchyList[j].ENTITY_NAME) {
+                    for (var k=0; k<hierarchyList[j].CHILD_ENTITY_LIST.length; k++) {
+                        
+                        utterBodyHtml += "<option value='" + hierarchyList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "'> " + hierarchyList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
+                    }
+                    break;
+                }
+            }
+            break;
+        case 4:
+
+            break;
+            /*
+        case 5:
+            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            for (var j=0; j<closedList.length; j++) {
+                if (selEntity == closedList[j].ENTITY_NAME) {
+                    for (var k=0; k<closedList[j].CHILD_ENTITY_LIST.length; k++) {
+                        utterBodyHtml += "<option value='" + closedList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "'> " + closedList[j].CHILD_ENTITY_LIST[k].CHILDREN_NAME + "</option>";
+                    }
+                    break;
+                }
+            }
+            break;
+            */
+    }
+
+    $(selObj).parent().find('select[name=entityChildSelBox]').html(utterBodyHtml);
+}
+
+
+//entity type sel
+$(document).on("change", "select[name=entityTypeForLabel]", function(e){
+    $(this).parent().find('select[name=entitySelBox]').remove();
+    $(this).parent().find('select[name=entityChildSelBox]').remove();
+    $(this).parent().find('input[name=matchUtterText]').remove();
+    $(this).parent().find('a[name=delLabelBtn]').remove();
+    $(this).parent().find('div[name=alertSpan]').remove();
+    
+    if ($(this).parent().find('select[name=multiMatchUtterSel]').length > 0) {
+        $(this).parent().find('select[name=multiMatchUtterSel]').remove();
+    }
+
+    var startIndex = $(this).parent().find('input[name=startIndex]').val();
+    var endIndex = $(this).parent().find('input[name=endIndex]').val();
+    for (var i=startIndex; i<=endIndex; i++) {
+        $(this).parents('tr').prev().find('#utterText_' + i).removeClass();//.removeAttr('class');
+    }
+    while(1) {
+        if ($(this).parents('div').next().find('div[name=indentDiv]').length > 0) {
+            $(this).parents('div').next().remove();
+        } else {
+            break;
+        }
+    }
+    
+
+    var utterBodyHtml = '';
+    switch($(this).val()*1) {
+        case 1:
+            utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+            for (var j=0; j<simpleList.length; j++) {
+                utterBodyHtml += "<option value='" + simpleList[j].ENTITY_NAME + "'>" + simpleList[j].ENTITY_NAME + "</option>";
+            }
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+            utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+            utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
+            $(this).parent().append(utterBodyHtml);
+            break;
+        case 3:
+            utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+            for (var j=0; j<hierarchyList.length; j++) {
+                utterBodyHtml += "<option value='" + hierarchyList[j].ENTITY_NAME + "'>" + hierarchyList[j].ENTITY_NAME + "</option>";
+            }
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<select name='entityChildSelBox' class='form-control' style='display:none' >";
+            utterBodyHtml += "<option value=''></option>";
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+            utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+            utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
+            $(this).parent().append(utterBodyHtml);
+            break;
+        case 4:
+            utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+            utterBodyHtml += "<option value='NONE'>" + language.SELECT + "</option>";
+            for (var j=0; j<compositeList.length; j++) {
+                utterBodyHtml += "<option value='" + compositeList[j].ENTITY_NAME + "'>" + compositeList[j].ENTITY_NAME + "</option>";
+            }
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+            utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+            utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<span name='alertSpan' ></span>";
+            $(this).parent().append(utterBodyHtml);
+            break;
+            /*
+        case 5:
+            utterBodyHtml += "<select name='entitySelBox' class='form-control'  >";
+            utterBodyHtml += "<option value='NONE'>선택해주세요.</option>";
+            for (var j=0; j<closedList.length; j++) {
+                utterBodyHtml += "<option value='" + closedList[j].ENTITY_NAME + "'>" + closedList[j].ENTITY_NAME + "</option>";
+            }
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<select name='entityChildSelBox' class='form-control' style='display:none' >";
+            utterBodyHtml += "<option value=''></option>";
+            utterBodyHtml += "</select>";
+            utterBodyHtml += "<input type='text' name='matchUtterText' value='' style='padding:0.5% 0; margin:0 0 0.5% 0;' />";
+            utterBodyHtml += "<input type='hidden' name='startIndex' value='' />";
+            utterBodyHtml += "<input type='hidden' name='endIndex' value=''  />";
+            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style=''><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<span name='alertSpan' style='font-size: 25px;'></span>";
+            $(this).parent().append(utterBodyHtml);
+            break;
+            */
+        default:
+            break;
+    }
+});
+
+
+$(document).on("change", "select[name=multiMatchUtterSel]", function(e){ 
+
+    var beforeStart;
+    var beforeEnd;
+    if ($(this).parent().find('input[name=startIndex]').val() != "") {
+        beforeStart = $(this).parent().find('input[name=startIndex]').val();
+        beforeEnd = $(this).parent().find('input[name=endIndex]').val();
+        for (var i=beforeStart; i<=beforeEnd; i++) {
+            $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
+        }
+    }
+
+
+    var matchStartIndex = $(this).val().split(",")[0];
+    var matchEndIndex = $(this).val().split(",")[1];
+    //$(this).parent().find('input[name=startIndex]').val(matchStartIndex);
+    //$(this).parent().find('input[name=endIndex]').val(matchEndIndex);
+    var trIndex = $("tr[name=utterMainTr]").index($(this).parents('tr').prev());
+    var divIndex = $("tr[name=utterMainTr]").eq(trIndex).find('div[name=labelInfoDiv]').index($(this).parents('div[name=labelInfoDiv]'));
+
+    if ($(this).parent().find('div[name=indentDiv]').length>0) {
+        var nowIndex = $('div[name=labelInfoDiv]').index($(this).parent());
+        for (var k=nowIndex-1; k >= 0; k--) {
+            if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
+                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
+                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
+                startInx = startInx==""?matchStartIndex:startInx*1;
+                endInx = endInx==""?matchEndIndex:endInx*1;
+                if (startInx <= matchStartIndex) {
+                    $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
+                }
+                if (endInx >= matchEndIndex) {
+                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(endInx);
+                }
+            }
+        }
+    }
+
+
+    changeMultMatchiLabel(matchStartIndex, matchEndIndex, trIndex, divIndex);
+});
 
  /**
   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
