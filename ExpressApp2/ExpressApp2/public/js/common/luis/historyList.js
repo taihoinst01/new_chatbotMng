@@ -235,6 +235,12 @@ function makeHistoryTable(newPage) {
                             resultText = language.ANSWER_NO;
                         }else if(data.rows[i].RESULT=="F"){
                             resultText = language.ANSWER_SUGGEST;
+                        }else if(data.rows[i].RESULT=="E"){
+                            resultText = "Error";
+                        }else if(data.rows[i].RESULT=="Q"){
+                            resultText = language.SAPWORD;
+                        }else if(data.rows[i].RESULT=="I"){
+                            resultText = language.SAPPASSWORDINIT;
                         }else{
                             resultText = "";
                         }

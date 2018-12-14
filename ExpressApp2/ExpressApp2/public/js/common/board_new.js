@@ -418,6 +418,8 @@ function getCountPanel() {
             $('#failCount').text(boardCount.FAIL);
             $('#errorCount').text(boardCount.ERROR);
             $('#suggestCount').text(boardCount.SUGGEST);
+            $('#sapWord').text(boardCount.SAPWORD);
+            $('#sapPasswordInit').text(boardCount.SAPPASSWORDINIT);
         },
         error : function() {   // 오류가 발생했을 때 호출된다. 
             console.log("error");
@@ -425,6 +427,8 @@ function getCountPanel() {
             $('#failCount').text("0");
             $('#errorCount').text("0");
             $('#suggestCount').text("0");
+            $('#sapWord').text("0");
+            $('#sapPasswordInit').text("0");
         },
         complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
             
