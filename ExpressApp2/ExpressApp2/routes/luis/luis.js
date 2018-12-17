@@ -391,13 +391,17 @@ router.get('/intentList', function (req, res) {
             var createQuery = req.query.createQuery;
 
             var intentList = req.session.intentList;
-            for (var i=0; i<intentList.length; i++) {
-                if (intentList[i].INTENT == selectIntent) {
-                    pageNum = i/10;
+            var arrTmp = intentList.filter(function (n) {
+                return selApp.APP_ID == n.APP_ID;
+            });
+            
+            for (var i=0; i<arrTmp.length; i++) {
+                if (arrTmp[i].INTENT == selectIntent) {
+                    pageNum = Math.ceil((i+1)/10);
                 }
             }
 
-            res.render('luis/intentList', { pageNumber: ++pageNum, createQuery: createQuery, selectIntent: selectIntent, appIndex: appNumber});
+            res.render('luis/intentList', { pageNumber: pageNum, createQuery: createQuery, selectIntent: selectIntent, appIndex: appNumber});
         }
         else if (req.query.rememberPageNum) {
             res.render('luis/intentList', { pageNumber: req.query.rememberPageNum, createQuery: -1, selectIntent: -1, appIndex: appNumber});
@@ -1949,25 +1953,42 @@ router.post('/deleteUtterance', function (req, res) {
     var intentId = req.body.intentId;//req.body['labelArr[]'];
     var tmpLuisObj;
     try {
-        
-        tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/examples/' + utterId, options);
-        
-        if (tmpLuisObj.statusCode == 200) { 
-            var utterList = req.session.utterList;
-            for (var tmpObj in utterList) {
-                if (utterList[tmpObj].INTENT_ID == intentId) {
-                    for (var i=0; i<utterList[tmpObj].UTTER_LIST.length; i++) {
-                        if (utterList[tmpObj].UTTER_LIST[i].id == utterId) {
-                            utterList[tmpObj].UTTER_LIST.splice(i, 1);
-                            break;
+        (async () => {
+            tmpLuisObj = syncClient.del(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/examples/' + utterId, options);
+            
+            if (tmpLuisObj.statusCode == 200) { 
+                var utterList = req.session.utterList;
+                var delUtterObj = [];
+                for (var tmpObj in utterList) {
+                    if (utterList[tmpObj].INTENT_ID == intentId) {
+                        for (var i=0; i<utterList[tmpObj].UTTER_LIST.length; i++) {
+                            if (utterList[tmpObj].UTTER_LIST[i].id == utterId) {
+                                delUtterObj = utterList[tmpObj].UTTER_LIST.splice(i, 1);
+                                break;
+                            }
                         }
                     }
                 }
+
+                if (delUtterObj.length > 0) {
+                    
+                    let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                    var delUtterQry = "UPDATE TBL_QNAMNG SET USE_YN = 'N' WHERE INTENT = @intent AND DLG_QUESTION = @delUtter;";
+        
+                    //console.log("intent -" + pp)
+                    let deleteUtter_result = await pool.request()
+                                                        .input('intent', sql.NVarChar, delUtterObj[0].intentLabel)
+                                                        .input('delUtter', sql.NVarChar, delUtterObj[0].text)
+                                                        .query(delUtterQry);
+                }
+
+
+
+                res.send({success : true, message : '성공했습니다.'});
+            } else {
+                res.send({success : false, message : '실패했습니다. 관리자에게 문의해주세요.'});
             }
-            res.send({success : true, message : '성공했습니다.'});
-        } else {
-            res.send({success : false, message : '실패했습니다. 관리자에게 문의해주세요.'});
-        }
+        })()
     } catch(e) {
         logger.info('[에러] 어터런스 변경 저장  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/deleteUtterance', e.message);
         res.send({error : true, message : ' 어터런스 저장 중 이상이 생겼습니다. 관리자에게 문의 해주세요.'});
@@ -1981,12 +2002,13 @@ router.post('/renameIntent', function (req, res) {
     options.headers['Ocp-Apim-Subscription-Key'] = subKey;
     var intentId = req.body.intentId;
     var intentName = req.body.intentName;
+    var intentHiddenName = req.body.intentHiddenName;
     var tmpLuisObj;
     try {
         options.payload = { 
             "name": intentName
         };
-        tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/intents' + intentId, options);
+        tmpLuisObj = syncClient.put(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/intents/' + intentId, options);
         
         if (tmpLuisObj.statusCode != 200) {
             var resultCode = tmpLuisObj.error.code;
@@ -1994,7 +2016,20 @@ router.post('/renameIntent', function (req, res) {
             logger.info('[에러] intent rename  저장  [id : %s] [url : %s] [코드 : %s] [내용 : %s]', userId, 'luis/renameIntent', tmp.statusCode, resultCode + ':' + resultStr);
             res.send({success : false, message : '실패했습니다. 관리자에게 문의해주세요.'});
         } else {
-            res.send({success : true, message : '성공했습니다.'});
+
+            (async () => {
+                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                var delUtterQry = "UPDATE TBL_DLG_RELATION_LUIS SET LUIS_INTENT = @intentName WHERE LUIS_INTENT = @intentBefore AND LUIS_ID = @luisAppName ";
+    
+                //console.log("intent -" + pp)
+                let deleteUtter_result = await pool.request()
+                                                    .input('intentName', sql.NVarChar, intentName)
+                                                    .input('intentBefore', sql.NVarChar, intentHiddenName)
+                                                    .input('luisAppName', sql.NVarChar, req.session.selAppName)
+                                                    .query(delUtterQry);
+
+                res.send({success : true, message : '성공했습니다.'});
+            })()
         }
     } catch(e) {
         logger.info('[에러] intent rename   [id : %s] [url : %s] [내용 : %s]', userId, 'luis/renameIntent', e.message);
@@ -2255,14 +2290,14 @@ router.post('/getNewUtterList', function (req, res){
     selectQnAMngQry += "		                 SELECT LUIS_INTENT\n";
     selectQnAMngQry += "		                   FROM TBL_DLG_RELATION_LUIS \n";
     selectQnAMngQry += "	 		             ) \n";
-    selectQnAMngQry += "      AND DLG_QUESTION LIKE '%@searchQna%' \n";
+    selectQnAMngQry += "      AND DLG_QUESTION LIKE @searchQna \n";
     selectQnAMngQry += " ORDER BY INTENT, REG_DT DESC; \n";
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let selectQnA = await pool.request()
-                .input('searchQna', sql.NVarChar, searchQnA)
+                .input('searchQna', sql.NVarChar, '%' + searchQnA + '%')
                 .query(selectQnAMngQry);
 
             var qnaListDb = selectQnA.recordset;

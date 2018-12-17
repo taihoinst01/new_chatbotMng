@@ -37,6 +37,7 @@ $(document).ready(function() {
 
     $('#updateIntentName').click(function() {
         editIntentName();
+        $('#updateIntentName').hide();
     });
 
     $('#scrollUpDownBtn').click(function() {
@@ -744,40 +745,16 @@ function makeChildSelBox(selObj, entityType) {
 $(document).on('focusout','#editIntentName',function(e){
     var editEntityName = $('#editIntentName').val();
 
-    if ( confirm(language.ALERT_CHANGE_ENTITY)) {
-        var params = {
-            'intentName' : editEntityName,
-            'intentId' : $('#hiddenIntentId').val()
-        };
-        
-        $.ajax({
-            type: 'POST',
-            data: params,
-            url: '/luis/renameIntent',
-            success: function(data) {
-                if (data.error) {
-                    $('#alertMsg').text(data.message);
-                    $('#alertBtnModal').modal('show');
-                    //alert(data.message);
-                } 
-                else if (!data.success) {
-                    $('#alertMsg').text(data.message);
-                    $('#alertBtnModal').modal('show');
-                    //alert(data.message);
-                    
-                    $('#intentNameTitle').html('');
-                    $('#intentNameTitle').text($('#hiddenIntentName').val());
-                } else {
-                    $('#alertMsg').text(data.message);
-                    $('#alertBtnModal').modal('show');
-                    //alert(data.message);
-                    $('#intentNameTitle').html('');
-                    $('#intentNameTitle').text(editEntityName);
-                    $('#hiddenIntentName').val(editEntityName);
-                }
-            }
-        });
-    }
+    $('#confirmTitle').text(language.INTENT + ' ' + language.MODIFY);
+    $('#confirmMsg').text("["+ editEntityName + "] " + language.ALERT_CHANGE_ENTITY);
+    $('#confirmBtn').prev().show();
+    $('#confirmBtnModal').modal('show');
+    $('#updateIntentName').show();
+    
+});
+
+$(document).on('click', 'button[name=confirmCancelBtn]', function(e){
+    $('#intentNameTitle').html('').text($('#hiddenIntentName').val().trim());
 });
 
 //페이징 클릭
@@ -788,6 +765,43 @@ $(document).on('click','.li_paging',function(e){
     }
 });
 
+function changeIntentNameFnc() {
+    var editEntityName = $('#editIntentName').val();
+    var hiddenIntent = $('#hiddenIntentName').val();
+    var params = {
+        'intentHiddenName' : hiddenIntent,
+        'intentName' : editEntityName,
+        'intentId' : $('#hiddenIntentId').val()
+    };
+    
+    $.ajax({
+        type: 'POST',
+        data: params,
+        url: '/luis/renameIntent',
+        success: function(data) {
+            if (data.error) {
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
+            } 
+            else if (!data.success) {
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
+                
+                $('#intentNameTitle').html('');
+                $('#intentNameTitle').text($('#hiddenIntentName').val());
+            } else {
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
+                $('#intentNameTitle').html('');
+                $('#intentNameTitle').text(editEntityName);
+                $('#hiddenIntentName').val(editEntityName);
+            }
+        }
+    });
+}
 function isAlpabet(ch) {
     var numUnicode = ch.charCodeAt(0);
     
@@ -846,7 +860,7 @@ $(document).on("keypress", "#utterInputText", function(e){
             utterBodyHtml += makeTokenizedText(tokenArr, 'INDEX', inputText);
             utterBodyHtml += "<input type='hidden' id='intentHiddenName' name='intentHiddenName' value='" + inputText + "' />";
             utterBodyHtml += "<input type='hidden' id='utterHiddenId' name='intentHiddenId' value='NEW' />";
-            utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+            utterBodyHtml += "<a href='#' name='delUtterBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
             utterBodyHtml += "</td>";
             utterBodyHtml += "</tr>";
             utterBodyHtml += makeLabelingTr();
@@ -928,69 +942,68 @@ $(document).on("click", "a[name=delLabelBtn]", function(e){
 //intent 삭제 버튼
 $(document).on("click", "#deleteIntentBtn", function(e){
     var intentName = $('#hiddenIntentName').val();
-    if (confirm("["+ intentName + "] 삭제하시겠습니까?")) {
-        var hId = $('#hiddenIntentId').val();
-        deleteIntent(intentName, hId);
-    }
+    $('#confirmTitle').text(language.INTENT + ' ' + language.DELETE);
+    $('#confirmMsg').text("["+ intentName + "] " + language.ASK_DELETE);
+    $('#confirmBtn').prev().show();
+    $('#confirmBtnModal').modal('show');
 });
 
-//intent 삭제 버튼
+var delUtterId = -1;
+var delIndex = -1;
+//utter 삭제 버튼
 $(document).on("click", "a[name=delUtterBtn]", function(e){
+    delUtterId = $(this).parent().find('input[name=intentHiddenId]').val();
+    delIndex = $('#utteranceTblBody tr').index($(this).parents('tr'));
     var utterName = $(this).parent().find('input[name=intentHiddenName]').val();
-    var intentId = $('#hiddenIntentId').val();
-    if (confirm("["+ utterName + "] 삭제하시겠습니까?")) {
-
-        var utterId = $(this).parent().find('input[name=intentHiddenId]').val();
-        if (utterId == 'NEW') {
-            $(this).parents('tr').next().remove();
-            $(this).parents('tr').remove();
-        }
-        else 
-        {
-            var delIndex = $('#utteranceTblBody tr').index($(this).parents('tr'));
-
-            var params = {
-                'utterId' : utterId,
-                'intentId' : intentId
-            };
     
-            $.ajax({
-                type: 'POST',
-                data: params,
-                url: '/luis/deleteUtterance',
-                success: function(data) {
-                    if (data.dupleRst) {
-                        $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
-                        $('#alertBtnModal').modal('show');
-                        //alert("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
-                    }
-                    else if (!data.success) 
-                    {
-                        $('#alertMsg').text(data.message);
-                        $('#alertBtnModal').modal('show');
-                        //alert(data.message);
-                    }
-                    else if (data.error) {
-                        $('#alertMsg').text(data.message);
-                        $('#alertBtnModal').modal('show');
-                        //alert(data.message);
-                    }
-                    else 
-                    {
-                        $('#utteranceTblBody tr').eq(delIndex+1).remove();
-                        $('#utteranceTblBody tr').eq(delIndex).remove();
-                        //$(this).parents('tr').next().remove();
-                        //$(this).parents('tr').remove();
-                        //alert(data.message);
-                        $('#alertMsg').text(data.message);
-                        $('#alertBtnModal').modal('show');
-                    }
-                }
-            });
-        }
-    }
+    $('#confirmTitle').text(language.UTTERANCE + ' ' + language.DELETE);
+    $('#confirmMsg').text("["+ utterName + "] " + language.ASK_DELETE);
+    $('#confirmBtn').prev().show();
+    $('#confirmBtnModal').modal('show');
 });
 
+function deleteUtter() {
+    var intentId = $('#hiddenIntentId').val();
+    if (delUtterId == 'NEW') {
+        $('#utteranceTblBody tr').eq(delIndex+1).remove();
+        $('#utteranceTblBody tr').eq(delIndex).remove();
+    }
+    else 
+    {
+        var params = {
+            'utterId' : delUtterId,
+            'intentId' : intentId
+        };
+
+        $.ajax({
+            type: 'POST',
+            data: params,
+            url: '/luis/deleteUtterance',
+            success: function(data) {
+                if (data.dupleRst) {
+                    $('#alertMsg').text("[" + data.existApp + "] " + language.ALERT_SAME_INTENT_EXIST);
+                    $('#alertBtnModal').modal('show');
+                }
+                else if (!data.success) 
+                {
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                }
+                else if (data.error) {
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                }
+                else 
+                {
+                    $('#utteranceTblBody tr').eq(delIndex+1).remove();
+                    $('#utteranceTblBody tr').eq(delIndex).remove();
+                    $('#alertMsg').text(data.message);
+                    $('#alertBtnModal').modal('show');
+                }
+            }
+        });
+    }
+}
 
 //change entity name input form
 function editIntentName() {
@@ -1445,7 +1458,7 @@ function changeEntitySel() {
                 $(this).next().css('display', 'inline');
                 $(this).next().html(childHtml);
                 if (chkChildExists) {
-                    $(this).next().prop('disabled', true);
+                    //$(this).next().prop('disabled', true);
                 }
                 
                 break;
@@ -1949,8 +1962,12 @@ function saveUtterance() {
                 }
                 outputTxtPre = language.SUCCESS + " : " + (luisResult.length - failCnt) + ", " + language.FAIL + " : " + failCnt + " <br/>";
                 
-                $('#alertMsg').html(outputTxtPre + outputTxtAfter);
-                $('#alertBtnModal').modal('show');
+                //$('#alertMsg').html(outputTxtPre + outputTxtAfter);
+                //$('#alertBtnModal').modal('show');
+                $('#confirmTitle').text(language.SUCCESS);
+                $('#confirmMsg').html(outputTxtPre + outputTxtAfter);
+                $('#confirmBtnModal').modal('show');
+                //updateUtterInfo();
                 //alert(data.message);
                 //updateUtter();
             }
@@ -2017,3 +2034,89 @@ $(document).on("click", "#alertCloseBtn", function () {
 });
 
 
+function updateUtterInfo() {
+    var intentName = $('#hiddenIntentName').val();
+    var intentId = $('#hiddenIntentId').val();
+    var labelCnt = $('tr[name=utterMainTr]').length;
+    var pageNum = $('#hiddenListPageNum').val();
+    var params = {
+        'intentName' : intentName,
+        'intentId' : intentId,
+        'labelCnt' : labelCnt
+    };
+
+    $.ajax({
+        type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
+        data: params,
+        url: '/luis/getUtterInIntent',
+        success: function(data) {
+            if (!data.success) 
+            {
+                $('#confirmTitle').text(language.ALERT);
+                $('#confirmMsg').text(data.message);
+                $('#confirmBtnModal').modal('show');
+                //$('#alertMsg').text(data.message);
+                //$('#alertBtnModal').modal('show');
+                //alert(data.message);
+            }
+            else if (data.error) {
+                $('#confirmTitle').text(language.ALERT);
+                $('#confirmMsg').text(data.message);
+                $('#confirmBtnModal').modal('show');
+                //$('#alertMsg').text(data.message);
+                //$('#alertBtnModal').modal('show');
+                //alert(data.message);
+            }
+            else 
+            {
+                location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
+            }
+        }
+    });
+}
+
+
+
+$(document).on("click", "#confirmBtn", function () {
+
+    $('#confirmBtnModal').modal('hide');
+    //$('#confirmBtn').prev().trigger('click');
+
+    if ($('#confirmTitle').text() == language.SUCCESS) {
+        updateUtterInfo();
+    } else if ($('#confirmTitle').text() == language.UTTERANCE + ' ' + language.DELETE) {
+        deleteUtter();
+    } else if ($('#confirmTitle').text() == language.INTENT + ' ' + language.DELETE) {
+        var intentName = $('#hiddenIntentName').val();
+        var hId = $('#hiddenIntentId').val();
+        deleteIntent(intentName, hId);
+    } else if ($('#confirmTitle').text() == language.INTENT + ' ' + language.MODIFY) {
+        changeIntentNameFnc();
+    } else {
+        var pageNum = $('#hiddenListPageNum').val();
+        location.href = "/luis/intentList?rememberPageNum=" + pageNum;
+    }
+    $('#confirmBtn').prev().hide();
+});
