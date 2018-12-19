@@ -1232,7 +1232,10 @@ router.post('/createEntity', function (req, res) {
         {
             switch (entityType) { 
                 case "1"://"readableType": "Entity Extractor",
-                    options.payload = { "name": entityName };
+                    options.payload = { 
+                        "id": "",
+                        "name": entityName 
+                    };
                     tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/entities', options);
                     break;
                 /*
@@ -1243,6 +1246,7 @@ router.post('/createEntity', function (req, res) {
                 */
                 case "3"://"Hierarchical Entity Extractor",
                     options.payload = { 
+                        "id": "",
                         "name": entityName,
                         "children" : childEntityArr
                     };
@@ -1251,6 +1255,7 @@ router.post('/createEntity', function (req, res) {
 
                 case "4"://"readableType": "Composite Entity Extractor",
                     options.payload = { 
+                        "id": "",
                         "name": entityName,
                         "children" : childEntityArr
                     };
@@ -1259,6 +1264,7 @@ router.post('/createEntity', function (req, res) {
 
                 case "5"://"readableType": "Closed List Entity Extractor",
                     options.payload = { 
+                        "id": "",
                         "name": entityName,
                         "sublists": []
                     };

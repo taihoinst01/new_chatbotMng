@@ -55,6 +55,13 @@ router.post('/selectQnaList', function (req, res) {
                         if (req.body.searchIntentText !== '') {
                             QueryStr += "AND INTENT like '" + req.body.searchIntentText + "%' \n";
                         }
+                        QueryStr += `
+                                    AND INTENT IN (  
+                                        SELECT LUIS_INTENT 
+                                        FROM TBL_DLG_RELATION_LUIS  
+                                        GROUP BY LUIS_INTENT 
+                                    )
+                        `;
                         QueryStr +="  ) tbp WHERE PAGEIDX = " + currentPage + "; \n";
 
             var subQryStr = "SELECT SEQ, ENTITY, DLG_QUESTION FROM TBL_QNAMNG WHERE GROUP_ID = @motherSeq";
@@ -849,9 +856,9 @@ router.post('/procSimilarQuestion', function (req, res) {
 
                                 for (var i=0; i<dataArr.length; i++) {
                                     if (dataArr[i].PROC_TYPE === 'INSERT') {
-                                        saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION, SIMILAR_ID) " + 
-                                                    "VALUES ( ";
-                                        saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + entities  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "',(SELECT ISNULL(MAX(SEQ),1) AS SIMILAR_ID FROM TBL_QNAMNG))";
+                                        //saveRelation += "INSERT INTO TBL_DLG_RELATION_LUIS (LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, DLG_ID, USE_YN, DLG_QUESTION, SIMILAR_ID) " + 
+                                        //            "VALUES ( ";
+                                        //saveRelation += "'luisId', '" + dataArr[i].LUIS_INTENT  + "', '" + entities  + "', '" + dataArr[i].DLG_ID  + "', 'Y', '" + dataArr[i].DLG_QUESTION  + "',(SELECT ISNULL(MAX(SEQ),1) AS SIMILAR_ID FROM TBL_QNAMNG))";
                             
                                         saveQna += "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT) " + 
                                                     "VALUES ( ";
