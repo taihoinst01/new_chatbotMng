@@ -2025,15 +2025,23 @@ router.post('/renameIntent', function (req, res) {
 
             (async () => {
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-                var delUtterQry = "UPDATE TBL_DLG_RELATION_LUIS SET LUIS_INTENT = @intentName WHERE LUIS_INTENT = @intentBefore AND LUIS_ID = @luisAppName ";
+                var uptUtterQry = "UPDATE TBL_DLG_RELATION_LUIS SET LUIS_INTENT = @intentName WHERE LUIS_INTENT = @intentBefore AND LUIS_ID = @luisAppName ";
     
                 //console.log("intent -" + pp)
                 let deleteUtter_result = await pool.request()
                                                     .input('intentName', sql.NVarChar, intentName)
                                                     .input('intentBefore', sql.NVarChar, intentHiddenName)
                                                     .input('luisAppName', sql.NVarChar, req.session.selAppName)
-                                                    .query(delUtterQry);
+                                                    .query(uptUtterQry);
 
+                var uptAnalQry = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET LUIS_INTENT = @intentName WHERE LUIS_INTENT = @intentBefore; ";
+
+                //console.log("intent -" + pp)
+                let updateAnaly_result = await pool.request()
+                                                    .input('intentName', sql.NVarChar, intentName)
+                                                    .input('intentBefore', sql.NVarChar, intentHiddenName)
+                                                    .query(uptAnalQry);
+                                                    
                 res.send({success : true, message : '성공했습니다.'});
             })()
         }

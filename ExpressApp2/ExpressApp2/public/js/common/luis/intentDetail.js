@@ -655,7 +655,8 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
 
                         utterBodyHtml += "<div name='labelInfoDiv'>";
                         
-                        utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                        //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                        utterBodyHtml += "<div name='indentDiv'>----</div>";
                         utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
                         utterBodyHtml += childTypeStr;
                         //utterBodyHtml += "<option value='1' selected>" + language.SIMPLE_ENTITY + "</option>";
@@ -1175,7 +1176,8 @@ function makeLabelingTr(entityLabel) {
                             
                             if (chkComposit) {
                                 if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
-                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    utterBodyHtml += "<div name='indentDiv'>----</div>";
                                 } else {
                                     chkComposit = false;
                                 }
@@ -1213,7 +1215,8 @@ function makeLabelingTr(entityLabel) {
                             var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                             if (chkComposit) {
                                 if (isInside ) {
-                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    utterBodyHtml += "<div name='indentDiv'>----</div>";
                                 } else {
                                     chkComposit = false;
                                 }
@@ -1312,7 +1315,8 @@ function makeLabelingTr(entityLabel) {
                                     var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                                     if (chkComposit) {
                                         if (isInside ) {
-                                            utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                            //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                            utterBodyHtml += "<div name='indentDiv'>----</div>";
                                         } else {
                                             chkComposit = false;
                                         }

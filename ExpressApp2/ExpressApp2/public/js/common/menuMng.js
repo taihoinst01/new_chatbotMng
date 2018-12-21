@@ -15,6 +15,7 @@ $(document).ready(function () {
     makeMenuTable();
 });
 
+var updateAuth = -1;
 var deleteCheck = "";
 $(document).ready(function () {
     //추가 버튼(Master)
@@ -28,45 +29,47 @@ $(document).ready(function () {
         if(MENU_NM==""||MENU_NM==null){
             validation_check = validation_check + 0;
         }else{
-            validation_check = validation_check + 1;
-        }
+            validation_check = validation_check + 1; 
+        } 
 
-        if(MENU_URL==""||MENU_URL==null){
-            validation_check = validation_check + 0;
-        }else{
-            validation_check = validation_check + 1;
-        }
+        if(MENU_URL==""||MENU_URL==null){ 
+            validation_check = validation_check + 0; 
+        }else{ 
+            validation_check = validation_check + 1; 
+        } 
 
-        if(MENU_AUTH==""||MENU_AUTH==null){
-            validation_check = validation_check + 0;
-        }else{
-            validation_check = validation_check + 1;
-        }
+        if(MENU_AUTH==""||MENU_AUTH==null){ 
+            validation_check = validation_check + 0; 
+        }else{ 
+            validation_check = validation_check + 1; 
+        } 
 
-        if(validation_check==3){
-            procMenuMaster('NEW');
-        }else{
-            alert(language.IS_REQUIRED);
-            return;
+        if(validation_check==3){ 
+            procMenuMaster('NEW'); 
+        }else{ 
+            alert(language.IS_REQUIRED); 
+            return; 
         }        
     });
 
     //수정폼
     $(document).on("click", "#update_menuForm", function () {
-        getMenu();
+        
         document.menuForm.reset();
         var menu_id = $(this).attr("menu_id");
         var tr = $(this).parent().parent();
         var td = tr.children();
-    
+        
         document.menuForm.MENU_ID.value = menu_id;
         document.menuForm.MENU_NM.value = td.eq(0).text();
         document.menuForm.MENU_URL.value = td.eq(1).text();
         document.menuForm.MENU_AUTH.value = td.eq(2).text();
+        updateAuth = td.eq(2).text();
+        getMenu();
+        
+        //$('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
-        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
-
-        $('#menuFormModal').modal('show');
+        //$('#menuFormModal').modal('show');
     });
 
     //수정 버튼
@@ -233,14 +236,24 @@ function getMenu() {
         url: '/menu/selectMenuAuthList',
         success: function (data) {
             if (data.records > 0) {
-                select_menu = "<option value='' selected>"+language.CHOOSE_AUTH+"</option>"
+                //var authVal = $('#MENU_AUTH').val();
+                select_menu = "<option value='' >"+language.CHOOSE_AUTH+"</option>"
                 for (var i = 0; i < data.rows.length; i++) {
-                    select_menu += '<option value="' + data.rows[i].AUTH_LEVEL + '">' + data.rows[i].AUTHGRP_M_NM + '</option>';
+                    if (updateAuth == data.rows[i].AUTH_LEVEL) {
+                        select_menu += '<option value="' + data.rows[i].AUTH_LEVEL + '" selected >' + data.rows[i].AUTHGRP_M_NM + '</option>';
+                    } else {
+                        select_menu += '<option value="' + data.rows[i].AUTH_LEVEL + '">' + data.rows[i].AUTHGRP_M_NM + '</option>';
+                    }
                 }
             } else {
                 select_menu = "<option value='' selected>"+language.CHOOSE_AUTH+"</option>"
             }
             $('#MENU_AUTH').html(select_menu);
+
+            
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
+
+            $('#menuFormModal').modal('show');
         }
     });
 }
