@@ -210,7 +210,7 @@ router.post('/intentScore', function (req, res) {
         sql.close();
     }).catch(err => {
         
-        res.status(500).send({ message: "${err}"})
+        res.send({ error_code: true, error_message : true})
         sql.close();
     });        
 });
@@ -396,12 +396,12 @@ router.post('/getOftQuestion', function (req, res) {
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset;
-          res.send({list : rows});
-          sql.close();
+            let rows = result.recordset;
+            res.send({list : rows});
+            sql.close();
         }).catch(err => {
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 
@@ -470,8 +470,8 @@ router.post('/nodeQuery', function (req, res) {
           sql.close();
         }).catch(err => {
             
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 
@@ -525,12 +525,12 @@ router.post('/firstQueryBar', function (req, res) {
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset
-          res.send({list : rows});
-          sql.close();
+            let rows = result.recordset
+            res.send({list : rows});
+            sql.close();
         }).catch(err => {
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 
@@ -584,12 +584,12 @@ router.post('/firstQueryTable', function (req, res) {
         dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset
-          res.send({list : rows, pageList : paging.pagination(currentPageNo,rows[0].TOTCNT)});
-          sql.close();
+            let rows = result.recordset
+            res.send({list : rows, pageList : paging.pagination(currentPageNo,rows[0].TOTCNT)});
+            sql.close();
         }).catch(err => {
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 
@@ -643,12 +643,12 @@ router.post('/getResponseScore', function (req, res) {
     //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset
-          res.send({list : rows});
-          sql.close();
+            let rows = result.recordset
+            res.send({list : rows});
+            sql.close();
         }).catch(err => {
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 
@@ -706,11 +706,11 @@ router.post('/getQueryByEachTime', function (req, res) {
                     }
                 }
             }
-          res.send({list : resultMap});
-          sql.close();
+            res.send({list : resultMap});
+            sql.close();
         }).catch(err => {
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({ error_code: true, error_message : true})
+            sql.close();
         });
 });
 function pad(n, width) {
@@ -792,6 +792,277 @@ router.post('/getSimulUrlInfo', function (req, res) {
         sql.close();
     });
 
+});
+
+
+
+var pannelQry1 = `
+SELECT COUNT( DISTINCT USER_NUMBER) AS CUSOMER_CNT 
+       , ISNULL(SUM(RESPONSE_TIME)/COUNT(RESPONSE_TIME), 0) AS REPLY_SPEED 
+       , CASE WHEN COUNT(*) != 0 THEN COUNT(*)/COUNT(DISTINCT USER_NUMBER) ELSE 0 END AS USER_QRY_AVG 
+  FROM   TBL_HISTORY_QUERY 
+ WHERE  1=1  
+   AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) 
+`;
+
+var pannelQry2 = `
+SELECT CASE WHEN COUNT(*) != 0 THEN ROUND(SUM(C.답변율)/ COUNT(*),2) ELSE 0 END  AS CORRECT_QRY   
+  FROM ( 
+    SELECT  ROUND(CAST(B.REPONSECNT AS FLOAT) / CAST(A.TOTALCNT AS FLOAT) * 100,2) AS 답변율, A.Dimdate AS REG_DATE 
+        FROM ( 
+            SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate 
+            FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+            WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  
+            GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  ) A, 
+            ( 
+                SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate 
+                    FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+                    WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    
+                    AND B.RESULT IN ('H')  
+                GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME, REG_DATE), 120) 
+            ) B 
+        WHERE  A.CHANNEL = B.CHANNEL 
+        AND                A.Dimdate = B.Dimdate 
+        AND A.Dimdate  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) 
+    ) C 
+ WHERE 1=1 
+`;
+
+
+var pannelQry3 = `
+SELECT CASE WHEN COUNT(*) != 0 THEN ROUND(SUM(C.답변율)/ COUNT(*), 2) ELSE 0 END  AS SEARCH_AVG    
+  FROM ( 
+        SELECT  ROUND(CAST(B.REPONSECNT AS FLOAT) / CAST(A.TOTALCNT AS FLOAT) * 100,2) AS 답변율, A.Dimdate AS REG_DATE 
+          FROM (    
+                SELECT COUNT(*) AS TOTALCNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate 
+                  FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+                 WHERE A.CUSTOMER_COMMENT_KR = B.QUERY   
+                GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)  
+			   ) A, 
+               ( 
+                SELECT COUNT(*) AS REPONSECNT, CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS Dimdate 
+                  FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+                 WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    
+                   AND B.RESULT IN ('S')  
+                GROUP BY CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120)
+			   ) B 
+         WHERE  A.CHANNEL = B.CHANNEL 
+           AND A.Dimdate = B.Dimdate 
+    ) C 
+ WHERE 1=1 
+   AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) 
+`;
+
+router.post('/getScorePanel1', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+
+    if (selDate !== 'allDay') {
+        pannelQry1 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+    }
+    if (selChannel !== 'all') {
+        pannelQry1 += "AND	CHANNEL = @selChannel \n";
+    }
+    //console.log("panel=="+selectQuery);
+    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
+        return pool.request()
+                    .input('startDate', sql.NVarChar, startDate)
+                    .input('endDate', sql.NVarChar, endDate)
+                    .input('selChannel', sql.NVarChar, selChannel)
+                    .query(pannelQry1)
+        }).then(result => {
+            let rows = result.recordset;
+            
+            res.send({result : true, list : rows});
+            sql.close();
+        }).catch(err => {
+            res.send({result : false});
+            sql.close();
+        });
+});
+
+
+router.post('/getScorePanel22', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+
+    if (selDate !== 'allDay') {
+        pannelQry2 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+    }
+    if (selChannel !== 'all') {
+        pannelQry2 += "AND	CHANNEL = @selChannel \n";
+    }
+    //console.log("panel=="+selectQuery);
+    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
+        return pool.request()
+                    .input('startDate', sql.NVarChar, startDate)
+                    .input('endDate', sql.NVarChar, endDate)
+                    .input('selChannel', sql.NVarChar, selChannel)
+                    .query(pannelQry2)
+        }).then(result => {
+            let rows = result.recordset;
+            
+            res.send({result : true, list : rows});
+            sql.close();
+        }).catch(err => {
+            res.send({result : false});
+            sql.close();
+        });
+});
+
+router.post('/getScorePanel2', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+
+        
+    var pannelQry2_1 = `
+            SELECT COUNT(*) AS TOTALCNT, CHANNEL, LEFT(REG_DATE, 10) AS Dimdate 
+              FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+             WHERE A.CUSTOMER_COMMENT_KR = B.QUERY  
+    `;
+    var pannelQry2_2 = `
+            SELECT COUNT(*) AS REPONSECNT, CHANNEL, LEFT(REG_DATE, 10) AS Dimdate 
+              FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
+             WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    
+               AND B.RESULT IN ('H')  
+    `;
+
+    if (selChannel !== 'all') {
+        pannelQry2_1 += "AND	CHANNEL = @selChannel \n";
+        pannelQry2_2 += "AND	CHANNEL = @selChannel \n";
+    }
+    if (selDate !== 'allDay') {
+        pannelQry2_1 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+        pannelQry2_2 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+    } else {
+        pannelQry2_1 += "   AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) \n \n";
+        pannelQry2_2 += "   AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) \n \n";
+    }
+    pannelQry2_1 += "GROUP BY CHANNEL, LEFT(REG_DATE, 10) \n";
+    pannelQry2_2 += "GROUP BY CHANNEL, LEFT(REG_DATE, 10) \n";
+
+    var resultAll = [];
+    var resultSome = [];
+
+    try {
+        (async () => {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+    
+            //console.log("intent -" + pp)
+            let first_result = await pool.request()
+                                .input('startDate', sql.NVarChar, startDate)
+                                .input('endDate', sql.NVarChar, endDate)
+                                .input('selChannel', sql.NVarChar, selChannel)
+                                .query(pannelQry2_1);
+            resultAll = first_result.recordset;
+    
+            //console.log("intent -" + pp)
+            let second_result = await pool.request() 
+                                .input('startDate', sql.NVarChar, startDate)
+                                .input('endDate', sql.NVarChar, endDate)
+                                .input('selChannel', sql.NVarChar, selChannel)
+                                .query(pannelQry2_2);
+            resultSome = second_result.recordset;
+            var resultList = [];
+            for (var i=0; i<resultAll.length; i++) {
+                for (var j=0; j<resultSome.length; j++) {
+                    if (resultAll[i].CHANNEL == resultSome[j].CHANNEL && resultAll[i].Dimdate == resultSome[j].Dimdate) {
+                        var avgVal = Number((resultSome[j].REPONSECNT/resultAll[i].TOTALCNT).toFixed(4));
+                        resultList.push(avgVal);
+                        break;
+                    }
+                }
+            }
+            var sum = resultList.reduce((a, b) => a + b, 0);
+            var vagRst = Number((sum/resultList.length).toFixed(4))*100;
+            sql.close();      
+            res.send({result : true, list : vagRst});
+        })()
+    } 
+    catch(e) {
+        sql.close();
+        res.send({result : false});
+    }
+});
+
+router.post('/getScorePanel3', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+
+    if (selDate !== 'allDay') {
+        pannelQry3 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+    }
+    if (selChannel !== 'all') {
+        pannelQry3 += "AND	CHANNEL = @selChannel \n";
+    }
+    //console.log("panel=="+selectQuery);
+    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
+        return pool.request()
+                    .input('startDate', sql.NVarChar, startDate)
+                    .input('endDate', sql.NVarChar, endDate)
+                    .input('selChannel', sql.NVarChar, selChannel)
+                    .query(pannelQry3)
+        }).then(result => {
+            let rows = result.recordset;
+            
+            res.send({result : true, list : rows});
+            sql.close();
+        }).catch(err => {
+            res.send({result : false});
+            sql.close();
+        });
+});
+
+router.post('/getScorePanel4', function (req, res) {
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var selDate = req.body.selDate;
+    var selChannel = req.body.selChannel;
+    
+    var pannelQry4 = `
+    SELECT ISNULL(
+        (SELECT MAX(B.CNT) 
+        FROM (
+                SELECT COUNT(*) AS CNT 
+                FROM TBL_HISTORY_QUERY 
+                WHERE 1=1 
+                    AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) 
+    `;
+    if (selDate !== 'allDay') {
+        pannelQry4 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+    }
+    if (selChannel !== 'all') {
+        pannelQry4 += "AND	CHANNEL = @selChannel \n";
+    }
+    pannelQry4 += ` 
+        GROUP BY USER_NUMBER 
+        ) B 
+    ), 0) AS MAX_QRY  
+    `;
+    //console.log("panel=="+selectQuery);
+    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
+        return pool.request()
+                    .input('startDate', sql.NVarChar, startDate)
+                    .input('endDate', sql.NVarChar, endDate)
+                    .input('selChannel', sql.NVarChar, selChannel)
+                    .query(pannelQry4)
+        }).then(result => {
+            let rows = result.recordset;
+            
+            res.send({result : true, list : rows});
+            sql.close();
+        }).catch(err => {
+            res.send({result : false});
+            sql.close();
+        });
 });
 
 module.exports = router;

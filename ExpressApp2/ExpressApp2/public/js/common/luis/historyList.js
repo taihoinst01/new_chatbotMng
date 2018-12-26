@@ -74,13 +74,13 @@ $(document).on('click','#excelDownload',function(){
                     worksheet.columns = [
                         { header: '번호', key: 'num', width: 7, style: {numFmt: "0000"}},
                         { header: '질문 내용', key: 'question', width: 40, style: {alignment: {wrapText: true} }},
-                        { header: '중복 갯수', key: 'overlapCount', width: 8},
+                        { header: '중복 갯수', key: 'overlapCount', width: 14},
                         { header: '코드', key: 'code', width: 20},
                         { header: '답변 시간', key: 'resultTime', width: 10 },
                         { header: '날짜', key: 'date', width: 25 },
                         { header: '의도', key: 'intent', width: 25, style: {alignment: {wrapText: true} } },
                         { header: '단어', key: 'text', width: 25, style: {alignment: {wrapText: true} } },
-                        { header: '답변 아이디', key: 'id', width: 10 }
+                        { header: '답변 아이디', key: 'id', width: 15 }
                     ];
 
                     var firstRow = worksheet.getRow(1);

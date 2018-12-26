@@ -1,5 +1,6 @@
 
 //가장 먼저 실행.
+var delayInMilliseconds = 200; //1 second = 1000 //db 조회 텀
 var language;
 ; (function ($) {
     $.ajax({
@@ -85,7 +86,7 @@ $(document).ready(function () {
     //
 
     //
-    var lastWeek = today.getDate() - 7;
+    var lastWeek = today.getDate() - 7; 
     var lastWeekVal;
     var lastDay;
     if (lastWeek < 1) {
@@ -125,8 +126,6 @@ function selectAll() {
     var drawFirstQueryHtml = "";
     var drawfirstQuerytableHtml = "";
 
-    
-    
     $.ajax({
         type: 'POST',
         url: '/board/getDashboardInfo',
@@ -135,9 +134,10 @@ function selectAll() {
             if (data.records > 0) {
                 
                 for (var i = 0; i < data.rows.length; i++) {
-                    //INTENT SCORE 평균/최소/최대
-                    console.log()
-                    
+
+                    setTimeout(function() {}, delayInMilliseconds);
+
+                    //INTENT SCORE 평균/최소/최대 
                     if (data.rows[i].BOARD_URL == "drawScoreList") {
                         
                         drawScoreListHtml += '<section class="col-lg-5">';
@@ -223,22 +223,6 @@ function selectAll() {
                         getResponseTime();
                     }
 
-                    //시간대 별 질문수
-                    if (data.rows[i].BOARD_URL == "getQueryByEachTime") {
-
-                        getQueryByEachTimeHtml += '<div class="box  color-palette-box">';
-                        getQueryByEachTimeHtml += '		<div class="box-body">';
-                        getQueryByEachTimeHtml += '			       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.QUESTION_CNT_EACH_HOUR + '</h3></div>';
-                        getQueryByEachTimeHtml += '				<div class="chart-responsive">';
-                        getQueryByEachTimeHtml += '				  <div class="chart" id="timeOfDay_div" style="height: 300px;"></div>';
-                        getQueryByEachTimeHtml += '				</div>';
-                        getQueryByEachTimeHtml += '		</div>';
-                        getQueryByEachTimeHtml += '	<div class="overlay" id="overlay_getQueryByEachTime"><i class="fa fa-refresh fa-spin"></i></div>';
-                        getQueryByEachTimeHtml += '</div>';
-                        $('#getQueryByEachTimeHtml').html(getQueryByEachTimeHtml);
-                        getQueryByEachTime();
-                    }
-
                     //미답변 질문
                     if (data.rows[i].BOARD_URL == "drawNoneQuerytable") {
 
@@ -301,7 +285,7 @@ function selectAll() {
                         drawfirstQuerytableHtml += '	<div class="box-body">';
                         drawfirstQuerytableHtml += '	       <div class="Tbl_wrap">';
                         drawfirstQuerytableHtml += '		    <table class="table table-hover" summary="">';
-                        drawfirstQuerytableHtml += '			<colgroup><col width="60%"/><col width="10%"/><col width="5%"/><col width="15%"/></colgroup>';
+                        drawfirstQuerytableHtml += '			<colgroup><col width="60%"/><col width="10%"/><col width="8%"/><col width="15%"/></colgroup>';
                         drawfirstQuerytableHtml += '			<thead>';
                         drawfirstQuerytableHtml += '			    <tr>';
                         drawfirstQuerytableHtml += '				<th>' + language.HangulQuestion + '</th>';
@@ -325,6 +309,22 @@ function selectAll() {
                         drawfirstQuerytableHtml += '</section>';
                         $('#drawfirstQuerytableHtml').html(drawfirstQuerytableHtml);
                         drawfirstQuerytable();
+                    }
+                    
+                    //시간대 별 질문수
+                    if (data.rows[i].BOARD_URL == "getQueryByEachTime") {
+
+                        getQueryByEachTimeHtml += '<div class="box  color-palette-box">';
+                        getQueryByEachTimeHtml += '		<div class="box-body">';
+                        getQueryByEachTimeHtml += '			       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.QUESTION_CNT_EACH_HOUR + '</h3></div>';
+                        getQueryByEachTimeHtml += '				<div class="chart-responsive">';
+                        getQueryByEachTimeHtml += '				  <div class="chart" id="timeOfDay_div" style="height: 300px;"></div>';
+                        getQueryByEachTimeHtml += '				</div>';
+                        getQueryByEachTimeHtml += '		</div>';
+                        getQueryByEachTimeHtml += '	<div class="overlay" id="overlay_getQueryByEachTime"><i class="fa fa-refresh fa-spin"></i></div>';
+                        getQueryByEachTimeHtml += '</div>';
+                        $('#getQueryByEachTimeHtml').html(getQueryByEachTimeHtml);
+                        getQueryByEachTime();
                     }
                 }
             }
@@ -386,33 +386,34 @@ function getFilterVal(page) {
 
 //누적상담자수, 평균 응답 속도(ms), 평균 고객 질문 수, 평균 정상 답변율, 검색 응답률, 최대 고객 질문 수
 function getScorePanel() {
-    $.ajax({
-        url: '/board/getScorePanel',
-        dataType: 'json',
-        type: 'POST',
-        data: getFilterVal(),
-        success: function (data) {
-            var scores = data.list[0];
-            $('#allCustomer').text(scores.CUSOMER_CNT);
-            $('#avgReplySpeed').text(scores.REPLY_SPEED);
-            $('#avgQueryCnt').text(scores.USER_QRY_AVG);
-
-            var CORRECT_QRY = scores.CORRECT_QRY.toString();
-            $('#avgCorrectAnswer').text((CORRECT_QRY.length > 4 ? CORRECT_QRY.substr(0, 4) : CORRECT_QRY) + '%');
-            $('#avgReply').text(scores.SEARCH_AVG + '%');
-            $('#maxQueryCnt').text(scores.MAX_QRY);
-        },
-        error : function() {   // 오류가 발생했을 때 호출된다. 
-            console.log("error");
-        },
-        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
-            
-        }
-    })
+        
+    $('#allCustomer').text('Loading..');
+    $('#avgReplySpeed').text('Loading..');
+    $('#avgQueryCnt').text('Loading..');
+    $('#avgCorrectAnswer').text('Loading..');
+    $('#avgReply').text('Loading..');
+    $('#maxQueryCnt').text('Loading..');
+    //누적상담자수, 평균 응답 속도(ms), 평균 고객 질문 수
+    getScorePanel1();
+    
+    setTimeout(function() {}, delayInMilliseconds);
+    //평균 정상 답변율
+    getScorePanel2();
+    //검색 응답률
+    //getScorePanel3();
+    //최대 고객 질문 수
+    //getScorePanel4();
 }
 
 //HISTORY 에서 SUCCESS, FAIL, ERROR, SUGGEST
 function getCountPanel() {
+    
+    $('#successCount').text("Loading..");
+    $('#failCount').text("Loading..");
+    $('#errorCount').text("Loading..");
+    $('#suggestCount').text("Loading..");
+    $('#sapWord').text("Loading..");
+    $('#sapPasswordInit').text("Loading..");
     $.ajax({
         url: '/board/getCountPanel',
         dataType: 'json',
@@ -453,8 +454,12 @@ function drawScoreList(page) {
         data: getFilterVal(page),
         success: function (data) {
             if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
+                
+                makeReloadEvent('overlay_drawScoreList');
+
             } else {
+                removeReloadEvent('overlay_drawScoreList');
+
                 $("#overlay_drawScoreList").remove();
                 var list = data.list;
                 var scoreList = "";
@@ -490,8 +495,9 @@ function getOftQuestion() {
         data: getFilterVal(),
     }).done(function (data) {
         if (data.error_code != null && data.error_message != null) {
-            alert(data.error_message);
+            makeReloadEvent('overlay_getOftQuestion');
         } else {
+            removeReloadEvent('overlay_getOftQuestion');
             $("#overlay_getOftQuestion").remove();
             var tableList = data.list;
 
@@ -523,8 +529,9 @@ function getResponseTime() {
         data: getFilterVal(),
         success: function (data) {
             if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
+                makeReloadEvent('overlay_getResponseTime');
             } else {
+                removeReloadEvent('overlay_getResponseTime');
                 $("#overlay_getResponseTime").remove();
                 //BAR CHART
                 var bar = new Morris.Bar({
@@ -558,8 +565,9 @@ function getQueryByEachTime() {
         data: getFilterVal(),
         success: function (data) {
             if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
+                makeReloadEvent('overlay_getQueryByEachTime');
             } else {
+                removeReloadEvent('overlay_getQueryByEachTime');
                 $("#overlay_getQueryByEachTime").remove();
                 //BAR CHART
                 var arrList = data.list;
@@ -614,8 +622,9 @@ function drawNoneQuerytable(page) {
                 $('#noneQueryDivTablePaging .pagination').html('').append('');
             }else{
                 if (data.error_code != null && data.error_message != null) {
-                    alert(data.error_message);
+                    makeReloadEvent('overlay_drawNoneQuerytable');
                 } else {
+                    removeReloadEvent('overlay_drawNoneQuerytable');
                     var list = data.list;
                     var noneList = "";
     
@@ -662,8 +671,9 @@ function drawFirstQuery() {
         success: function (data) {
 
             if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
+                makeReloadEvent('overlay_drawFirstQuery');
             } else {
+                removeReloadEvent('overlay_drawFirstQuery');
                 $("#overlay_drawFirstQuery").remove();
                 var jsonList = [];
                 for (var i = 0; i < data.list.length; i++) {
@@ -702,8 +712,10 @@ function drawfirstQuerytable(page) {
         data: getFilterVal(page),
         success: function (data) {
             if (data.error_code != null && data.error_message != null) {
-                alert(data.error_message);
+                makeReloadEvent('overlay_drawfirstQuerytable');
             } else {
+                removeReloadEvent('overlay_drawfirstQuerytable');
+
                 $("#overlay_drawfirstQuerytable").remove();
                 var list = data.list;
                 var firstList = "";
@@ -731,6 +743,103 @@ function drawfirstQuerytable(page) {
     });
 }
 
+function getScorePanel1() {
+    $.ajax({
+        url: '/board/getScorePanel1',
+        dataType: 'json',
+        type: 'POST',
+        data: getFilterVal(),
+        success: function (data) {
+            if (data.result) {
+                var scores = data.list[0];
+                $('#allCustomer').text(scores.CUSOMER_CNT);
+                $('#avgReplySpeed').text(scores.REPLY_SPEED);
+                $('#avgQueryCnt').text(scores.USER_QRY_AVG);
+            } else {
+                $('#allCustomer').text(0);
+                $('#avgReplySpeed').text(0);
+                $('#avgQueryCnt').text(0);
+            }
+        },
+        error : function() {   
+            $('#allCustomer').text(0);
+            $('#avgReplySpeed').text(0);
+            $('#avgQueryCnt').text(0);
+        },
+        complete : function() {
+            //getScorePanel4();
+        }
+    })
+}
+
+
+function getScorePanel2() {
+    $.ajax({
+        url: '/board/getScorePanel2',
+        dataType: 'json',
+        type: 'POST',
+        data: getFilterVal(),
+        success: function (data) {
+            if (data.result) {
+                var scores = data.list;
+                var CORRECT_QRY = scores.toString();
+                $('#avgCorrectAnswer').text((CORRECT_QRY.length > 4 ? CORRECT_QRY.substr(0, 4) : CORRECT_QRY) + '%');
+            } else {
+                $('#avgCorrectAnswer').text(0);
+            }
+        },
+        error : function() {   
+            $('#avgCorrectAnswer').text(0);
+        },
+        complete : function() {
+            getScorePanel4();
+        }
+    })
+}
+function getScorePanel3() {
+    $.ajax({
+        url: '/board/getScorePanel3',
+        dataType: 'json',
+        type: 'POST',
+        data: getFilterVal(),
+        success: function (data) {
+            if (data.result) {
+                var scores = data.list[0];
+                $('#avgReply').text(scores.SEARCH_AVG + '%');
+            } else {
+                $('#avgReply').text(0);
+            }
+        },
+        error : function() {   
+            $('#avgReply').text(0);
+        }
+    })
+}
+
+function getScorePanel4() {
+    $.ajax({
+        url: '/board/getScorePanel4',
+        dataType: 'json',
+        type: 'POST',
+        data: getFilterVal(),
+        success: function (data) {
+            if (data.result) {
+                var scores = data.list[0];
+                $('#maxQueryCnt').text(scores.MAX_QRY);
+            } else {
+                $('#maxQueryCnt').text(0);
+            }
+        },
+        error : function() {   
+            $('#maxQueryCnt').text(0);
+        },
+        complete : function() {
+            //getScorePanel2();
+        }
+    })
+}
+
+
 function getSimulUrl(){
     $.ajax({
         url: '/board/getSimulUrlInfo',
@@ -740,4 +849,83 @@ function getSimulUrl(){
             $('#simulURL').val(data.simul_url);
         }
     });
+}
+
+
+function makeReloadEvent(divName) {
+    
+    $('#' + divName + '  .fa-spin').css('cursor', 'pointer');
+
+    $('#' + divName + '  .fa-spin').on('mouseover',function(e){
+    
+        //var oWidth = $('#' + divName + '  .fa-spin').offset().top
+        //var oHeight = $('#' + divName + '  .fa-spin').offset().top;
+    
+        // 레이어가 나타날 위치를 셋팅한다.
+        var divLeft =  e.pageX; //$('#divInfo').css('width').split('px')[0]*1 +
+        var divTop =  e.pageY; //$('#divInfo').css('height').split('px')[0]*1 +
+    
+        $('#divInfo').css({
+            "top": divTop,
+            "left": divLeft,
+            "position": "absolute"
+        }).show();
+    });
+
+    
+    $('#' + divName + '  .fa-spin').on('mouseout',function(e){
+        $('#divInfo').hide();
+    });
+
+    if (divName == 'overlay_drawfirstQuerytable') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            drawfirstQuerytable(1);
+        });
+    }
+    else if (divName == 'overlay_getOftQuestion') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            getOftQuestion();
+        });
+    }
+    else if (divName == 'overlay_getResponseTime') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            getResponseTime();
+        });
+    }
+    else if (divName == 'overlay_drawNoneQuerytable') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            drawNoneQuerytable(1);
+        });
+    }
+    else if (divName == 'overlay_drawFirstQuery') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            drawFirstQuery();
+        });
+    }
+    else if (divName == 'overlay_getQueryByEachTime') 
+    {
+        $('#' + divName + '  .fa-spin').on('click',function(e){
+            removeReloadEvent(divName);
+            getQueryByEachTime();
+        });
+    }
+}
+
+
+function removeReloadEvent(divName) { 
+    $('#divInfo').hide();
+    $('#' + divName + ' .fa-spin').css('cursor', null);
+    $('#' + divName + ' .fa-spin').off('click');
+    $('#' + divName + ' .fa-spin').off('mouseover');
+    $('#' + divName + ' .fa-spin').off('mouseout');
 }

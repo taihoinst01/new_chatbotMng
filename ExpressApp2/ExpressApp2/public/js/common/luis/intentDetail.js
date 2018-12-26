@@ -761,6 +761,12 @@ $(document).on('click', 'button[name=confirmCancelBtn]', function(e){
 //페이징 클릭
 $(document).on('click','.li_paging',function(e){
     if(!$(this).hasClass('active')){
+        isFirst = true;
+        
+        if( $('#scrollUpDownBtn').children().eq(0).hasClass('fa-arrow-down') ) {
+            $('#scrollUpDownBtn').children().eq(0).removeClass('fa-arrow-down')
+            $('#scrollUpDownBtn').children().eq(0).addClass('fa-arrow-up')
+        }
         $('#currentPage').val($(this).val());
         makeUtteranceTable();
     }
@@ -1048,7 +1054,7 @@ function makeUtteranceTable() {
                         for(var i = 0; i < utterList.length; i++){
                             utterBodyHtml += "<tr name='utterMainTr'>";
                             utterBodyHtml += "<td ></td>";
-                            utterBodyHtml += "<td style='text-align: left; padding-left:1%;'>";
+                            utterBodyHtml += "<td style='text-align: left; padding-left:1%; max-width:1000px;'>";
                             utterBodyHtml += makeTokenizedText(utterList[i].tokenizedText, 'SPAN');
                             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
                             utterBodyHtml += "</td>";

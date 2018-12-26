@@ -62,6 +62,7 @@ $(document).ready(function() {
 //페이지 버튼 클릭
 $(document).on('click','.li_paging',function(e){
     if(!$(this).hasClass('active')){
+        $('#currentPage').val($(this).val());
         makeUserTable();
     }
 });

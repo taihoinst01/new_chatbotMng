@@ -35,7 +35,26 @@
             $('.slider').slider()
         })
     </script>
+    <style type="text/css">
+        
+        #divInfo {
+            position:absolute;
+            display:none;
+            background-color:#ffffff;
+            border:solid 2px #d0d0d0;
+            max-width:300px;
+            max-height:100px;
+            min-width: 5%;
+            height:fit-content;
+            padding:10px;
+            border-radius: 10px;
+            z-index: 1025;
+        }
+        #divInfo th {
+            padding:0.5em;
+        }
 
+    </style>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -352,6 +371,17 @@
                 </div>
             </div>
         </div>
+
+        
+    <div id="divInfo">
+        <table>
+            <col width="20%">
+            <col width="80%">
+            <tr style="border-bottom:1pt solid black; padding-bottom: 0.1em;">
+                <th><%= __("ALERT_RELOAD_CHART") %></th>
+            </tr>
+        </table>
+    </div>
 </body>
 
 </html>
