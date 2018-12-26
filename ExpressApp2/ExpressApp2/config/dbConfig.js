@@ -12,6 +12,11 @@ var dbConfig = {
     requestTimeout : 30000,
     options: {
         encrypt: true
+    },
+    pool: {
+        max: 20,
+        min: 0,
+        idleTimeoutMillis: 35000
     }
 };
 /*
