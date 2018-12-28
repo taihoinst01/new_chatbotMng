@@ -194,15 +194,14 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "                  ,(CASE RTRIM(A.DLG_ID) WHEN '' THEN 'NONE' \n";
                 QueryStr += "                         ELSE ISNULL(A.DLG_ID, 'NONE') END \n";
                 QueryStr += "                  ) AS DLG_ID, A.SID, TBL_B.SAME_CNT \n";
-                QueryStr += "             FROM TBL_HISTORY_QUERY A, \n";
+                QueryStr += "             FROM TBL_HISTORY_QUERY A \n";
+                QueryStr += "             INNER JOIN  \n";
                 QueryStr += "                  ( \n";
-                QueryStr += "			         SELECT CUSTOMER_COMMENT_KR AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT \n";
+                QueryStr += "			         SELECT MAX(SID) AS TRANS_SID, CUSTOMER_COMMENT_KR AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT  \n";
                 QueryStr += "                  	   FROM TBL_HISTORY_QUERY\n";
-                QueryStr += "                  	   WHERE CUSTOMER_COMMENT_KR != '건의사항입력' \n";
-                QueryStr += "                  GROUP BY CUSTOMER_COMMENT_KR\n";
-                QueryStr += "                  ) TBL_B \n";
-                QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
-                QueryStr += "              AND A.CUSTOMER_COMMENT_KR = TBL_B.TRANS_COMMENT \n";
+                QueryStr += "                  	   WHERE 1 = 1 \n";
+                QueryStr += "					     AND RTRIM(LTRIM(ISNULL(USER_ID, ''))) != '' \n";
+                QueryStr += " 					     AND RTRIM(CUSTOMER_COMMENT_KR) != ''  \n";
                 if (searchQuestion !== '') {
                     QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
                 }
@@ -212,25 +211,19 @@ router.post('/selectHistoryList', function (req, res) {
                 }
                 
                 if (selDate == 'today') {
-                    QueryStr += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
+                    QueryStr += " AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
                 } else if (selDate == 'select') {
-                    QueryStr += "AND CONVERT(date, @startDate) <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, @endDate) ";
+                    QueryStr += " AND CONVERT(date, @startDate) <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, @endDate) ";
                 }
-                /*
-                if (selChannel !== 'all') {
-                    QueryStr += "AND	CHANNEL = @selChannel \n";
-                }
-                */
                 if (selResult !== 'all') {
-                    QueryStr += "AND	RESULT = @selResult \n";
+                    QueryStr += " AND	RESULT = @selResult \n";
                 }
-        
-                /**중복행 제거 부분 주석 */
-                //QueryStr += "              AND SID IN ( \n";
-                //QueryStr += "                           SELECT MAX(SID) AS SID \n";
-                //QueryStr += "                           FROM TBL_HISTORY_QUERY  \n";
-                //QueryStr += "                           GROUP BY REPLACE(CUSTOMER_COMMENT_KR, ' ', '') \n";
-                //QueryStr += "                         ) \n";
+                QueryStr += "                  GROUP BY CUSTOMER_COMMENT_KR\n";
+                QueryStr += "                   \n";
+                QueryStr += "                   \n";
+                QueryStr += "                  ) TBL_B \n";
+                QueryStr += "				  ON SID = TBL_B.TRANS_SID \n";
+                QueryStr += "            WHERE 1=1 \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
               

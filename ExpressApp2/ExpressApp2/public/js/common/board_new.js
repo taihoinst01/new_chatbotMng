@@ -1,6 +1,8 @@
 
+"use strict";
 //가장 먼저 실행.
-var delayInMilliseconds = 200; //1 second = 1000 //db 조회 텀
+var saveBoardList = [];
+var delayInMilliseconds = 500; //1 second = 1000 //db 조회 텀
 var language;
 ; (function ($) {
     $.ajax({
@@ -61,10 +63,79 @@ var language;
     })
 })(jQuery);
 
+$.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top;
+    var elementBottom = elementTop + $(this).outerHeight();
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+    //console.log('======================' + (elementBottom > viewportTop && elementTop < viewportBottom));
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+
+$(document).scroll(function() {
+    //INTENT SCORE 평균/최소/최대 
+    for (var i=0; i<saveBoardList.length; i++) {
+        if (saveBoardList[i].BOARD_URL == "drawScoreList") {
+            if ($('#scoreTableBody').html().trim() == "" && $('#scoreTableBody').isInViewport()) {
+                //console.log('drawScoreList');
+                saveBoardList.splice(i--, 1);
+                drawScoreList();
+            }   
+        }
+        //자주 묻는 질문에 대한 답변 top 10
+        else if (saveBoardList[i].BOARD_URL == "getOftQuestion") {
+            if ($('#OftQuestionTableBody').html().trim() == "" && $('#OftQuestionTableBody').isInViewport()) {
+                //console.log('getOftQuestion');
+                saveBoardList.splice(i--, 1);
+                getOftQuestion();
+            }   
+        }
+        //응답(평균/최대/최소)/평균 머무르는 시간
+        else if (saveBoardList[i].BOARD_URL == "getResponseTime") {
+            if ($('#responseTimeDiv').html().trim() == "" && $('#responseTimeDiv').isInViewport()) {
+                //console.log('getResponseTime');
+                saveBoardList.splice(i--, 1);
+                getResponseTime();
+            }   
+        }
+        //미답변 질문
+        else if (saveBoardList[i].BOARD_URL == "drawNoneQuerytable") {
+            if ($('#noneQueryDiv').html().trim() == "" && $('#noneQueryDiv').isInViewport()) {
+                //console.log('drawNoneQuerytable');
+                saveBoardList.splice(i--, 1);
+                drawNoneQuerytable();
+            }   
+        }
+        //고객 별 첫 질문 bar
+        else if (saveBoardList[i].BOARD_URL == "drawFirstQuery") {
+            if ($('#fistQueryDiv').html().trim() == "" && $('#fistQueryDiv').isInViewport()) {
+                //console.log('drawFirstQuery');
+                saveBoardList.splice(i--, 1);
+                drawFirstQuery();
+            } 
+        }
+        //고객 별 첫 질문 table
+        else if (saveBoardList[i].BOARD_URL == "drawfirstQuerytable") {
+            if ($('#fistQueryTable').html().trim() == "" && $('#fistQueryTable').isInViewport()) {
+                //console.log('drawfirstQuerytable');
+                saveBoardList.splice(i--, 1);
+                drawfirstQuerytable();
+            } 
+        }
+        //시간대 별 질문수
+        else if (saveBoardList[i].BOARD_URL == "getQueryByEachTime") {
+            if ($('#timeOfDay_div').html().trim() == "" && $('#timeOfDay_div').isInViewport()) {
+                //console.log('getQueryByEachTime');
+                saveBoardList.splice(i--, 1);
+                getQueryByEachTime();
+            } 
+        }
+    }
+});
 
 $(document).ready(function () {
 
-    "use strict";
 
     //달력 초기값 설정
     var today = new Date();
@@ -134,8 +205,7 @@ function selectAll() {
             if (data.records > 0) {
                 
                 for (var i = 0; i < data.rows.length; i++) {
-
-                    setTimeout(function() {}, delayInMilliseconds);
+                    saveBoardList = data.rows;
 
                     //INTENT SCORE 평균/최소/최대 
                     if (data.rows[i].BOARD_URL == "drawScoreList") {
@@ -172,7 +242,10 @@ function selectAll() {
                         drawScoreListHtml += '  </div>';
                         drawScoreListHtml += '</section>';
                         $('#drawScoreListHtml').html(drawScoreListHtml);
-                        drawScoreList();
+                        if ($('#scoreTableBody').html().trim() == "" && $('#scoreTableBody').isInViewport()) {
+                            drawScoreList();
+                        }   
+                        //drawScoreList();
                     }
                     //자주 묻는 질문에 대한 답변 top 10
                     if (data.rows[i].BOARD_URL == "getOftQuestion") {
@@ -203,7 +276,10 @@ function selectAll() {
                         getOftQuestionHtml += '   </div>';
                         getOftQuestionHtml += '</section>';
                         $('#getOftQuestionHtml').html(getOftQuestionHtml);
-                        getOftQuestion();
+                        if ($('#OftQuestionTableBody').html().trim() == "" && $('#OftQuestionTableBody').isInViewport()) {
+                            getOftQuestion();
+                        }  
+                        //getOftQuestion();
                     }
 
                     //응답(평균/최대/최소)/평균 머무르는 시간
@@ -220,7 +296,10 @@ function selectAll() {
                         getResponseTimeHtml += '	<div class="overlay" id="overlay_getResponseTime"><i class="fa fa-refresh fa-spin"></i></div>';
                         getResponseTimeHtml += '   </div>';
                         $('#getResponseTimeHtml').html(getResponseTimeHtml);
-                        getResponseTime();
+                        if ($('#responseTimeDiv').html().trim() == "" && $('#responseTimeDiv').isInViewport()) {
+                            getResponseTime();
+                        }   
+                        //getResponseTime();
                     }
 
                     //미답변 질문
@@ -256,7 +335,10 @@ function selectAll() {
                         drawNoneQuerytableHtml += '	<div class="overlay" id="overlay_drawNoneQuerytable"><i class="fa fa-refresh fa-spin"></i></div>';
                         drawNoneQuerytableHtml += '</div>';
                         $('#drawNoneQuerytableHtml').html(drawNoneQuerytableHtml);
-                        drawNoneQuerytable();
+                        if ($('#noneQueryDiv').html().trim() == "" && $('#noneQueryDiv').isInViewport()) {
+                            drawNoneQuerytable();
+                        }  
+                        //drawNoneQuerytable();
                     }
 
                     //고객 별 첫 질문 bar
@@ -274,7 +356,10 @@ function selectAll() {
                         drawFirstQueryHtml += '   </div>';
                         drawFirstQueryHtml += '</section>';
                         $('#drawFirstQueryHtml').html(drawFirstQueryHtml);
-                        drawFirstQuery();
+                        if ($('#fistQueryDiv').html().trim() == "" && $('#fistQueryDiv').isInViewport()) {
+                            drawFirstQuery();
+                        } 
+                        //drawFirstQuery();
                     }
 
                     //고객 별 첫 질문 table
@@ -308,7 +393,10 @@ function selectAll() {
                         drawfirstQuerytableHtml += '      </div>';
                         drawfirstQuerytableHtml += '</section>';
                         $('#drawfirstQuerytableHtml').html(drawfirstQuerytableHtml);
-                        drawfirstQuerytable();
+                        if ($('#fistQueryTable').html().trim() == "" && $('#fistQueryTable').isInViewport()) {
+                            drawfirstQuerytable();
+                        } 
+                        //drawfirstQuerytable();
                     }
                     
                     //시간대 별 질문수
@@ -324,7 +412,10 @@ function selectAll() {
                         getQueryByEachTimeHtml += '	<div class="overlay" id="overlay_getQueryByEachTime"><i class="fa fa-refresh fa-spin"></i></div>';
                         getQueryByEachTimeHtml += '</div>';
                         $('#getQueryByEachTimeHtml').html(getQueryByEachTimeHtml);
-                        getQueryByEachTime();
+                        if ($('#timeOfDay_div').html().trim() == "" && $('#timeOfDay_div').isInViewport()) {
+                            getQueryByEachTime();
+                        } 
+                        //getQueryByEachTime();
                     }
                 }
             }

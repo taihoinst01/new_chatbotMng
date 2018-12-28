@@ -255,7 +255,7 @@ function makeHistoryTable(newPage) {
                         
                         tableHtml += '<tr name="userTr">';
                         tableHtml += '<td>' + data.rows[i].NUM + '</td>';
-                        tableHtml += '<td><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>';
+                        tableHtml += '<td style="text-align: left; padding-left:1%;"><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>';
                         tableHtml += '<td>' + userIdText + '</td>';
                         tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>';
                         tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
@@ -348,7 +348,7 @@ function getHistoryDetail(sId) {
                         }
                         
                         tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
-                        tableHtml += '<td>'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
+                        tableHtml += '<td style="text-align: left; padding-left:1%;">'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
                         tableHtml += '<td>' + userIdText + '</td>';
                         tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>'
                         tableHtml += '<td>' + resultText + '</td>'
