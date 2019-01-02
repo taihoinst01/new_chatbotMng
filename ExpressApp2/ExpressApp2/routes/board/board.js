@@ -980,8 +980,13 @@ router.post('/getScorePanel2', function (req, res) {
                 }
             }
             var sum = resultList.reduce((a, b) => a + b, 0);
-            var vagRst = Number((sum/resultList.length).toFixed(4))*100;
+            var vagRst = 0;//Number((sum/resultList.length).toFixed(4))*100;
+            //var vagRst = Number((sum/resultList.length).toFixed(4))*100;
             sql.close();      
+            
+            if (resultList.length != 0) {
+               vagRst = Number((sum/resultList.length).toFixed(4))*100;
+            }
             res.send({result : true, list : vagRst});
         })()
     } 

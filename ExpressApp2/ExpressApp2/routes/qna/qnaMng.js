@@ -163,7 +163,7 @@ router.post('/getDlgAjax', function (req, res) {
         + "AND DLG_ID = @dlgID \n";
     + "ORDER BY DLG_ID";
 
-    var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT,\n"
+    var dlgCard = "SELECT DLG_ID, CARD_TEXT, CARD_TITLE, IMG_URL, BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT, BTN_1_CONTEXT_M, \n"
         + "BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT,\n"
         + "BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT,\n"
         + "BTN_4_TYPE, BTN_4_TITLE, BTN_4_CONTEXT,\n"
@@ -351,11 +351,20 @@ router.post('/updateDialog', function (req, res) {
                 '(@dlgId,@dialogTitle,@dialogDesc,\'KO\',@dlgType,@dialogOrderNo,\'Y\',@groupl,@groupm,@groups,2,@relationNum)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
+            
+            /*
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
             var insertTblDlgMedia = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_DIVISION,CARD_VALUE,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardDivision,@cardValue,\'Y\')';
-            var insertTblRelation = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, DLG_QUESTION, ST_FLAG) "
+            */
+            var insertTblCarousel_M = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_1_CONTEXT_M,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
+                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@buttonContent1_M,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
+            var insertTblDlgMedia_M = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_DIVISION,CARD_VALUE,USE_YN) VALUES ' +
+                '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@buttonContent1_M,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardDivision,@cardValue,\'Y\')';
+            
+            
+                var insertTblRelation = "INSERT INTO TBL_DLG_RELATION_LUIS(LUIS_ID,LUIS_INTENT,LUIS_ENTITIES,DLG_ID,DLG_API_DEFINE,USE_YN, DLG_QUESTION, ST_FLAG) "
                 + "VALUES( @luisId, @luisIntent, @entity, @dlgId, 'D', 'Y', @dlgQuestion, 'T' ) ";
 
             var luisId = array[array.length - 1]["largeGroup"];
@@ -464,6 +473,7 @@ router.post('/updateDialog', function (req, res) {
                             .input('btn1Type', sql.NVarChar, carTmp["btn1Type"])
                             .input('buttonName1', sql.NVarChar, carTmp["cButtonName1"])
                             .input('buttonContent1', sql.NVarChar, carTmp["cButtonContent1"])
+                            .input('buttonContent1_M', sql.NVarChar, carTmp["cButtonContentM"])
                             .input('btn2Type', sql.NVarChar, carTmp["btn2Type"])
                             .input('buttonName2', sql.NVarChar, carTmp["cButtonName2"])
                             .input('buttonContent2', sql.NVarChar, carTmp["cButtonContent2"])
@@ -474,7 +484,7 @@ router.post('/updateDialog', function (req, res) {
                             .input('buttonName4', sql.NVarChar, carTmp["cButtonName4"])
                             .input('buttonContent4', sql.NVarChar, carTmp["cButtonContent4"])
                             .input('cardOrderNo', sql.Int, (j + 1))
-                            .query(insertTblCarousel);
+                            .query(insertTblCarousel_M);
 
                     }
 
@@ -507,7 +517,7 @@ router.post('/updateDialog', function (req, res) {
                         .input('buttonContent4', sql.NVarChar, array[i]["mButtonContent4"])
                         .input('cardDivision', sql.NVarChar, cardDivision)
                         .input('cardValue', sql.NVarChar, array[i]["mediaUrl"])
-                        .query(insertTblDlgMedia)
+                        .query(insertTblDlgMedia_M)
 
                 }
                 /*
@@ -767,15 +777,19 @@ router.post('/dialogList', function (req, res) {
                 "AND DLG_GROUP = 2 \n" +
                 "  AND B.DLG_ID = A.DLG_ID \n";
             if (req.body.searchTitleTxt !== '') {
-                dlg_desQueryString += "AND DLG_NAME like '%" + req.body.searchTitleTxt + "%' \n";
+                dlg_desQueryString += "AND DLG_NAME like @searchTitle \n";
             }
             if (req.body.searchDescTxt !== '') {
-                dlg_desQueryString += "AND DLG_DESCRIPTION like '%" + req.body.searchDescTxt + "%' \n";
+                dlg_desQueryString += "AND DLG_DESCRIPTION like @searchText \n";
             }
             dlg_desQueryString += ") tbp \n" +
                 "WHERE PAGEIDX = @currentPage";
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(dlg_desQueryString);
+            let result1 = await pool.request()
+                        .input('searchTitle', sql.NVarChar, '%' + searchTitleTxt + '%')
+                        .input('searchText', sql.NVarChar, '%' + searchDescTxt + '%')
+                        .input('currentPage', sql.Int, currentPage)
+                        .query(dlg_desQueryString);
             let rows = result1.recordset;
 
             /*

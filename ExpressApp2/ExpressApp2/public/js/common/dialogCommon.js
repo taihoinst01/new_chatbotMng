@@ -84,7 +84,7 @@ $(document).ready(function() {
             '<tr><td>' +
             '<select class="form-control" name="btnType">' +
             '<option value="imBack" selected>imBack</option>' +
-            '<option value="openURL">openURL</option>' +
+            '<option value="openUrl">openUrl</option>' +
             '</select>' +
             '</td><td></td>' +
             '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '">' +
@@ -106,7 +106,7 @@ $(document).ready(function() {
                 '<td>' +
                 '<select class="form-control" name="btnType">' +
                 '<option value="imBack" selected>imBack</option>' +
-                '<option value="openURL">openURL</option>' +
+                '<option value="openUrl">openUrl</option>' +
                 '</select>' +
                 '</td><td></td>' +
                 '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
@@ -190,7 +190,7 @@ $(document).ready(function() {
             $('.insertForm:eq(' + idx + ') .mediaLayout').css('display', 'block');
             $('.insertForm:eq(' + idx + ') .mediaLayout').find('.addMediaBtn:last').closest('div').css('display', 'inline-block');
         }
-
+        
         if ($(e.target).val() == "2") {
             $(".dialogView").eq(idx).html('');
             insertHtml += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
@@ -198,9 +198,13 @@ $(document).ready(function() {
             insertHtml += '<svg class="wc-message-callout"></svg>';
             insertHtml += '<div><div class="format-markdown"><div class="textMent">';
             insertHtml += '<h1 class="textTitle">' + language.Please_enter_a_title + '</h1>';
+            
+            insertHtml += '<div class="dlg_content">';
             insertHtml += '<p>';
             insertHtml += language.Please_enter;
             insertHtml += '</p>';
+            insertHtml += '</div>';
+
             insertHtml += '</div></div></div></div></div>';
 
             $(".dialogView").eq(idx).html(insertHtml);
@@ -267,7 +271,11 @@ $(document).ready(function() {
 
             $(".dialogView").eq(idx).html(insertHtml);
         }
+        var triggerEvent = jQuery.Event( 'keyup', { keyCode: 39, which: 39 } );
+        $(this).parents('#dialogLayout').find('input[name=dialogTitle]').trigger(triggerEvent);
+        $(this).parents('#dialogLayout').find('textarea[name=dialogText]').trigger(triggerEvent);
         
+        //dialogText
         //dyyoo change이벤트 후 미리보기 적용. keycode:17 - ctrl한번 누르기
         /*
         var e = jQuery.Event( "keyup", { keyCode: 17 } ); 
@@ -615,13 +623,15 @@ $(document).on('mouseout', 'td[name=dlgTitleTd]', function (e) {
 
 //다이얼로그생성모달 - 버튼삭제
 $(document).on('click', '.btn_delete', function (e) {
-
+    var divIndex = $('.btnInsertDiv').index($(this).parents('.btnInsertDiv'));
+    var trIndex = $(this).parents('tbody').children().index($(this).parents('tr'));
     var trLength = $(this).parents('tbody').children().length;
     if (trLength == 1) {
         $(this).parents('.btnInsertDiv').html('');
         return;
     }
     $(this).parent().parent().remove();
+    $('.btnInsertDiv').eq(divIndex).find('tbody tr').eq(trIndex).find("select[name=btnType]").trigger('change');
 });
 
 //다이얼로그생성모달 - 버튼추가
@@ -639,7 +649,7 @@ $(document).on('click', '.carouseBtn', function (e) {
         '<tbody>' +
         '<tr>' +
         '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
-        '<option value="openURL">openURL</option></select></td>' +
+        '<option value="openUrl">openUrl</option></select></td>' +
         '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
@@ -651,11 +661,12 @@ $(document).on('click', '.carouseBtn', function (e) {
         return;
     }
     var trLength = $(this).parent().prev().prev().prev().find('.cardCopyTbl tbody tr').length;
+    
     if (trLength >= 1 && trLength < 4) {
 
         var inputTrHtml = '<tr>' +
             '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
-            '<option value="openURL">openURL</option></select></td>' +
+            '<option value="openUrl">openUrl</option></select></td>' +
             '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
             '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
             '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
@@ -671,6 +682,9 @@ $(document).on('click', '.carouseBtn', function (e) {
     }
 
 });
+
+
+
 
 //다이얼로그생성모달 - 카드추가 복사본!!
 $(document).on('click', '.addCarouselBtn', function (e) {
@@ -791,10 +805,12 @@ function updateDialog() {
             exit = true;
             return false;
             */
+           /*이미지 URL
             $('#proc_content').html(language.ImageURL_must_be_entered);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
             $('#procDialog').modal('show');
             return;
+            */
         }
     });
     //if (exit) return;
@@ -899,7 +915,11 @@ function updateDialog() {
 
             var groupType = $('.selected').text();
             var sourceType = $('#tblSourceType').val();
-            selectDlgByTxt(groupType, sourceType);
+            if (typeof selectDlgByTxt == 'function') {
+                selectDlgByTxt(groupType, sourceType);
+            } else {
+                makeQnaListTable(1);
+            }
         }
 
     });
@@ -933,7 +953,12 @@ function deleteDialog() {
                 $('.createDlgModalClose').click();
                 var groupType = $('.selected').text();
                 var sourceType = $('#tblSourceType').val();
-                selectDlgByTxt(groupType, sourceType);
+                //selectDlgByTxt(groupType, sourceType);
+                if (typeof selectDlgByTxt == 'function') {
+                    selectDlgByTxt(groupType, sourceType);
+                } else {
+                    makeQnaListTable(1);
+                }
             }else if(deleteDlgType=="init"){
                 
                 makeInitDlgTable();
@@ -1032,7 +1057,7 @@ $(document).on("click", "#show_dlg", function () {
         '<tbody>' +
         '<tr>' +
         '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
-        '<option value="openURL">openURL</option></select></td>' +
+        '<option value="openUrl">openUrl</option></select></td>' +
         '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
@@ -1040,7 +1065,7 @@ $(document).on("click", "#show_dlg", function () {
 
     var inputTrHtml = '<tr>' +
         '<td><select class="form-control" name="btnType"><option value="imBack" selected>imBack</option>' +
-        '<option value="openURL">openURL</option></select></td>' +
+        '<option value="openUrl">openUrl</option></select></td>' +
         '<td></td><td><input type="text" name="cButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><input type="text" name="cButtonContent" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
         '<td></td><td><a href="#" class="btn_delete" style="margin:0px;"><span class="fa fa-trash"></span></a></td>' +
@@ -1056,7 +1081,7 @@ $(document).on("click", "#show_dlg", function () {
         '<tr><td>' +
         '<select class="form-control" name="btnType">' +
         '<option value="imBack" selected>imBack</option>' +
-        '<option value="openURL">openURL</option>' +
+        '<option value="openUrl">openUrl</option>' +
         '</select>' +
         '</td><td></td>' +
         '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '">' +
@@ -1070,7 +1095,7 @@ $(document).on("click", "#show_dlg", function () {
         '<td>' +
         '<select class="form-control" name="btnType">' +
         '<option value="imBack" selected>imBack</option>' +
-        '<option value="openURL">openURL</option>' +
+        '<option value="openUrl">openUrl</option>' +
         '</select>' +
         '</td><td></td>' +
         '<td><input type="text" name="mButtonName" class="form-control" placeholder="' + language.Please_enter + '"></td>' +
@@ -1232,11 +1257,20 @@ $(document).on("click", "#show_dlg", function () {
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=imgUrl]").val(tmp.dlg[j].IMG_URL);
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardValue]").val(tmp.dlg[j].CARD_VALUE).prop("selected", true);
 
+                            //두연
                             if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find(".btnInsertDiv").append(inputHtml);
-                                $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(0)").val(tmp.dlg[j].BTN_1_TYPE).prop("selected", true);
+                                for (var k=0; k<2; k++) {
+                                    var childBtnVal = $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]").children().eq(k).val();
+                                    if (childBtnVal == tmp.dlg[j].BTN_1_TYPE) {
+                                        $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]").children().eq(k).prop("selected", true);
+                                        $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]").trigger('change');
+                                    }
+                                }
+                                //$("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=btnType]:eq(0)").val(tmp.dlg[j].BTN_1_TYPE).prop("selected", true);
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonName]:eq(0)").val(tmp.dlg[j].BTN_1_TITLE);
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(0)").val(tmp.dlg[j].BTN_1_CONTEXT);
+                                $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContentM]:eq(0)").val(tmp.dlg[j].BTN_1_CONTEXT_M);
                             }
                             if (tmp.dlg[j].BTN_2_TYPE != null && tmp.dlg[j].BTN_2_TYPE != "") {
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find(".cardCopyTbl tbody").append(inputTrHtml);
@@ -1429,3 +1463,22 @@ function prevBtn(botChatNum) {
 
     $("#nextBtn" + botChatNum).show();
 }
+
+
+
+
+$(document).on('change', 'select[name=btnType]', function (e) {
+
+    var selBtnTypVal = $(this).val();
+    var trIndex = $(this).parents('tbody').find('tr').index($(this).parents('tr'));
+    if (selBtnTypVal == 'openUrl') {
+        if (trIndex == 0) {
+            var appendInput = '<input type="text" name="cButtonContentM" class="form-control" placeholder="' + language.INPUT_BTN_URL_MOBILE + '">';
+            $(this).parents('tr').find('input[name=cButtonContent]').attr('placeholder', language.INPUT_BTN_URL_PC );
+            $(this).parents('tr').find('input[name=cButtonContent]').after(appendInput);
+        } else {
+            $(this).parents('tr').find('input[name=cButtonContent]').attr('placeholder', language.INPUT_BTN_URL_PC );
+        }
+    }
+
+});

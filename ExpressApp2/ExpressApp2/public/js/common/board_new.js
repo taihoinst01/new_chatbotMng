@@ -142,6 +142,7 @@ $(document).ready(function () {
     var dd = today.getDate();
     var mm = today.getMonth() + 1; //January is 0!
     var yyyy = today.getFullYear();
+    var yyyyStart = 0;
 
     var d = new Date();
     var lastDayofLastMonth = (new Date(d.getYear(), d.getMonth(), 0)).getDate();
@@ -161,14 +162,16 @@ $(document).ready(function () {
     var lastWeekVal;
     var lastDay;
     if (lastWeek < 1) {
+        yyyyStart = yyyy.toString() -1;
         lastDay = (new Date(lastMonth.getYear(), lastMonth.getMonth() + 1, 0)).getDate();
         lastDay += lastWeek;
     } else {
+        yyyyStart = yyyy.toString();
         lastDay = lastWeek;
         lastMonthVal = mm;
     }
     //
-    var minDate = lastMonthVal.toString() + "/" + lastDay.toString() + "/" + (yyyy.toString());  //new Date(yyyy.toString()-1, mm.toString(), dd.toString());
+    var minDate = lastMonthVal.toString() + "/" + lastDay.toString() + "/" + (yyyyStart.toString());  //new Date(yyyy.toString()-1, mm.toString(), dd.toString());
     var maxDate = mm.toString() + "/" + dd.toString() + "/" + yyyy.toString();  //new Date(yyyy.toString(), mm.toString(), dd.toString());
     $('#reservation').val(minDate + " - " + maxDate);
 

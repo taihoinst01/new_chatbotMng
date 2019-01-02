@@ -30,9 +30,15 @@ $(document).ready(function () {
     //selectApiGroup();
 
     //검색 enter
-    $('#iptDialog').keyup(function (e) {
+    $('#searchTitleTxt, #searchDescTxt').keyup(function (e) {
         if (e.keyCode == 13) {
-            searchIptDlg(1);
+            $('#searchDlgBtn').trigger('click');
+            /*
+            var groupType = $('.selected').text();
+            var sourceType = $('#tblSourceType').val();
+            selectDlgByTxt(groupType, sourceType);
+            */
+            //searchIptDlg(1);
             //selectDlgByTxt('selectDlgByTxt', 'search');
         }
     });
@@ -117,6 +123,12 @@ function createDialog() {
                 }
                 if (tmp[j].name == 'cButtonContent') {
                     tmp[j].name = 'cButtonContent' + (cButtonContentCount++);
+                    if (cButtonContentCount == 5) {
+                        cButtonContentCount = 1;
+                    }
+                }
+                if (tmp[j].name == 'cButtonContentM') {
+                    tmp[j].name = 'cButtonContentM' + (cButtonContentCount++);
                     if (cButtonContentCount == 5) {
                         cButtonContentCount = 1;
                     }
@@ -240,7 +252,16 @@ $(document).on('change', '.searchGroup', function () {
 
 //search버튼 클릭시 다이얼로그 검색
 $(document).on('click', '#searchDlgBtn', function () {
-
+    var searchTitle = $('#searchTitleTxt').val().trim();
+    var searchText = $('#searchDescTxt').val().trim();
+    
+    $('#hiddenSearchTitle').val(searchTitle);
+    $('#hiddenSearchText').val(searchText);
+    $('#currentPage').val(1);
+    var groupType = $('.selected').text();
+    var sourceType = $('#tblSourceType').val();
+    selectDlgByTxt(groupType, sourceType);
+    /*
     var group = {
         sourceType2: $('#sourceType2').val(),
         searchTitleTxt: $('#searchTitleTxt').val(),
@@ -249,9 +270,9 @@ $(document).on('click', '#searchDlgBtn', function () {
 
     $('#currentPage').val(1);
     selectDlgByFilter(group);
-
+    */
 });
-
+/*
 var searchGroups; // 페이징을 위해서 검색 후 그룹들을 담아둘 변수
 function selectDlgByFilter(group) {
 
@@ -313,14 +334,15 @@ function selectDlgByFilter(group) {
             $('#dialogTbltbody').append(item);
 
             $('#pagination').html('').append(data.pageList);
-            currentSearchNum = 1;
+            //currentSearchNum = 1;
             searchGroups = group;
         }
     });
-
 }
+*/
 
 //그룹메뉴에서 모두보기 눌렀을시 리스트 초기화
+/*
 $(document).on('click', '.allGroup', function () {
     var groupType = $(this).text();
     var sourceType = $('#tblSourceType').val();
@@ -329,8 +351,10 @@ $(document).on('click', '.allGroup', function () {
     $('.selectOptionsbox').removeClass('active');
     selectDlgByTxt(groupType, sourceType);
 })
+*/
 
 // 소그룹 클릭시 리스트 출력
+/*
 $(document).on('click', '.smallGroup', function () {
 
     var group = {
@@ -347,7 +371,7 @@ $(document).on('click', '.smallGroup', function () {
     $('#currentPage').val(1);
     selectDlgByFilter(group);
 });
-
+*/
 //dialog 페이지 첫 로딩때도 실행
 var sourceType2 = $('#sourceType2').val();
 var searchTitleTxt = '';
@@ -361,8 +385,8 @@ function selectDlgByTxt(groupType, sourceType) {
         'currentPage': ($('#currentPage').val() == '') ? 1 : $('#currentPage').val(),
         'groupType': groupType,
         'sourceType': sourceType,
-        'searchTitleTxt': $('#searchTitleTxt').val(),
-        'searchDescTxt': $('#searchDescTxt').val()
+        'searchTitleTxt': $('#hiddenSearchTitle').val(),
+        'searchDescTxt': $('#hiddenSearchText').val()
     };
 
     $.tiAjax({
@@ -417,7 +441,7 @@ function selectDlgByTxt(groupType, sourceType) {
                     '</tr>';
             }
 
-            currentSearchNum = 2;
+            //currentSearchNum = 2;
             $('#dialogTbltbody').append(item);
 
             $('#pagination').html('').append(data.pageList);
@@ -430,11 +454,16 @@ function selectDlgByTxt(groupType, sourceType) {
     });
 }
 
-var currentSearchNum = 2; // 0: 검색어로 검색한 경우, 1: 테이블 위 그룹으로 검색한 경우, 2: 테이블에 있는 그룹으로 검색한 경우
+//var currentSearchNum = 2; // 0: 검색어로 검색한 경우, 1: 테이블 위 그룹으로 검색한 경우, 2: 테이블에 있는 그룹으로 검색한 경우
 $(document).on('click', '.li_paging', function (e) {
 
     if (!$(this).hasClass('active')) {
         $('#currentPage').val($(this).val());
+        
+        var groupType = $('.selected').text();
+        var sourceType = $('#tblSourceType').val();
+        selectDlgByTxt(groupType, sourceType);
+        /*
         if (currentSearchNum == 0) {
             searchIptDlg();
         } else if (currentSearchNum == 1) {
@@ -445,6 +474,7 @@ $(document).on('click', '.li_paging', function (e) {
             var sourceType = $('#tblSourceType').val();
             selectDlgByTxt(groupType, sourceType);
         }
+        */
     }
 });
 

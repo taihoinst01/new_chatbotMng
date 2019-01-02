@@ -477,6 +477,9 @@
 	"ALERT_NO_MATCHING_WORDS": "대응되는 글자가 없습니다.",
 	"ALERT_THIS_UTTER_FAILED": "이 문장은 실패했습니다.",
 	"ALERT_RELOAD_CHART": "클릭시 데이터를 가져옵니다.",
+	"INPUT_BTN_VALUE": "버튼 값을 입력하세요.",
+	"INPUT_BTN_URL_PC": "PC URL을 입력하세요.",
+	"INPUT_BTN_URL_MOBILE": "모바일 URL을 입력하세요.",
 	"============= The end =============": "",
 	"language": "언어"
 }

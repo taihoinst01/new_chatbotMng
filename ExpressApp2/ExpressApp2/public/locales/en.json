@@ -307,5 +307,8 @@
 	"ALERT_NO_MATCHING_WORDS": "No matching words",
 	"ALERT_THIS_UTTER_FAILED": "failed.",
 	"ALERT_RELOAD_CHART": "Click to load data.",
+	"INPUT_BTN_VALUE": "Fill out btn value.",
+	"INPUT_BTN_URL_PC": "Fill out PC URL.",
+	"INPUT_BTN_URL_MOBILE": "Fill out mobile URL.",
 	"============= The end =============": ""
 }
