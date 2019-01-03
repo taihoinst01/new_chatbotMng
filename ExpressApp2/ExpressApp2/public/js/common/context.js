@@ -264,7 +264,7 @@ $(document).ready(function () {
             insertHtml += '<div class="wc-carousel slideBanner" style="width: 312px;">';
             insertHtml += '<div>';
             insertHtml += '<button class="scroll previous" id="prevBtn' + (idx) + '" style="display: none; height: 30px;" onclick="prevBtn(' + idx + ', this)">';
-            insertHtml += '<img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png">';
+            insertHtml += '<img src="/images/02_contents_carousel_btn_left_401x.png">';
             insertHtml += '</button>';
             insertHtml += '<div class="wc-hscroll-outer" >';
             insertHtml += '<div class="wc-hscroll slideDiv" style="margin-bottom: 0px;" class="content" id="slideDiv' + (idx) + '">';
@@ -272,7 +272,7 @@ $(document).ready(function () {
             insertHtml += '<li class="wc-carousel-item">';
             insertHtml += '<div class="wc-card hero">';
             insertHtml += '<div class="wc-container imgContainer">';
-            insertHtml += '<img src="https://bot.hyundai.com/assets/images/movieImg/teasure/02_teaser.jpg">';
+            insertHtml += '<img src="/images/02_teaser.jpg">';
             insertHtml += '</div>';
             insertHtml += '<h1>' + language.Please_enter_a_title + '</h1>';
             insertHtml += '<p class="carousel">' + language.Please_enter_your_content + '</p>';
@@ -283,7 +283,7 @@ $(document).ready(function () {
             insertHtml += '</ul>';
             insertHtml += '</div>';
             insertHtml += '</div>';
-            insertHtml += '<button class="scroll next" style="display: none; height: 30px;" id="nextBtn' + (idx) + '" onclick="nextBtn(' + idx + ', this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+            insertHtml += '<button class="scroll next" style="display: none; height: 30px;" id="nextBtn' + (idx) + '" onclick="nextBtn(' + idx + ', this)"><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
             insertHtml += '</div></div></div></div>';
             $(".dialogView").eq(idx).html(insertHtml);
         } else if ($(e.target).val() == "4") {
@@ -294,7 +294,7 @@ $(document).ready(function () {
             insertHtml += '<div>';
             insertHtml += '<div class="wc-carousel">';
             insertHtml += '<div>';
-            insertHtml += '<button class="scroll previous" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png"></button>';
+            insertHtml += '<button class="scroll previous" disabled=""><img src="/images/02_contents_carousel_btn_left_401x.png"></button>';
             insertHtml += '<div class="wc-hscroll-outer">';
             insertHtml += '<div class="wc-hscroll" style="margin-bottom: 0px;">';
             insertHtml += '<ul style="padding-left: 0px;">';
@@ -302,7 +302,7 @@ $(document).ready(function () {
             insertHtml += '<div class="wc-card hero">';
             insertHtml += '<div class="wc-card-div imgContainer">';
             insertHtml += '<input type="hidden" name="dlgId" value="dlg_id"/>';
-            insertHtml += '<img src="https://bot.hyundai.com/assets/images/convenience/USP_convenience_09.jpg">';
+            insertHtml += '<img src="/images/USP_convenience_09.jpg">';
             insertHtml += '<div class="playImg"></div>';
             insertHtml += '<div class="hidden" alt="card_title"></div>';
             insertHtml += '<div class="hidden" alt="card_value"></div>';
@@ -314,7 +314,7 @@ $(document).ready(function () {
             insertHtml += '</ul>';
             insertHtml += '</div>';
             insertHtml += '</li></ul></div></div>';
-            insertHtml += '<button class="scroll next" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+            insertHtml += '<button class="scroll next" disabled=""><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
             insertHtml += '</div></div></div></div></div>';
 
             $(".dialogView").eq(idx).html(insertHtml);
@@ -844,7 +844,7 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         var inputUttrHtml = '<li class="wc-carousel-item">';
         inputUttrHtml += '<div class="wc-card hero">';
         inputUttrHtml += '<div class="wc-container imgContainer" >';
-        inputUttrHtml += '<img src="https://bot.hyundai.com/assets/images/movieImg/teasure/02_teaser.jpg">';
+        inputUttrHtml += '<img src="/images/02_teaser.jpg">';
         inputUttrHtml += '</div>';
         inputUttrHtml += '<h1>CARD_TITLE</h1>';
         inputUttrHtml += '<p class="carousel">CARD_TEXT</p>';
@@ -1906,7 +1906,7 @@ function searchDialog(dlgID, missingEntitiesData) {
                                 inputUttrHtml += '<div class="wc-carousel slideBanner" style="width: 312px;">';
                                 inputUttrHtml += '<div>';
                                 inputUttrHtml += '<button class="scroll previous" id="prevBtn0" style="display: none;" onclick="prevBtn(0,this)">';
-                                inputUttrHtml += '<img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png">';
+                                inputUttrHtml += '<img src="/images/02_contents_carousel_btn_left_401x.png">';
                                 inputUttrHtml += '</button>';
                                 inputUttrHtml += '<div class="wc-hscroll-outer" >';
                                 inputUttrHtml += '<div class="wc-hscroll slideDiv" style="margin-bottom: 0px;" class="content" id="slideDiv0">';
@@ -1937,9 +1937,9 @@ function searchDialog(dlgID, missingEntitiesData) {
                                 inputUttrHtml += '</div>';
                                 inputUttrHtml += '</div>';
                                 if ((tmp.dlg.length) > 2) {
-                                    inputUttrHtml += '<button class="scroll next" style="display: block; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                    inputUttrHtml += '<button class="scroll next" style="display: block; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
                                 } else {
-                                    inputUttrHtml += '<button class="scroll next" style="display: none; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                    inputUttrHtml += '<button class="scroll next" style="display: none; height: 30px;" id="nextBtn0" onclick="nextBtn(0,this)"><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
                                 }
                                 inputUttrHtml += '</div></div></div></div>';
                             }
@@ -1997,7 +1997,7 @@ function searchDialog(dlgID, missingEntitiesData) {
                             inputUttrHtml += '<div>';
                             inputUttrHtml += '<div class="wc-carousel">';
                             inputUttrHtml += '<div>';
-                            inputUttrHtml += '<button class="scroll previous" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png"></button>';
+                            inputUttrHtml += '<button class="scroll previous" disabled=""><img src="/images/02_contents_carousel_btn_left_401x.png"></button>';
                             inputUttrHtml += '<div class="wc-hscroll-outer">';
                             inputUttrHtml += '<div class="wc-hscroll" style="margin-bottom: 0px;">';
                             inputUttrHtml += '<ul style="min-width:0px">';
@@ -2015,7 +2015,7 @@ function searchDialog(dlgID, missingEntitiesData) {
                             inputUttrHtml += '</ul>';
                             inputUttrHtml += '</div>';
                             inputUttrHtml += '</li></ul></div></div>';
-                            inputUttrHtml += '<button class="scroll next" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                            inputUttrHtml += '<button class="scroll next" disabled=""><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
                             inputUttrHtml += '</div></div></div></div></div>';
 
                             $(".insertForm form").append(dlgForm);

@@ -111,12 +111,12 @@ ol, ul, menu { list-style: none; }
 #option_slider > ul > li > img { width:142px; height:75px; padding:2px;}
 .option_prev { position: absolute; bottom:16px; z-index: 1; }
 .option_next { position: absolute; bottom:16px; right:0; z-index: 1; }
-#optionSlide_prev { background: url('https://bottest.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png'); width:32px; height:32px; opacity:0.8; }
-#optionSlide_next { background: url('https://bottest.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png'); width:32px; height:32px; opacity:0.8; }
+#optionSlide_prev { background: url('/images/02_contents_carousel_btn_left_401x.png'); width:32px; height:32px; opacity:0.8; }
+#optionSlide_next { background: url('/images/02_contents_carousel_btn_right_401x.png.png'); width:32px; height:32px; opacity:0.8; }
 .optionVR_prev { position: absolute; bottom:83px; right:60px; z-index: 1; }
 .optionVR_next { position: absolute; bottom:83px; right:25px; z-index: 1; }
-#optionVR_prev { background: url('https://bottest.hyundai.com/assets/images/trim_btn_01-2.png'); width:32px; height:32px; opacity:0.8; }
-#optionVR_next { background: url('https://bottest.hyundai.com/assets/images/trim_btn_01-1.png'); width:32px; height:32px; opacity:0.8; }
+#optionVR_prev { background: url('/images/trim_btn_01-2.png'); width:32px; height:32px; opacity:0.8; }
+#optionVR_next { background: url('/images/trim_btn_01-1.png'); width:32px; height:32px; opacity:0.8; }
 #option_detail { position: absolute; right: 0; top: 0; width:568px; height:320px; opacity: 1; background-color:#fff; display: none; z-index:2;}
 #option_detail > img { width:inherit; /*height:inherit;*/ padding:10px 0;}
 

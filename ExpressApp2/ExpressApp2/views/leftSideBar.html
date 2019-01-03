@@ -1,5 +1,9 @@
 <!-- Left Menu Side -->
 <script type="text/javascript" src="/js/common/menuUserCheck.js"></script>
+
+
+
+
 <aside class="main-sidebar">
     <section class="sidebar">
         <input type="hidden" id="successHidden" value="<%= __('SUCCESS') %> " />
@@ -392,8 +396,15 @@
         $('#simulBtn').click(function () {
             if (!$('#simulDiv').hasClass('control-sidebar-open')) {
                 var simulUrl = $('#simulURL').val();
-                var chatbotItem = '<iframe id="testChatBot" style="height:100%; width:100%;" class="" src="' + simulUrl + '"></iframe>';
+
+                var chatbotItem = '<iframe id="testChatBot" name="testChatBot" style="height:100%; width:100%;" class="" src="' + simulUrl + '"></iframe>';
                 $('#iframChatbot').html(chatbotItem);
+/*
+                $('#iframChatbot').load( function() {
+                    $('iframe').contents().find("head")
+                    .append($('<style type="text/css"> .wc-upload { display: none; } .wc-textbox{ left: 10px; right: 0px;} .wc-header { display: none; } </style>'));
+                });
+                */
             }
         });
 

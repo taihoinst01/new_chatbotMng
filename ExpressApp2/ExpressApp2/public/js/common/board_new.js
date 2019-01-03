@@ -136,7 +136,7 @@ $(document).scroll(function() {
 
 $(document).ready(function () {
 
-
+/*
     //달력 초기값 설정
     var today = new Date();
     var dd = today.getDate();
@@ -174,7 +174,7 @@ $(document).ready(function () {
     var minDate = lastMonthVal.toString() + "/" + lastDay.toString() + "/" + (yyyyStart.toString());  //new Date(yyyy.toString()-1, mm.toString(), dd.toString());
     var maxDate = mm.toString() + "/" + dd.toString() + "/" + yyyy.toString();  //new Date(yyyy.toString(), mm.toString(), dd.toString());
     $('#reservation').val(minDate + " - " + maxDate);
-
+*/
     selectAll();
 
     $('#searchBoardBtn').click(function () {

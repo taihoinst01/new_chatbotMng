@@ -438,7 +438,7 @@ function searchDialog(contextEntityData) {
                                 inputUttrHtml += '<div class="wc-carousel slideBanner" style="width:280px;">';
                                 inputUttrHtml += '<div>';
                                 inputUttrHtml += '<button class="scroll previous" id="prevBtn' + (botChatNum) + '" style="display: none;" onclick="prevBtn(' + botChatNum + ', this)">';
-                                inputUttrHtml += '<img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png">';
+                                inputUttrHtml += '<img src="/images/02_contents_carousel_btn_left_401x.png">';
                                 inputUttrHtml += '</button>';
                                 inputUttrHtml += '<div class="wc-hscroll-outer" >';
                                 inputUttrHtml += '<div class="wc-hscroll" style="margin-bottom: 0px;" class="content" id="slideDiv' + (botChatNum) + '">';
@@ -476,7 +476,7 @@ function searchDialog(contextEntityData) {
                                 inputUttrHtml += '</ul>';
                                 inputUttrHtml += '</div>';
                                 inputUttrHtml += '</div>';
-                                inputUttrHtml += '<button class="scroll next" id="nextBtn' + (botChatNum) + '" onclick="nextBtn(' + botChatNum + ', this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                inputUttrHtml += '<button class="scroll next" id="nextBtn' + (botChatNum) + '" onclick="nextBtn(' + botChatNum + ', this)"><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
                                 inputUttrHtml += '</div></div></div></div>';
                             }
                         } else if (tmp.dlg[j].DLG_TYPE == 4) {
@@ -486,7 +486,7 @@ function searchDialog(contextEntityData) {
                             inputUttrHtml += '<div>';
                             inputUttrHtml += '<div class="wc-carousel">';
                             inputUttrHtml += '<div>';
-                            inputUttrHtml += '<button class="scroll previous" disabled=""><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png"></button>';
+                            inputUttrHtml += '<button class="scroll previous" disabled=""><img src="/images/02_contents_carousel_btn_left_401x.png"></button>';
                             inputUttrHtml += '<div class="wc-hscroll-outer">';
                             inputUttrHtml += '<div class="wc-hscroll" style="margin-bottom: 0px;">';
                             inputUttrHtml += '<ul style="min-width:0px; padding-left: 0px;">';
@@ -518,7 +518,7 @@ function searchDialog(contextEntityData) {
                                 inputUttrHtml += '</ul>';
                                 inputUttrHtml += '</div>';
                                 inputUttrHtml += '</div>';
-                                inputUttrHtml += '<button class="scroll next" id="nextBtn' + (botChatNum) + '" onclick="nextBtn(' + botChatNum + ', this)"><img src="https://bot.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png"></button>';
+                                inputUttrHtml += '<button class="scroll next" id="nextBtn' + (botChatNum) + '" onclick="nextBtn(' + botChatNum + ', this)"><img src="/images/02_contents_carousel_btn_right_401x.png"></button>';
                                 inputUttrHtml += '</div></div></div></div></div>';
                             }
                         }

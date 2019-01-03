@@ -2490,7 +2490,7 @@
                         }, t));
                     default:
 			t.onError = function(e){
-				e.target.src = "https://bottest.hyundai.com/assets/images/noImage.jpg";
+				e.target.src = "/images/noImage.jpg";
 			}          
                         return o.createElement("img", r.__assign({}, t))
                 }
@@ -4116,7 +4116,7 @@ $(".format-markdown").remove();
 								d: this.props.prevSvgPathData
 							}))*/
 			/*o.createElement("img", {src:'https://bottest.hyundai.com/assets/images/ico_index_left.png'})*/
-			o.createElement("img", {src:'https://bottest.hyundai.com/assets/images/02_contents_carousel_btn_left_401x.png'})
+			o.createElement("img", {src:'/images/02_contents_carousel_btn_left_401x.png'})
 			), o.createElement("div", {
 								className: "wc-hscroll-outer"
 							}, o.createElement("div", {
@@ -4135,10 +4135,10 @@ $(".format-markdown").remove();
 								d: this.props.nextSvgPathData
 							}))*/
 			/*o.createElement("img", {src:'https://bottest.hyundai.com/assets/images/ico_index_right.png'})*/
-			o.createElement("img", {src:'https://bottest.hyundai.com/assets/images/02_contents_carousel_btn_right_401x.png'})
+			o.createElement("img", {src:'/images/02_contents_carousel_btn_right_401x.png.png'})
 					))
 			}
-		
+            
 		
             }, e
         }(o.Component);
@@ -17824,7 +17824,7 @@ function appendLoadingDiv() {
                                                         + '</svg>'
                                                         + '<div>'
                                                             + '<div class="format-markdown loadingMsg">'
-                                                                + '<p><img src="https://bottest.hyundai.com/assets/images/loading.gif" width="15px;" /></p>'
+                                                                + '<p><img src="/images/loading.gif" width="15px;" /></p>'
                                                             + '</div>'
                                                         + '</div>'
                                                         + '<div class="wc-list">'
