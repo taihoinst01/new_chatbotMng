@@ -930,7 +930,7 @@ router.post('/selectUtterList', function (req, res) {
 router.post('/getEntityList', function (req, res) {
     
     var userId = req.session.sid;
-    var selAppId = req.session.selAppId;
+    var selAppId = (typeof req.session.selAppId != 'undefined' ? req.session.selAppId : 'ALL');
     var isAll = req.body.isAll;
     var entityList = req.session.entityList.slice();
     var childList = req.session.entityChildList;
@@ -942,7 +942,7 @@ router.post('/getEntityList', function (req, res) {
     try {
         for (var i=0; i<entityList.length; i++) {
             if (isAll != "ALL") {
-                if (entityList[i].APP_ID !=selAppId) continue;
+                if (entityList[i].APP_ID !=selAppId && selAppId != 'ALL') continue;
             }
             var editChild = [];
             switch(entityList[i].ENTITY_TYPE) {

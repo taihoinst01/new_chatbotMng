@@ -898,7 +898,7 @@ function updateDialog() {
     }
     
     array[array.length] = JSON.stringify($("form[name=appInsertForm]").serializeObject());//JSON.stringify($("form[name=appInsertForm]"));
-
+    
     $.ajax({
         url: '/qna/updateDialog',                //주소
         dataType: 'json',                  //데이터 형식

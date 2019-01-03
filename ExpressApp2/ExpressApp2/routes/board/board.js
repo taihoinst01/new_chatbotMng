@@ -883,7 +883,7 @@ router.post('/getScorePanel1', function (req, res) {
         });
 });
 
-
+/*
 router.post('/getScorePanel22', function (req, res) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
@@ -913,7 +913,7 @@ router.post('/getScorePanel22', function (req, res) {
             sql.close();
         });
 });
-
+*/
 router.post('/getScorePanel2', function (req, res) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
