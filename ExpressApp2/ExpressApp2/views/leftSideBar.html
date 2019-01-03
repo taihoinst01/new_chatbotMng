@@ -89,13 +89,13 @@
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i> </span>
                 </a>
             </li>
-
+<!--
             <li class="treeview" id="dashboardClick">
                 <a href="#" class="spmenu" id="simulBtn" data-toggle="control-sidebar">
                     <i class="fa fa-eye"></i> <span><%= __('SIMULATION') %></span>
                 </a>
             </li>
-
+-->
             <li class=" treeview" id="luisMenuLi">
                 <a href="#">
                     <i class="fa fa-braille"></i> <span>LUIS</span>
@@ -391,7 +391,7 @@
             $('#luisSyncModal').modal('show');
         });
 
-
+        /*
         //simulataion url 아이디별로 구분.
         $('#simulBtn').click(function () {
             if (!$('#simulDiv').hasClass('control-sidebar-open')) {
@@ -399,15 +399,9 @@
 
                 var chatbotItem = '<iframe id="testChatBot" name="testChatBot" style="height:100%; width:100%;" class="" src="' + simulUrl + '"></iframe>';
                 $('#iframChatbot').html(chatbotItem);
-/*
-                $('#iframChatbot').load( function() {
-                    $('iframe').contents().find("head")
-                    .append($('<style type="text/css"> .wc-upload { display: none; } .wc-textbox{ left: 10px; right: 0px;} .wc-header { display: none; } </style>'));
-                });
-                */
             }
         });
-
+        */
         //test 챗봇 새로고침
         $('#startOver').click(function () {
             var simulUrl = $('#simulURL').val();
