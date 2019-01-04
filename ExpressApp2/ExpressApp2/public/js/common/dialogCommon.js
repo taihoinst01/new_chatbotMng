@@ -603,8 +603,11 @@ $(document).on('mouseover', 'td[name=dlgTitleTd]', function (e) {
     if( divLeft < 0 ) divLeft = 0;
     if( divTop < 0 ) divTop = 0;
 
-    $('#dlgTitle').text(cardTitle);
-    $('#dlgText').text(cardText);
+    cardTitle = cardTitle.split('/n').join('<br/>');
+    cardText = cardText.split('/n').join('<br/>');
+
+    $('#dlgTitle').html(cardTitle);
+    $('#dlgText').html(cardText);
     $('#divInfo').css({
         "top": divTop,
         "left": divLeft,

@@ -49,7 +49,9 @@
         #divInfo th {
             padding:0.5em;
         }
-
+        #typeOrderTh {
+            cursor: pointer;
+        }
     </style>
     
 
@@ -99,7 +101,10 @@
                                                         <th></th>
                                                         <th><%= __('TITLE') %></th>
                                                         <th><%= __('DESC') %></th>
-                                                        <th><%= __('DIALOG_BOX_TYPE') %></th>
+                                                        <th id="typeOrderTh" orderValue="ASC">
+                                                            <%= __('DIALOG_BOX_TYPE') %> 
+                                                            <span class='fa fa-arrow-up' style='font-size: 15px;'></span>
+                                                        </th>
                                                         <th></th>
                                                   </tr>
                                                 <tbody id="dialogTbltbody">

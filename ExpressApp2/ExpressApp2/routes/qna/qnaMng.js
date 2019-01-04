@@ -731,11 +731,14 @@ router.post('/dialogList', function (req, res) {
     var searchTitleTxt = req.body.searchTitleTxt;
     var searchDescTxt = req.body.searchDescTxt;
     var currentPage = req.body.currentPage;
+    
+    var typeOrder = req.body.typeOrder;
 
     (async () => {
         try {
             var sourceType = req.body.sourceType;
             var groupType = req.body.groupType;
+            /*
             var dlg_desQueryString = "select tbp.* from \n" +
                 "(select ROW_NUMBER() OVER(ORDER BY RELATION_NUM DESC, DLG_ORDER_NO, A.DLG_ID DESC) AS NUM, \n" +
                 "      A.DLG_ID, \n" +
@@ -754,6 +757,48 @@ router.post('/dialogList', function (req, res) {
             }
             dlg_desQueryString += ") tbp \n" +
                 "WHERE PAGEIDX = @currentPage";
+            */
+            var dlg_desQueryString = `
+            SELECT tbp.* 
+              FROM 
+              ( 
+                SELECT ROW_NUMBER() OVER(ORDER BY DLG_TYPE ` + typeOrder + `, DLG_ORDER_NO, A.DLG_ID DESC) AS NUM, 
+                       COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, 
+                       CEILING((ROW_NUMBER() OVER(ORDER BY DLG_TYPE ` + typeOrder + `, DLG_ORDER_NO, A.DLG_ID DESC))/ convert(numeric ,10)) PAGEIDX, A.* 
+                  FROM 
+                  ( 
+                      SELECT A.DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_TYPE, DLG_ORDER_NO, RELATION_NUM, B.CARD_TITLE, B.CARD_TEXT 
+                        FROM TBL_DLG A, TBL_DLG_TEXT B 
+                       WHERE 1=1 
+                         AND DLG_GROUP = 2  
+                         AND B.DLG_ID = A.DLG_ID 
+                  UNION 
+                      SELECT A.DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_TYPE, DLG_ORDER_NO, RELATION_NUM, B.CARD_TITLE, B.CARD_TEXT 
+                        FROM TBL_DLG A, TBL_DLG_CARD B 
+                       WHERE 1=1 
+                         AND DLG_GROUP = 2  
+                         AND B.DLG_ID = A.DLG_ID 
+                  UNION 
+                      SELECT A.DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_TYPE, DLG_ORDER_NO, RELATION_NUM, B.CARD_TITLE, B.CARD_TEXT 
+                        FROM TBL_DLG A, TBL_DLG_MEDIA B 
+                       WHERE 1=1 
+                         AND DLG_GROUP = 2  
+                         AND B.DLG_ID = A.DLG_ID  
+                  ) A 
+                 WHERE 1=1  
+                   AND ISNULL(A.DLG_NAME, '') like @searchTitle 
+                   AND ISNULL(A.DLG_DESCRIPTION, '') like @searchText 
+              ) tbp 
+             WHERE 1=1 
+               AND tbp.PAGEIDX = @currentPage 
+            `;
+            /*
+            if (typeOrder == 'DESC') {
+                dlg_desQueryString += '\n ORDER BY tbp.DLG_TYPE DESC, tbp.DLG_ORDER_NO;';
+            } else {
+                dlg_desQueryString += '\n ORDER BY tbp.DLG_TYPE ASC, tbp.DLG_ORDER_NO;';
+            }
+            */
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request()
                         .input('searchTitle', sql.NVarChar, '%' + searchTitleTxt + '%')
@@ -788,7 +833,7 @@ router.post('/dialogList', function (req, res) {
                 res.send({ list: [] });
             }
         } catch (err) {
-            console.log(err)
+            res.send({ list: [], result:false });
             // ... error checks
         } finally {
             sql.close();

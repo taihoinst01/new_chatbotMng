@@ -372,6 +372,21 @@ $(document).on('click', '.smallGroup', function () {
     selectDlgByFilter(group);
 });
 */
+function changeTypeOrder() {
+    var typeOrderValue = $('#typeOrderTh').attr('orderValue');
+    if (typeOrderValue == 'ASC') {
+        $('#typeOrderTh').children().eq(0).removeClass('fa-arrow-up')
+        $('#typeOrderTh').children().eq(0).addClass('fa-arrow-down')
+        $('#typeOrderTh').attr('orderValue', 'DESC');
+    } else {
+        $('#typeOrderTh').children().eq(0).removeClass('fa-arrow-down')
+        $('#typeOrderTh').children().eq(0).addClass('fa-arrow-up')
+        $('#typeOrderTh').attr('orderValue', 'ASC');
+    }
+    $('#typeOrderTh').off('click');
+    $('#searchDlgBtn').trigger('click');
+}
+
 //dialog 페이지 첫 로딩때도 실행
 var sourceType2 = $('#sourceType2').val();
 var searchTitleTxt = '';
@@ -386,15 +401,25 @@ function selectDlgByTxt(groupType, sourceType) {
         'groupType': groupType,
         'sourceType': sourceType,
         'searchTitleTxt': $('#hiddenSearchTitle').val(),
-        'searchDescTxt': $('#hiddenSearchText').val()
+        'searchDescTxt': $('#hiddenSearchText').val(),
+        'typeOrder': $('#typeOrderTh').attr('orderValue')
     };
 
-    $.tiAjax({
+    $.ajax({
         type: 'POST',
         url: '/qna/dialogList',
         data: params,
-        isloading: true,
+        complete: function() {
+            $('#typeOrderTh').off('click');
+            $("#typeOrderTh").on('click', function () {
+                changeTypeOrder();
+            });
+        },
         success: function (data) {
+            if (data.result) {
+                alert(language.It_failed);
+                return false;
+            }
             searchTitleTxt = $('#searchTitleTxt').val();
             searchDescTxt = $('#searchDescTxt').val();
             $('#dialogTbltbody').html('');
