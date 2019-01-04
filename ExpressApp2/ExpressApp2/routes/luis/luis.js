@@ -940,6 +940,7 @@ router.post('/getEntityList', function (req, res) {
     var compositeList = [];
     var closedList = [];
     try {
+
         for (var i=0; i<entityList.length; i++) {
             if (isAll != "ALL") {
                 if (entityList[i].APP_ID !=selAppId && selAppId != 'ALL') continue;
@@ -2748,8 +2749,108 @@ router.post('/uploadFile', upload.any(), function (req, res) {
 });
 
 
+router.post('/getSelEntityList', function (req, res) {
+    
+    var userId = req.session.sid;
+    var dlgId = req.body.dlg_id;
+    //var selAppId = (typeof req.session.selAppId != 'undefined' ? req.session.selAppId : 'ALL');
+    var isAll = req.body.isAll;
+    var entityList = req.session.entityList.slice();
+    var childList = req.session.entityChildList;
 
+    var simpleList = [];
+    var hierarchyList = [];
+    var compositeList = [];
+    var closedList = [];
+    
+    (async () => {
+        try {
+            
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                        
+            var getAppIdQry = `
+            SELECT TOP 1 CNF_VALUE 
+            FROM TBL_CHATBOT_CONF 
+            WHERE CNF_NM IN 
+                            ( 
+                                SELECT LUIS_ID 
+                                FROM TBL_DLG_RELATION_LUIS 
+                                WHERE 1=1 
+                                AND DLG_ID = @dlgId
+                            );
+            `;
+            let getAppId = await pool.request()
+            .input('dlgId', sql.Int, dlgId)
+            .query(getAppIdQry);
 
+            let rows = getAppId.recordset;
+            var selAppId = "";
+            if (rows.length > 0) {
+                selAppId = rows[0].CNF_VALUE;
+            } else {
+                res.send({status:500 , message:'Save Error'});
+                return false;
+            }
+
+            for (var i=0; i<entityList.length; i++) {
+                if (isAll != "ALL") {
+                    if (entityList[i].APP_ID !=selAppId && selAppId != 'ALL') continue;
+                }
+                var editChild = [];
+                switch(entityList[i].ENTITY_TYPE) {
+                    case '1':
+                        //'Simple';
+                        simpleList.push(entityList[i]);
+                        break;
+                    case '2':
+                        //'Prebuilt';
+                        break;
+                    case '3':
+                        //'Hierarchical';
+                        for (var j=0; j<childList.length; j++) {
+                            if (entityList[i].ENTITY_ID == childList[j].ENTITY_ID) {
+                                editChild.push(childList[j]);
+                            }
+                        }
+                        entityList[i].CHILD_ENTITY_LIST = editChild;
+                        hierarchyList.push(entityList[i]);
+
+                        break;
+                    case '4':
+                        //'Composite';
+                        for (var j=0; j<childList.length; j++) {
+                            if (entityList[i].ENTITY_ID == childList[j].ENTITY_ID) {
+                                editChild.push(childList[j]);
+                            }
+                        }
+                        entityList[i].CHILD_ENTITY_LIST = editChild;
+                        compositeList.push(entityList[i]);
+                        break;
+                    case '5':
+                        //'Closed List';
+                        for (var j=0; j<childList.length; j++) {
+                            if (entityList[i].ENTITY_ID == childList[j].ENTITY_ID) {
+                                editChild.push(childList[j]);
+                            }
+                        }
+                        entityList[i].CHILD_ENTITY_LIST = editChild;
+                        closedList.push(entityList[i]);
+                        break;
+                    default:
+                        //'None';
+                        break;
+                }
+            }
+            
+            res.send({simpleList : simpleList, hierarchyList : hierarchyList, compositeList : compositeList, closedList : closedList});
+        
+            
+        } catch (e) {
+            logger.info('[에러]엔티티 리스트 조회  [id : %s] [url : %s] [내용 : %s]', userId, 'luis/getEntityList',  e.message);
+            res.send({error : true, message : '이상이 생겼습니다. 관리자에게 문의해주세요.'});
+        }
+    })()
+});
 
 
 

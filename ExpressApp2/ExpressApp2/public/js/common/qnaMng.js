@@ -13,7 +13,7 @@ var language;
             language= data.lang;
         }
     });
-    getEntityList();
+    //getEntityList();
 })(jQuery);
 
 $(document).ready(function() {
@@ -691,12 +691,15 @@ function isAlpabet(ch) {
 
 
 //엔티티 가져오기
-function getEntityList(intentName, intentId) {
+function getEntityList(dlg_id) {
 
     $.ajax({
         type: 'POST',
-        url: '/luis/getEntityList',
-        data: {'isAll' : 'NOTALL'},
+        url: '/luis/getSelEntityList',
+        data: {
+                  'isAll' : 'NOTALL'
+                , 'dlg_id' : dlg_id
+              },
         success: function(data) {
             if (data.error) {
                 //alert(data.message);
@@ -1322,6 +1325,9 @@ $(document).on("keypress", "input[name=matchUtterText]", function(e){
 
 
 $(document).on("click", "#insert_similarQ_dlg", function () {
+
+    getEntityList($(this).attr('dlg_id'));
+
     $('#s_question').val('');
     var dlgID = $(this).attr("dlg_id");
     var qSeq = $(this).attr("q_seq");

@@ -816,6 +816,33 @@ router.post('/procSimilarQuestion', function (req, res) {
 
     (async () => {
         try {
+            
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            
+            var getAppIdQry = `
+            SELECT TOP 1 CNF_VALUE 
+              FROM TBL_CHATBOT_CONF 
+             WHERE CNF_NM IN 
+                             ( 
+                                SELECT LUIS_ID 
+                                FROM TBL_DLG_RELATION_LUIS 
+                                WHERE 1=1 
+                                AND DLG_ID = @dlgId
+                              );
+            `;
+            let getAppId = await pool.request()
+            .input('dlgId', sql.Int, dataArr[0].DLG_ID)
+            .query(getAppIdQry);
+
+            let rows = getAppId.recordset;
+            var selAppId = "";
+            if (rows.length > 0) {
+                selAppId = rows[0].CNF_VALUE;
+            } else {
+                res.send({status:500 , message:'Save Error'});
+                return false;
+            }
+            
             if (labeledUtterArr.length > 0) {
                 var labelArr = [];
                 var tmpObj = new Object();
@@ -823,7 +850,7 @@ router.post('/procSimilarQuestion', function (req, res) {
                 for (var i=0; i<labeledUtterArr.length; i++) {
                     options.payload = labeledUtterArr[i];
                     
-                    tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
+                    tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + selAppId + '/versions/' + '0.1' + '/example', options);
                     
                     if (newUtterArr != undefined) {
                         for (var j=0; j<newUtterArr.length; j++) {
@@ -853,7 +880,6 @@ router.post('/procSimilarQuestion', function (req, res) {
                                     }
                                 }
                                     
-                                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
                                 if (saveQna !== "") {
                                     let insertQna = await pool.request().query(saveQna);
@@ -890,7 +916,7 @@ router.post('/procSimilarQuestion', function (req, res) {
         
                 res.send({status:200 , message:'Save Success'});
             } else {
-                res.send({status:500 , message:'Save Success'});
+                res.send({status:500 , message:'Save Error'});
             }
         } catch (err) {
             console.log(err);
