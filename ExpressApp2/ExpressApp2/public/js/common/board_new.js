@@ -515,21 +515,31 @@ function getCountPanel() {
         data: getFilterVal(),
         success: function (data) {
             var boardCount = data.list[0];
+            $('#totalCount').text(boardCount.총합);
+            $('#successCount').text(boardCount.응답);
+            $('#failCount').text(boardCount.미응답);
+            $('#errorCount').text(boardCount.ERROR);
+            $('#sapWord').text(boardCount.SMALLTALK);
+            $('#sapPasswordInit').text(boardCount.용어사전);
+            $('#suggestCount').text(boardCount.건의사항);
+            /*
             $('#successCount').text(boardCount.SUCCESS);
             $('#failCount').text(boardCount.FAIL);
             $('#errorCount').text(boardCount.ERROR);
             $('#suggestCount').text(boardCount.SUGGEST);
             $('#sapWord').text(boardCount.SAPWORD);
             $('#sapPasswordInit').text(boardCount.SAPPASSWORDINIT);
+            */
         },
         error : function() {   // 오류가 발생했을 때 호출된다. 
             console.log("error");
+            $('#totalCount').text("0");
             $('#successCount').text("0");
             $('#failCount').text("0");
             $('#errorCount').text("0");
-            $('#suggestCount').text("0");
             $('#sapWord').text("0");
             $('#sapPasswordInit').text("0");
+            $('#suggestCount').text("0");
         },
         complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
             

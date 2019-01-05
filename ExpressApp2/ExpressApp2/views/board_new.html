@@ -53,6 +53,9 @@
         #divInfo th {
             padding:0.5em;
         }
+        .col-narrower {
+            width: 14.2% !important;
+        }
 
     </style>
 </head>
@@ -136,7 +139,7 @@
                     </div>
                 </div>
                 <!-- content 02 -->
-                <section class="col-lg-12">
+                <section class="col-lg-12" style=" padding: 0;">
                     
                     <div class="box">
                         
@@ -199,39 +202,39 @@
                         
                             <div class="box-body">
                                     <!--<div class="box-header with-border dashb"><h3 class="box-title02">Log 통계</h3></div>-->
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-2 col-narrower">
                                         <div class="small-box color_01">
+                                            <div class="inner">
+                                                <h3 id="totalCount">Loading..</h3>
+                                            </div>
+                                            <a href="#" class="small-box-footer"><%= __('TOTAL_SAP') %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-narrower">
+                                        <div class="small-box color_02">
                                             <div class="inner">
                                                 <h3 id="successCount">Loading..</h3>
                                             </div>
-                                            <a href="#" class="small-box-footer"><%= __('ANSWER_OK') %></a>
+                                            <a href="#" class="small-box-footer"><%= __('Response') %></a>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2">
-                                        <div class="small-box color_02">
+                                    <div class="col-lg-2 col-narrower">
+                                        <div class="small-box color_03">
                                             <div class="inner">
                                                 <h3 id="failCount">Loading..</h3>
                                             </div>
-                                            <a href="#" class="small-box-footer"><%= __('ANSWER_NO') %></a>
+                                            <a href="#" class="small-box-footer"><%= __('NO_REPLY') %></a>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2">
-                                        <div class="small-box color_03">
+                                    <div class="col-lg-2 col-narrower">
+                                        <div class="small-box color_04">
                                             <div class="inner">
                                                 <h3 id="errorCount">Loading..</h3>
                                             </div>
-                                            <a href="#" class="small-box-footer">Error</a>
+                                            <a href="#" class="small-box-footer"><%= __('ERROR_SAP') %></a>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2">
-                                        <div class="small-box color_04">
-                                            <div class="inner">
-                                                <h3 id="suggestCount">Loading..</h3>
-                                            </div>
-                                            <a href="#" class="small-box-footer"><%= __('ANSWER_SUGGEST') %></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-2 col-narrower">
                                         <div class="small-box color_05">
                                             <div class="inner">
                                                 <h3 id="sapWord">Loading..</h3>
@@ -239,12 +242,20 @@
                                             <a href="#" class="small-box-footer"><%= __('SAP_WORD') %></a>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-2 col-narrower">
                                         <div class="small-box color_06">
                                             <div class="inner">
                                                 <h3 id="sapPasswordInit">Loading..</h3>
                                             </div>
                                             <a href="#" class="small-box-footer"><%= __('SAP_PASSWORDINIT') %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-narrower">
+                                        <div class="small-box color_06">
+                                            <div class="inner">
+                                                <h3 id="suggestCount">Loading..</h3>
+                                            </div>
+                                            <a href="#" class="small-box-footer"><%= __('ANSWER_SUGGEST') %></a>
                                         </div>
                                     </div>
                             </div>
