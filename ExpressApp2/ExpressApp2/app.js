@@ -287,7 +287,7 @@ app.use(function (req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
-        if (req.session.sid) {
+        if (!req.session.sid) {
             logger.info('[에러페이지] [message : %s] ', err);
             res.render('error');
         } else {
@@ -302,7 +302,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
-    if (req.session.sid) {
+    if (!req.session.sid) {
         logger.info('[에러페이지] [message : %s] ', err);
         res.render('error');
     } else {

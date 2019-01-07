@@ -20,7 +20,7 @@ var logger = Logger.CreateLogger();
 var router = express.Router();
 
 router.get('/menuMng', function (req, res) {
-    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('menuMng/menuMng');
 });
 
@@ -90,7 +90,7 @@ router.post('/selectMenuList', function (req, res) {
             var QueryStr = "SELECT MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TB_MENU_AUTH";
 
 
-            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
@@ -131,7 +131,7 @@ router.post('/selectMenuList', function (req, res) {
 });
 
 router.post('/checkMenuAuth', function (req, res) {
-    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var menuArr = JSON.parse(req.body.saveArr);
     var checkStr = "";
     var MENU_AUTH = "0";
@@ -142,7 +142,7 @@ router.post('/checkMenuAuth', function (req, res) {
     
     (async () => {
         try {
-            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(checkStr);
 
@@ -176,7 +176,7 @@ router.post('/checkMenuAuth', function (req, res) {
 });
 
 router.post('/selectMenuAuthList', function (req, res) {
-    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     (async () => {
         try {
@@ -184,7 +184,7 @@ router.post('/selectMenuAuthList', function (req, res) {
             var QueryStr = "SELECT AUTHGRP_M_NM, AUTH_LEVEL FROM TB_AUTHGRP_M";
 
 
-            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_AUTHGRP_M 테이블 조회');
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_AUTHGRP_M 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
