@@ -12,14 +12,22 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //템플릿 관리
 router.get('/templateMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('chatbotMng/templateMng');
 });
 
 router.post('/selectTemplateList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+     
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
     var chatbotName = req.body.chatbotName;
@@ -35,6 +43,8 @@ router.post('/selectTemplateList', function (req, res) {
                            "          FROM TBL_CHATBOT_TEMPLATE ) tbp \n" +
                            " WHERE CHATBOT_NAME = '"+chatbotName+ "' \n" +
                            "   AND PAGEIDX = " + currentPage + "; \n";
+
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_TEMPLATE 테이블 조회 시작');
 
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
@@ -73,7 +83,7 @@ router.post('/selectTemplateList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -96,6 +106,7 @@ function checkNull(val, newVal) {
 }
 
 router.post('/procTemplate', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var dataArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateAllStr = "";
@@ -120,20 +131,24 @@ router.post('/procTemplate', function (req, res) {
         try {
             let pool = await dbConnect.getConnection(sql);
             if (saveStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_TEMPLATE 테이블 추가');
                 let insertTemplate = await pool.request().query(saveStr);
             }
             if (updateStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_TEMPLATE 테이블 수정1');
                 let updateTemplateAll = await pool.request().query(updateAllStr);
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_TEMPLATE 테이블 수정2');
                 let updateTemplate = await pool.request().query(updateStr);
             }
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_TEMPLATE 테이블 삭제');
                 let deleteBannedWord = await pool.request().query(deleteStr);
             }
 
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();

@@ -125,7 +125,7 @@ router.get('/', function (req, res) {
 
 
         } catch (err) {
-            logger.info('[오류]동기화  [id : %s] [url : %s] [error : %s]', userId, '/board', err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.render('error');
         } finally {
             sql.close();
@@ -157,6 +157,7 @@ router.get('/dashBoard', function (req, res) {
         });
         sql.close();
     }).catch(err => {
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         res.status(500).send({ message: "${err}"})
         sql.close();
     });
@@ -181,9 +182,9 @@ router.post('/intentScore', function (req, res) {
             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
             "         CEILING((ROW_NUMBER() OVER(ORDER BY A.LUIS_INTENT DESC))/ convert(numeric , 9)) PAGEIDX, \n";
     selectQuery += "	LOWER(A.LUIS_INTENT) AS intentName, \n";
-    selectQuery += "ROUND(AVG(CAST(A.LUIS_INTENT_SCORE AS FLOAT)), 2) AS intentScoreAVG,  \n";
-    selectQuery += "MAX(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMAX , \n";
-    selectQuery += "MIN(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMIN, \n";
+    //selectQuery += "ROUND(AVG(CAST(A.LUIS_INTENT_SCORE AS FLOAT)), 2) AS intentScoreAVG,  \n";
+    //selectQuery += "MAX(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMAX , \n";
+    //selectQuery += "MIN(CAST(A.LUIS_INTENT_SCORE AS FLOAT)) AS intentScoreMIN, \n";
     selectQuery += "COUNT(*) AS intentCount \n";
     selectQuery += "FROM	TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B \n";
     selectQuery += "WHERE	1=1 \n";
@@ -209,7 +210,7 @@ router.post('/intentScore', function (req, res) {
         res.send({list : rows, pageList : paging.pagination(currentPageNo,rows[0].TOTCNT)});
         sql.close();
     }).catch(err => {
-        
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         res.send({ error_code: true, error_message : true})
         sql.close();
     });        
@@ -307,14 +308,14 @@ router.post('/getScorePanel', function (req, res) {
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         return pool.request().query(selectQuery)
         }).then(result => {
-          let rows = result.recordset;
-          
-          res.send({list : rows});
-          sql.close();
-        }).catch(err => {
+            let rows = result.recordset;
             
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({list : rows});
+            sql.close();
+        }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);    
+            res.status(500).send({ message: "${err}"})
+            sql.close();
         });
 });
 
@@ -381,14 +382,14 @@ router.post('/getCountPanel', function (req, res) {
                     .input('endDate', sql.NVarChar, endDate)
                     .query(selectQuery)
         }).then(result => {
-          let rows = result.recordset;
-          
-          res.send({list : rows});
-          sql.close();
-        }).catch(err => {
+            let rows = result.recordset;
             
-          res.status(500).send({ message: "${err}"})
-          sql.close();
+            res.send({list : rows});
+            sql.close();
+        }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            res.status(500).send({ message: "${err}"})
+            sql.close();
         });
 });
 
@@ -436,6 +437,7 @@ router.post('/getOftQuestion', function (req, res) {
             res.send({list : rows});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -524,7 +526,7 @@ router.post('/nodeQuery', function (req, res) {
 
           sql.close();
         }).catch(err => {
-            
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -584,6 +586,7 @@ router.post('/firstQueryBar', function (req, res) {
             res.send({list : rows});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -643,6 +646,7 @@ router.post('/firstQueryTable', function (req, res) {
             res.send({list : rows, pageList : paging.pagination(currentPageNo,rows[0].TOTCNT)});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -680,7 +684,7 @@ router.post('/getResponseScore', function (req, res) {
         selectQuery += "	 ), 0) AS MIN_REPLY \n";
         selectQuery += "	 , ISNULL(AVG(유저별답변시간합), 0) AS REPLY_SUM \n";
         selectQuery += "FROM ( ";
-        selectQuery += "SELECT USER_NUMBER, SUM(RESPONSE_TIME) AS 유저별답변시간합, AVG(RESPONSE_TIME) AS 유저별평균답변시간 \n";
+        selectQuery += "SELECT USER_ID, SUM(RESPONSE_TIME) AS 유저별답변시간합, AVG(RESPONSE_TIME) AS 유저별평균답변시간 \n";
         selectQuery += "  FROM TBL_HISTORY_QUERY  \n";
         selectQuery += " WHERE 1=1  \n";
         selectQuery += "AND CONVERT(date, '" + startDate + "') <= CONVERT(date, REG_DATE)  AND  CONVERT(date, REG_DATE)   <= CONVERT(date, '" + endDate + "') ";
@@ -691,7 +695,7 @@ router.post('/getResponseScore', function (req, res) {
             if (selChannel !== 'all') {
                 selectQuery += "AND	CHANNEL = '" + selChannel + "' \n";
             }
-        selectQuery += "GROUP BY USER_NUMBER \n";
+        selectQuery += "GROUP BY USER_ID \n";
         selectQuery += ") A \n";
     
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
@@ -702,6 +706,7 @@ router.post('/getResponseScore', function (req, res) {
             res.send({list : rows});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -764,6 +769,7 @@ router.post('/getQueryByEachTime', function (req, res) {
             res.send({list : resultMap});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ error_code: true, error_message : true})
             sql.close();
         });
@@ -819,8 +825,12 @@ router.post('/getDashboardInfo', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({
+                records: 0,
+                rows: null
+            });
         } finally {
             sql.close();
         }
@@ -843,17 +853,27 @@ router.post('/getSimulUrlInfo', function (req, res) {
         req.session.simul_url = result.recordset[0].SIMUL_URL;
         res.send({status:200 , simul_url:req.session.simul_url});
     }).catch(err => {
-        console.log(err);
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
         sql.close();
     });
 
 });
 
 
+var pannelQry0 = `
+SELECT COUNT(DISTINCT A.USER_ID) AS CUSOMER_CNT 
+FROM  ( 
+    SELECT ISNULL(USER_ID, '') AS USER_ID, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) AS REG_DATE 
+      FROM   TBL_HISTORY_QUERY 
+    GROUP BY ISNULL(USER_ID, ''), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120) 
+  ) A 
+ WHERE  1=1  
+   AND REG_DATE  between CONVERT(date, @startDate) AND CONVERT(date, @endDate) 
+`;
 
 var pannelQry1 = `
-SELECT COUNT( DISTINCT USER_NUMBER) AS CUSOMER_CNT 
-       , ISNULL(SUM(RESPONSE_TIME)/COUNT(RESPONSE_TIME), 0) AS REPLY_SPEED 
+SELECT ISNULL(SUM(RESPONSE_TIME)/COUNT(RESPONSE_TIME), 0) AS REPLY_SPEED 
        , CASE WHEN COUNT(*) != 0 THEN COUNT(*)/COUNT(DISTINCT USER_NUMBER) ELSE 0 END AS USER_QRY_AVG 
   FROM   TBL_HISTORY_QUERY 
  WHERE  1=1  
@@ -909,33 +929,57 @@ SELECT CASE WHEN COUNT(*) != 0 THEN ROUND(SUM(C.답변율)/ COUNT(*), 2) ELSE 0 
 `;
 
 router.post('/getScorePanel1', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
     var selChannel = req.body.selChannel;
 
     if (selDate !== 'allDay') {
+        pannelQry0 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
         pannelQry1 += "AND CONVERT(int, CONVERT(char(8), CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), 112)) = CONVERT(VARCHAR, GETDATE(), 112) \n";
     }
     if (selChannel !== 'all') {
+        pannelQry0 += "AND	CHANNEL = @selChannel \n";
         pannelQry1 += "AND	CHANNEL = @selChannel \n";
     }
-    //console.log("panel=="+selectQuery);
-    dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
-        return pool.request()
-                    .input('startDate', sql.NVarChar, startDate)
-                    .input('endDate', sql.NVarChar, endDate)
-                    .input('selChannel', sql.NVarChar, selChannel)
-                    .query(pannelQry1)
-        }).then(result => {
-            let rows = result.recordset;
+
+    try {
+        (async () => {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+    
+            //console.log("intent -" + pp)
+            let first_result = await pool.request()
+                                .input('startDate', sql.NVarChar, startDate)
+                                .input('endDate', sql.NVarChar, endDate)
+                                .input('selChannel', sql.NVarChar, selChannel)
+                                .query(pannelQry0)
+            var result1 = first_result.recordset;
+    
+            //console.log("intent -" + pp)
+            let second_result = await pool.request() 
+                                .input('startDate', sql.NVarChar, startDate)
+                                .input('endDate', sql.NVarChar, endDate)
+                                .input('selChannel', sql.NVarChar, selChannel)
+                                .query(pannelQry1);
+            var result2 = second_result.recordset;
+
+            let rows1 = result1;
+            let rows2 = result2;
             
-            res.send({result : true, list : rows});
+            res.send({result : true, list1 : rows1, list2 : rows2});
             sql.close();
-        }).catch(err => {
-            res.send({result : false});
-            sql.close();
-        });
+
+
+        })()
+    } 
+    catch(err) {
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+    
+        sql.close();
+        res.send({result : false});
+    }
+
 });
 
 /*
@@ -970,6 +1014,7 @@ router.post('/getScorePanel22', function (req, res) {
 });
 */
 router.post('/getScorePanel2', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
@@ -1045,13 +1090,16 @@ router.post('/getScorePanel2', function (req, res) {
             res.send({result : true, list : vagRst});
         })()
     } 
-    catch(e) {
+    catch(err) {
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+    
         sql.close();
         res.send({result : false});
     }
 });
 
 router.post('/getScorePanel3', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
@@ -1076,12 +1124,15 @@ router.post('/getScorePanel3', function (req, res) {
             res.send({result : true, list : rows});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        
             res.send({result : false});
             sql.close();
         });
 });
 
 router.post('/getScorePanel4', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
@@ -1103,7 +1154,7 @@ router.post('/getScorePanel4', function (req, res) {
         pannelQry4 += "AND	CHANNEL = @selChannel \n";
     }
     pannelQry4 += ` 
-        GROUP BY USER_NUMBER 
+        GROUP BY USER_ID 
         ) B 
     ), 0) AS MAX_QRY  
     `;
@@ -1120,6 +1171,7 @@ router.post('/getScorePanel4', function (req, res) {
             res.send({result : true, list : rows});
             sql.close();
         }).catch(err => {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({result : false});
             sql.close();
         });

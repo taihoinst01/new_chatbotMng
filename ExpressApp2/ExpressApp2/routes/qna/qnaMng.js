@@ -12,29 +12,39 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //질문답변 관리
 router.get('/qnaList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('qna/qnaList');
 });
 
 //미답변 질문목록
 router.get('/noAnswerQList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('qna/noAnswerQList');
 });
 
 //대화상자 설정
 router.get('/dialogMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('qna/dialogMng');
 });
 
 //초기메세지 설정(welcome, sorry, suggess)
 router.get('/initDialogMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('qna/initdialogMng');
 });
 
 router.post('/selectQnaList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
     
@@ -122,7 +132,12 @@ router.post('/selectQnaList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({
+                records : 0,
+                rows : null
+            });
             // ... error checks
         } finally {
             sql.close();
@@ -145,7 +160,8 @@ function checkNull(val, newVal) {
 }
 
 router.post('/getDlgAjax', function (req, res) {
-
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
+	
     var entity = [];
     var dlgID = req.body.dlgID;
    
@@ -260,8 +276,9 @@ router.post('/getDlgAjax', function (req, res) {
             res.send({ list: result });
 
         } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
 
-            console.log(err);
+            res.send({ list: [] });
         } finally {
             sql.close();
         }
@@ -273,7 +290,8 @@ router.post('/getDlgAjax', function (req, res) {
 });
 
 router.post('/updateDialog', function (req, res) {
-    var dlgIdReq = req.body.dlgId;
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
+	var dlgIdReq = req.body.dlgId;
     var dlgType = req.body.dlgType;
     var entity = req.body.entity;
     var relationNum = req.body.relationNum;
@@ -554,6 +572,7 @@ router.post('/updateDialog', function (req, res) {
             res.send({ "res": true });
 
         } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ "res": false });
         } finally {
             sql.close();
@@ -565,7 +584,8 @@ router.post('/updateDialog', function (req, res) {
 });
 
 router.post('/updateInitDialog', function (req, res) {
-    var dlgIdReq = req.body.dlgId;
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
+	var dlgIdReq = req.body.dlgId;
     var dlgType = req.body.dlgType;
     var entity = req.body.entity;
 
@@ -716,7 +736,9 @@ router.post('/updateInitDialog', function (req, res) {
             res.send({ "res": true });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({ "res": false });
         } finally {
             sql.close();
         }
@@ -728,7 +750,8 @@ router.post('/updateInitDialog', function (req, res) {
 });
 
 router.post('/dialogList', function (req, res) {
-    var searchTitleTxt = req.body.searchTitleTxt;
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
+	var searchTitleTxt = req.body.searchTitleTxt;
     var searchDescTxt = req.body.searchDescTxt;
     var currentPage = req.body.currentPage;
     
@@ -833,6 +856,7 @@ router.post('/dialogList', function (req, res) {
                 res.send({ list: [] });
             }
         } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ list: [], result:false });
             // ... error checks
         } finally {
@@ -846,6 +870,7 @@ router.post('/dialogList', function (req, res) {
 });
 
 router.post('/procSimilarQuestion', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var dataArr = JSON.parse(req.body.saveArr);
     var saveRelation = "";
     var saveQna = "";
@@ -964,7 +989,8 @@ router.post('/procSimilarQuestion', function (req, res) {
                 res.send({status:500 , message:'Save Error'});
             }
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        
             res.send({status:500 , message:'Save Error'});
         } finally {
             sql.close();
@@ -979,6 +1005,7 @@ router.post('/procSimilarQuestion', function (req, res) {
 
 
 router.post('/selectNoAnswerQList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var selectType = req.body.selectType;
     var currentPage = req.body.currentPage;
     var searchRecommendText = req.body.searchRecommendText;
@@ -999,6 +1026,8 @@ router.post('/selectNoAnswerQList', function (req, res) {
                 "                          FROM TBL_QUERY_ANALYSIS_RESULT, ( \n" +
                 "						                                     SELECT CUSTOMER_COMMENT_KR AS QUERY_KR \n" +
                 "						                                       FROM TBL_HISTORY_QUERY \n" +
+                "						                                       WHERE 1=1  \n" +
+                "						                                       AND CHATBOT_COMMENT_CODE NOT IN ('SAP') \n" +
                 "						                                      GROUP BY CUSTOMER_COMMENT_KR ) TBH \n" +
                 "                         WHERE RESULT NOT IN ('H', 'R')     \n" +
             //    "                           AND TRAIN_FLAG = 'N'  \n" +
@@ -1058,7 +1087,7 @@ router.post('/selectNoAnswerQList', function (req, res) {
             }
 
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -1075,6 +1104,7 @@ router.post('/selectNoAnswerQList', function (req, res) {
 router.post('/deleteNoAnswerQ', function (req, res) {
     (async () => {
         try {
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
             var arryseq = req.body.seq;
             //var arryseq = seqs.split(',');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
@@ -1086,6 +1116,7 @@ router.post('/deleteNoAnswerQ', function (req, res) {
             }
             res.send({result : true});
         } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({result : false});
         } finally {
             sql.close();
@@ -1105,9 +1136,11 @@ router.post('/selectIntentApp', function (req, res) {
 
     (async () => {
         try {
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
             var intentList = req.session.intentList;
             res.send({ result: true, intentList: intentList});
         } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ result: false });
 
         } finally {
@@ -1122,6 +1155,7 @@ router.post('/selectIntentApp', function (req, res) {
 
 
 router.post('/getAppNumber', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var userId = req.session.sid;
     var selAppId = req.body.appId
     try {
@@ -1134,6 +1168,7 @@ router.post('/getAppNumber', function (req, res) {
         }
         res.send({ result: true, selIndex: selIndex});
     } catch (err) {
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         res.send({ result: false });
 
     } finally {
@@ -1143,6 +1178,7 @@ router.post('/getAppNumber', function (req, res) {
 
 
 router.post('/initDialogList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var searchTitleTxt = req.body.searchTitleTxt;
     var searchDescTxt = req.body.searchDescTxt;
     var currentPage = req.body.currentPage;
@@ -1206,8 +1242,9 @@ router.post('/initDialogList', function (req, res) {
                 res.send({ list: result });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({ list: [] });
         } finally {
             sql.close();
         }

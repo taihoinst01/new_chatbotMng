@@ -12,17 +12,25 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 router.get('/smallTalkMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('smallTalkMng');
 });
 
 router.get('/smallTalkEntity', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('smallTalkEntity');
 });
 
 router.post('/selectSmallTalkList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
     
@@ -47,6 +55,8 @@ router.post('/selectSmallTalkList', function (req, res) {
                             QueryStr += "AND ENTITY like '" + req.body.searchIntentText + "%' \n";
                         }
                         QueryStr +="  ) tbp WHERE PAGEIDX = " + currentPage + "; \n";
+
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
 
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().query(QueryStr);
@@ -85,7 +95,8 @@ router.post('/selectSmallTalkList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
             // ... error checks
         } finally {
             sql.close();
@@ -109,6 +120,8 @@ function checkNull(val, newVal) {
 }
 
 router.post('/smallTalkProc', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+     
     var dataArr = JSON.parse(req.body.saveArr);
     var insertStr = "";
     var deleteStr = "";
@@ -133,16 +146,20 @@ router.post('/smallTalkProc', function (req, res) {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             if (insertStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 저장');
+                
                 let insertSmallTalk= await pool.request().query(insertStr);
             }
 
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 제거');
+                
                 let deleteSmallTalk = await pool.request().query(deleteStr);
             }
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();
@@ -156,12 +173,16 @@ router.post('/smallTalkProc', function (req, res) {
 
 router.post('/getEntityAjax', function (req, res, next) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
+				
     var iptUtterance = req.body.iptUtterance;
     var entitiesArr = [];
     var commonEntitiesArr = [];
 
     (async () => {
         try {
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'FN_SMALLTALK_ENTITY_ORDERBY_ADD 함수 엔티티 조회');
+
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
                 var iptUtterTmp = iptUtterance;
@@ -246,7 +267,7 @@ router.post('/getEntityAjax', function (req, res, next) {
 
         } catch (err) {
             // ... error checks
-            console.log(err);
+	    logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         } finally {
             sql.close();
         }
@@ -263,6 +284,8 @@ router.post('/getEntityAjax', function (req, res, next) {
 */
 router.post('/entities', function (req, res) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
+				
     var currentPage = req.body.currentPage;
 
     (async () => {
@@ -283,7 +306,9 @@ router.post('/entities', function (req, res) {
                 + "              GROUP BY entity, API_GROUP) TBL_SMALLTALK_ENTITY_DEFINE \n"
                 + "         ) tbp \n"
                 + "WHERE PAGEIDX = @currentPage; \n"
-                
+                				
+	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 조회');
+
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().input('currentPage', sql.Int, currentPage).query(entitiesQueryString);
 
@@ -307,7 +332,7 @@ router.post('/entities', function (req, res) {
                 res.send({ list: result });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -321,11 +346,14 @@ router.post('/entities', function (req, res) {
 
 router.post('/deleteEntity', function (req, res) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
+		
     var delEntityDefine = req.body.delEntityDefine;
     
     (async () => {
         try {
 
+	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 삭제');
             var deleteAppStr = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
@@ -334,8 +362,7 @@ router.post('/deleteEntity', function (req, res) {
             res.send({ status: 200, message: 'delete Entity Success' });
             
         } catch (err) {
-            console.log(err);
-            console.log("res 500");
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 500, message: 'delete Entity Error' });
         } finally {
             sql.close();
@@ -351,6 +378,7 @@ router.post('/deleteEntity', function (req, res) {
 
 //엔티티 추가
 router.post('/insertEntity', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
 
     var entityList = req.body;
     var entityTemp = [];
@@ -374,6 +402,7 @@ router.post('/insertEntity', function (req, res) {
                 entityInputStr += "ENTITY_VALUE = '" + entityList[i].entityValue + "' \n";
             }
             entityInputStr += "); \n";
+	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 추가');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
             let result0 = await pool.request().query(entityInputStr);
@@ -395,9 +424,8 @@ router.post('/insertEntity', function (req, res) {
                 res.send({ status: 'Duplicate', message: 'Duplicate entities exist' });
             }
 
-        } catch (err) {
-            console.log(err);
-            res.send({ status: 500, message: 'insert Entity Error' });
+        } catch (err) { 
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         } finally {
             sql.close();
         }
@@ -410,6 +438,7 @@ router.post('/insertEntity', function (req, res) {
 
 //엔티티 수정
 router.post('/updateEntity', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
 
     var entity = req.body.entityDefine;
     var updEntityValue = req.body.entityValue;
@@ -443,6 +472,7 @@ router.post('/updateEntity', function (req, res) {
         try {
             let appPool = await appDbConnect.getAppConnection(appSql, req.session.appName, req.session.dbValue);
 
+	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 수정');
             let selEntity = await appPool.request()
                 .input('entity', sql.NVarChar, entity)
                 .query(selEntityQuery);
@@ -484,7 +514,7 @@ router.post('/updateEntity', function (req, res) {
             }
             res.send({ status: 200 });
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 500, message: 'insert Entity Error' });
         } finally {
             sql.close();
@@ -499,6 +529,7 @@ router.post('/updateEntity', function (req, res) {
 
 //엔티티 검색
 router.post('/searchEntities', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작'); 
 
     var currentPage = req.body.currentPage;
     var searchEntities = req.body.searchEntities;
@@ -522,6 +553,7 @@ router.post('/searchEntities', function (req, res) {
                 + "      ) tbp  \n"
                 + "WHERE PAGEIDX = 1 \n";
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 조회');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().input('currentPage', sql.Int, currentPage).input('searchEntities', sql.NVarChar, '%' + searchEntities + '%').query(entitiesQueryString);
 
@@ -544,8 +576,9 @@ router.post('/searchEntities', function (req, res) {
             } else {
                 res.send({ list: result });
             }
-        } catch (err) {
-            console.log(err)
+        } catch (err) { 
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        
             // ... error checks
         } finally {
             sql.close();

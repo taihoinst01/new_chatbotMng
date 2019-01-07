@@ -12,15 +12,22 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //권한관리 그룹관리
 router.get('/authMasterMng', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     res.render('authMng/authMasterMng');
 });
 
 router.post('/selectAuthGrpList', function (req, res) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     let sortIdx = checkNull(req.body.sort, "AUTHGRP_M_ID") + " " + checkNull(req.body.order, "ASC");
     let pageSize = checkNull(req.body.rows, 10);
     let currentPageNo = checkNull(req.body.page, 1);
@@ -104,8 +111,12 @@ router.post('/selectAuthGrpList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({
+                records : 0,
+                rows : null
+            });
         } finally {
             sql.close();
         }
@@ -130,6 +141,7 @@ function checkNull(val, newVal) {
 * 권한관리 저장,수정,삭제
 */
 router.post('/procAuthMaster', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var authMasterArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateStr = "";
@@ -170,7 +182,7 @@ router.post('/procAuthMaster', function (req, res) {
             res.send({status:200 , message:'Save Success'});
             
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({status:500 , message:'Save Error'});
         } finally {
             sql.close();

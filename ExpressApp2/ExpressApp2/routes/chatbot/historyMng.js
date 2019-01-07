@@ -24,10 +24,15 @@ var router = express.Router();
 //템플릿 관리
 router.get('/historyList', function (req, res) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+ 
     var selectChannel = "";
     selectChannel += "  SELECT ISNULL(CHANNEL,'') AS CHANNEL FROM TBL_HISTORY_QUERY \n";
     selectChannel += "   WHERE 1=1 \n";
     selectChannel += "GROUP BY CHANNEL \n";
+    
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
+
     dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue).then(pool => {
         //new sql.ConnectionPool(dbConfig).connect().then(pool => {
         return pool.request().query(selectChannel)
@@ -45,12 +50,15 @@ router.get('/historyList', function (req, res) {
         });
         sql.close();
     }).catch(err => {
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        
         res.status(500).send({ message: "${err}"})
         sql.close();
     });
 });
 
 router.post('/selectHistoryListAll', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     var searchQuestion = req.body.searchQuestion;
     var searchUserId = req.body.searchUserId;
@@ -72,7 +80,7 @@ router.post('/selectHistoryListAll', function (req, res) {
     var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
     
     if (chkBoardParams(req.body, req.session.channelList)) {
-        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
+        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, req.body.toString());
         res.send({ status: "PARAM_ERROR" });
     } else {
         (async () => {
@@ -121,6 +129,7 @@ router.post('/selectHistoryListAll', function (req, res) {
                 }
         
                 QueryStr += "     ) tbx\n";
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
                         .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
@@ -147,6 +156,7 @@ router.post('/selectHistoryListAll', function (req, res) {
                     });
                 }
             } catch (err) {
+                logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
                 res.send({ rows: [], status : false});
             } finally {
                 sql.close();
@@ -162,6 +172,7 @@ router.post('/selectHistoryListAll', function (req, res) {
 
 router.post('/selectHistoryList', function (req, res) {
 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var searchQuestion = req.body.searchQuestion;
     var searchUserId = req.body.searchUserId;
     var startDate = req.body.startDate;
@@ -172,7 +183,7 @@ router.post('/selectHistoryList', function (req, res) {
     var currentPage = checkNull(req.body.currentPage, 1);
     
     if (chkBoardParams(req.body, req.session.channelList)) {
-        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', userId, 'historyMng/selectHistoryList', req.body.toString());
+        logger.info('[에러]history 검색 필터 오류 [id : %s] [url : %s] [error : %s]', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, req.body.toString());
         res.send({ status: "PARAM_ERROR" });
     } else {
         (async () => {
@@ -224,9 +235,11 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "                  ) TBL_B \n";
                 QueryStr += "				  ON SID = TBL_B.TRANS_SID \n";
                 QueryStr += "            WHERE 1=1 \n";
+                //QueryStr += "              AND A.CHATBOT_COMMENT_CODE NOT IN ('SAP') \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
               
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
                         .input('searchQuestion', sql.NVarChar, '%' + searchQuestion + '%')
@@ -249,8 +262,8 @@ router.post('/selectHistoryList', function (req, res) {
                     });
                 }
             } catch (err) {
-                res.send({ rows: [], status : false});
-                console.log(err)
+                logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+                res.send({ rows: [], status : false}); 
                 // ... error checks
             } finally {
                 sql.close();
@@ -262,6 +275,7 @@ router.post('/selectHistoryList', function (req, res) {
 
 router.post('/selectHistoryDetail', function (req, res) {
     
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var sId = req.body.sId;
 
     (async () => {
@@ -293,8 +307,10 @@ router.post('/selectHistoryDetail', function (req, res) {
             QueryStr += "                  ) TBL_B \n";
             QueryStr += "            WHERE RTRIM(CUSTOMER_COMMENT_KR) != '' \n";
             QueryStr += "              AND REPLACE(A.CUSTOMER_COMMENT_KR, ' ', '') = TBL_B.TRANS_COMMENT \n";
+            //QueryStr += "              AND A.CHATBOT_COMMENT_CODE NOT IN ('SAP') \n";
             QueryStr += "     ) tbx\n";
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request()
                     .input('sId', sql.NVarChar, sId)
@@ -311,8 +327,8 @@ router.post('/selectHistoryDetail', function (req, res) {
                 });
             }
         } catch (err) {
-            res.send({ rows: [], status : false});
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            res.send({ rows: [], status : false}); 
             // ... error checks
         } finally {
             sql.close();

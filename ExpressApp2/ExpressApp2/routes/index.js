@@ -8,6 +8,12 @@ var i18n = require("i18n");
 const syncClient = require('sync-rest-client');
 const appDbConnect = require('../config/appDbConnect');
 const appSql = require('mssql');
+
+//log start
+var Logger = require("../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+ 
 var router = express.Router();
 
 //var luisConfig = require('../config/luisConfig');
@@ -68,7 +74,7 @@ router.get('/', function (req, res) {
                             });
 */
                         }).catch(err => {
-                            console.log(err);
+                            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
                             sql.close();
                         });
                         //db정보 조회 end----
@@ -213,7 +219,7 @@ router.get('/', function (req, res) {
                     } 
                     
                 } catch (err) {
-                    console.log(err);
+                    logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
                     res.send({status:500 , message:'app Load Error'});
                 } finally {
                     sql.close();
@@ -227,7 +233,7 @@ router.get('/', function (req, res) {
                 
 
         }catch(e){
-            console.log(e);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         }
         
     }
@@ -239,6 +245,7 @@ router.get('/', function (req, res) {
 });
 
 router.get('/list', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     req.session.selMenu = 'm1';
     var loginId = req.session.sid;
 
@@ -291,8 +298,7 @@ router.get('/list', function (req, res) {
             }
             
         } catch (err) {
-            console.log("====================================================================")
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -301,12 +307,14 @@ router.get('/list', function (req, res) {
 });
 
 router.get('/addChatbot', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
     req.session.selMenus = 'ms1';
     res.render('addChatbot');
 });
 
 //Chatbot App Insert
 router.post('/admin/addChatBotApps', function (req, res){
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');		
     var chatName = req.body.appInsertName;
     var culture = req.body.appInsertCulture;
     var chatDes = req.body.appDes;
@@ -382,7 +390,7 @@ router.post('/admin/addChatBotApps', function (req, res){
                 res.send({result:false});
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -393,6 +401,7 @@ router.post('/admin/addChatBotApps', function (req, res){
 
 //Luis app insert
 router.post('/admin/putAddApps', function (req, res){
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var appService = req.body.appInsertService;
     var appName = req.body.appInsertName;
     var appCulture = req.body.appInsertCulture;
@@ -426,13 +435,14 @@ router.post('/admin/putAddApps', function (req, res){
             }
             res.json(responseData);
         });
-    }catch(e){
-        console.log(e);
+    }catch(err){
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
     }
 });
 
 //Luis app delete
 router.post('/admin/deleteApp', function (req, res){
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var appId = req.body.deleteAppId;
     var HOST = req.session.hostURL;
     var subKey = req.session.subKey;
@@ -447,8 +457,8 @@ router.post('/admin/deleteApp', function (req, res){
         client.delete( HOST + '/luis/api/v2.0/apps/' + appId , options, function (data, response) {
             res.json(data);
         });
-    }catch(e){
-        console.log(e);
+    }catch(err){
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
     }
     
 });
@@ -480,6 +490,7 @@ router.post('/admin/renameApp', function (req, res){
 });
 
 router.post('/admin/trainApp', function (req, res){
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var appId = req.session.appId;
     var appName = req.session.appName;
     var HOST = req.session.hostURL;
@@ -565,7 +576,7 @@ router.post('/admin/trainApp', function (req, res){
 
 
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();

@@ -12,15 +12,22 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //공통코드 Master
 router.get('/codeMasterMng', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('codeMng/codeMasterMng');
 });
 
 //공통코드 Detail
 router.get('/codeDetailMng', function (req, res) { 
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var CDM_ID = req.query.CDM_ID;
     //res.render('codeMng/codeDetailMng');
     res.render('codeMng/codeDetailMng', {
@@ -34,6 +41,7 @@ router.get('/codeDetailMng', function (req, res) {
 * 공통코드 master 저장,수정,삭제
 */
 router.post('/procCodeMaster', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var codeMasterArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateStr = "";
@@ -57,19 +65,26 @@ router.post('/procCodeMaster', function (req, res) {
         try {
             let pool = await dbConnect.getConnection(sql);
             if (saveStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_M 테이블 추가');
+                
                 let insertCodeMaster = await pool.request().query(saveStr);
             }
             if (updateStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_M 테이블 수정');
+                
                 let updateCodeMaster = await pool.request().query(updateStr);
             }
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_M 테이블 제거');
+                
                 let deleteCodeMaster = await pool.request().query(deleteStr);
             }
 
             res.send({status:200 , message:'Save Success'});
             
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
             res.send({status:500 , message:'Save Error'});
         } finally {
             sql.close();
@@ -85,6 +100,7 @@ router.post('/procCodeMaster', function (req, res) {
 * 공통코드 detail 저장,수정,삭제
 */
 router.post('/procCodeDetail', function (req, res) {  
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var codeDetailArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateStr = "";
@@ -116,19 +132,22 @@ router.post('/procCodeDetail', function (req, res) {
         try {
             let pool = await dbConnect.getConnection(sql);
             if (saveStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_D 테이블 추가');
                 let insertCodeDetail = await pool.request().query(saveStr);
             }
             if (updateStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_D 테이블 수정');
                 let updateCodeDetail = await pool.request().query(updateStr);
             }
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_D 테이블 제거');
                 let deleteCodeDetail = await pool.request().query(deleteStr);
             }
 
             res.send({status:200 , message:'Save Success'});
             
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({status:500 , message:'Save Error'});
         } finally {
             sql.close();
@@ -141,6 +160,7 @@ router.post('/procCodeDetail', function (req, res) {
 });
 
 router.post('/selectCodeMasterList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     let searchType = checkNull(req.body.searchType, null);
     let searchWord = checkNull(req.body.searchWord, null);
@@ -166,6 +186,7 @@ router.post('/selectCodeMasterList', function (req, res) {
             QueryStr += " ORDER BY A.CDM_SEQ, A.CDM_ID";
             
             
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_M 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
@@ -193,7 +214,7 @@ router.post('/selectCodeMasterList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -208,6 +229,7 @@ router.post('/selectCodeMasterList', function (req, res) {
 });
 
 router.post('/selectCodeDetailList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     let CDM_ID = checkNull(req.body.CDM_ID, null);
     (async () => {
@@ -219,6 +241,7 @@ router.post('/selectCodeDetailList', function (req, res) {
 
             QueryStr += " ORDER BY A.CD_SEQ";
             
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_CODE_D 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
@@ -246,7 +269,7 @@ router.post('/selectCodeDetailList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();

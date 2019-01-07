@@ -12,18 +12,27 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //챗봇 환경관리
 router.get('/chatbotEnv', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('chatbotMng/chatbotEnv');
 });
 
 router.post('/selectChatbotEnv', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var chatbotName = req.body.chatbotName;
 
     (async () => {
         try {
+
+
 
             var chatBotDbStr = "SELECT \n" +
                            " USER_NAME, PASSWORD, SERVER, DATABASE_NAME \n" +
@@ -37,7 +46,9 @@ router.post('/selectChatbotEnv', function (req, res) {
             let db_pool = await dbConnect.getConnection(sql);
             let db_result = await db_pool.request().query(chatBotDbStr);
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_DB_CONFIG 테이블 조회 시작');
             let luis_pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 조회 시작');
             let luis_result = await luis_pool.request().query(chatBotLuisStr);
 
             let db_rows = db_result.recordset;
@@ -73,7 +84,7 @@ router.post('/selectChatbotEnv', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -96,6 +107,7 @@ function checkNull(val, newVal) {
 }
 
 router.post('/procChatBotEnv', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var dataArr = JSON.parse(req.body.saveArr);
     var updateTimeLimit = "";
     var updateScoreLimit = "";
@@ -126,23 +138,28 @@ router.post('/procChatBotEnv', function (req, res) {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             if (updateTimeLimit !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 수정1');
                 let updateTimeLimitP = await pool.request().query(updateTimeLimit);
             }
             if (updateScoreLimit !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 수정2');
                 let updateBannedWordP = await pool.request().query(updateScoreLimit);
             }
 
             if (deleteAPIInfoQry !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 삭제');
                 let deleteAPIInfo = await pool.request().query(deleteAPIInfoQry);
             }
 
             if (insertAPIInfoQry !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 추가');
                 let insertAPIInfo = await pool.request().query(insertAPIInfoQry);
             }
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();
@@ -155,12 +172,14 @@ router.post('/procChatBotEnv', function (req, res) {
 });
 
 router.post('/selectAPIInfo', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
    
     (async () => {
         try {
 
             var QueryStr = "SELECT CNF_NM, CNF_VALUE, ORDER_NO FROM TBL_CHATBOT_CONF WHERE CNF_TYPE ='API';";
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 api 조회');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().query(QueryStr);
 
@@ -186,8 +205,7 @@ router.post('/selectAPIInfo', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         } finally {
             sql.close();
         }

@@ -12,14 +12,22 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 //자동완성 관리
 router.get('/autoCompleteMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('chatbotMng/autoCompleteMng');
 });
 
 router.post('/selectAutoCompleteList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    
     var pageSize = checkNull(req.body.rows, 10);
     var currentPage = checkNull(req.body.currentPage, 1);
 
@@ -34,7 +42,8 @@ router.post('/selectAutoCompleteList', function (req, res) {
                            "          FROM TBL_AUTOCOMPLETE ) tbp \n" +
                            " WHERE 1=1 \n" +
                            "   AND PAGEIDX = " + currentPage + "; \n";
-
+            
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_AUTOCOMPLETE테이블 조회 시작');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             let result1 = await pool.request().query(QueryStr);
 
@@ -72,7 +81,8 @@ router.post('/selectAutoCompleteList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            //console.log(err)
             // ... error checks
         } finally {
             sql.close();
@@ -96,6 +106,7 @@ function checkNull(val, newVal) {
 }
 
 router.post('/procAutoComplete', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var menuArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateStr = "";
@@ -118,21 +129,26 @@ router.post('/procAutoComplete', function (req, res) {
 
     (async () => {
         try {
+            
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             if (saveStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_AUTOCOMPLETE 테이블 조회 시작');
                 let insertAutoComplete = await pool.request().query(saveStr);
             }
             if (updateStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_AUTOCOMPLETE 테이블 수정 시작');
                 let updateAutoComplete = await pool.request().query(updateStr);
             }
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_AUTOCOMPLETE 테이블 제거 시작');
                 let deleteAutoComplete = await pool.request().query(deleteStr);
             }
 
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();

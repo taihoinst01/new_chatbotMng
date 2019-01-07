@@ -216,18 +216,19 @@ function selectAll() {
                         drawScoreListHtml += '<section class="col-lg-5">';
                         drawScoreListHtml += '  <div class="box  color-palette-box">';
                         drawScoreListHtml += '	<div class="box-body">';
-                        drawScoreListHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.INTENT_SCROE_AVG_MIN_MAX + '</h3></div> ';
+                        drawScoreListHtml += '		       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.ANSWERED_INTENT_CNT + '</h3></div> ';
                         drawScoreListHtml += '		       <div class="Tbl_wrap">';
                         drawScoreListHtml += '			    <table class="table table-hover" summary="INTENT SCORE 평균/최소/최대">';
-                        drawScoreListHtml += '				<colgroup><col width="40%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="15%"/></colgroup>';
+                        drawScoreListHtml += '				<colgroup><col width="40%"/><col width="15%"/></colgroup>';
+                        //drawScoreListHtml += '				<colgroup><col width="40%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="15%"/></colgroup>';
 
                         drawScoreListHtml += '				<thead>';
                         drawScoreListHtml += '				      <tr>';
                         drawScoreListHtml += '					  <th>' + language.Intent_name + '</th>';
                         drawScoreListHtml += '					  <th>' + language.Number + '</th>';
-                        drawScoreListHtml += '					  <th>' + language.average + '</th>';
-                        drawScoreListHtml += '					  <th>' + language.minimum + '</th>';
-                        drawScoreListHtml += '					  <th>' + language.maximum + '</th>';
+                        //drawScoreListHtml += '					  <th>' + language.average + '</th>';
+                        //drawScoreListHtml += '					  <th>' + language.minimum + '</th>';
+                        //drawScoreListHtml += '					  <th>' + language.maximum + '</th>';
                         drawScoreListHtml += '				      </tr>';
                         drawScoreListHtml += '				</thead>';
                         drawScoreListHtml += '				<tbody id="scoreTableBody">';
@@ -280,7 +281,7 @@ function selectAll() {
                         getOftQuestionHtml += '</section>';
                         $('#getOftQuestionHtml').html(getOftQuestionHtml);
                         if ($('#OftQuestionTableBody').html().trim() == "" && $('#OftQuestionTableBody').isInViewport()) {
-                            getOftQuestion();
+                            //getOftQuestion();
                         }  
                         //getOftQuestion();
                     }
@@ -300,7 +301,7 @@ function selectAll() {
                         getResponseTimeHtml += '   </div>';
                         $('#getResponseTimeHtml').html(getResponseTimeHtml);
                         if ($('#responseTimeDiv').html().trim() == "" && $('#responseTimeDiv').isInViewport()) {
-                            getResponseTime();
+                            //getResponseTime();
                         }   
                         //getResponseTime();
                     }
@@ -339,7 +340,7 @@ function selectAll() {
                         drawNoneQuerytableHtml += '</div>';
                         $('#drawNoneQuerytableHtml').html(drawNoneQuerytableHtml);
                         if ($('#noneQueryDiv').html().trim() == "" && $('#noneQueryDiv').isInViewport()) {
-                            drawNoneQuerytable();
+                            //drawNoneQuerytable();
                         }  
                         //drawNoneQuerytable();
                     }
@@ -360,7 +361,7 @@ function selectAll() {
                         drawFirstQueryHtml += '</section>';
                         $('#drawFirstQueryHtml').html(drawFirstQueryHtml);
                         if ($('#fistQueryDiv').html().trim() == "" && $('#fistQueryDiv').isInViewport()) {
-                            drawFirstQuery();
+                            //drawFirstQuery();
                         } 
                         //drawFirstQuery();
                     }
@@ -397,7 +398,7 @@ function selectAll() {
                         drawfirstQuerytableHtml += '</section>';
                         $('#drawfirstQuerytableHtml').html(drawfirstQuerytableHtml);
                         if ($('#fistQueryTable').html().trim() == "" && $('#fistQueryTable').isInViewport()) {
-                            drawfirstQuerytable();
+                            //drawfirstQuerytable();
                         } 
                         //drawfirstQuerytable();
                     }
@@ -416,12 +417,14 @@ function selectAll() {
                         getQueryByEachTimeHtml += '</div>';
                         $('#getQueryByEachTimeHtml').html(getQueryByEachTimeHtml);
                         if ($('#timeOfDay_div').html().trim() == "" && $('#timeOfDay_div').isInViewport()) {
-                            getQueryByEachTime();
+                            //getQueryByEachTime();
                         } 
                         //getQueryByEachTime();
                     }
                 }
             }
+            window.scrollTo(window.scrollX, window.scrollY - 1);
+            window.scrollTo(window.scrollX, window.scrollY + 1);
             $('#loadingModal').modal('hide');
         }
     });
@@ -571,17 +574,18 @@ function drawScoreList(page) {
                 var maxData = 0;
 
                 for (var i = 0; i < list.length; i++) {
-                    minData = list[i].intentScoreMIN;
-                    maxData = list[i].intentScoreMAX;
+                    //minData = list[i].intentScoreMIN;
+                    //maxData = list[i].intentScoreMAX;
 
-                    minData = minData.toFixed(4);
-                    maxData = maxData.toFixed(4);
+                    //minData = minData.toFixed(4);
+                    //maxData = maxData.toFixed(4);
 
                     scoreList += "<tr><td class=\"text-left\">" + list[i].intentName + "</td>";
                     scoreList += "<td>" + list[i].intentCount + "</td>";
-                    scoreList += "<td>" + list[i].intentScoreAVG + "</td>";
-                    scoreList += "<td>" + minData + "</td>";
-                    scoreList += "<td>" + maxData + "</td></tr>";
+                    //scoreList += "<td>" + list[i].intentScoreAVG + "</td>";
+                    //scoreList += "<td>" + minData + "</td>";
+                    //scoreList += "<td>" + maxData + "</td></tr>";
+                    scoreList += "</tr>";
                 }
 
                 $("#scoreTableBody").html(scoreList);
@@ -645,7 +649,7 @@ function getResponseTime() {
                         { y: '평균 답변시간', a: data.list[0].REPLY_AVG },
                         { y: '최대 답변시간', a: data.list[0].MAX_REPLY },
                         { y: '최소 답변시간', a: data.list[0].MIN_REPLY },
-                        { y: '평균 머무르는 시간', a: data.list[0].REPLY_SUM }
+                        { y: '총 답변 시간', a: data.list[0].REPLY_SUM }
                     ],
                     barColors: ['#5181ae', '#ff7659'],
                     xkey: 'y',
@@ -854,13 +858,17 @@ function getScorePanel1() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
-            if (data.result) {
-                var scores = data.list[0];
+            if (data.list1) {
+                var scores = data.list1[0];
                 $('#allCustomer').text(scores.CUSOMER_CNT);
+            } else {
+                $('#allCustomer').text(0);
+            }
+            if (data.list2) {
+                var scores = data.list2[0];
                 $('#avgReplySpeed').text(scores.REPLY_SPEED);
                 $('#avgQueryCnt').text(scores.USER_QRY_AVG);
             } else {
-                $('#allCustomer').text(0);
                 $('#avgReplySpeed').text(0);
                 $('#avgQueryCnt').text(0);
             }

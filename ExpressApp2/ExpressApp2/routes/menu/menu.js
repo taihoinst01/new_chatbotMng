@@ -12,13 +12,20 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 router.get('/menuMng', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     res.render('menuMng/menuMng');
 });
 
 router.post('/procMenu', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var menuArr = JSON.parse(req.body.saveArr);
     var saveStr = "";
     var updateStr = "";
@@ -46,19 +53,23 @@ router.post('/procMenu', function (req, res) {
         try {
             let pool = await dbConnect.getConnection(sql);
             if (saveStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 추가'); 
                 let insertMenu = await pool.request().query(saveStr);
             }
             if (updateStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 수정');
                 let updateMenu = await pool.request().query(updateStr);
             }
             if (deleteStr !== "") {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 제거');
                 let deleteMenu = await pool.request().query(deleteStr);
             }
 
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();
@@ -71,6 +82,7 @@ router.post('/procMenu', function (req, res) {
 });
 
 router.post('/selectMenuList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     (async () => {
         try {
@@ -78,6 +90,7 @@ router.post('/selectMenuList', function (req, res) {
             var QueryStr = "SELECT MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TB_MENU_AUTH";
 
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
@@ -105,7 +118,7 @@ router.post('/selectMenuList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();
@@ -118,6 +131,7 @@ router.post('/selectMenuList', function (req, res) {
 });
 
 router.post('/checkMenuAuth', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var menuArr = JSON.parse(req.body.saveArr);
     var checkStr = "";
     var MENU_AUTH = "0";
@@ -128,6 +142,7 @@ router.post('/checkMenuAuth', function (req, res) {
     
     (async () => {
         try {
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(checkStr);
 
@@ -148,7 +163,7 @@ router.post('/checkMenuAuth', function (req, res) {
             
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 'FAIL' });
         } finally {
             sql.close();
@@ -161,6 +176,7 @@ router.post('/checkMenuAuth', function (req, res) {
 });
 
 router.post('/selectMenuAuthList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     (async () => {
         try {
@@ -168,6 +184,7 @@ router.post('/selectMenuAuthList', function (req, res) {
             var QueryStr = "SELECT AUTHGRP_M_NM, AUTH_LEVEL FROM TB_AUTHGRP_M";
 
 
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_AUTHGRP_M 테이블 조회');
             let pool = await dbConnect.getConnection(sql);
             let result1 = await pool.request().query(QueryStr);
 
@@ -195,7 +212,7 @@ router.post('/selectMenuAuthList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             // ... error checks
         } finally {
             sql.close();

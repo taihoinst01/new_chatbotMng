@@ -14,9 +14,9 @@ module.exports.CreateLogger = function () {
 
     appenders.push(new winston.transports.DailyRotateFile({
         //prepend: true,  
-        datePattern: 'YYYY-MM-DD',
         json: false,
-        filename: _logDir + '.txt',
+        filename: _logDir + '%DATE%' + '.txt',
+        datePattern: 'YYYY-MM-DD',
         timestamp: function () {    
             return moment().format('YYYY-MM-DD HH:mm:ss.SSS ZZ')
         },

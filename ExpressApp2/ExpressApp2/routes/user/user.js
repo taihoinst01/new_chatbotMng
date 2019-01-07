@@ -12,6 +12,11 @@ const syncClient = require('sync-rest-client');
 const appDbConnect = require('../../config/appDbConnect');
 const appSql = require('mssql');
 
+//log start
+var Logger = require("../../config/logConfig");
+var logger = Logger.CreateLogger();
+//log end
+
 var router = express.Router();
 
 
@@ -26,6 +31,7 @@ router.get('/userAuthMng', function (req, res) {
 });
 
 router.post('/selectUserList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
 
     let sortIdx = checkNull(req.body.sort, "USER_ID") + " " + checkNull(req.body.order, "ASC");
     let pageSize = checkNull(req.body.rows, 10);
@@ -118,8 +124,12 @@ router.post('/selectUserList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({
+                records: 0,
+                rows: null
+            });
         } finally {
             sql.close();
         }
@@ -144,6 +154,7 @@ router.post('/getAuthList', function (req, res) {
 
     (async () => {
         try {
+            logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
             var QueryStr = "SELECT AUTHGRP_M_NM, AUTH_LEVEL FROM TB_AUTHGRP_M ORDER BY AUTH_LEVEL ";
 
             let pool = await dbConnect.getConnection(sql);
@@ -171,8 +182,12 @@ router.post('/getAuthList', function (req, res) {
                 });
             }
         } catch (err) {
-            console.log(err)
-            // ... error checks
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            res.send({
+                records: 0,
+                rows: null
+            });
         } finally {
             sql.close();
         }
@@ -184,6 +199,7 @@ router.post('/getAuthList', function (req, res) {
 });
 
 router.post('/updateUserAuth', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     var userAuthArr = JSON.parse(req.body.saveArr);
     var updateStr = "";
     var userId = req.session.sid;
@@ -206,7 +222,7 @@ router.post('/updateUserAuth', function (req, res) {
             res.send({ status: 200, message: 'Save Success' });
 
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({ status: 500, message: 'Save Error' });
         } finally {
             sql.close();
@@ -219,6 +235,7 @@ router.post('/updateUserAuth', function (req, res) {
 });
 
 router.post('/selectUserAppList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');	
     
     let userId = checkNull(req.body.userId, '');
     var currentPage = checkNull(req.body.currentPage, 1);
@@ -279,7 +296,7 @@ router.post('/selectUserAppList', function (req, res) {
             });
             
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({status:500 , message:'app Load Error'});
         } finally {
             sql.close();
@@ -292,6 +309,7 @@ router.post('/selectUserAppList', function (req, res) {
 })
 
 router.post('/updateUserAppList', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     let userId = req.body.userId;
     let saveData = JSON.parse(checkNull(req.body.saveData, ''));
     let removeData = JSON.parse(checkNull(req.body.removeData, ''));
@@ -328,7 +346,7 @@ router.post('/updateUserAppList', function (req, res) {
             res.send({status:200 , message:'Update Success'});
             
         } catch (err) {
-            console.log(err);
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
             res.send({status:500 , message:'Update Error'});
         } finally {
             sql.close();

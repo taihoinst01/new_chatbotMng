@@ -74,6 +74,7 @@ router.post('/login', function (req, res) {
                 var userPwConverted = pwConfig.getPassWord(userPw, rows[0].SCRT_SALT);
 
                 if (rows[0].PW_INIT_YN == 'Y') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 초기화');
                     res.render('passwordChng', {
                         changeId: req.body.mLoginId,
                     });
@@ -82,6 +83,7 @@ router.post('/login', function (req, res) {
                         //if(decipheredOutput == userPw) {
                         req.session.sid = req.body.mLoginId;
                         req.session.sAuth = rows[0].USER_AUTH;
+                        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인');
     
                         //subscription key 조회 start-----
                         var subsQry = "";
@@ -128,11 +130,13 @@ router.post('/login', function (req, res) {
                             //subscription key 조회 end-----
                             
                     } else {
+                        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 불일치');
                         res.send('<script>alert("비밀번호가 일치하지 않습니다");location.href="/";</script>');
                     }
                 }
                 
             } else {
+                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '아이디를 찾을수 없거나 사용중지 중인 아이디');
                 res.send('<script>alert("아이디를 찾을수 없거나 사용중지 중입니다");location.href="/";</script>');
             }
           sql.close();
@@ -147,7 +151,8 @@ router.get('/logout', function (req, res) {
     
     req.session.destroy(function (err) { 
         if (err) { 
-            console.log(err); 
+            var logoutID = req.session.sid?"NONE":req.session.sid;
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
         } else { 
             res.clearCookie('sid');
             res.redirect('/'); 
