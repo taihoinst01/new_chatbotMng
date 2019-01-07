@@ -36,7 +36,10 @@ router.post('/selectSmallTalkList', function (req, res) {
                             "         SEQ, S_QUERY, INTENT, ENTITY, S_ANSWER, USE_YN \n" +
                            "          FROM TBL_SMALLTALK \n" +
                            "          WHERE 1=1 \n";
-                           if (req.body.searchQuestiontText !== '') {
+                        if (req.body.useYn != 'ALL') {
+                            QueryStr += "AND USE_YN = '" + req.body.useYn + "' \n";
+                        }
+                        if (req.body.searchQuestiontText !== '') {
                             QueryStr += "AND S_QUERY like '%" + req.body.searchQuestiontText + "%' \n";
                         }
 
@@ -164,7 +167,7 @@ router.post('/getEntityAjax', function (req, res, next) {
                 var iptUtterTmp = iptUtterance;
                 let result1 = await pool.request()
                     .input('iptUtterance', sql.NVarChar, iptUtterTmp)
-                    .query('SELECT RESULT FROM dbo.FN_SMALLTALK_ENTITY_ORDERBY_ADD(@iptUtterance)')
+                    .query('SELECT RESULT FROM FN_SMALLTALK_ENTITY_ORDERBY_ADD(@iptUtterance)')
 
                 let rows = result1.recordset;
 
@@ -205,7 +208,7 @@ router.post('/getEntityAjax', function (req, res, next) {
                                     } else {
                                         longEntity = commonEntities[k].ENTITY_VALUE;
                                         shortEntity = rows3[j].ENTITY_VALUE;
-                                    }
+                                    } 
                                     if (longEntity.indexOf(shortEntity) != -1) {
                                         if (isAdd) {
                                             commonEntities.splice(k, 1);

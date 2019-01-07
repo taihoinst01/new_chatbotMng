@@ -313,8 +313,8 @@ function selectAll() {
                         drawNoneQuerytableHtml += '	       <div class="box-header with-border dashb"><h3 class="box-title02">' + language.Unanswered_questions + '</h3></div> ';
                         drawNoneQuerytableHtml += '	       <div class="Tbl_wrap">';
                         drawNoneQuerytableHtml += '		    <table class="table table-hover" summary="미답변 질문">';
-                        drawNoneQuerytableHtml += '			<colgroup><col width="10%"/><col width="23%"/><col width="5%"/><col width="5%"/>';
-                        drawNoneQuerytableHtml += '				  <col width="15%"/><col width="5%"/><col width="10%"/><col width="10%"/><col width="10%"/>';
+                        drawNoneQuerytableHtml += '			<colgroup><col width="35%"/><col width="10%"/><col width="5%"/>';
+                        drawNoneQuerytableHtml += '				  <col width="15%"/>';
                         drawNoneQuerytableHtml += '			</colgroup>';
                         drawNoneQuerytableHtml += '			<thead>';
                         drawNoneQuerytableHtml += '			      <tr>';

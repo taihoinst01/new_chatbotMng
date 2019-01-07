@@ -64,6 +64,8 @@ $(document).ready(function() {
     });
 
     $('#searchDlgBtn').click(function (e) {
+        $('#searchIntentHidden').val($('#searchIntent').val().trim());
+        $('#searchQuestionHidden').val($('#searchQuestion').val().trim());
         makeSmallTalkTable(1);
     });
 
@@ -71,6 +73,16 @@ $(document).ready(function() {
         $("#smallTalkForm")[0].reset();
         //window.location.reload();
         $('#smallTalkMngModal').modal('show');
+    });
+
+    $('input[name=searchIntent], input[name=searchQuestion]').keypress(function (e) {
+        if (e.keyCode == 13) {
+            var searchIntent = $('#searchIntentHidden').val().trim();
+            var searchQuestion = $('#searchQuestionHidden').val().trim();
+            if (searchIntent != $('#searchIntent').val().trim() || searchQuestion != $('#searchQuestion').val().trim()) {
+                $('#searchDlgBtn').trigger('click');
+            }
+        }
     });
 
     // question 입력
@@ -142,11 +154,11 @@ var searchIntentText = ""; //페이징시 필요한 검색어 담아두는 변�
 function makeSmallTalkTable(page) {
     if (page) {
         //$('#currentPage').val(1);
-        searchQuestiontText = $('#searchQuestion').val();
-        searchIntentText = $('#searchIntent').val();
+        searchQuestiontText = $('#searchQuestionHidden').val();
+        searchIntentText = $('#searchIntentHidden').val();
     }
-
     params = {
+        'useYn' : $('#smallTalkYn').find('option:selected').val(),
         //'currentPage': ($('#currentPage').val() == '') ? 1 : $('#currentPage').val(),
         'currentPage': ($('#currentPage').val() == '') ? 1 : page,
         'searchQuestiontText': searchQuestiontText,
@@ -169,7 +181,13 @@ function makeSmallTalkTable(page) {
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].NUM + '</td>';
                     tableHtml += '<td><input type="checkbox" class="flat-red" name="DELETE_ST_SEQ" id="DELETE_ST_SEQ" value="'+ data.rows[i].SEQ+'"></td>';
                     tableHtml += '<td>' + data.rows[i].ENTITY + '</td>';
-                    tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+data.rows[i].S_QUERY+'\',\''+data.rows[i].S_ANSWER+'\','+data.rows[i].SEQ+',\''+data.rows[i].USE_YN+'\')">' + data.rows[i].S_QUERY + '</a></td>';
+                    
+                    
+                    var s_qry = data.rows[i].S_QUERY.split('"').join("\"");
+                    var s_answer = data.rows[i].S_ANSWER.split('"').join("&quot;");
+
+
+                    tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+s_qry+'\',\''+s_answer+'\','+data.rows[i].SEQ+',\''+data.rows[i].USE_YN+'\'); return false;">' + data.rows[i].S_QUERY + '</a></td>';
                     tableHtml += '<td class="txt_left">' + answerText + '</td>';
                     tableHtml += '<td>' + data.rows[i].USE_YN + '</td>';
                     tableHtml += '</tr>';
