@@ -447,8 +447,8 @@ function selectDlgByTxt(groupType, sourceType) {
                         '<td>' + data.list[i].NUM + '</td>' +
                         '<td class="txt_left" name="dlgTitleTd">' + 
                         '<span name="titleSpan">' +
-                        '<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' +
-                         dlgNameHtml + '</span>' +
+                        //'<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' + dlgNameHtml + '</span>' +
+                         '<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' + '</span>' +
                         '<input type="hidden" name="cardTitle" value="' + (data.list[i].CARD_TITLE==null?'':data.list[i].CARD_TITLE) + '" />' +
                         '<input type="hidden" name="cardText" value="' + (data.list[i].CARD_TEXT==null?'':data.list[i].CARD_TEXT) + '" />' +
                         '</td>' +
