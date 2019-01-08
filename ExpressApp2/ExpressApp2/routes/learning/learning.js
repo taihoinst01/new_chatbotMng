@@ -2492,16 +2492,29 @@ router.post('/addDialog', function (req, res) {
             /*
             //dyyoo 2018-12-05작업 시작
             */
-            var selectRelationNum = 'SELECT ISNULL(MAX(RELATION_NUM)+1,1) AS RELATION_NUM FROM TBL_DLG;';
+            var selectDlgId = `
+            SELECT CASE 
+                        WHEN (SELECT COUNT(DLG_ID) FROM TBL_DLG WHERE DLG_ID IN ( SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG WHERE DLG_GROUP = 2 ) ) > 0 
+                        THEN (SELECT ISNULL(MAX(DLG_ID),1) AS DLG_ID FROM TBL_DLG) 
+                        ELSE ( SELECT ISNULL(MAX(DLG_ID),1) AS DLG_ID FROM TBL_DLG WHERE DLG_GROUP = 2 ) 
+                   END AS DLG_ID;
+            `;
+            
+            
+            //'SELECT ISNULL(MAX(RELATION_NUM)+1,1) AS RELATION_NUM FROM TBL_DLG;';
             /*
             //dyyoo 2018-12-05작업 끝
             */
 
-            var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
-            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP, RELATION_NUM) VALUES ' +
-                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup, @relationNum)';
+            //var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
+            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
+                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
+                
+            var insertTblCarousel_M = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_1_CONTEXT_M,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
+            '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@buttonContent1_M,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
+        
             var insertTblCarousel = 'INSERT INTO TBL_DLG_CARD(DLG_ID,CARD_TITLE,CARD_TEXT,IMG_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_ORDER_NO,USE_YN,CARD_VALUE) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,@imgUrl,@btn1Type,@buttonName1,@buttonContent1,@btn2Type,@buttonName2,@buttonContent2,@btn3Type,@buttonName3,@buttonContent3,@btn4Type,@buttonName4,@buttonContent4,@cardOrderNo,\'Y\',@cardValue)';
             var insertTblDlgMedia = 'INSERT INTO TBL_DLG_MEDIA(DLG_ID,CARD_TITLE,CARD_TEXT,MEDIA_URL,BTN_1_TYPE,BTN_1_TITLE,BTN_1_CONTEXT,BTN_2_TYPE,BTN_2_TITLE,BTN_2_CONTEXT,BTN_3_TYPE,BTN_3_TITLE,BTN_3_CONTEXT,BTN_4_TYPE,BTN_4_TITLE,BTN_4_CONTEXT,CARD_DIVISION,CARD_VALUE,USE_YN) VALUES ' +
@@ -2513,10 +2526,11 @@ router.post('/addDialog', function (req, res) {
             var predictIntent = array[array.length - 1]["predictIntent"];
             var dialogOrderNo = array[array.length - 1]["dlgOrderNo"];
 
-            
+            /*
             let resultRNum = await pool.request()
                 .query(selectRelationNum);
-            var relationNum = resultRNum.recordset;
+            var dlgNo = resultRNum.recordset;
+            */
 
             for (var i = 0; i < (array.length - 1); i++) {
                 var insertDlgOrderNo = 0;
@@ -2585,6 +2599,7 @@ router.post('/addDialog', function (req, res) {
                             .input('btn1Type', sql.NVarChar, carTmp["btn1Type"])
                             .input('buttonName1', sql.NVarChar, carTmp["cButtonName1"])
                             .input('buttonContent1', sql.NVarChar, carTmp["cButtonContent1"])
+                            .input('buttonContent1_M', sql.NVarChar, carTmp["cButtonContentM"])
                             .input('btn2Type', sql.NVarChar, carTmp["btn2Type"])
                             .input('buttonName2', sql.NVarChar, carTmp["cButtonName2"])
                             .input('buttonContent2', sql.NVarChar, carTmp["cButtonContent2"])
@@ -2595,7 +2610,7 @@ router.post('/addDialog', function (req, res) {
                             .input('buttonName4', sql.NVarChar, carTmp["cButtonName4"])
                             .input('buttonContent4', sql.NVarChar, carTmp["cButtonContent4"])
                             .input('cardOrderNo', sql.Int, (j + 1))
-                            .query(insertTblCarousel);
+                            .query(insertTblCarousel_M);
                     }
 
                     tblDlgId.push(dlgId[0].DLG_ID);

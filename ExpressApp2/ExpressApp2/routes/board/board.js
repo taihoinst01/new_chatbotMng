@@ -15,6 +15,7 @@ var Logger = require("../../config/logConfig");
 var logger = Logger.CreateLogger();
 //log end
 
+var luisUtil = require("../../config/luisUtil");
 var router = express.Router();
 
 /* GET users listing. */
@@ -61,33 +62,6 @@ router.get('/', function (req, res) {
             }
             
 
-            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-
-            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'db Intent 조회 시작');
-            
-            let getDBIntent_result = await pool.request()
-                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT");   
-            var sessionIntentList = getDBIntent_result.recordset;
-            req.session.intentList = sessionIntentList;
-            
-            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'intent 조회 완료, db Entity 조회 시작');
-            let getDBEntity_result = await pool.request()
-                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, ENTITY_TYPE, MOD_DT FROM TBL_LUIS_ENTITY");     
-            var sessionEntityList = getDBEntity_result.recordset;            
-            req.session.entityList = sessionEntityList;
-
-            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', 'entity 조회 완료, db child entity 조회 시작');
-            let getDBEntityChild_result = await pool.request()
-                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY");      
-            var sessionEntityChildList = getDBEntityChild_result.recordset;           
-            req.session.entityChildList = sessionEntityChildList;
-            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, '/board', ' db child entity 조회 완료');
-
-
-            //어터런스 cnt 
-            //https://westus.api.cognitive.microsoft.com/luis/webapi/v2.0/apps/0a66734d-690a-4877-9b4c-28ada8098751/versions/0.1/stats/labelsperintent
-
-            
             var options = {
                 headers: {
                     'Content-Type': 'application/json'
@@ -97,6 +71,273 @@ router.get('/', function (req, res) {
             var HOST = req.session.hostURL;
             var subKey = req.session.subKey;
             options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+            var selectedAppList = [];
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+/*
+            var leftList = req.session.leftList;
+            var chatNum = -1;
+            for (var ii = 0; ii< leftList.length; ii++) {
+                if (leftList[ii].CHATBOT_NAME == req.session.appName) {
+                    chatNum = leftList[ii].CHATBOT_NUM;
+                    break;
+                }
+            }
+
+            if (chatNum != -1) {
+                var ChatRelationAppList = req.session.ChatRelationAppList;
+
+                for (var jj = 0; jj< ChatRelationAppList.length; jj++) {
+                    if (ChatRelationAppList[jj].CHAT_ID == chatNum) {
+                        
+                        selectedAppList.push(ChatRelationAppList[jj].APP_ID);
+                    }
+                }
+            }
+
+
+            var intentListTotal = [];
+            var entityListTotal = [];
+            var childrenListTotal = [];
+
+            for (var kk=0; kk<selectedAppList.length; kk++) {
+                var tmpObj = new Object();
+                
+                logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s] [앱 id : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis app정보 조회 시작', selectedAppList[kk]);
+                //tmpObj.intentList = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/intents', options);
+                var tmpIntentObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/intents', options);
+                var tmpSimpleObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/entities', options);
+                var tmpHierarchyObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/hierarchicalentities', options);
+                var tmpCompositeObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/compositeentities', options);
+                var tmpClosedObj = syncClient.get(HOST + '/luis/api/v2.0/apps/' + selectedAppList[kk] + '/versions/' + '0.1' + '/closedlists', options);
+                
+                tmpIntentObj.appId = selectedAppList[kk];
+                tmpSimpleObj.appId = selectedAppList[kk];
+                tmpHierarchyObj.appId = selectedAppList[kk];
+                tmpCompositeObj.appId = selectedAppList[kk];
+                tmpClosedObj.appId = selectedAppList[kk];
+
+                
+                intentListTotal = intentListTotal.concat(luisUtil.getIntentList(tmpIntentObj.body, selectedAppList[kk]));
+
+                entityListTotal = entityListTotal.concat(luisUtil.getSimpleList(tmpSimpleObj.body, selectedAppList[kk]));
+
+                tmpObj = luisUtil.getHierarchyList(tmpHierarchyObj.body, selectedAppList[kk]);
+                entityListTotal = entityListTotal.concat(tmpObj.hierarchyList);
+                childrenListTotal = childrenListTotal.concat(tmpObj.childrenList);
+
+                tmpObj = luisUtil.getCompositeList(tmpCompositeObj.body, selectedAppList[kk]);
+                entityListTotal = entityListTotal.concat(tmpObj.compositeList);
+                childrenListTotal = childrenListTotal.concat(tmpObj.childrenList);
+
+                tmpObj = luisUtil.getClosedList(tmpClosedObj.body, selectedAppList[kk]);
+                entityListTotal = entityListTotal.concat(tmpObj.closedList);
+                childrenListTotal = childrenListTotal.concat(tmpObj.childrenList);
+                
+                logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s] [앱 id : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis app정보 조회 완료', selectedAppList[kk]);
+                //selectedIntentList.push(tmpObj);
+            }
+
+
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db Intent 조회 시작');
+            
+            let getDBIntent_result = await pool.request()
+                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT");   
+            var sessionIntentList = getDBIntent_result.recordset;
+            //req.session.intentList = sessionIntentList;
+            
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'intent 조회 완료, db Entity 조회 시작');
+            let getDBEntity_result = await pool.request()
+                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY");     
+            var sessionEntityList = getDBEntity_result.recordset;            
+            //req.session.entityList = sessionEntityList;
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'entity 조회 완료, db child entity 조회 시작');
+            let getDBEntityChild_result = await pool.request()
+                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY");      
+            var sessionEntityChildList = getDBEntityChild_result.recordset;           
+            //req.session.entityChildList = sessionEntityChildList;
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, ' db child entity 조회 완료');
+
+            //db, luis 동기화 start
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db-luis 동기화 시작');
+            
+
+            //var objLength =  ((intentListTotal.length>entityListTotal.length?intentListTotal.length:entityListTotal.length)>childrenListTotal.length?intentListTotal.length:childrenListTotal.length);
+            
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db-luis intent 비교');
+            for (var jk=0; jk<intentListTotal.length; jk++) {
+                for (var aj=0; aj<sessionIntentList.length; aj++) {
+                    if (intentListTotal[jk].id == sessionIntentList[aj].INTENT_ID && intentListTotal[jk].name == sessionIntentList[aj].INTENT) {
+                        sessionIntentList.splice(aj--, 1);
+                        intentListTotal.splice(jk--, 1);
+                        //sessionIntentList = sessionIntentList.splice(1+aj--, sessionIntentList.length);
+                        //intentListTotal = intentListTotal.splice(1+jk--, intentListTotal.length);
+                        break;
+                    }
+                }
+            }
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db-luis entity 비교');
+            for (var jk=0; jk<entityListTotal.length; jk++) {
+                for (var aj=0; aj<sessionEntityList.length; aj++) {
+                    if (entityListTotal[jk].id == sessionEntityList[aj].ENTITY_ID && entityListTotal[jk].name == sessionEntityList[aj].ENTITY_NAME) {
+                        sessionEntityList.splice(aj--, 1);
+                        entityListTotal.splice(jk--, 1);
+                        //sessionEntityList = sessionEntityList.splice(1+aj--, sessionEntityList.length);
+                        //entityListTotal = entityListTotal.splice(1+jk--, entityListTotal.length);
+                        break;
+                    }
+                }
+            }
+            
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db-luis child entity 비교');
+            for (var jk=0; jk<childrenListTotal.length; jk++) {
+                for (var aj=0; aj<sessionEntityChildList.length; aj++) {
+                    if (childrenListTotal[jk].childId == sessionEntityChildList[aj].CHILDREN_ID && childrenListTotal[jk].name == sessionEntityChildList[aj].CHILDREN_NAME
+                        && childrenListTotal[jk].entityId == sessionEntityChildList[aj].ENTITY_ID ) 
+                    {
+                        //5 : closed list
+                        if (childrenListTotal[jk].typeId == 5) {
+                            var subStrTmp = childrenListTotal[jk] == null ? null :childrenListTotal[jk];
+                            if (sessionEntityChildList[aj].SUB_LIST == subStrTmp) {
+                                sessionEntityChildList.splice(aj--, 1);
+                                childrenListTotal.splice(jk--, 1);
+                                break;
+                            } 
+                            else 
+                            {
+                                break;
+                            }
+                        }
+                        else 
+                        {
+                            sessionEntityChildList.splice(aj--, 1);
+                            childrenListTotal.splice(jk--, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //db, luis 동기화 end
+            //--------------------------intent start --------------------------
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 없고 db에 있는 intent db delete');
+            for (var pp=0; pp<sessionIntentList.length; pp++) {
+                var intentQry = "DELETE FROM TBL_LUIS_INTENT WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @intentId AND INTENT = @intent; \n ";
+
+                //console.log("intent -" + pp)
+                let delDBIntent = await pool.request()
+                                                    .input('appId', sql.NVarChar, sessionIntentList[pp].APP_ID)
+                                                    .input('intentId', sql.NVarChar, sessionIntentList[pp].INTENT_ID)
+                                                    .input('intent', sql.NVarChar, sessionIntentList[pp].INTENT)
+                                                    .query(intentQry);
+            }
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 있고 db에 없는 intent db insert');
+            for (var pp=0; pp<intentListTotal.length; pp++) {
+                var intentQry = "INSERT INTO TBL_LUIS_INTENT (APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT) \n ";
+                intentQry += "VALUES(@appId, @intentName, @intentId, @reg_id, SWITCHOFFSET(getDate(), '+09:00')); ";
+
+                //console.log("intent -" + pp)
+                let insertDBIntent = await pool.request()
+                                                    .input('appId', sql.NVarChar, intentListTotal[pp].appId)
+                                                    .input('intentName', sql.NVarChar, intentListTotal[pp].name)
+                                                    .input('intentId', sql.NVarChar, intentListTotal[pp].id)
+                                                    .input('reg_id', sql.NVarChar, userId)
+                                                    .query(intentQry);
+            }
+            //--------------------------intent end --------------------------
+
+            //--------------------------entity start --------------------------
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 없고 db에 있는 entity db delete');
+            for (var pp=0; pp<sessionEntityList.length; pp++) {
+                var entityQry = "DELETE FROM TBL_LUIS_ENTITY WHERE 1=1 AND APP_ID = @appId AND ENTITY_ID = @entityId AND ENTITY_NAME = @entityName; \n ";
+
+                //console.log("entity -" + pp)
+                let delDBEntity = await pool.request()
+                                                    .input('appId', sql.NVarChar, sessionEntityList[pp].APP_ID)
+                                                    .input('entityId', sql.NVarChar, sessionEntityList[pp].ENTITY_ID)
+                                                    .input('entityName', sql.NVarChar, sessionEntityList[pp].ENTITY_NAME)
+                                                    .query(entityQry);
+            }
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 있고 db에 없는 entity db insert');
+            for (var pp=0; pp<entityListTotal.length; pp++) {
+                
+                var entityQry = "INSERT INTO TBL_LUIS_ENTITY (APP_ID, ENTITY_NAME, ENTITY_ID, ENTITY_TYPE, REG_DT) \n ";
+                entityQry += "VALUES(@appId, @entityName, @entityId, @entityType, SWITCHOFFSET(getDate(), '+09:00')); ";
+                //console.log("entity -" + pp)
+                let insertDBEntity = await pool.request()
+                                                    .input('appId', sql.NVarChar, entityListTotal[pp].appId)
+                                                    .input('entityName', sql.NVarChar, entityListTotal[pp].name)
+                                                    .input('entityId', sql.NVarChar, entityListTotal[pp].id)
+                                                    .input('entityType', sql.NVarChar, entityListTotal[pp].typeId)
+                                                    .query(entityQry);
+            }
+
+            //--------------------------entity end --------------------------
+
+            //--------------------------child Entity start --------------------------
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 없고 db에 있는 child entity db delete');
+            for (var pp=0; pp<sessionEntityChildList.length; pp++) {
+                var childEntityQry = "DELETE FROM TBL_LUIS_CHILD_ENTITY WHERE 1=1 AND ENTITY_ID = @entityId AND CHILDREN_ID = @childId AND CHILDREN_NAME = @childName; \n ";
+
+                //console.log("child -" + pp)
+                let delDBChildEntity = await pool.request()
+                                                    .input('entityId', sql.NVarChar, sessionEntityChildList[pp].ENTITY_ID)
+                                                    .input('childId', sql.NVarChar, sessionEntityChildList[pp].CHILDREN_ID)
+                                                    .input('childName', sql.NVarChar, sessionEntityChildList[pp].CHILDREN_NAME)
+                                                    .query(childEntityQry);
+            }
+
+            logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 있고 db에 없는 child entity db insert');
+            for (var pp=0; pp<childrenListTotal.length; pp++) {
+                //console.log("child -" + pp)
+                if (childrenListTotal[pp].typeId != 5) {//composite, hierarchy
+                    var childEntityQry = "INSERT INTO TBL_LUIS_CHILD_ENTITY (ENTITY_ID, CHILDREN_ID, CHILDREN_NAME) \n ";
+                    childEntityQry += "VALUES(@entityId, @childId, @entityName ); ";
+
+                    let insertDBChildEntity = await pool.request()
+                                                        .input('entityId', sql.NVarChar, childrenListTotal[pp].entityId)
+                                                        .input('childId', sql.NVarChar, childrenListTotal[pp].childId)
+                                                        .input('entityName', sql.NVarChar, childrenListTotal[pp].name)
+                                                        .query(childEntityQry);
+                }
+                else //closed list
+                {
+                    var childEntityQry = "INSERT INTO TBL_LUIS_CHILD_ENTITY (ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST) \n ";
+                    childEntityQry += "VALUES(@entityId, @childId, @entityName, @childListStr); ";
+
+                    let insertDBChildEntity = await pool.request()
+                                                        .input('entityId', sql.NVarChar, childrenListTotal[pp].entityId)
+                                                        .input('childId', sql.NVarChar, childrenListTotal[pp].childId)
+                                                        .input('entityName', sql.NVarChar, childrenListTotal[pp].name)
+                                                        .input('childListStr', sql.NVarChar, childrenListTotal[pp].childList)
+                                                        .query(childEntityQry);
+                }
+            }
+            */
+            //--------------------------child Entity start --------------------------
+
+            //db에서 가져와서 session에 저장
+            let getDBIntent_result = await pool.request()
+                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT ORDER BY CASE WHEN INTENT  LIKE '[0-9]%' THEN 3 WHEN INTENT like '[A-Za-z]%' THEN 1 ELSE 2 END, INTENT;");   
+            req.session.intentList = getDBIntent_result.recordset;
+            
+            let getDBEntity_result = await pool.request()
+                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, ENTITY_TYPE, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY ORDER BY ENTITY_TYPE, ENTITY_NAME;");        
+            req.session.entityList = getDBEntity_result.recordset;
+
+            let getDBEntityChild_result = await pool.request()
+                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY ORDER BY ENTITY_ID, CHILDREN_NAME;");              
+            req.session.entityChildList = getDBEntityChild_result.recordset;
+
+            //어터런스 cnt 
+            //https://westus.api.cognitive.microsoft.com/luis/webapi/v2.0/apps/0a66734d-690a-4877-9b4c-28ada8098751/versions/0.1/stats/labelsperintent
+
+            
+            
 
             var utterCntObj;
             var saveAppId = '';
@@ -631,7 +872,7 @@ router.post('/firstQueryTable', function (req, res) {
         selectQuery += "    ) A \n";
         selectQuery += "    WHERE ROW = 1 \n";
         selectQuery += "    GROUP BY CUSTOMER_COMMENT_KR,날짜,채널 \n";
-        selectQuery += ") HI LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN ON REPLACE(REPLACE(LOWER(HI.CUSTOMER_COMMENT_KR),'.',''),'?','') = LOWER(AN.QUERY) \n";
+        selectQuery += ") HI LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN ON HI.CUSTOMER_COMMENT_KR = AN.QUERY \n";
         selectQuery += "LEFT OUTER JOIN (SELECT LUIS_INTENT,LUIS_ENTITIES,MIN(DLG_ID) AS DLG_ID FROM TBL_DLG_RELATION_LUIS GROUP BY LUIS_INTENT, LUIS_ENTITIES) RE \n";
         selectQuery += "    ON AN.LUIS_INTENT = RE.LUIS_INTENT \n";
         selectQuery += "    AND AN.LUIS_ENTITIES = RE.LUIS_ENTITIES \n";
@@ -737,7 +978,7 @@ router.post('/getQueryByEachTime', function (req, res) {
         selectQuery += "	 GROUP BY USER_NUMBER, datename(hh,reg_date), CHANNEL, CONVERT(DATE,CONVERT(DATETIME,REG_DATE),120), CUSTOMER_COMMENT_KR \n";
         selectQuery += "	 ) HI \n";
         selectQuery += "LEFT OUTER JOIN TBL_QUERY_ANALYSIS_RESULT AN \n";
-        selectQuery += "ON REPLACE(REPLACE(LOWER(HI.CUSTOMER_COMMENT_KR),'.',''),'?','') = LOWER(AN.QUERY) \n";
+        selectQuery += "ON HI.CUSTOMER_COMMENT_KR = AN.QUERY \n";
         selectQuery += "GROUP BY (REPLICATE('0', 2 - LEN(시간)) + 시간)  \n";
         selectQuery += "HAVING 1=1 \n";
         selectQuery += "ORDER BY TIME; \n";

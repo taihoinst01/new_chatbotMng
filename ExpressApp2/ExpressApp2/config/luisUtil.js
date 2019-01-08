@@ -150,6 +150,123 @@ module.exports = {
 
     },
 
+    getIntentList: function (body, appId) { 
+        var intentList = [];
+        body.forEach(x => {
+            x.appId = appId;
+            /*
+            var tmpObj = new Object();
+            tmpObj.APP_ID = appId;
+            tmpObj.INTENT_ID = x.id;
+            tmpObj.INTENT = x.name;
+            */
+            intentList.push(x);
+        });
+        return intentList;
+    },
 
+    getSimpleList: function (body, appId) { 
+        var simpleList = [];
+        body.forEach(x => {
+            x.appId = appId;
+            /*
+            var tmpObj = new Object();
+            tmpObj.APP_ID = appId;
+            tmpObj.ENTITY_ID = x.id;
+            tmpObj.ENTITY = x.name;
+            */
+            simpleList.push(x);
+        });
+        return simpleList;
+    },
+
+    getHierarchyList: function (body, appId) { 
+        var hierarchyObj = new Object();
+        var hierarchyList = [];
+        var childrenList = [];
+        body.forEach(x => {
+            x.appId = appId;
+            /*
+            var tmpObj = new Object();
+            tmpObj.APP_ID = appId;
+            tmpObj.ENTITY_ID = x.id;
+            tmpObj.ENTITY = x.name;
+            */
+            hierarchyList.push(x);
+            x.children.forEach(k => {
+                var tmpObj = new Object();
+                tmpObj.entityId = x.id;
+                tmpObj.childId = k.id;
+                tmpObj.name = k.name;
+                tmpObj.typeId = x.typeId;
+                childrenList.push(tmpObj);
+            });
+        });
+        hierarchyObj.hierarchyList = hierarchyList;
+        hierarchyObj.childrenList = childrenList;
+        return hierarchyObj;
+    },
+
+    getCompositeList: function (body, appId) { 
+        var compositeObj = new Object();
+        var compositeList = [];
+        var childrenList = [];
+        body.forEach(x => {
+            x.appId = appId;
+            /*
+            var tmpObj = new Object();
+            tmpObj.APP_ID = appId;
+            tmpObj.ENTITY_ID = x.id;
+            tmpObj.ENTITY = x.name;
+            */
+            compositeList.push(x);
+
+            x.children.forEach(k => {
+                var tmpObj = new Object();
+                tmpObj.entityId = x.id;
+                tmpObj.childId = k.id;
+                tmpObj.name = k.name;
+                tmpObj.typeId = x.typeId;
+                childrenList.push(tmpObj);
+            });
+        });
+        compositeObj.compositeList = compositeList;
+        compositeObj.childrenList = childrenList;
+        return compositeObj;
+    },
+
+    getClosedList: function (body, appId) { 
+        var closedObj = new Object();
+        var closedList = [];
+        var childrenList = [];
+        body.forEach(x => {
+            x.appId = appId;
+            /*
+            var tmpObj = new Object();
+            tmpObj.APP_ID = appId;
+            tmpObj.ENTITY_ID = x.id;
+            tmpObj.ENTITY = x.name;
+            */
+            closedList.push(x);
+
+            x.subLists.forEach( k => {
+                var tmpObj = new Object();
+                tmpObj.entityId = x.id;
+                tmpObj.childId = k.id;
+                tmpObj.name = k.canonicalForm;
+                tmpObj.typeId = x.typeId;
+                var childListStr = "";
+                for (var t=0; t<k.list.length; t++) {
+                    childListStr += k.list[t];
+                    if (t != k.list.length-1)  childListStr += ",";
+                }
+                tmpObj.childList = childListStr;
+                childrenList.push(tmpObj);
+            });
+        });
+        closedObj.closedList = closedList;
+        closedObj.childrenList = childrenList;
+        return closedObj;
+    },
 
 };

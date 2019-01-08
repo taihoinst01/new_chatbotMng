@@ -34,6 +34,11 @@ var logger = Logger.CreateLogger();
 
 var app = express();
 
+
+//http헤더 보안
+var helmet = require('helmet');
+app.use(helmet());
+
 process.setMaxListeners(0);
 
 // view engine setup test ydy pjs

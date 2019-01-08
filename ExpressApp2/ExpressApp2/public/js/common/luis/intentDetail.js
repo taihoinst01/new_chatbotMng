@@ -7,6 +7,7 @@ var simpleList = [];
 var hierarchyList = [];
 var compositeList = [];
 var closedList = [];
+var closedCompareList = [];
 var isFirst = true;
 ;(function($) {
     $.ajax({
@@ -60,7 +61,6 @@ $(document).ready(function() {
         location.href = "/luis/intentList?rememberPageNum=" + pageNum;
     });
 
-
 });
 
 // input 엔터 감지
@@ -105,7 +105,7 @@ $(document).on("keydown", "input[name=matchUtterText]", function(e){
     }
 });
 
-
+/*//dyyoo 라벨링 제거
 // tr클릭 scoreSelTd
 $(document).on("click", "tr[name=utterMainTr]", function(e){ 
     if (e.target.className.indexOf('fa-plus') != -1 || e.target.className.indexOf('fa-trash') != -1 
@@ -122,7 +122,7 @@ $(document).on("click", "tr[name=utterMainTr]", function(e){
         }
     }
 });
-
+*/
 
 function chkDulpleSelBox(trIndex, chkIndexStr) {
     
@@ -152,6 +152,8 @@ $(document).on("focusin", "input[name=matchUtterText]", function(e){
     rememberUtterEnd = $(this).parent().find('input[name=endIndex]').val();
 });
 
+
+//작업중
 
 //input focusout
 $(document).on("focusout", "input[name=matchUtterText]", function(e){
@@ -858,7 +860,9 @@ $(document).on("keypress", "#utterInputText", function(e){
             utterBodyHtml += "<td ></td>";
             utterBodyHtml += "<td style='text-align: left; padding-left:1%;'>";
             utterBodyHtml += makeTokenizedText(tokenArr, 'SPAN'); 
+            /*//dyyoo 라벨링 제거
             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
+            */
             utterBodyHtml += "</td>";
             //utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;'>" + utterList.tokenizedText + "</td>";
             utterBodyHtml += "<td></td>";
@@ -1056,7 +1060,9 @@ function makeUtteranceTable() {
                             utterBodyHtml += "<td ></td>";
                             utterBodyHtml += "<td style='text-align: left; padding-left:1%; max-width:1000px;'>";
                             utterBodyHtml += makeTokenizedText(utterList[i].tokenizedText, 'SPAN');
+                            /*//dyyoo 라벨링 제거
                             utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
+                            */
                             utterBodyHtml += "</td>";
                             //utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;'>" + utterList.tokenizedText + "</td>";
                             utterBodyHtml += "<td class='scoreSelTd'>";
@@ -1087,6 +1093,10 @@ function makeUtteranceTable() {
                             isFirst = false;
                             $('#scrollUpDownBtn').trigger('click');
                         }
+                                            
+                        setTimeout(function () {
+                            labelingClosedList ();
+                        }, 200);
                     }
                 }
             }
@@ -1681,6 +1691,24 @@ function getEntityList(intentName, intentId) {
                 hierarchyList = data.hierarchyList;
                 compositeList = data.compositeList;
                 closedList = data.closedList;
+                var childTmpArr = [];
+                for (var i=0; i<closedList.length; i++) {
+                    var childList = closedList[i].CHILD_ENTITY_LIST;
+                    for (var j=0; j<childList.length; j++) {
+                        for (var k=0; k<childList[j].CHILDREN_NAME.length; k++) {
+                            childTmpArr.push(childList[j].CHILDREN_NAME.split(' ').join(''));
+                            if (childList[j].SUB_LIST) {
+                                var tmp = childList[j].SUB_LIST.split(',');
+                                for (var q=0; q<tmp.length; q++) {                                    
+                                    childTmpArr.push(tmp[q].split(' ').join(''));
+                                }
+                            }
+                        }
+                    }
+                }
+                $.each(childTmpArr, function(i, el){
+                    if($.inArray(el, closedCompareList) === -1) closedCompareList.push(el);
+                });
             }
         }
     });
@@ -2130,3 +2158,167 @@ $(document).on("click", "#confirmBtn", function () {
     }
     $('#confirmBtn').prev().hide();
 });
+
+
+
+function labelingClosedList () {
+    var indexArr = [];
+
+    $('#utteranceTblBody tr[name=utterMainTr]').each(function(inx){
+
+        var fullContext = $(this).find('#intentHiddenName').val();
+        var matchClosedArr = [];
+        for (var i=0; i<closedCompareList.length; i++) {
+            if (fullContext.indexOf(closedCompareList[i]) != -1) {
+                matchClosedArr.push(closedCompareList[i]);
+            } else {
+            }
+        }
+
+        
+        for (var q=0; q<matchClosedArr.length; q++) {
+
+            var chkMatch = [];
+            var chkMatchIndex = [];
+            var isMatch = false;
+            var isEngNum = false;
+            
+            for (var i=0; i<matchClosedArr.length; i++) {
+                var inputLength = matchClosedArr[i].length;
+                var utterLength = $(this).find('span[name=utterText]').length;
+                
+                for (var j=0; j<matchClosedArr[i].length; j++) {
+                    if (isAlpabet(matchClosedArr[i][j])) {
+                        isEngNum = true;
+                        break;
+                    } 
+                }
+
+                var indexArr = [];
+                var inputVal = matchClosedArr[i];
+                if (isEngNum) {
+                    $(this).find('input[name=tokenVal]').each(function(index, item){
+                        var strVal = '';
+                        var isMatch = false;
+            
+                        var innerIndex = 0;
+                        while (1) {
+                            var hasClass = $(item).parent().find('#utterText_' + index).attr('class');
+                            hasClass = hasClass == undefined? '' : hasClass;
+                            if (hasClass.indexOf('span_color') != -1) {
+                                break;
+                            }
+                            strVal += $(item).parent().find('input[name=tokenVal]').eq(index+innerIndex).val();
+                            var subInput = inputVal.substr(0, strVal.length);
+                            if (inputVal == strVal) {
+                                isMatch = true
+                                break;
+                            } else if (strVal == subInput) {
+                                innerIndex++
+                                continue;
+                            } else {
+                                break;
+                            }
+                        }
+                        if (isMatch) {
+                            var matchObj = new Object();
+                            matchObj.startIndex = index;
+                            matchObj.endIndex = index+innerIndex;
+                            indexArr.push(matchObj);
+                            //
+                            chkMatch.push(inputStr);
+                            var tmpIndex = index + ',' + matchObj.endIndex;
+                            chkMatchIndex.push(tmpIndex);
+                        }
+                    });
+                } else {
+                    for (var inc=0; inc<=utterLength-inputLength; inc++) {
+                        var strTmp = '';
+                        var chkLabeled = false;
+                        for (var jnc=0; jnc<inputLength; jnc++) {
+                            var spanClass = $(this).find('span[name=utterText]').eq(inc+jnc).attr('class');
+                            if (typeof spanClass == 'undefined') {
+                                spanClass = '';
+                        }
+                            if (spanClass.indexOf('span_color_') != -1) {
+                                chkLabeled = true;
+                                break;
+                            } else {
+                                strTmp += $(this).find('span[name=utterText]').eq(inc+jnc).text();
+                            }
+                        }
+                        if (inputVal == strTmp && strTmp != '' && !chkLabeled) {
+                            chkMatch.push(inputVal);
+                            var tmpNum = (inc + inputLength*1)-1;
+                            var tmpIndex = inc + ',' + tmpNum;
+                            chkMatchIndex.push(tmpIndex);
+                        }
+                    }
+                }
+            }
+
+//-------------------------------[
+//-------------------------------[
+//-------------------------------[]
+            if (chkMatch.length<1) {
+                continue;
+            }
+            for (var k=0; k<chkMatchIndex.length; k++) {
+                var matchStartIndex = chkMatchIndex[k].split(",")[0]*1;
+                var matchEndIndex = chkMatchIndex[k].split(",")[1]*1;
+                var colorIndexArr = [0, 1, 2, 3, 4];
+                $(this).find('span[name=utterText]').each(function(){
+                    var classValue = $(this).attr('class');
+
+                    if (typeof classValue == 'undefined') {
+                        classValue = '';
+                    }
+
+                    if (classValue.indexOf('span_color_') != -1) {
+                        for (var i=0; i<colorIndexArr.length; i++) {
+                            if ('span_color_' + colorIndexArr[i] == $(this).attr('class')) {
+                                colorIndexArr.splice(i--, 1);
+                            }
+                        }
+                    }
+                });
+
+                for (var i=0; i<matchStartIndex; i++) {
+                    var tmpClass = $(this).find('span[name=utterText]').eq(i).attr('class');
+                    if (typeof tmpClass == 'undefined') {
+                        tmpClass = '';
+                    }
+                    if (tmpClass.indexOf('span_color_') != -1) {
+                        if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                            colorIndexArr.splice(i--, 1);
+                            break;
+                        }
+                    }
+                }
+                for (var i=matchEndIndex+1; i<matchStartIndex; i++) {
+                    var tmpClass = $(this).find('span[name=utterText]').eq(i).attr('class');
+                    if (typeof tmpClass == 'undefined') {
+                        tmpClass = '';
+                    }
+                    if (tmpClass.indexOf('span_color_') != -1) {
+                        if (colorIndexArr[i] == tmpClass.split('span_color_')[1]) {
+                            colorIndexArr.splice(i--, 1);
+                            break;
+                        }
+                    }
+                }
+
+                if (colorIndexArr.length > 0) {
+                    for (var i=matchStartIndex; i<=matchEndIndex; i++) {
+                        $(this).find('#utterText_' + i).addClass('span_color_' + colorIndexArr[0]);
+                    }
+                }
+            }
+            
+
+        } 
+    });
+ 
+    
+ 
+}
