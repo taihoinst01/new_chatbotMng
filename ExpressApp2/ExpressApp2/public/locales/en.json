@@ -315,5 +315,9 @@
 	"INPUT_BTN_VALUE": "Fill out btn value.",
 	"INPUT_BTN_URL_PC": "Fill out PC URL.",
 	"INPUT_BTN_URL_MOBILE": "Fill out mobile URL.",
+	"============= 보안 =============": "",
+	"ALERT_LOGIN_FAIL": "Login failed.",
+	"ALERT_LOGOUT": "You have been signed out for no use.",
+	"ALERT_CANT_CHANGE_SAME_PW": "PW is the same password you used before.",
 	"============= The end =============": ""
 }

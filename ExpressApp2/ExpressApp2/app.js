@@ -89,6 +89,12 @@ app.use(function(req, res, next) {
         res.locals.sAuth = null;
     }
 
+    if(req.session.userInfo) {
+        res.locals.userInfo = req.session.userInfo;
+    } else {
+        res.locals.userInfo = null;
+    }
+
     if(req.session.dbValue) {
         res.locals.dbValue = req.session.dbValue;
     } else {

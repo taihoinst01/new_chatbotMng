@@ -486,6 +486,10 @@
 	"INPUT_BTN_VALUE": "버튼 값을 입력하세요.",
 	"INPUT_BTN_URL_PC": "PC URL을 입력하세요.",
 	"INPUT_BTN_URL_MOBILE": "모바일 URL을 입력하세요.",
-	"============= The end =============": "",
-	"language": "언어"
+	"language": "언어",
+	"============= 보안 =============": "",
+	"ALERT_LOGIN_FAIL": "로그인에 실패했습니다.",
+	"ALERT_LOGOUT": "일정시간 미사용으로 로그아웃 되었습니다.",
+	"ALERT_CANT_CHANGE_SAME_PW": "이전 비밀번호와 일치합니다.",
+	"============= The end =============": ""
 }

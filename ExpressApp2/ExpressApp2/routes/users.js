@@ -28,6 +28,55 @@ basePW = cipher.final('base64');
 //암호화
 var pwConfig = require('../config/passConfig');
 
+//로그인 제한 횟수
+const loginLimitCnt = 3;
+
+var loginSelQry = ` 
+SELECT USER_ID 
+       , SCRT_NUM 
+       , SCRT_SALT 
+       , ISNULL(PW_INIT_YN, 'N') AS PW_INIT_YN 
+       , ISNULL(LAST_LOGIN_IP, 'NONE') AS LAST_LOGIN_IP 
+       , ISNULL(CONVERT(char(19), LAST_LOGIN_DT, 120), 'NONE') AS LAST_LOGIN_DT2 
+       , DATEDIFF ( day , ISNULL(LAST_LOGIN_DT, getdate() ) 
+       , getdate() ) AS LAST_LOGIN_DT 
+       , ISNULL(LOGIN_IP, 'NONE') AS LOGIN_IP 
+       , ISNULL(LOGIN_FAIL_CNT, 0) AS LOGIN_FAIL_CNT 
+       , DATEDIFF ( mi , ISNULL(LOGIN_FAIL_DT, getdate() ), getdate() ) AS LOGIN_FAIL_DT 
+       , DATEDIFF ( mi , ISNULL(LAST_SCRT_DT, getdate() ), getdate() ) AS LAST_SCRT_DT
+       , ISNULL(LOGIN_YN, 'N') AS LOGIN_YN 
+       , ISNULL(USER_AUTH, '0') AS USER_AUTH 
+       
+       , ISNULL(SCRT_NUM_FIRST, '0') AS SCRT_NUM_FIRST 
+       , ISNULL(SCRT_SALT_FIRST, '0') AS SCRT_SALT_FIRST 
+       , ISNULL(SCRT_NUM_SECOND, '0') AS SCRT_NUM_SECOND 
+       , ISNULL(SCRT_SALT_SECOND, '0') AS SCRT_SALT_SECOND 
+       , ISNULL(SCRT_NUM_THIRD, '0') AS SCRT_NUM_THIRD 
+       , ISNULL(SCRT_SALT_THIRD, '0') AS SCRT_SALT_THIRD 
+       
+  FROM TB_USER_M 
+ WHERE USER_ID = @userId 
+   AND USE_YN = 'Y';
+`;
+
+var insertUserLoginHistoryQry = ` 
+INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, USERIP, STATUS) 
+VALUES (@userId, GETDATE(), @loginIp, 'LOGIN');
+`; 
+
+var insertUserLogoutHistoryQry = ` 
+INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, LOGOUT_TIME, USERIP, STATUS) 
+VALUES (@userId 
+     , ( SELECT LOGIN_TIME FROM ( 
+                                  SELECT ROW_NUMBER() OVER(ORDER BY TBL_A.LOGIN_TIME DESC) AS NUM, TBL_A.LOGIN_TIME 
+                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE STATUS='LOGIN' AND USERID='test01') TBL_A 
+                                ) TBL_B 
+          WHERE TBL_B.NUM = 1 
+       ) 
+     , GETDATE() 
+     , @loginIp 
+     , 'LOGOUT');
+`; 
 
 //const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
@@ -55,122 +104,258 @@ router.post('/login', function (req, res) {
     console.log(cipheredOutput);
     */
 
-    var loginSelQry = "";
-    loginSelQry = "SELECT USER_ID, SCRT_NUM, ISNULL(PW_INIT_YN, 'N') AS PW_INIT_YN, SCRT_SALT, USER_AUTH \n";
-    loginSelQry += " FROM TB_USER_M \n WHERE USER_ID = @userId AND USE_YN = 'Y' ";
+    var initLoginFailCntQry = `
+    UPDATE TB_USER_M SET LOGIN_FAIL_CNT = 0 WHERE USER_ID = @userId;
+    `
 
-    dbConnect.getConnection(sql).then(pool => {
-    //new sql.ConnectionPool(dbConfig).connect().then(pool => {
-        return pool.request()
-                    .input('userId', sql.NVarChar, userId)
-                    .query(loginSelQry)
-        }).then(result => {
-            let rows = result.recordset;
-            console.log(rows);
+    var updateLoginFailCntQry = ` 
+    UPDATE TB_USER_M SET LOGIN_FAIL_CNT = (ISNULL(LOGIN_FAIL_CNT, 0) + 1), LOGIN_FAIL_DT = GETDATE()  WHERE USER_ID = @userId;
+    `;
 
-            if(rows.length > 0 && rows[0].USER_ID != null && rows[0].USER_ID == userId) {
+    var selectLuisInfoQry = `
+    SELECT CNF_TYPE, CNF_VALUE 
+      FROM TBL_CHATBOT_CONF 
+     WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' 
+        OR CNF_TYPE = 'HOST_URL';
+    `;
 
-                
-                var userPwConverted = pwConfig.getPassWord(userPw, rows[0].SCRT_SALT);
+    var updateUserLoginQry = `
+    UPDATE TB_USER_M 
+       SET LAST_LOGIN_DT = GETDATE(), LOGIN_YN = 'Y', LOGIN_SID = @loginSid, LOGIN_FAIL_CNT = 0, LAST_LOGIN_IP = @loginIp 
+     WHERE USER_ID = @userId;
+    `; 
 
-                if (rows[0].PW_INIT_YN == 'Y') {
-                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 초기화');
-                    res.render('passwordChng', {
-                        changeId: req.body.mLoginId,
-                    });
-                } else {
-                    if (rows[0].SCRT_NUM == userPwConverted) {
-                        //if(decipheredOutput == userPw) {
-                        req.session.sid = req.body.mLoginId;
-                        req.session.sAuth = rows[0].USER_AUTH;
-                        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인');
-    
-                        //subscription key 조회 start-----
-                        var subsQry = "";
-                        subsQry += "SELECT CNF_TYPE, CNF_VALUE \n";
-                        subsQry += "  FROM TBL_CHATBOT_CONF \n";
-                        subsQry += " WHERE CNF_TYPE = 'LUIS_SUBSCRIPTION' \n";
-                        subsQry += "    OR CNF_TYPE = 'HOST_URL' \n";
-                        //subsQry += "   AND CHATBOT_NAME IN (SELECT CHAT_ID \n";
-                        //subsQry += "					      FROM TBL_USER_RELATION_APP \n";
-                        //subsQry += "					     WHERE USER_ID = @userId) \n";
-                        //subsQry += "GROUP BY CNF_VALUE; \n";
-    
-                        dbConnect.getConnection(sql).then(pool => { 
-                            return pool.request()
-                                .input('userId', sql.NVarChar, userId)
-                                .query(subsQry) 
-                        }).then(result => {
-                            let subsList = result.recordset;
-                            if (subsList.length > 0) {
-                                //req.session.subsKey = subsList[0].CNF_VALUE;
-                                req.session.subKey = subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}).CNF_VALUE;
-                                req.session.subsKey = req.session.subKey;
-                                req.session.hostURL = subsList.find((item, idx) => {return item.CNF_TYPE === 'HOST_URL'}).CNF_VALUE;
-                                var tmpArr = [];
-                                tmpArr.push(subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}));
-                                req.session.subsKeyList = tmpArr;
-                            }
-                            /*
-                            //subsList[subsList.findIndex(x => x.CNF_TYPE === 'LUIS_SUBSCRIPTION')].CNF_VALUE;
-                            //subsList[subsList.findIndex(x => x.CNF_TYPE === 'HOST_URL')].CNF_VALUE;
-                            if (subsList.findIndex(x => x.CNF_NM === req.session.sid) !== -1) {
-                                req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === req.session.sid)].CNF_VALUE;
-                            } else {
-                                req.session.subsKey = subsList[subsList.findIndex(x => x.CNF_NM === 'admin')].CNF_VALUE;
-                            }
-                            */
-                            req.session.save(function(){
-                                res.redirect("/");
-                            });
-                        }).catch(err => {
-                            console.log(err);
-                            sql.close();
-                        });
-                            //subscription key 조회 end-----
-                            
-                    } else {
-                        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 불일치');
-                        res.send('<script>alert("비밀번호가 일치하지 않습니다");location.href="/";</script>');
-                    }
-                }
+
+    try {
+        (async () => {
+            let pool = await dbConnect.getAppConnection(sql);
+            let loginUserRst = await pool.request()
+                                            .input('userId', sql.NVarChar, userId)
+                                            .query(loginSelQry)
+
+            let userInfo = loginUserRst.recordset;
+
+            if(userInfo.length > 0 && userInfo[0].USER_ID != null && userInfo[0].USER_ID == userId) {
+                //사용자 있음
                 
             } else {
-                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.body.mLoginId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '아이디를 찾을수 없거나 사용중지 중인 아이디');
-                res.send('<script>alert("아이디를 찾을수 없거나 사용중지 중입니다");location.href="/";</script>');
+                //사용자 없음
+                logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인 아이디 없음');
+                
             }
-          sql.close();
-        }).catch(err => {
-          console.log(err);
-          sql.close();
-        });
 
+            //비밀번호 확인
+            var userPwConverted = pwConfig.getPassWord(userPw, userInfo[0].SCRT_SALT);
+            if (userInfo[0].SCRT_NUM != userPwConverted) {
+                //비밀번호 다름 -실패카운트 추가
+                
+                var failCntRemain = parseInt(userInfo[0].LOGIN_FAIL_CNT);
+                failCntRemain++;
+                logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인 실패 횟수 : [' + (failCntRemain) + ']' );
+                
+                let loginUserRst = await pool.request()
+                    .input('userId', sql.NVarChar, userId)
+                    .query(updateLoginFailCntQry)
+
+                
+                res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+                return false;
+            } 
+            //------비밀번호 일치------//
+
+            if (parseInt(userInfo[0].LOGIN_FAIL_CNT) >= loginLimitCnt) {
+                //로그인실패 3회 사용자 로그인 제한 설정 
+                var failDate = parseInt(userInfo[0].LOGIN_FAIL_DT);
+                if (failDate <= 60) {
+                    //1시간 안됨 
+                    var alertStr = i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL_TIME
+                        + (60 - failDate)
+                        + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL_TIME_REMAIN;
+
+                        
+                    logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인 제한 사용자 로그인 시도' );
+                
+                    res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+                    return false;
+                } else {
+                    let loginUserRst = await pool.request()
+                                                    .input('userId', sql.NVarChar, userId)
+                                                    .query(initLoginFailCntQry)
+                    
+                    //한시간 돼서 접속 가능합니다. 다시로그인해주세요
+                    //res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL_END + '");location.href="/";</script>');
+                }
+            }
+
+            //ip 체크  
+            var userLoginIP = "";
+            userLoginIP = req.headers['x-forwarded-for']
+                || req.connection.remoteAddress
+                || req.socket.remoteAddress
+                || req.connection.socket.remoteAddress;
+
+            if (userLoginIP != "") {
+                var tmpIp = userLoginIP.split(':');
+                userLoginIP = tmpIp[tmpIp.length - 1];
+
+                /*
+                if ((userLoginIP != userInfo[0].LOGIN_IP && userInfo[0].LOGIN_IP_YN != 'N') ) {
+                    logger.info('미등록 IP에서 로그인 시도 [id : %s] [url : %s]', userId, 'users/login');
+                    res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+                    return false;
+                }
+                */
+
+            } else {
+                logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비정상 IP에서 로그인 시도 제한 사용자 로그인 시도' );
+                
+                res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+                return false;
+            }
+            //ip 체크 end
+
+            if (parseInt(userInfo[0].LAST_SCRT_DT) >= 61) {
+                //미 로그인 날짜 지남
+                logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 변경 60일 지난 사용자 로그인 - 비밀번호변경페이지' );
+                res.render('passwordChng', {
+                    changeId: userId,
+                });
+                return false;
+            }
+            if (userInfo[0].PW_INIT_YN == 'Y') {
+                //비밀번호 초기화->변경 페이지
+                logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 초기화 사용자 로그인 - 비밀번호변경페이지' );
+                res.render('passwordChng', {
+                    changeId: userId,
+                });
+                return false;
+            }
+
+            //-----로그인 성공 처리-----
+
+            
+            req.session.sid = userId;
+            req.session.sAuth = userInfo[0].USER_AUTH;
+            userInfo[0].LAST_LOGIN_IP = userLoginIP;
+            req.session.userInfo = userInfo[0];
+            
+            let luisInfoRst = await pool.request()
+                    .query(selectLuisInfoQry)
+            let subsList = luisInfoRst.recordset;
+            
+            if (subsList.length > 0) {
+                //req.session.subsKey = subsList[0].CNF_VALUE;
+                req.session.subKey = subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}).CNF_VALUE;
+                req.session.subsKey = req.session.subKey;
+                req.session.hostURL = subsList.find((item, idx) => {return item.CNF_TYPE === 'HOST_URL'}).CNF_VALUE;
+                var tmpArr = [];
+                tmpArr.push(subsList.find((item, idx) => {return item.CNF_TYPE === 'LUIS_SUBSCRIPTION'}));
+                req.session.subsKeyList = tmpArr;
+            }
+
+            let userLoginRst = await pool.request()
+                    .input('loginSid', sql.NVarChar, req.sessionID)
+                    .input('loginIp', sql.NVarChar, userLoginIP)
+                    .input('userId', sql.NVarChar, userId)
+                    .query(updateUserLoginQry)
+            
+            let userLoginHistoryRst = await pool.request()
+                    .input('userId', sql.NVarChar, userId)
+                    .input('loginIp', sql.NVarChar, userLoginIP)
+                    .query(insertUserLoginHistoryQry)
+
+
+            var logStr = "로그인 IP : " + userLoginIP;
+            logger.info('[알림]로그인 성공  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, logStr);
+                
+            req.session.save(function(){
+                res.send('<script>alert("최근 접속 시간 : ' + userInfo[0].LAST_LOGIN_DT2 + ', 최근 접속 IP : ' + userInfo[0].LAST_LOGIN_IP + '");location.href="/";</script>');
+            });
+        })()
+        
+    } catch(err) {
+        logger.info('[에러] 로그인 실패 [id : %s] [url : %s] [내용 : %s] ', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+    } finally {
+        sql.close();
+    }
 });
 
 router.get('/logout', function (req, res) { 
     
-    req.session.destroy(function (err) { 
-        if (err) { 
-            var logoutID = req.session.sid?"NONE":req.session.sid;
+    var logoutID = !req.session.sid?"NONE":req.session.sid;
+    var loginIp = !req.session.userInfo?"NONE":req.session.userInfo.LAST_LOGIN_IP;
+    try {
+        (async () => {
+            req.session.destroy(function (err) { 
+                if (logoutID == 'NONE') {
+                    res.redirect('/');
+                    return false;
+                }
+                if (err) {  
+                    logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err);
+                    res.redirect('/');
+                } else { 
+                    dbConnect.getConnection(sql).then(pool => {
+                        return pool.request()
+                        .input('userId', sql.NVarChar, logoutID)
+                        .input('loginIp', sql.NVarChar, loginIp)
+                        .query(insertUserLogoutHistoryQry)
+
+                    }).then(result => {
+                        logger.info('[알림]로그아웃 [id : %s] [url : %s] [내용 : %s]', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그아웃 성공');
+                        res.clearCookie('sid');
+                        //res.clearCookie('connect.sid', {path: '/'});
+                        //res.clearCookie('i18n', {path: '/'});
+                        res.redirect('/');
+                    });
+                    /*
+                    var pool = await dbConnect.getAppConnection(sql);
+                    let userLoginHistoryRst = await pool.request()
+                                .input('userId', sql.NVarChar, logoutID)
+                                .input('loginIp', sql.NVarChar, req.session.userInfo.LAST_LOGIN_IP)
+                                .query(insertUserLogoutHistoryQry)
+
+                    
+                    logger.info('[알림]로그아웃 [id : %s] [url : %s] [내용 : %s]', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그아웃 성공');
+                    res.clearCookie('sid');
+                    res.redirect('/');
+                    */
+                }
+            }); 
+        })()
+    } catch(err) {
             logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
-        } else { 
-            res.clearCookie('sid');
-            res.redirect('/'); 
+            res.redirect('/');
+    } finally {
+    }
+//------------------------------------------------------------------------------------------------
+/*
+    var logoutId = req.session.sid;
+    req.session.destroy(function (err) {
+        if (err) {
+            //console.log(err);
+            logger.info('[에러]로그아웃 [id : %s] [url : %s] [message : %s]', logoutId, 'users/logout', err);
+        } else {
+            dbConnect.getConnection(sql).then(pool => {
+                return pool.request()
+                    .input('userSessionID', sql.NVarChar, req.sessionID)
+                    .input('userId', sql.NVarChar, logoutId)
+                    .query("UPDATE TB_USER_M SET LOGIN_YN = (CASE WHEN LOGIN_SID = @userSessionID THEN 'N' ELSE LOGIN_YN END ), LOGIN_SID = (CASE WHEN LOGIN_SID = @userSessionID THEN 'NOTLOGIN' ELSE LOGIN_SID END )  WHERE USER_ID = @userId;");
+                
+            }).then(result => {
+                logger.info('로그아웃 [id : %s] [url : %s]', logoutId, 'users/logout');
+                res.clearCookie('sid');
+                res.redirect('/');
+            });
+            //update [TB_USER_M] set LOGIN_SID = (case when LOGIN_SID = 'NOTLOGIN' then LOGIN_SID + 'aa' else 'NOTLOGIN' end ) where user_id='dyyoo' 
         }
     });
-    
 
-    /*
-    delete req.session.sid;
-    delete req.session.appName;
-    delete req.session.appId;
-    delete req.session.leftList;
-    delete req.session.subKey;
+*/
 
-    req.session.save(function(){
-		res.redirect('/');
-	});
-    */
+
+
 	
 });
 
@@ -1078,7 +1263,83 @@ router.post('/getAppSelValues', function (req, res) {
     })
 })
 
+function validateUserInfo(userId, changePw) {
+    var pwMinLength = 4;    //문자4개 이상 아이디랑 일치하면 제한, 4자리 반복문자 숫자 제한
+    var pwLength = changePw.length;
+    var loopLength = pwLength-pwMinLength;   
+    
+    if (pwLength < 8) {
+        logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호 8자 미만' );
+        return false;    //비밀번호 8자 미만
+    }
+    for (var i=0; i<=loopLength; i++ ) {
 
+        var subPw = changePw.substring(i, pwMinLength + i);
+        if (userId.indexOf(subPw) != -1) {
+            logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호와 아이디가 4자 일치' );
+            return false;    //비밀번호와 아이디가 4자 일치
+        }
+    }
+
+    var chkContinuous = false;
+    for (var i=0; i<=loopLength; i++ ) {
+        var sameNum = 0;
+        for (var j=0; j<pwMinLength-1; j++) {
+            if (changePw[j]==changePw[j+1]) {
+                sameNum++;
+            }
+            if (sameNum == pwMinLength-1) {
+                chkContinuous = true;
+            }
+        }
+        if (chkContinuous) {break;}
+    }
+    if (chkContinuous) {
+        logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호에 연속 4개 일치하는 문자,숫자' );
+        return false;    //비밀번호에 연속 4개 일치하는 문자,숫자
+    }
+
+    return true;  
+}
+
+function fn_passWordChk(inputPW, userId, req) {
+    var pw = inputPW;
+    
+    if (typeof pw != "undefined") {
+        var sumChk = 0;
+        var num = pw.search(/[0-9]/g);
+        var engSmall = pw.search(/[a-z]/ig);
+        var engBig = pw.search(/[A-Z]/ig);
+        var spe = pw.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);
+
+        if (num>0) {
+            sumChk++;
+        }
+        if (engSmall>=0 || engBig >=0) {
+            sumChk++;
+        }
+        /*
+        if (engBig > 0) {
+            sumChk++;
+        }
+        */
+        if (spe>=0) {
+            sumChk++;
+        }
+
+        if (pw.length < 8 || pw.length >= 20) {
+            logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호는 8자 이상 20자 이하로 입력하지 않음' );
+            return 'false';
+        }
+
+        if (sumChk < 3) {
+            logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '비밀번호가 영문 대소문자, 숫자, 특수문자중 3가지 이상 있지 않음' );
+            return 'false';
+        }
+        return 'true';
+    }
+
+}
 router.post('/changePW', function (req, res) {
 
     if (req.body.err) {
@@ -1086,39 +1347,102 @@ router.post('/changePW', function (req, res) {
         return;
     }
     
+    var getOriginalPw = req.body.originalPw;
+
     var userId = req.body.changeId;
     var userPw = req.body.changePw1;
+
+    if (!validateUserInfo(userId, userPw) && !fn_passWordChk(userPw, userId, req)) {
+        res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
+        return false;
+    }
 
     //let chngPw = encryption(userPw);
     (async () => {
         try {
+            
+            let pool = await dbConnect.getConnection(sql);
+            let loginUserRst = await pool.request()
+                                            .input('userId', sql.NVarChar, userId)
+                                            .query(loginSelQry) 
+            var userInfoArr = loginUserRst.recordset;
+            if(userInfoArr.length > 0  ) {
+                //사용자 있음
+            } else {
+                logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '조회된 아이디 없음' );
+                res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
+                return false;
+            }
+            var userInfo = userInfoArr[0];
+           
+            var originalPw = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT);
+            var firstPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_FIRST);
+            var secondPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_SECOND);
+            var thirdPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_THIRD);
+
+            if (originalPw != userInfo.SCRT_NUM) {//ALERT_CHNG_FAIL  //ALERT_CHNG_SUCCESS
+                logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '잘못된 기존 비밀번호 입력' );
+                res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
+                return false;
+            }
+
+            if (firstPwBefore == userInfo.SCRT_NUM_FIRST) {//ALERT_CHNG_FAIL  //ALERT_CHNG_SUCCESS
+                logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '이전 첫번째 비밀번호와 일치' );
+                res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CANT_CHANGE_SAME_PW});
+                return false;
+            }
+            if (secondPwBefore == userInfo.SCRT_NUM_SECOND) {//ALERT_CHNG_FAIL  //ALERT_CHNG_SUCCESS
+                logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '이전 두번째 비밀번호와 일치' );
+                res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CANT_CHANGE_SAME_PW});
+                return false;
+            }
+            if (thirdPwBefore == userInfo.SCRT_NUM_THIRD) {//ALERT_CHNG_FAIL  //ALERT_CHNG_SUCCESS
+                logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '이전 세번째 비밀번호와 일치' );
+                res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CANT_CHANGE_SAME_PW});
+                return false;
+            }
+//작업중
+
 
             var newSalt = await pwConfig.getSaltCode();
             let chngPw = pwConfig.getPassWord(userPw, newSalt);
+//SCRT_NUM_THIRD = SCRT_NUM_SECOND, SCRT_NUM_SECOND = SCRT_NUM_FIRST, SCRT_NUM_FIRST = 2
+            var QueryStr = `
+            UPDATE TB_USER_M 
+            SET  PW_INIT_YN = 'N'  
+               , SCRT_NUM_THIRD = SCRT_NUM_SECOND 
+               , SCRT_NUM_SECOND = SCRT_NUM_FIRST 
+               , SCRT_NUM_FIRST = SCRT_NUM 
 
-            var QueryStr = "UPDATE TB_USER_M SET SCRT_NUM = @chngPw, SCRT_SALT = @newSalt, PW_INIT_YN = 'N' WHERE USER_ID = @userId;";
+               , SCRT_SALT_THIRD = SCRT_SALT_SECOND 
+               , SCRT_SALT_SECOND = SCRT_SALT_FIRST 
+               , SCRT_SALT_FIRST = SCRT_SALT  
 
-            let pool = await dbConnect.getConnection(sql);
+               , SCRT_NUM = @chngPw 
+               , SCRT_SALT = @newSalt 
+            WHERE USER_ID = @userId; 
+            `; // "UPDATE TB_USER_M SET SCRT_NUM = @chngPw, SCRT_SALT = @newSalt, PW_INIT_YN = 'N' WHERE USER_ID = @userId;";
+
             let result1 = await pool.request()
                 .input('chngPw', sql.NVarChar, chngPw)
                 .input('newSalt', sql.NVarChar, newSalt)
                 .input('userId', sql.NVarChar, userId)
                 .query(QueryStr);
 
-            logger.info('비밀번호변경 [id : %s] [url : %s]', userId, 'users/changePW');
-            res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_SUCCESS + '");location.href="/";</script>');
-
+            logger.info('[알림]비밀번호 변경 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '성공' );
+            res.send({result:true , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_SUCCESS});
+    
         } catch (err) {
-            logger.info('[에러]비밀번호변경 [id : %s] [url : %s] [message : %s]', userId, 'users/changePW', err);
-            res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL + '");location.href="/";</script>');
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
         } finally {
             sql.close();
         }
     })()
 
     sql.on('error', err => {
-        logger.info('[에러]비밀번호변경 [id : %s] [url : %s] [message : %s]', userId, 'users/changePW', err);
-        res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL + '");location.href="/";</script>');
+        logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+        res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
     })
 });
 

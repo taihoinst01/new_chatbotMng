@@ -153,7 +153,7 @@ router.post('/checkMenuAuth', function (req, res) {
                 MENU_AUTH = parseInt(rows[0].MENU_AUTH);
             }
            
-            var USER_AUTH = parseInt(req.session.sAuth);
+            var USER_AUTH = parseInt(typeof req.session.sAuth=='undefined'?0:req.session.sAuth);
             
             if(USER_AUTH >= MENU_AUTH) {
                 res.send({ status: 'PASS' });
