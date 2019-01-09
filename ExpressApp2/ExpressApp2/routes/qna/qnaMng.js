@@ -1029,7 +1029,8 @@ router.post('/selectNoAnswerQList', function (req, res) {
                 "						                                       WHERE 1=1  \n" +
                 "						                                       AND CHATBOT_COMMENT_CODE NOT IN ('SAP') \n" +
                 "						                                      GROUP BY CUSTOMER_COMMENT_KR ) TBH \n" +
-                "                         WHERE RESULT NOT IN ('H', 'R')     \n" +
+                //"                         WHERE RESULT NOT IN ('H', 'R')     \n" +
+                "                         WHERE RESULT = 'D'    \n" +
             //    "                           AND TRAIN_FLAG = 'N'  \n" +
                 "                           AND QUERY = dbo.fn_replace_regex(TBH.QUERY_KR)  \n";
 

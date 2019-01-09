@@ -65,7 +65,7 @@ router.post('/selectHistoryListAll', function (req, res) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
     var selDate = req.body.selDate;
-    //var selChannel = req.body.selChannel;
+    var selMobilePc = req.body.selMobilePc;
     var selResult = req.body.selResult;
 
     var date = new Date();
@@ -92,7 +92,7 @@ router.post('/selectHistoryListAll', function (req, res) {
                 QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
                 QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
                 QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE \n";
+                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE, A.MOBILE_YN \n";
                 QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
                 QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
                 QueryStr += "                  ) AS LUIS_INTENT \n";
@@ -116,7 +116,7 @@ router.post('/selectHistoryListAll', function (req, res) {
                 }
 
                 if (searchUserId !== '') {
-                    QueryStr += "     AND A.USER_ID LIKE @searchUserId \n";
+                    QueryStr += "     AND USER_ID LIKE @searchUserId \n";
                 }
                 
                 if (selDate == 'today') {
@@ -127,7 +127,9 @@ router.post('/selectHistoryListAll', function (req, res) {
                 if (selResult !== 'all') {
                     QueryStr += "AND	RESULT = @selResult \n";
                 }
-        
+                if (selMobilePc !== 'all') {
+                    QueryStr += " AND	MOBILE_YN = @selMobilePc \n";
+                }
                 QueryStr += "     ) tbx\n";
                 logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
@@ -136,7 +138,7 @@ router.post('/selectHistoryListAll', function (req, res) {
                         .input('searchUserId', sql.NVarChar, '%' + searchUserId + '%')
                         .input('startDate', sql.NVarChar, startDate)
                         .input('endDate', sql.NVarChar, endDate)
-                        //.input('selChannel', sql.NVarChar, selChannel)
+                        .input('selMobilePc', sql.NVarChar, selMobilePc)
                         .input('selResult', sql.NVarChar, selResult)
                         .query(QueryStr);
                 
@@ -180,6 +182,7 @@ router.post('/selectHistoryList', function (req, res) {
     var selDate = req.body.selDate;
     //var selChannel = req.body.selChannel;
     var selResult = req.body.selResult;
+    var selMobilePc = req.body.selMobilePc;
     var currentPage = checkNull(req.body.currentPage, 1);
     
     if (chkBoardParams(req.body, req.session.channelList)) {
@@ -195,7 +198,7 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "           SELECT ROW_NUMBER() OVER(ORDER BY A.SID DESC) AS NUM \n";
                 QueryStr += "                  ,COUNT('1') OVER(PARTITION BY '1') AS TOTCNT \n";
                 QueryStr += "                  ,CEILING((ROW_NUMBER() OVER(ORDER BY A.SID DESC))/ convert(numeric ,10)) PAGEIDX \n";
-                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE \n";
+                QueryStr += "                  ,A.CUSTOMER_COMMENT_KR, A.CHATBOT_COMMENT_CODE, A.CHANNEL, A.RESULT, A.RESPONSE_TIME, A.USER_ID, A.REG_DATE, A.MOBILE_YN \n";
                 QueryStr += "                  ,(CASE RTRIM(A.LUIS_INTENT) WHEN '' THEN 'NONE' \n";
                 QueryStr += "                         ELSE ISNULL(A.LUIS_INTENT, 'NONE') END \n";
                 QueryStr += "                  ) AS LUIS_INTENT \n";
@@ -218,7 +221,7 @@ router.post('/selectHistoryList', function (req, res) {
                 }
 
                 if (searchUserId !== '') {
-                    QueryStr += "     AND A.USER_ID LIKE @searchUserId \n";
+                    QueryStr += "     AND USER_ID LIKE @searchUserId \n";
                 }
                 
                 if (selDate == 'today') {
@@ -229,6 +232,9 @@ router.post('/selectHistoryList', function (req, res) {
                 if (selResult !== 'all') {
                     QueryStr += " AND	RESULT = @selResult \n";
                 }
+                if (selMobilePc !== 'all') {
+                    QueryStr += " AND	MOBILE_YN = @selMobilePc \n";
+                }
                 QueryStr += "                  GROUP BY CUSTOMER_COMMENT_KR\n";
                 QueryStr += "                   \n";
                 QueryStr += "                   \n";
@@ -238,7 +244,7 @@ router.post('/selectHistoryList', function (req, res) {
                 //QueryStr += "              AND A.CHATBOT_COMMENT_CODE NOT IN ('SAP') \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
-              
+                console.log("QueryStr=="+QueryStr);
                 logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
@@ -246,7 +252,7 @@ router.post('/selectHistoryList', function (req, res) {
                         .input('searchUserId', sql.NVarChar, '%' + searchUserId + '%')
                         .input('startDate', sql.NVarChar, startDate)
                         .input('endDate', sql.NVarChar, endDate)
-                        //.input('selChannel', sql.NVarChar, selChannel)
+                        .input('selMobilePc', sql.NVarChar, selMobilePc)
                         .input('selResult', sql.NVarChar, selResult)
                         .input('currentPage', sql.NVarChar, currentPage)
                         .query(QueryStr);

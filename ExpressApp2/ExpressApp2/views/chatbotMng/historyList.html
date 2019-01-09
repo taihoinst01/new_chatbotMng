@@ -118,6 +118,17 @@
                                                 </label>
                                                 <input type="text" name="searchUserId" id="searchUserId" class="form-control" placeholder=" <%= __('Enter_search_word') %>">
                                             </div>
+
+                                            <div class="col-lg-3 form-group " style="width:10%;">
+                                                <label>
+                                                    <%= __('MOBILE_PC') %>
+                                                </label>
+                                                <select class="form-control" id="selMobilePc" name="selMobilePc">
+                                                    <option value="all"><%= __('All') %></option>
+                                                    <option value="M">Mobile</option>
+                                                    <option value="P">PC</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" id="excelDownload" class="btn btn_01 "><i class="fa fa-file-excel-o"></i> <%= __('Excel Download') %></button>
@@ -139,7 +150,7 @@
                                                           <th><%= __('DLG_QUESTION') %></th>
                                                           <th><%= __('USER_ID') %></th>
                                                           <th><%= __('DUP_CNT') %></th>
-                                                          <th><%= __('CODE_') %></th>
+                                                          <th><%= __('MOBILE_PC') %></th>
                                                           <th><%= __('ANSWER_TYPE') %></th>
                                                           <th><%= __('REPLY_TIME') %></th>
                                                           <th><%= __('Date') %></th>

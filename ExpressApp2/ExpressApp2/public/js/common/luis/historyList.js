@@ -75,7 +75,8 @@ $(document).on('click','#excelDownload',function(){
                         { header: '번호', key: 'num', width: 7, style: {numFmt: "0000"}},
                         { header: '질문 내용', key: 'question', width: 40, style: {alignment: {wrapText: true} }},
                         { header: '중복 갯수', key: 'overlapCount', width: 14},
-                        { header: '코드', key: 'code', width: 20},
+                        { header: '사용자ID', key: 'user', width: 20},
+                        { header: 'Device유형', key: 'mobilePc', width: 20},
                         { header: '답변 시간', key: 'resultTime', width: 10 },
                         { header: '날짜', key: 'date', width: 25 },
                         { header: '의도', key: 'intent', width: 25, style: {alignment: {wrapText: true} } },
@@ -97,7 +98,8 @@ $(document).on('click','#excelDownload',function(){
                             num: data.rows[i].NUM
                             , question: data.rows[i].CUSTOMER_COMMENT_KR
                             , overlapCount: data.rows[i].SAME_CNT
-                            , code: data.rows[i].CHATBOT_COMMENT_CODE
+                            , user: data.rows[i].USER_ID
+                            , mobilePc: data.rows[i].MOBILE_YN
                             , resultTime: data.rows[i].RESPONSE_TIME
                             , date: data.rows[i].REG_DATE
                             , intent: data.rows[i].LUIS_INTENT
@@ -156,6 +158,7 @@ function getFilterVal(page) {
             'selDate' : $('#selDate').val(),
             //'selChannel' : $('#selChannel').val(),
             'selResult' : $('#selResult').val(),
+            'selMobilePc' : $('#selMobilePc').val(),
         };
     } else {
         
@@ -174,6 +177,7 @@ function getFilterVal(page) {
                 'selDate' : $('#selDate').val(),
                 //'selChannel' : $('#selChannel').val(),
                 'selResult' : $('#selResult').val(),
+                'selMobilePc' : $('#selMobilePc').val(),
             };
         } else {
             return false;
@@ -228,6 +232,7 @@ function makeHistoryTable(newPage) {
                     var tableHtml = "";
                     var resultText = "";
                     var userIdText = "";
+                    var mobilePcText = "";
                     for (var i = 0; i < data.rows.length; i++) {
                         if(data.rows[i].RESULT=="H"){
                             resultText = language.ANSWER_OK;
@@ -237,8 +242,10 @@ function makeHistoryTable(newPage) {
                             resultText = language.ANSWER_SUGGEST;
                         }else if(data.rows[i].RESULT=="E"){
                             resultText = "Error";
-                        }else if(data.rows[i].RESULT=="Q"){
-                            resultText = language.SAPWORD;
+                        }else if(data.rows[i].RESULT=="Q"&&data.rows[i].LUIS_INTENT=="SAP"){
+                            resultText = language.ANSWER_OK;
+                        }else if(data.rows[i].RESULT=="Q"&&data.rows[i].LUIS_INTENT=="NONE"){
+                            resultText = language.ANSWER_NO;
                         }else if(data.rows[i].RESULT=="I"){
                             resultText = language.SAPPASSWORDINIT;
                         }else{
@@ -252,13 +259,22 @@ function makeHistoryTable(newPage) {
                         }else{
                             userIdText = data.rows[i].USER_ID;
                         }
+
+                        if(data.rows[i].MOBILE_YN=="M"){
+                            mobilePcText = "Mobile"
+                        }else if(data.rows[i].MOBILE_YN=="P"){
+                            mobilePcText = "PC"
+                        }else{
+                            mobilePcText = "NONE";
+                        }
                         
                         tableHtml += '<tr name="userTr">';
                         tableHtml += '<td>' + data.rows[i].NUM + '</td>';
                         tableHtml += '<td style="text-align: left; padding-left:1%;"><a href="#" onClick="getHistoryDetail(' + data.rows[i].SID + ');" >'+ data.rows[i].CUSTOMER_COMMENT_KR + '</a></td>';
                         tableHtml += '<td>' + userIdText + '</td>';
                         tableHtml += '<td>' + data.rows[i].SAME_CNT + '</td>';
-                        tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
+                        //tableHtml += '<td>' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
+                        tableHtml += '<td>' + mobilePcText + '</td>';
                         tableHtml += '<td>' + resultText + '</td>';
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>';
                         tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>';

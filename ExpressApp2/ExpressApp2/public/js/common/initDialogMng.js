@@ -64,9 +64,9 @@ function makeInitDlgTable() {
                     }else if(data.list[i].DLG_GROUP==5){
                         dlgGroupHtml = language.SORRY_MESSAGE;
                     }else if(data.list[i].DLG_GROUP==6){
-                        dlgGroupHtml = language.SUGGESS_MESSAGE1;
+                        dlgGroupHtml = language.SUGGEST_MESSAGE1;
                     }else if(data.list[i].DLG_GROUP==7){
-                        dlgGroupHtml = language.SUGGESS_MESSAGE2;
+                        dlgGroupHtml = language.SUGGEST_MESSAGE2;
                     }else{
                         dlgGroupHtml = "NONE";
                     }
