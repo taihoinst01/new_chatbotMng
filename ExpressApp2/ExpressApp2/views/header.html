@@ -1,11 +1,22 @@
-﻿<header class="main-header">
+﻿<header class="main-header"   >
+
+    <script language="JavaScript">
+        //$(document).on("contextmenu",function(e){return false;});
+    </script> 
+
+
+<!-- Left Menu Side -->
+<script type="text/javascript" src="/js/common/menuUserCheck.js"></script>
+
     <input type="hidden" id="signMassage" value="<%= __('SIGN_IN_REQUIRED') %>" />
+    <input type="hidden" id="timeoutLogOut" value="<%= __('ALERT_LOGOUT') %>" />
     <!-- Logo -->
     <!--<a href="/list" class="logo">-->
     <a href="#" onClick="goMainList();" class="logo">
         <span class="logo-mini"></span>
         <span class="logo-lg"></span>
     </a>
+    
 
     <nav class="navbar navbar-static-top">
         <!-- Sidebar toggle button-->
@@ -79,6 +90,24 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="noPermissionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static"
+    data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">TIIZ Manager</h4>
+            </div>
+            <div class="modal-body">
+                <%= __('NOACCESSAUTH') %>
+            </div>
+            <div class="modal-footer" id="delete_footer_button">
+                <button type="button" class="btn btn-primary" id="noPermission" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
 
@@ -91,5 +120,109 @@
         $('#loadingModalMain').modal('show');
         location.href = "/list";
     }
+
+
+
+    var spcKey = false;
+    var hover = true;
+    var contextMenu = false;
+
+    //out start
+    var timoutNow = 60000*10;//3600000; // Timeout in 10 mins would be 600000. 60 mins - 3600000
+    var logoutUrl = '/users/logout'; // URL to logout page.
+    
+    var timeoutTimer;
+
+    // Start timers.
+    function StartTimers() {
+        timeoutTimer = setTimeout("IdleTimeout()", timoutNow);
+    }
+
+    // Reset timers.
+    function ResetTimers() {
+        clearTimeout(timeoutTimer);
+        StartTimers();
+    }
+    
+    // Logout the user.
+    function IdleTimeout() {
+        alert($('#timeoutLogOut').val());
+        window.location = logoutUrl;
+    }
+    //out end ALERT_LOGOUT timeoutLogOut
+
+    window.onload = function () {
+        StartTimers();
+        document.body.onclick = function (e) {
+            ResetTimers();
+        };
+    };
+    
+
+
+    function spc(e) {
+        return ((e.altKey || e.ctrlKey || e.keyCode == 91 || e.keyCode == 87) && e.keyCode != 82 && e.keyCode != 116);
+    }
+
+    $(document).hover(function () {
+        hover = true;
+        contextMenu = false;
+        spcKey = false;
+    }, function () {
+        hover = false;
+    }).keydown(function (e) {
+        if (spc(e) == false) {
+            hover = true;
+            spcKey = false;
+        }
+        else {
+            spcKey = true;
+        }
+    }).keyup(function (e) {
+        if (spc(e)) {
+            spcKey = false;
+        }
+    }).contextmenu(function (e) {
+        contextMenu = true;
+    }).click(function () {
+        hover = true;
+        contextMenu = false;
+    });
+
+    window.addEventListener('focus', function () {
+        spcKey = false;
+    });
+    window.addEventListener('blur', function () {
+        hover = false;
+    });
+
+
+    //뒤로가기 제어
+    history.pushState(null, null, location.href);
+    window.onpopstate = function (event) {
+        contextMenu = true;
+        history.back();
+    };
+
+    //백스페이스 제어
+    $(document).keydown(function (e) {
+        if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA") {
+            if (e.keyCode === 8) {
+                contextMenu = true;
+            }
+        }
+    });
+
+    window.onbeforeunload = function (e) {
+        if ((hover == false || spcKey == true) && contextMenu == false) {
+            location.href('/users/logout');
+            //$('.btn_log_out').trigger('click');
+            //console.log('a00');
+        }
+        return;
+    };
+
+
+
 
 </script>

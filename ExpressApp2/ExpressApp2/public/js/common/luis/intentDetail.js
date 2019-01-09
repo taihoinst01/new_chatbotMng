@@ -507,8 +507,8 @@ $(document).on("change", "select[name=entityTypeForLabel]", function(e){
     $(this).parent().find('input[name=matchUtterText]').remove();
     $(this).parent().find('a[name=delLabelBtn]').remove();
     $(this).parent().find('div[name=alertSpan]').remove();
-    var startIndex = $(this).parent().find('input[name=startIndex]').val();
-    var endIndex = $(this).parent().find('input[name=endIndex]').val();
+    var startIndex = $(this).parent().find('input[name=startIndex]').val()*1;
+    var endIndex = $(this).parent().find('input[name=endIndex]').val()*1;
     for (var i=startIndex; i<=endIndex; i++) {
         $(this).parents('tr').prev().find('#utterText_' + i).removeClass();//.removeAttr('class');
     }
@@ -600,8 +600,8 @@ $(document).on("change", "select[name=entitySelBox]", function(e){
 
 
     $(this).parent().find('input[name=matchUtterText]').val('');
-    var startIndex = $(this).parent().find('input[name=startIndex]').val();
-    var endIndex = $(this).parent().find('input[name=endIndex]').val();
+    var startIndex = $(this).parent().find('input[name=startIndex]').val()*1;
+    var endIndex = $(this).parent().find('input[name=endIndex]').val()*1;
     if (startIndex != '' && endIndex != '') {
         for (var i=startIndex; i<=endIndex; i++) {
             $(this).parents('tr').prev().find('#utterText_' + i).removeClass();//.removeAttr('class');
@@ -1399,8 +1399,8 @@ function changeEntitySel() {
         }
 
         var utterStr = '';
-        var startIndex = $(this).parent().find('input[name=startIndex]').val();
-        var endIndex = $(this).parent().find('input[name=endIndex]').val();
+        var startIndex = $(this).parent().find('input[name=startIndex]').val()*1;
+        var endIndex = $(this).parent().find('input[name=endIndex]').val()*1;
         if ($(this).parent().find('select[name=entityTypeForLabel]').val() != 4) {
             for (var i=startIndex; i<=endIndex; i++) {
                 utterStr += $(this).parents('tr').prev().find('#utterText_' + i).text();

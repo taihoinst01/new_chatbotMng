@@ -2555,7 +2555,6 @@ router.post('/addDialog', function (req, res) {
                     .input('largeGroup', sql.NVarChar, largeGroup)
                     .input('dlgGroup', sql.NVarChar, dlgGroup)
                     .input('predictIntent', sql.NVarChar, predictIntent)
-                    .input('relationNum', sql.Int, relationNum)
                     .query(insertTblDlg);
                 //.input('luisEntities', sql.NVarChar, (typeof luisEntities ==="string" ? luisEntities:luisEntities[j]))
 
