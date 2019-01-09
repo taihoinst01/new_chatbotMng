@@ -373,6 +373,7 @@
 	"SAP_WORD": "SAP 용어",
 	"SAP_PASSWORDINIT": "SAP 비밀번호초기화",
 	"DUP_CNT": "중복갯수",
+	"MOBILE_PC": "Device 유형",
 	"============== scenario ==============": "",
 	"SCENARIO_NAME": "시나리오명",
 	"SCENARIO_LIST": "시나리오 목록",
