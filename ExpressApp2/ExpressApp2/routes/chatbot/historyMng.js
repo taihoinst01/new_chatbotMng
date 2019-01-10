@@ -214,7 +214,8 @@ router.post('/selectHistoryList', function (req, res) {
                 QueryStr += "			         SELECT MAX(SID) AS TRANS_SID, CUSTOMER_COMMENT_KR AS TRANS_COMMENT, COUNT(CUSTOMER_COMMENT_KR) AS SAME_CNT  \n";
                 QueryStr += "                  	   FROM TBL_HISTORY_QUERY\n";
                 QueryStr += "                  	   WHERE 1 = 1 \n";
-                QueryStr += "					     AND RTRIM(LTRIM(ISNULL(USER_ID, ''))) != '' \n";
+                QueryStr += "					     AND ISNULL(USER_ID, '') != '' \n";
+                //QueryStr += "					     AND RTRIM(LTRIM(ISNULL(USER_ID, ''))) != '' \n";
                 QueryStr += " 					     AND RTRIM(CUSTOMER_COMMENT_KR) != ''  \n";
                 if (searchQuestion !== '') {
                     QueryStr += "     AND TBL_B.TRANS_COMMENT LIKE @searchQuestion \n";
@@ -244,7 +245,7 @@ router.post('/selectHistoryList', function (req, res) {
                 //QueryStr += "              AND A.CHATBOT_COMMENT_CODE NOT IN ('SAP') \n";
                 QueryStr += "     ) tbx\n";
                 QueryStr += "  WHERE PAGEIDX = @currentPage\n";
-                console.log("QueryStr=="+QueryStr);
+                
                 logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_HISTORY_QUERY 테이블 조회 시작');
                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                 let result1 = await pool.request()
