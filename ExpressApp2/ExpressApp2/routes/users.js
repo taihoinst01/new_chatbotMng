@@ -68,7 +68,7 @@ INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, LOGOUT_TIME, USERIP, LOGIN_STA
 VALUES (@userId 
      , ( SELECT LOGIN_TIME FROM ( 
                                   SELECT ROW_NUMBER() OVER(ORDER BY TBL_A.LOGIN_TIME DESC) AS NUM, TBL_A.LOGIN_TIME 
-                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE LOGIN_STATUS='LOGIN' AND USERID='test01') TBL_A 
+                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE LOGIN_STATUS='LOGIN' AND USERID=@userId ) TBL_A 
                                 ) TBL_B 
           WHERE TBL_B.NUM = 1 
        ) 
@@ -373,7 +373,7 @@ router.get('/logout', function (req, res) {
                     logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err);
                     res.redirect('/');
                 } else { 
-                    if (logoutID == 'DUPLE_LOGIN_Y___') {
+                    if (logoutID == '___DUPLE_LOGIN_Y___') {
                         res.clearCookie('sid');
                         res.redirect('/');
                     } else {
@@ -1769,6 +1769,9 @@ router.post('/initUserLimit', function (req, res) {
 
 });
 
+router.get('/dupleLogin', function (req, res) {
+    res.send('<script>alert("' + i18n.getCatalog()[i18n.getLocale(req)].ALERT_OTHER_USER_LOGIN_WITH_SAME_ID + '");location.href="/users/logout";</script>');
+});
 
 router.get('/error', function (req, res) {
     if (req.session.sid) {

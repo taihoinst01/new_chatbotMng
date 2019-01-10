@@ -77,7 +77,16 @@ app.use(i18n.init);
 app.use('/*', function (req, res, next) {
     res.header("Access-Control-Allow-Methods", "POST, GET");
     if (req.method == "GET") {
-        next();
+        if ( req.originalUrl == '/' || req.originalUrl == '/login' || req.originalUrl == '/users/logout' || req.originalUrl == '/users/dupleLogin' || req.originalUrl.split('?')[0] == '/api/updateLatestDate') {
+            next();
+        } else {
+            if (req.session.sid == "___DUPLE_LOGIN_Y___") {
+                res.redirect('/users/dupleLogin');
+            }
+            else {
+                next();
+            }
+        }
     }
     else if (req.method == "POST") {
         if ((req.baseUrl.indexOf('dupleLoginCheck') > 0) || (req.baseUrl.indexOf('login') > 0) || req.baseUrl === '/jsLang' || req.baseUrl === '/users/changePW') {
