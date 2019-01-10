@@ -310,7 +310,7 @@ router.post('/login', function (req, res) {
 
             //-----로그인 성공 처리-----
 
-            
+            var beforeLoginIp = userInfo[0].LAST_LOGIN_IP;
             req.session.sid = userId;
             req.session.sAuth = userInfo[0].USER_AUTH;
             userInfo[0].LAST_LOGIN_IP = userLoginIP;
@@ -346,7 +346,7 @@ router.post('/login', function (req, res) {
             logger.info('[알림]로그인 성공  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, logStr);
                 
             req.session.save(function(){
-                res.send('<script>alert("최근 접속 시간 : ' + userInfo[0].LAST_LOGIN_DT2 + ', 최근 접속 IP : ' + userInfo[0].LAST_LOGIN_IP + '");location.href="/";</script>');
+                res.send('<script>alert("최근 접속 시간 : ' + userInfo[0].LAST_LOGIN_DT2 + ', 최근 접속 IP : ' + beforeLoginIp + '");location.href="/";</script>');
             });
         })()
         
