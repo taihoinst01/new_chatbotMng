@@ -474,6 +474,10 @@ function getGroupSeelectBox() {
         url: '/learning/getGroupSelectBox',
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var groupL = data.groupL;
             var groupM = data.groupM;
 
@@ -523,6 +527,10 @@ function searchIptDlg(page) {
         data: params,
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             $('#dialogTbltbody').html('');
             var item = '';
@@ -872,6 +880,10 @@ function selectApiGroup() {
         //data: params,
         url: '/learning/selectApiGroup',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.groupList) {
                 var groupList = data.groupList;
                 var optionStr = "";
@@ -1039,6 +1051,10 @@ function createDialog() {
         type: 'POST',
         data: { 'data': array, /*'entities' : chkEntities*/ },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert(language.Added);
 
             var inputUttrHtml = '';
@@ -1130,6 +1146,10 @@ function selectDlgByFilter(group) {
         data: params,
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             $('#dialogTbltbody').html('');
             var item = '';
@@ -1271,6 +1291,10 @@ function searchGroup(groupName, group, type, groupL) {
         data: { 'groupName': groupName, 'group': group, 'searchType': type, 'groupL': groupL, 'searchTxt': $('#iptDialog').val() },
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (type == 1) {
 
                 if (group == 'searchMedium') {
@@ -1416,6 +1440,10 @@ function selectDlgByTxt(groupType, sourceType) {
         data: params,
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             searchText = $('#iptDialog').val();
             $('#dialogTbltbody').html('');
             var item = '';
@@ -1696,6 +1724,10 @@ function insertDialog() {
         type: 'POST',
         data: $('#appInsertForm').serializeObject(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status == 200) {
                 var inputUttrHtml = '';
                 inputUttrHtml += '<tr> <td> <div class="check-radio-tweak-wrapper" type="checkbox">';
@@ -1840,6 +1872,10 @@ function searchDialog(dlgID, missingEntitiesData) {
         data: { 'dlgID': dlgID, 'missingEntitiesData': missingEntitiesData },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputUttrHtml = '';
 
             if (result['list'].length == 0) {
@@ -2208,6 +2244,10 @@ function updateDialog() {
         data: { 'dlgId': dlgId, 'dlgType': dlgType, 'data': array, 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert('success');
             $('.createDlgModalClose').click();
 
@@ -2227,6 +2267,10 @@ function deleteDialog(dlgId) {
         data: { 'dlgId': dlgId },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert('delele complete');
             $('.createDlgModalClose').click();
             var groupType = $('.selected').text();

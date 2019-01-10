@@ -204,6 +204,10 @@ function selectAll() {
         type: 'POST',
         url: '/board/getDashboardInfo',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.records > 0) {
                 
@@ -517,6 +521,10 @@ function getCountPanel() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var boardCount = data.list[0];
             $('#totalCount').text(boardCount.총합);
             $('#successCount').text(boardCount.응답);
@@ -560,6 +568,10 @@ function drawScoreList(page) {
         type: 'POST',
         data: getFilterVal(page),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error_code != null && data.error_message != null) {
                 
                 makeReloadEvent('overlay_drawScoreList');
@@ -602,6 +614,10 @@ function getOftQuestion() {
         type: "post",
         data: getFilterVal(),
     }).done(function (data) {
+        if (data.loginStatus == 'DUPLE_LOGIN') {
+            alert($('#dupleMassage').val());
+            location.href = '/users/logout';
+        }
         if (data.error_code != null && data.error_message != null) {
             makeReloadEvent('overlay_getOftQuestion');
         } else {
@@ -636,6 +652,10 @@ function getResponseTime() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error_code != null && data.error_message != null) {
                 makeReloadEvent('overlay_getResponseTime');
             } else {
@@ -672,6 +692,10 @@ function getQueryByEachTime() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error_code != null && data.error_message != null) {
                 makeReloadEvent('overlay_getQueryByEachTime');
             } else {
@@ -724,6 +748,10 @@ function drawNoneQuerytable(page) {
         type: 'POST',
         data: getFilterVal(page),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $("#overlay_drawNoneQuerytable").remove();
             if(data.length==0){
                 $("#noneQueryDiv").html('<tr><td colspan=9>dfafdsa</td></tr>');
@@ -777,6 +805,10 @@ function drawFirstQuery() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.error_code != null && data.error_message != null) {
                 makeReloadEvent('overlay_drawFirstQuery');
@@ -819,6 +851,10 @@ function drawfirstQuerytable(page) {
         type: 'POST',
         data: getFilterVal(page),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error_code != null && data.error_message != null) {
                 makeReloadEvent('overlay_drawfirstQuerytable');
             } else {
@@ -858,6 +894,10 @@ function getScorePanel1() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.list1) {
                 var scores = data.list1[0];
                 $('#allCustomer').text(scores.CUSOMER_CNT);
@@ -892,6 +932,10 @@ function getScorePanel2() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.result) {
                 var scores = data.list;
                 var CORRECT_QRY = scores.toString();
@@ -915,6 +959,10 @@ function getScorePanel3() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.result) {
                 var scores = data.list[0];
                 $('#avgReply').text(scores.SEARCH_AVG + '%');
@@ -935,6 +983,10 @@ function getScorePanel4() {
         type: 'POST',
         data: getFilterVal(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.result) {
                 var scores = data.list[0];
                 $('#maxQueryCnt').text(scores.MAX_QRY);
@@ -958,6 +1010,10 @@ function getSimulUrl(){
         dataType: 'json',
         type: 'POST',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#simulURL').val(data.simul_url);
         }
     });

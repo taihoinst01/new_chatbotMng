@@ -135,6 +135,10 @@ function makeUserTable() {
         data: params,
         url: '/users/selectUserList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.rows) {
                 
@@ -153,18 +157,18 @@ function makeUserTable() {
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>';
                     if(data.rows[i].USER_AUTH=="99"){
                         tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>';
-                        tableHtml += '<td>' + data.rows[i].HPHONE + '</td>';
-                        tableHtml += '<td>' + data.rows[i].EMAIL + '</td>';
+                        //tableHtml += '<td>' + data.rows[i].HPHONE + '</td>';
+                        //tableHtml += '<td>' + data.rows[i].EMAIL + '</td>';
                     }else{
                         tableHtml += '<td class="editable-cell">' + data.rows[i].EMP_NM + '</td>';
-                        tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>';
-                        tableHtml += '<td class="editable-cell">' + data.rows[i].EMAIL + '</td>';
+                        //tableHtml += '<td class="editable-cell">' + data.rows[i].HPHONE + '</td>';
+                        //tableHtml += '<td class="editable-cell">' + data.rows[i].EMAIL + '</td>';
                     }
                     
                     if (data.rows[i].PW_INIT_YN == 'Y') {
                         tableHtml += '<td>' + language.INIT_COMPLETE+ '</td>';
                     } else {
-                        tableHtml += '<td><button type="button" class="btn btn_01" name=pwInitBtn><i class="fa fa-refresh"></i> ' + language.INIT+ '</button></td>';
+                        tableHtml += '<td><button type="button" class="btn btn_01" name="pwInitBtn"><i class="fa fa-refresh"></i> ' + language.INIT+ '</button></td>';
                     }
                     //tableHtml += '<td>' + '<a href="javascript://" class="" onclick="initPassword(\''+ data.rows[i].USER_ID +'\');">' + language.INIT+ '</a>' + '</td>'
                     tableHtml += '<td>' + data.rows[i].USE_YN + '</td>'
@@ -172,7 +176,14 @@ function makeUserTable() {
                     //tableHtml += '<td>' + data.rows[i].REG_ID + '</td>'
                     //tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>' + data.rows[i].LAST_LOGIN_DT + '</td>'
-                    tableHtml += '<td>' + data.rows[i].LOGIN_FAIL_CNT + '</td></tr>'
+                    tableHtml += '<td>' + data.rows[i].LOGIN_FAIL_CNT + '</td>'
+
+                    if(data.rows[i].LOGIN_FAIL_CNT >= 3){
+                        tableHtml += '<td><button type="button" class="btn btn_01" name="unlockAccountBtn"><i class="fa lock-open"></i> ' + language.UNLOCK_ACCOUNT_DISTRICTION + '[' + data.rows[i].LOGIN_FAIL_CNT + ']</button></td>';
+                    }else{
+                        tableHtml += '<td>[0]</td>';
+                    }
+                    tableHtml += '</tr>';
                 }
     
                 saveTableHtml = tableHtml;
@@ -227,6 +238,10 @@ $(document).on('click', 'button[name=pwInitBtn]', function (e) {
                 $("#loadingBar").css("display","none");
             },
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.status == 200) {
                     //alert(data.message);
                     $('#tableBodyId').children().eq(userIndex).children().eq(4).html('').text('초기화완료');
@@ -251,8 +266,8 @@ function addUser() {
     addHtml = '<tr><td>NEW</td><td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>'
     addHtml += '<td><input type="text" name="new_user_id" spellcheck="false" autocomplete="off" value="" /></td>';
     addHtml += '<td><input type="text" name="new_user_name" spellcheck="false" autocomplete="off" value="" /></td> ';
-    addHtml += '<td><input type="text" name="new_hphone" spellcheck="false" autocomplete="off" value="" /></td> ';
-    addHtml += '<td><input type="text" name="new_email" spellcheck="false" autocomplete="off" value="" /></td> ';
+    //addHtml += '<td><input type="text" name="new_hphone" spellcheck="false" autocomplete="off" value="" /></td> ';
+    //addHtml += '<td><input type="text" name="new_email" spellcheck="false" autocomplete="off" value="" /></td> ';
     addHtml += '<td colspan="6"></td></tr>'
 
     $('#tableBodyId').prepend(addHtml);
@@ -357,8 +372,10 @@ function saveUser() {
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).children().eq(2).text();
                 data.EMP_NM = $(this).children().eq(3).text();
-                data.HPHONE = $(this).children().eq(4).text();
-                data.EMAIL = $(this).children().eq(5).text();
+                data.HPHONE = '';//$(this).children().eq(4).text();
+                data.EMAIL = '';//$(this).children().eq(5).text();
+                //data.HPHONE = $(this).children().eq(4).text();
+                //data.EMAIL = $(this).children().eq(5).text();
                 saveArr.push(data);
 
             } else if (statusFlag === 'NEW' ) {
@@ -367,8 +384,10 @@ function saveUser() {
                 data.statusFlag = statusFlag;
                 data.USER_ID = $(this).find('input[name=new_user_id]').val();
                 data.EMP_NM = $(this).find('input[name=new_user_name]').val();
-                data.HPHONE = $(this).find('input[name=new_hphone]').val();
-                data.EMAIL = $(this).find('input[name=new_email]').val();
+                data.HPHONE = '';//$(this).children().eq(4).text();
+                data.EMAIL = '';//$(this).children().eq(5).text();
+                //data.HPHONE = $(this).find('input[name=new_hphone]').val();
+                //data.EMAIL = $(this).find('input[name=new_email]').val();
                 saveArr.push(data);
             } else if (statusFlag === 'DEL') {
 
@@ -406,7 +425,10 @@ function saveUser() {
         data: params,
         url: '/users/saveUserInfo',
         success: function(data) {
-            console.log(data);
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            } 
             if (data.status === 200) {
                 //alert(language['REGIST_SUCC']);
                 $('#proc_content').html(language.REGIST_SUCC);
@@ -422,6 +444,42 @@ function saveUser() {
         }
     });
 }
+
+
+//계정 로그이제한 초기화
+$(document).on('click', 'button[name=unlockAccountBtn]', function (e) {
+    if (confirm("사용자 로그인 제한을 해제하시겠습니까?")) {
+
+        var userID = $(this).parents('tr').find('td').eq(2).text();
+        var userIndex = $('#tableBodyId').children().index($(this).parents('tr'));
+        var params = {
+            'userId': userID
+        };
+
+        $.ajax({
+            type: 'POST',
+            data: params,
+            url: '/users/initUserLimit',
+            success: function (data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
+                if (data.status == 200) {
+
+                    alert(data.message);
+
+                    $('#tableBodyId').children().eq(userIndex).children().eq(8).text('[0]');
+
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+    }
+});
+
+
 
 function goReloadPage(){
     window.location.reload();

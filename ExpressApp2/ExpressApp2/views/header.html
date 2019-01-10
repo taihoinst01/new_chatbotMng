@@ -1,15 +1,25 @@
 ﻿<header class="main-header"   >
 
-    <script language="JavaScript">
-        //$(document).on("contextmenu",function(e){return false;});
-    </script> 
-
+    
 
 <!-- Left Menu Side -->
 <script type="text/javascript" src="/js/common/menuUserCheck.js"></script>
 
+    <input type="hidden" id="dupleMassage" value="<%= __('ALERT_OTHER_USER_LOGIN_WITH_SAME_ID') %>" />
     <input type="hidden" id="signMassage" value="<%= __('SIGN_IN_REQUIRED') %>" />
     <input type="hidden" id="timeoutLogOut" value="<%= __('ALERT_LOGOUT') %>" />
+
+    <%
+        if(sid == 'DUPLE_LOGIN_Y___') {
+    %>
+        <script>
+            alert($('#dupleMassage').val());
+            location.href = '/users/logout';
+        </script>
+    <%
+        }
+    %>
+
     <!-- Logo -->
     <!--<a href="/list" class="logo">-->
     <a href="#" onClick="goMainList();" class="logo">
@@ -44,7 +54,7 @@
         <% 
             if(sid) { 
         %>
-            <li class="user_id"> <strong><%=sid%></strong> <%= __('SIR') %></li>
+            <li class="user_id"><a  href="#" class="small-box-footer" id="userLoginHistoryBtn" onclick="return false;" style="margin-left: 5px; color: #867f7f;"> <strong><%=sid%></strong> <%= __('SIR') %></a></li>
             <%
                 if(sAuth>=99) {
             %>
@@ -71,11 +81,10 @@
         </div>
     </nav>
 </header>
-<div class="modal fade" id="loadingModalMain" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
-    aria-labelledby="myModalLabel">
+<div class="modal fade" id="loadingModalMain" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="z-index: 9999;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" >
                 <h3 style="margin:0;">Loading...</h3>
             </div>
             <div class="modal-body">
@@ -108,18 +117,181 @@
     </div>
 </div>
 
+
+<!-- 유저 로그인 히스토리 -->
+<div class="modal fade" id="userHistoryModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" >
+    <div class="modal-dialog" style="width:80%;">
+        <div class="modal-content" style="max-height:650px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="similarQTitle"><%= __('LOGIN_HISTORY') %></h4>
+                <input type="hidden" name='userHistoryCurrentPage' id="userHistoryCurrentPage" value="1" />
+            </div>
+            <div class="modal-body">
+
+                <div class="Tbl_wrap"  style="overflow-y: auto !important;max-height: 470px !important;">
+                    <table class="Tbl">
+                        <!--
+                        <colgroup><col width="15%"/><col width="25%"/><col width="40%"/><col width="17%"/><col width="3%"/></colgroup>
+                        -->
+                        <colgroup> 
+                            <col width="8%"/><col width="17%"/><col width="25%"/><col width="25%"><col width="15%">
+                        </colgroup>
+                              <tr>
+                                    <th>
+                                        <select class="form-control" id="userHistorySelDate" name="userHistorySelDate">
+                                            <option value="All">
+                                                    <%= __('STATUS') %>
+                                            </option>
+                                            <option value="LOGIN">
+                                                <%= __('LOGIN_BTN') %>
+                                            </option>
+                                            <option value="LOGOUT">
+                                                <%= __('SIGN_OUT') %>
+                                            </option>
+                                        </select>
+                                    </th>
+                                    <th><%= __('USER_ID') %></th>
+                                    <th><%= __('LOGIN_IP') %></th>
+                                    <th><%= __('LOGIN_TIME') %></th>
+                                    <th><%= __('LOGOUT_TIME') %></th>
+                              </tr>
+                        <tbody id="userHistoryModalBody" >
+                            
+                        </tbody>
+                    </table>
+                </div> 
+            </div>        
+            <div class="modal-footer">
+                <div class="btn_wrap">
+                    <div class="pagination_wrap" id="userLoginHistoryTablePaging">
+                        <ul class="pagination pagination-sm no-margin"></ul>
+                    </div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <%= __('OK') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+<!-- //유저 로그인 히스토리  -->
+
 <script>
     $(document).ready(function () {
 
         $('#selectLang').change(function() {
             location.href="/index/lang"
         });
+
+        
+        $('#userLoginHistoryBtn').click(function() {
+            $('#userHistorySelDate option').eq(0).prop('selected',true);
+            $('#userHistoryCurrentPage').val(1);
+            makeUserHistoryTable(); 
+        });
+    });
+
+
+    $(document).on('click', '#userLoginHistoryTablePaging .li_paging', function (e) {
+        if (!$(this).hasClass('active')) {
+            var currPage = $(this).val();
+            $('#userHistoryCurrentPage').val(currPage);
+            makeUserHistoryTable();
+        }
+    });
+
+    $('#userHistorySelDate').change(function() {
+        makeUserHistoryTable();
     });
 
     function goMainList(){
         $('#loadingModalMain').modal('show');
         location.href = "/list";
     }
+
+    function makeUserHistoryTable () {
+        var params = {
+                'currentPage': $('#userHistoryCurrentPage').val(),
+                'loginStatus': $('#userHistorySelDate :selected').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                timeout: 0,
+                beforeSend: function () {
+                    $('#loadingModalMain').modal('show');
+                },
+                complete: function () {
+                    $('#loadingModalMain').modal('hide'); 
+                },
+                data: params,
+                url: '/users/selectUserHistoryList',
+                success: function(data) {
+                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                        alert($('#dupleMassage').val());
+                        location.href = '/users/logout';
+                    }
+                    
+                    var saveTableHtml = '';
+                    if(data.error)
+                    {
+                        alert(data.message);
+                    }
+                    else 
+                    {   
+                        $('#userHistoryModal').modal('show'); 
+                        var userList = data.userHistoryList;
+                        if (userList.length == 0) {
+                            saveTableHtml = '<tr><td colspan="5" class="text-center">No Data</td></tr>';
+                            /*
+                            saveTableHtml += '<div class="pagination_wrap" id="userLoginHistoryTablePaging">';
+                            saveTableHtml += '<ul class="pagination pagination-sm no-margin">';
+                            saveTableHtml += '</ul>';
+                            saveTableHtml += '</div>';
+                                */
+                            $('#userHistoryModalBody').html(saveTableHtml);
+                            $('#userLoginHistoryTablePaging').html('');
+                        } else {
+                            for (var i = 0; i < userList.length; i++) { 
+                                saveTableHtml += '<tr>';
+                                saveTableHtml += '<td>' + userList[i].LOGIN_STATUS + '</td>';
+                                saveTableHtml += '<td>' + userList[i].USERID + '</td>';
+                                saveTableHtml += '<td>' + userList[i].USERIP + '</td>';
+                                saveTableHtml += '<td>' + userList[i].LOGIN_TIME + '</td>';
+                                saveTableHtml += '<td>' + (userList[i].LOGOUT_TIME==null?' NONE ':userList[i].LOGOUT_TIME) + '</td>';
+                                saveTableHtml += '</tr>';
+                            }
+                            /*
+                            saveTableHtml += '<div class="pagination_wrap" id="userLoginHistoryTablePaging">';
+                            saveTableHtml += '<ul class="pagination pagination-sm no-margin">';
+                            saveTableHtml += '</ul>';
+                            saveTableHtml += '</div>';
+*/
+                            $('#userHistoryModalBody').html(saveTableHtml);
+                            $('#userLoginHistoryTablePaging').html('').append(data.pageList);
+                        }
+                         
+/*
+                        changeModalHeight = setInterval(function() {
+                            if ($('#userHistoryModal .modal-content').css('height').split('px')[0] != '0') {
+                                
+                                setTimeout(function() {
+                                    var modalHeight = $('#userHistoryModal .modal-content').css('height').split('px')[0];
+                                    var pagingHeight = $('#userLoginHistoryTablePaging').css('height').split('px')[0];
+                                    var updateHeight = (modalHeight*1) + (pagingHeight*1);
+                                    $('#userHistoryModal .modal-content').css('max-height', updateHeight + 'px');
+                                    clearInterval(changeModalHeight);
+                                }, 500);
+                            }
+                        }, 300);
+                        */
+                        //alert(data.message);
+                    }
+                }
+            });
+    }
+
+
+
 
 
 

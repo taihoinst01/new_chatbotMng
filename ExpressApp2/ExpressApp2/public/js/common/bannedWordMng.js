@@ -98,6 +98,10 @@ function makeBannedWordTable(newPage) {
         data: params,
         url: '/bannedWordMng/selectBannedWordList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.rows) {
 
@@ -167,6 +171,10 @@ function procBandWord(procType) {
         data: params,
         url: '/bannedWordMng/procBandWord',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
                 window.location.reload();

@@ -112,6 +112,10 @@ function makeAutoCompleteTable(newPage) {
         data: params,
         url: '/autoCompleteMng/selectAutoCompleteList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.rows) {
 
@@ -180,6 +184,10 @@ function procAutoComplete(procType) {
         data: params,
         url: '/autoCompleteMng/procAutoComplete',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
                 window.location.reload();

@@ -319,5 +319,15 @@
 	"ALERT_LOGIN_FAIL": "Login failed.",
 	"ALERT_LOGOUT": "You have been signed out for no use.",
 	"ALERT_CANT_CHANGE_SAME_PW": "PW is the same password you used before.",
+	"LOGIN_TIME": "Login",
+	"LOGOUT_TIME": "Logout",
+	"LOGIN_IP": "Login IP",
+	"LOGIN_HISTORY": "USER LOGIN HISTORY",
+	"USE_Y": "Y",
+	"USE_N": "N",
+	"LOGIN_BTN": "LOGIN",
+	"ACCOUNT_DISTRICTION": "LIMIT",
+	"UNLOCK_ACCOUNT_DISTRICTION": "UNLOCK",
+	"ALERT_OTHER_USER_LOGIN_WITH_SAME_ID": "Someone signed in with same account.",
 	"============= The end =============": ""
 }

@@ -118,6 +118,10 @@ function makeCodeMasterTable() {
         data: params,
         url: '/code/selectCodeMasterList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.records > 0) {
                 
@@ -172,6 +176,10 @@ function makeCodeDeatilTable() {
         data: params,
         url: '/code/selectCodeDetailList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.records > 0) {
                 
@@ -292,6 +300,10 @@ function procCodeMaster(procType) {
         data: params,
         url: '/code/procCodeMaster',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data);
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
@@ -354,6 +366,10 @@ function procCodeDetail(procType) {
         data: params,
         url: '/code/procCodeDetail',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data);
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);

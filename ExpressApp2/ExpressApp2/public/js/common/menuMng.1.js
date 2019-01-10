@@ -139,6 +139,10 @@ function makeMenuTable() {
         data: params,
         url: '/menu/selectMenuList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.records > 0) {
 
@@ -225,6 +229,10 @@ function procMenuMaster(procType) {
         data: params,
         url: '/menu/procMenu',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
                 window.location.reload();
@@ -254,6 +262,10 @@ function getParentMenu() {
         url: '/menu/getParentMenu',
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.records > 0) {
                 select_menu = "<option value='ROOT' selected>ROOT</option>"
                 for (var i = 0; i < data.rows.length; i++) {
@@ -286,6 +298,10 @@ function childDataCnt(menu_id) {
         data: params,
         url: '/menu/childDataCnt',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             deleteCheck = data.status;
             if (deleteCheck == "EXIST") {
                 $('#delete_content').html('하위 메뉴가 존재합니다. 삭제할 수 없습니다.');

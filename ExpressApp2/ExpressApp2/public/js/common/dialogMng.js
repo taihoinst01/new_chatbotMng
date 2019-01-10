@@ -200,6 +200,10 @@ function createDialog() {
         type: 'POST',
         data: { 'data': array, /*'entities' : chkEntities*/ },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             //alert(language.Added);
 
             var inputUttrHtml = '';
@@ -416,6 +420,10 @@ function selectDlgByTxt(groupType, sourceType) {
             });
         },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.result) {
                 alert(language.It_failed);
                 return false;
@@ -702,6 +710,10 @@ function insertDialog() {
         type: 'POST',
         data: $('#appInsertForm').serializeObject(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status == 200) {
                 var inputUttrHtml = '';
                 inputUttrHtml += '<tr> <td> <div class="check-radio-tweak-wrapper" type="checkbox">';

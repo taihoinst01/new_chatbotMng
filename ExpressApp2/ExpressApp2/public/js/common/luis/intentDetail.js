@@ -788,6 +788,10 @@ function changeIntentNameFnc() {
         data: params,
         url: '/luis/renameIntent',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -991,6 +995,10 @@ function deleteUtter() {
             data: params,
             url: '/luis/deleteUtterance',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.dupleRst) {
                     $('#alertMsg').text("[" + data.existApp + "] " + language.ALERT_SAME_INTENT_EXIST);
                     $('#alertBtnModal').modal('show');
@@ -1042,6 +1050,10 @@ function makeUtteranceTable() {
         data: params,
         url: '/luis/selectUtterList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -1584,6 +1596,10 @@ function createIntent() {
             data: params,
             url: '/luis/createIntent',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.dupleRst) {
                     $('#alertMsg').text("[" + data.existApp + "] " + language.ALERT_SAME_INTENT_EXIST);
                     $('#alertBtnModal').modal('show');
@@ -1650,6 +1666,10 @@ function deleteIntent(intentHiddenName, hId) {
         data: params,
         url: '/luis/deleteIntent',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.error){
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -1680,6 +1700,10 @@ function getEntityList(intentName, intentId) {
         url: '/luis/getEntityList',
         data: {'isAll' : 'NOTALL'},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -1972,6 +1996,10 @@ function saveUtterance() {
         data: params,
         url: '/luis/saveUtterance',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -2034,7 +2062,11 @@ function updateUtter() {
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display","none");   
         },
-        success: function(data) {   
+        success: function(data) {  
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            } 
             if (!data.success) 
             {
                 $('#alertMsg').text(data.message);
@@ -2110,6 +2142,10 @@ function updateUtterInfo() {
         data: params,
         url: '/luis/getUtterInIntent',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (!data.success) 
             {
                 $('#confirmTitle').text(language.ALERT);

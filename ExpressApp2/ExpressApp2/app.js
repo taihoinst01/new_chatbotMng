@@ -74,6 +74,34 @@ i18n.configure({
 
 app.use(i18n.init);
 
+app.use('/*', function (req, res, next) {
+    res.header("Access-Control-Allow-Methods", "POST, GET");
+    if (req.method == "GET") {
+        next();
+    }
+    else if (req.method == "POST") {
+        if ((req.baseUrl.indexOf('dupleLoginCheck') > 0) || (req.baseUrl.indexOf('login') > 0) || req.baseUrl === '/jsLang' || req.baseUrl === '/users/changePW') {
+            return next();
+        }
+        if (!req.session.sid) {
+            res.send({ loginStatus: "NOT_LOGIN" });
+            return false;
+        }
+        if (req.session.sid == "___DUPLE_LOGIN_Y___") {
+            res.send({ loginStatus: "DUPLE_LOGIN" });
+            return false;
+        }
+        return next();
+    }
+    else {
+        res.send({ METHOD_STATUS: "NOT_ALLOWED" });
+        return false;
+    }
+});
+
+
+
+
 //페이지 요청시마다 세션값이 있는지 확인
 app.use(function(req, res, next) {
 

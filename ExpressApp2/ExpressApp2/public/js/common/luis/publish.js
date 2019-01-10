@@ -95,6 +95,10 @@ $(document).ready(function() {
                 $("#loadingBar").css("display","none");      
             }
         }).done(function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data)
             if (data.result === 400) {
                 $('#trainResultTag').text(data.message);

@@ -110,6 +110,10 @@ function makeIntentTable() {
         data: params,
         url: '/luis/selectIntentList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#intentListBody').html('');
             $('#pagination').html('');
             var intentBodyHtml = '';
@@ -185,6 +189,10 @@ function createIntent() {
             data: params,
             url: '/luis/createIntent',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.dupleRst) {
                     $('#alertMsg').text("[" + data.existApp + "] 앱에 같은 이름의 인텐트가 존재합니다.");
                     $('#alertBtnModal').modal('show');
@@ -251,6 +259,10 @@ function deleteIntent(intentHiddenName, hId) {
         data: params,
         url: '/luis/deleteIntent',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.error){
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -323,6 +335,10 @@ function intentDetail(intentName, intentId, labelCnt) {
         data: params,
         url: '/luis/getUtterInIntent',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (!data.success) 
             {
                 $('#alertMsg').text(data.message);

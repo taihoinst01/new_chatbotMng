@@ -491,5 +491,12 @@
 	"ALERT_LOGIN_FAIL": "로그인에 실패했습니다.",
 	"ALERT_LOGOUT": "일정시간 미사용으로 로그아웃 되었습니다.",
 	"ALERT_CANT_CHANGE_SAME_PW": "이전 비밀번호와 일치합니다.",
+	"LOGIN_TIME": "로그인 시간",
+	"LOGOUT_TIME": "로그아웃 시간",
+	"LOGIN_IP": "로그인 아이피",
+	"LOGIN_HISTORY": "사용자 로그인 내역",
+	"ACCOUNT_DISTRICTION": "계정잠금",
+	"UNLOCK_ACCOUNT_DISTRICTION": "잠금해제",
+	"ALERT_OTHER_USER_LOGIN_WITH_SAME_ID": "다른 사용자가 로그인했습니다. 로그아웃 됩니다.",
 	"============= The end =============": ""
 }

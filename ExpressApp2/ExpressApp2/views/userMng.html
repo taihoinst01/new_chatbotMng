@@ -59,16 +59,22 @@
                                                 <!-- 사용자관리 테이블 --> 
                                                 <div class="Tbl_wrap">
                                                     <table class="Tbl" summary="사용자관리">
-                                                        <colgroup><col width="2%"/><col width="3%"/><col width="8%"/><col width="7%"/><col width="10%"/>
-                                                                  <col width="8%"/><col width="10%"/><col width="8%"/><col width="10%"/><col width="10%"/><col width="8%"/>
+                                                        <colgroup><col width="2%"/><col width="3%"/><col width="8%"/><col width="7%"/> 
+                                                            <!--
+                                                                <col width="10%"/>
+                                                                <col width="8%"/>
+                                                            -->
+                                                                  <col width="10%"/><col width="8%"/><col width="10%"/><col width="10%"/><col width="8%"/><col width="8%"/>
                                                         </colgroup>
                                                         <thead><tr>
                                                                 <th></th>
                                                                 <th><input type="checkbox" class="flat-red" id="check-all"></th>
                                                                 <th><%= __('USER_ID') %></th>
                                                                 <th><%= __('USER_NAME') %></th>
+                                                                <!--
                                                                 <th><%= __('HPHONE') %></th>
                                                                 <th><%= __('EMAIL') %></th>
+                                                                -->
                                                                 <th><%= __('PASSWOARD') %></th>
                                                                 <th><%= __('USE_YN') %></th>
                                                                 <!--
@@ -78,6 +84,7 @@
                                                                 -->                                                                
                                                                 <th><%= __('LAST_LOGIN_DATE') %></th>
                                                                 <th><%= __('LOGIN_FAIL_CNT') %></th>   
+                                                                <th><%= __('ACCOUNT_DISTRICTION') %></th>   
                                                             </tr>
                                                         </thead>
                                                         <tbody id="tableBodyId">

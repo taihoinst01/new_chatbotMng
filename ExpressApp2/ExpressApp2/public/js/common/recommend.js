@@ -40,6 +40,10 @@ function recommendAjax(){
         url: '/learning/recommend',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#recommendContents').html('');
             var item = '';
 
@@ -170,6 +174,10 @@ function deleteRecommend(){
                 url : '/learning/deleteRecommend',
                 isloading : true,
                 success: function(data){
+                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                        alert($('#dupleMassage').val());
+                        location.href = '/users/logout';
+                    }
                     alert("삭제되었습니다.");
                     $('#currentPage').val(1)
                     recommendAjax();

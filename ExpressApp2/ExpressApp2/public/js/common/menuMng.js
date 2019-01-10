@@ -140,6 +140,10 @@ function makeMenuTable() {
         data: params,
         url: '/menu/selectMenuList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.records > 0) {
 
@@ -207,6 +211,10 @@ function procMenuMaster(procType) {
         data: params,
         url: '/menu/procMenu',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);
                 window.location.reload();
@@ -235,6 +243,10 @@ function getMenu() {
         type: 'POST',
         url: '/menu/selectMenuAuthList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.records > 0) {
                 //var authVal = $('#MENU_AUTH').val();
                 select_menu = "<option value='' >"+language.CHOOSE_AUTH+"</option>"

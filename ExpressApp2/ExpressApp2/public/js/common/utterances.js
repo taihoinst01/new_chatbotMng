@@ -371,6 +371,10 @@ $(document).ready(function () {
                             $("#loadingBar").css("display", "none");
                         },
                         success: function (result) {
+                            if (result.loginStatus == 'DUPLE_LOGIN') {
+                                alert($('#dupleMassage').val());
+                                location.href = '/users/logout';
+                            }
                             if (result['result'] == "learned") {
                                 alert(language.Learned);
                                 $('input[name=tableAllChk]').parent().iCheck('uncheck');
@@ -855,6 +859,10 @@ function selectApiGroup() {
         //data: params,
         url: '/learning/selectApiGroup',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.groupList) {
                 var groupList = data.groupList;
                 var optionStr = "";
@@ -995,6 +1003,10 @@ function createDialog() {
         type: 'POST',
         data: { 'data': array/*, 'entities' : chkEntities*/ },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert(language.Added);
 
             var inputUttrHtml = '';
@@ -1052,6 +1064,10 @@ function selectDlgListAjax(entity) {
         data: { 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputUttrHtml = '';
             for (var i = 0; i < result['list'].length; i++) {
                 var tmp = result['list'][i];
@@ -1242,6 +1258,10 @@ function utterInput(queryText) {
         data: { 'iptUtterance': queryTextArr },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var entities = result['entities'];
             for (var k = 0; k < queryTextArr.length; k++) {
 
@@ -1315,6 +1335,10 @@ function selectGroup(selectId, str1, str2) {
         type: 'POST',
         data: { 'selectId': selectId, 'selectValue1': str1, 'selectValue2': str2 },
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var group = result.rows;
             $("#" + selectId).html("");
             if (selectId == "searchLargeGroup") {
@@ -1467,6 +1491,10 @@ function searchDialog(contextEntityData) {
         type: 'POST',
         data: formData,
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             var inputUttrHtml = '';
 
@@ -1943,6 +1971,10 @@ function insertEntity() {
         type: 'POST',
         data: JSON.stringify(entityValueList), //$('#appInsertForm').serializeObject(),
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status == 200) {
                 $('.addDialogCancel').click();
                 alert(language.Added);
@@ -2019,6 +2051,10 @@ function getGroupSeelectBox() {
         url: '/learning/getGroupSelectBox',
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var groupL = data.groupL;
             var groupM = data.groupM;
 
@@ -2060,6 +2096,10 @@ function predictIntent(queryText) {
         data: { 'iptUtterance': queryTextArr },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var success_data = data.body.intents;
             var score_data;
 
@@ -2084,6 +2124,10 @@ $(document).on('change', '#predictIntent', function (e) {
         data: { 'intent': intent },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#dlgViewDiv').html('');
             var inputUttrHtml = '';
             for (var i = 0; i < result['list'].length; i++) {

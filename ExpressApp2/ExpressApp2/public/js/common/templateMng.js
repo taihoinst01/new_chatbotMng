@@ -149,6 +149,10 @@ function makeTemplateTable(newPage) {
         data: params,
         url: '/templateMng/selectTemplateList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.rows) {
 
@@ -241,6 +245,10 @@ function procTemplate(procType) {
         data: params,
         url: '/templateMng/procTemplate',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 ChangeSeq = "";
                 //alert(language['REGIST_SUCC']);

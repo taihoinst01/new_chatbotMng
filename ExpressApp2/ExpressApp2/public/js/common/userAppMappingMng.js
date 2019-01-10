@@ -81,6 +81,10 @@ function makeUserTable(newPage) {
         data: params,
         url: '/user/selectUserList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.rows) {
                 
@@ -127,6 +131,10 @@ function makeAppTable(userId, newPage) {
         data: params,
         url: '/user/selectUserAppList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             initAppList = data.rows;
             initAppCheck = data.checkedApp;
             mkAppRow(data.rows, data.checkedApp);
@@ -221,6 +229,10 @@ function saveUserApp() {
             data: params,
             url: '/user/updateUserAppList',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.status === 200) {
                     //window.location.reload();
                     alert(language['REGIST_SUCC']);

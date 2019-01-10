@@ -32,6 +32,10 @@ function save(type){
         url: urlStr,
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             //console.log(data);
             if(data.appId != undefined && data.appId != null && data.appId != ''){
                 $('#addAppClose').click();
@@ -81,6 +85,10 @@ function deleteApp(){
             url: '/admin/deleteApp',
             isloading: true,
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 movePage();
             }
         });
