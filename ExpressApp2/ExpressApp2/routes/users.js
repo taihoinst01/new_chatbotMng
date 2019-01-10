@@ -60,16 +60,16 @@ SELECT USER_ID
 `;
 
 var insertUserLoginHistoryQry = ` 
-INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, USERIP, STATUS) 
+INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, USERIP, LOGIN_STATUS) 
 VALUES (@userId, GETDATE(), @loginIp, 'LOGIN');
 `; 
 
 var insertUserLogoutHistoryQry = ` 
-INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, LOGOUT_TIME, USERIP, STATUS) 
+INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, LOGOUT_TIME, USERIP, LOGIN_STATUS) 
 VALUES (@userId 
      , ( SELECT LOGIN_TIME FROM ( 
                                   SELECT ROW_NUMBER() OVER(ORDER BY TBL_A.LOGIN_TIME DESC) AS NUM, TBL_A.LOGIN_TIME 
-                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE STATUS='LOGIN' AND USERID='test01') TBL_A 
+                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE LOGIN_STATUS='LOGIN' AND USERID='test01') TBL_A 
                                 ) TBL_B 
           WHERE TBL_B.NUM = 1 
        ) 
@@ -1569,6 +1569,53 @@ router.post('/', function (req, res) {
 });
 */
 
+router.post('/selectUserList', function (req, res) {
+
+    (async () => {
+        try {
+         
+            var QueryStr =  `
+            
+            `;
+            
+            let pool = await dbConnect.getConnection(sql);
+            let result1 = await pool.request().query(QueryStr);
+
+            let rows = result1.recordset;
+
+
+            if(rows.length > 0){
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOT_CNT, 0);
+                var getTotalPageCount = Math.floor((totCnt - 1) / checkNull(rows[0].TOT_CNT, 10) + 1);
+
+
+                res.send({
+                    records : recordList.length,
+                    total : getTotalPageCount,
+                    pageList : paging.pagination(currentPageNo,rows[0].TOT_CNT), //page : checkNull(currentPageNo, 1),
+                    rows : recordList
+                });
+
+            }else{
+                //res.send({list : result});
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            console.log(err)
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+
+});
 
 
 
