@@ -597,6 +597,9 @@ router.post('/getCountPanel', function (req, res) {
              SUM(CNT) FOR RESULT IN ([H],[D],[E],[S],[Q],[I],[G]) 
            ) AS X; 
      `;
+     console.log("getCountPanel===="+selectQuery);
+     console.log("getCountPanel startDate===="+startDate);
+     console.log("getCountPanel endDate===="+endDate);
      /*
     var selectQuery = "";
         selectQuery += "SELECT \n";
@@ -1271,7 +1274,7 @@ router.post('/getScorePanel2', function (req, res) {
             SELECT COUNT(*) AS REPONSECNT, CHANNEL, LEFT(REG_DATE, 10) AS Dimdate 
               FROM TBL_HISTORY_QUERY A, TBL_QUERY_ANALYSIS_RESULT B 
              WHERE A.CUSTOMER_COMMENT_KR = B.QUERY    
-               AND B.RESULT IN ('H')  
+               AND B.RESULT NOT IN ('D','E')  
     `;
 
     if (selChannel !== 'all') {
