@@ -77,6 +77,10 @@ function makeUserTable(newPage) {
         data: params,
         url: '/user/selectUserList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var tableHtml = "";
             if (data.rows) {
 
@@ -123,6 +127,10 @@ function getAuthList() {
         url: '/user/getAuthList',
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.records > 0) {
                 select_menu = "<option value=''>"+language.CHOOSE_AUTH+"</option>"
                 for (var i = 0; i < data.rows.length; i++) {
@@ -154,6 +162,10 @@ function updateUserAuth() {
         data: params,
         url: '/user/updateUserAuth',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data);
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);

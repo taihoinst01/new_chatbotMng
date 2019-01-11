@@ -127,6 +127,10 @@ function makeApiTable() {
         data: params,
         url: '/users/selectApiList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             
             if (data.rows) {
                 
@@ -168,6 +172,10 @@ function initPassword(userId) {
             data: params,
             url: '/users/inItPassword',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 alert(data.message);
             }
         });
@@ -291,6 +299,10 @@ function saveApi() {
             data: params,
             url: '/users/saveApiInfo',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 console.log(data);
                 if (data.status === 200) {
                     alert(language['REGIST_SUCC']);

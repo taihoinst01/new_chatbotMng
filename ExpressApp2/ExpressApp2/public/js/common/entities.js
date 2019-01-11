@@ -181,6 +181,10 @@ function goDeleteEntity(){
         },
         data: {'delEntityDefine': delEntityDefine},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.status == 200){
                 //alert(language.SUCCESS);
                 $('#proc_content').html("삭제되었습니다");
@@ -258,6 +262,10 @@ function entitiesAjax(){
         url: '/learning/entities',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#entitiesTbltbody').html('');
             var item = '';
             if(data.list.length > 0){
@@ -363,6 +371,10 @@ function addEntityValueAjax(addValues) {
         type: 'POST',
         data: addValues,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.status == 200){
                 //alert(language.Added);
                 $('#proc_content').html("등록되었습니다.");
@@ -402,6 +414,10 @@ function searchEntities() {
             url: '/learning/searchEntities',
             isloading: true,
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 $('#entitiesTbltbody').html('');
                 var item = '';
                 if(data.list.length > 0){
@@ -571,6 +587,10 @@ function updateEntity() {
             $("#loadingBar").css("display","none");      
         },
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.status == 200){
                 alert(language.Added);
                 entitiesAjax();
@@ -639,6 +659,10 @@ function insertEntity(){
         type: 'POST',
         data: JSON.stringify(entityValueList), //$('#appInsertForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if(data.status == 200){
                 //alert(language.Added);
@@ -670,6 +694,10 @@ function selectApiGroup() {
         //data: params,
         url: '/learning/selectApiGroup',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.groupList) {
                 var groupList = data.groupList;
                 var optionStr = "";

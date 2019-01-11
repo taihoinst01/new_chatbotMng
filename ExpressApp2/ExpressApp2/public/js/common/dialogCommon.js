@@ -909,6 +909,10 @@ function updateDialog() {
         data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity, 'relationNum' : relationNum},      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             
             $('#proc_content').html(language.REGIST_SUCC);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
@@ -947,6 +951,10 @@ function deleteDialog() {
         data: { 'dlgId': deleteDlgId },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             //alert('delele complete');
             $('#proc_content').html(language.Deleted);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
@@ -1133,6 +1141,10 @@ $(document).on("click", "#show_dlg", function () {
             $("#loadingBar").css("display","none");      
         },
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputUttrHtml = '';
             if (result['list'].length == 0) {
                 inputUttrHtml += '<div style="display:table-cell;vertical-align:middle; height:400px; width:900px; text-align:center;">' +

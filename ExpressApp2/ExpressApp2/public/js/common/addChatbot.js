@@ -65,6 +65,10 @@ function addApp() {
         url: 'admin/addChatBotApps',
         data: params,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#loadingModal').modal('hide');
             if(data.result == true) {
                 alert(language['REGIST_SUCC']);

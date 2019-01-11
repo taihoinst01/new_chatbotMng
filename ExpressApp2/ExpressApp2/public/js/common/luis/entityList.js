@@ -245,6 +245,10 @@ function makeEntityTable() {
         data: params,
         url: '/luis/selectEntityList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#entityListBody').html('');
             $('#pagination').html('');
             var entityBodyHtml = '';
@@ -378,6 +382,10 @@ function createEntity() {
                 data: params,
                 url: '/luis/createEntity',
                 success: function(data) {
+                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                        alert($('#dupleMassage').val());
+                        location.href = '/users/logout';
+                    }
                     if (data.dupleRst) {
                         if (data.existEntity) {
                             $('#alertMsg').text("[" + data.existEntity + "] 같은 이름의 자식 엔티티가 존재합니다.");
@@ -420,6 +428,10 @@ function getChildCompositeList() {
         type: 'POST',
         url: '/luis/selectChildCompositeList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -468,6 +480,10 @@ function deleteEntity(entityHiddenName, hId, hType) {
         data: params,
         url: '/luis/deleteEntity',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.error){
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');

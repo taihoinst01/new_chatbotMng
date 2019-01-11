@@ -111,6 +111,10 @@ function makeChatBotTable(newPage) {
             //$("#loadingBar").css("display","none");      
         },
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.rows) {
                 
@@ -149,6 +153,10 @@ function makeChatSelBox() {
         //data: params,
         url: '/users/selecChatList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.rows) {
                 var chatListSelHtml = $.trim($('#appService').html());
@@ -182,6 +190,10 @@ function saveApp() {
         data: params,
         url: '/users/addApp',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.message) {
                 alert(data.message);
@@ -228,6 +240,10 @@ function makeAppTable(clicChatId, newPage) {
         },
         url: '/users/selectChatAppList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             initAppList = data.rows;
             initAppCheck = data.checkedApp;
             mkAppRow(data.rows, data.checkedApp);
@@ -324,6 +340,10 @@ function saveChatApp() {
             data: params,
             url: '/users/updateChatAppList',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.status === 200) {
                     //window.location.reload();
                     alert(language['REGIST_SUCC']);

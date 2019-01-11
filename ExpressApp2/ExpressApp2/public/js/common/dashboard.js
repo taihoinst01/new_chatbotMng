@@ -8,6 +8,10 @@ $(document).ready(function () {
         type: 'POST',
         data: {'appName':appName},
         success: function(result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (typeof result != 'undefined') {
                 $('#spanIntentsCount').html(result.INTENT_CNT);
                 $('#spanEntitiesCount').html(result.ENTITY_CNT);
@@ -66,6 +70,10 @@ function getEndpointHistory () {
         data: "{body}",
     })
     .done(function(data) {
+        if (data.loginStatus == 'DUPLE_LOGIN') {
+            alert($('#dupleMassage').val());
+            location.href = '/users/logout';
+        }
         // Display a popup containing the top intent
         //alert("Detected the following intent: " + data.topScoringIntent.intent);
         console.log(data);

@@ -78,6 +78,10 @@ function selectChatBotEnv(){
         data: params,
         url: '/chatBotEnv/selectChatbotEnv',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $("#loadingModal").modal('hide');
             if (data.rows) {
                 $('#dbId').text(data.rows[0].USER_NAME);
@@ -151,6 +155,10 @@ function procChatBotEnv(procType) {
         data: params,
         url: '/chatBotEnv/procChatBotEnv',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 $('#proc_content').html(language.REGIST_SUCC);
                 $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="reloadPage();"><i class="fa fa-times"></i> Close</button>');
@@ -237,6 +245,10 @@ function getAPIInfo() {
         data: params,
         url: '/chatBotEnv/selectAPIInfo',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.rows) {
 

@@ -81,6 +81,10 @@ function makeUserTable(newPage) {
         data: params,
         url: '/boardMng/selectUserList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.rows) {
                 
@@ -123,6 +127,10 @@ function makeBoardItemTable(userId, newPage) {
         data: params,
         url: '/boardMng/selectUserBoardList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             initAppList = data.rows;
             initAppCheck = data.checkedApp;
             mkBoardItemRow(data.rows, data.checkedApp);
@@ -217,6 +225,10 @@ function saveUserBoardItemApp() {
             data: params,
             url: '/boardMng/updateBoardItemList',
             success: function(data) {
+                if (data.loginStatus == 'DUPLE_LOGIN') {
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
                 if (data.status === 200) {
                     //window.location.reload();
                     alert(language['REGIST_SUCC']);

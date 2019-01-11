@@ -52,6 +52,14 @@ $(document).on('click','#excelDownload',function(){
         },
         url: '/historyMng/selectHistoryListAll',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (status) {
                 $('#alertMsg').text(language.ALERT_ERROR);
                 $('#alertBtnModal').modal('show');
@@ -223,6 +231,10 @@ function makeHistoryTable(newPage) {
         },
         url: '/historyMng/selectHistoryList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (status) {
                 $('#alertMsg').text(language.ALERT_ERROR);
                 $('#alertBtnModal').modal('show');
@@ -351,6 +363,10 @@ function getHistoryDetail(sId) {
         },
         data: params,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             
             if (status) {
                 $('#alertMsg').text(language.ALERT_ERROR);

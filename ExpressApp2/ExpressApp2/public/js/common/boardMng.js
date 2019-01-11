@@ -113,6 +113,10 @@ function makeBoardItemTable() {
         data: params,
         url: '/boardMng/selectDashboardItemList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
            
             if (data.records > 0) {
                 
@@ -182,6 +186,10 @@ function procBoardItemMaster(procType) {
         data: params,
         url: '/boardMng/procBoardItem',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data);
             if (data.status === 200) {
                 alert(language['REGIST_SUCC']);

@@ -313,6 +313,10 @@ function saveEntityDetail() {
                 data: params,
                 url: '/luis/saveChangedEntity',
                 success: function(data) {
+                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                        alert($('#dupleMassage').val());
+                        location.href = '/users/logout';
+                    }
                     if(data.error){
                         $('#alertMsg').text(data.message);
                         $('#alertBtnModal').modal('show');
@@ -458,6 +462,10 @@ function getChildEntityList() {
         data: params,
         url: '/luis/getChildEntity',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.error){
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -636,6 +644,10 @@ function getChildCompositeList() {
         type: 'POST',
         url: '/luis/selectChildCompositeList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -684,6 +696,10 @@ function deleteEntity(entityHiddenName, hId, hType) {
         data: params,
         url: '/luis/deleteEntity',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.error){
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');

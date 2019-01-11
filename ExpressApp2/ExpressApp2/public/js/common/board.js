@@ -10,6 +10,10 @@ var language;
         dataType: 'json',
         type: 'POST',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             language= data.lang;
             console.log(language);
             //google.charts.load('current', {'packages':['corechart']});
@@ -107,6 +111,10 @@ function getLanguage() {
         dataType: 'json',
         type: 'POST',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             language = data.lang;
             console.log(language);
         }
@@ -161,6 +169,10 @@ function getEntityListAjax () {
         data: "",
     })
     .done(function(data) {
+        if (data.loginStatus == 'DUPLE_LOGIN') {
+            alert($('#dupleMassage').val());
+            location.href = '/users/logout';
+        }
         //entityList = data;
         mkEntityList (data);
     })
@@ -412,6 +424,10 @@ function drawStatusOverview() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error_code != null && data.error_message != null) {
                   alert(data.error_message);
             } else {
@@ -516,6 +532,10 @@ function getOftQuestion() {
         type: "post",
         data: $("#filterForm").serialize(),
     }).done(function(data) {
+        if (data.loginStatus == 'DUPLE_LOGIN') {
+            alert($('#dupleMassage').val());
+            location.href = '/users/logout';
+        }
         if (data.error_code != null && data.error_message != null) {
             alert(data.error_message);
       } else {
@@ -595,6 +615,10 @@ function drawNoneQuerylist() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
               if (data.error_code != null && data.error_message != null) {
                   alert(data.error_message);
               } else {
@@ -700,6 +724,10 @@ function drawStuff() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             inputDataforBar = new google.visualization.DataTable();
             if (data.list.length < 3) {
                 inputDataforBar.addRows(3);
@@ -769,6 +797,10 @@ function drawFirstQueryTable() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputData = new google.visualization.DataTable();
             //inputData.addRows(data.list.length);
             inputData.addColumn('string', language.HangulQuestion);
@@ -881,6 +913,10 @@ function getScorePanel() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var scores = data.list[0];
             $('#allCustomer').html(scores.CUSOMER_CNT);
             $('#avgReplySpeed').html(scores.REPLY_SPEED);
@@ -902,6 +938,10 @@ function getResponseScores() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             
             var arrTmp = [];
             var arr0 = ['NAME', 'ms'];
@@ -959,6 +999,10 @@ function getQueryByEachTime() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var arrList = data.list;
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Time of Day');

@@ -38,12 +38,11 @@ SELECT USER_ID
        , ISNULL(PW_INIT_YN, 'N') AS PW_INIT_YN 
        , ISNULL(LAST_LOGIN_IP, 'NONE') AS LAST_LOGIN_IP 
        , ISNULL(CONVERT(char(19), LAST_LOGIN_DT, 120), 'NONE') AS LAST_LOGIN_DT2 
-       , DATEDIFF ( day , ISNULL(LAST_LOGIN_DT, getdate() ) 
-       , getdate() ) AS LAST_LOGIN_DT 
+       , DATEDIFF ( day , ISNULL(LAST_LOGIN_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LAST_LOGIN_DT 
        , ISNULL(LOGIN_IP, 'NONE') AS LOGIN_IP 
        , ISNULL(LOGIN_FAIL_CNT, 0) AS LOGIN_FAIL_CNT 
-       , DATEDIFF ( mi , ISNULL(LOGIN_FAIL_DT, getdate() ), getdate() ) AS LOGIN_FAIL_DT 
-       , DATEDIFF ( mi , ISNULL(LAST_SCRT_DT, getdate() ), getdate() ) AS LAST_SCRT_DT
+       , DATEDIFF ( mi , ISNULL(LOGIN_FAIL_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LOGIN_FAIL_DT 
+       , DATEDIFF ( mi , ISNULL(LAST_SCRT_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LAST_SCRT_DT
        , ISNULL(LOGIN_YN, 'N') AS LOGIN_YN 
        , ISNULL(USER_AUTH, '0') AS USER_AUTH 
        
@@ -61,7 +60,7 @@ SELECT USER_ID
 
 var insertUserLoginHistoryQry = ` 
 INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, USERIP, LOGIN_STATUS) 
-VALUES (@userId, GETDATE(), @loginIp, 'LOGIN');
+VALUES (@userId, DATEADD(hh, 9, GETDATE()), @loginIp, 'LOGIN');
 `; 
 
 var insertUserLogoutHistoryQry = ` 
@@ -69,11 +68,11 @@ INSERT INTO TBL_USER_HISTORY (USERID, LOGIN_TIME, LOGOUT_TIME, USERIP, LOGIN_STA
 VALUES (@userId 
      , ( SELECT LOGIN_TIME FROM ( 
                                   SELECT ROW_NUMBER() OVER(ORDER BY TBL_A.LOGIN_TIME DESC) AS NUM, TBL_A.LOGIN_TIME 
-                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE LOGIN_STATUS='LOGIN' AND USERID='test01') TBL_A 
+                                    FROM (SELECT LOGIN_TIME FROM TBL_USER_HISTORY WHERE LOGIN_STATUS='LOGIN' AND USERID=@userId ) TBL_A 
                                 ) TBL_B 
           WHERE TBL_B.NUM = 1 
        ) 
-     , GETDATE() 
+     , DATEADD(hh, 9, GETDATE()) 
      , @loginIp 
      , 'LOGOUT');
 `; 
@@ -90,12 +89,77 @@ router.get('/', function (req, res) {
     //res.send('respond with a resource');
 });
 
+router.post('/dupleLoginCheck', function (req, res) {  
+    var userId = req.body.mLoginId;
+
+    var sessionObjList = req.sessionStore.sessions;
+
+    var isLoggedIn = false;
+    for (var key in sessionObjList) {
+        var userObj = JSON.parse(sessionObjList[key]);
+        if (userObj.sid) {
+            if (userId == userObj.sid) {
+                //delete sessionObjList[key]; 
+                /*
+                userObj.sid = 'DUPLE_LOGIN_Y___'; 
+                userObj.dupleLogin = "DUPLE_Y";
+                JSON.stringify(userObj)
+                sessionObjList[key] = JSON.stringify(userObj); 
+                //sessionObjList[key] = undefined;
+                */
+                isLoggedIn = true;
+                break;
+            } else {
+                continue
+            }
+        }
+    }
+
+    if (isLoggedIn) {
+        res.send({
+            'duple' : true
+        });
+    } else {
+        res.send({
+            'duple' : false
+        });
+    }
+});
+
 router.post('/login', function (req, res) {  
     //req.session.sid = req.body.mLoginId;
 
     var userId = req.body.mLoginId;
     var userPw = req.body.mLoginPass;
+    var dupleYn = req.body.dupleYn;
+    var dupleLoginIp = "NONE";
+    var isLoggedIn = false;
+    if (typeof dupleYn != 'undefined') {
+        var sessionObjList = req.sessionStore.sessions;
+        for (var key in sessionObjList) {
+            var userObj = JSON.parse(sessionObjList[key]);
+            if (userObj.sid) {
+                if (userId == userObj.sid) {
+                    //delete sessionObjList[key]; 
+                    userObj.sid = '___DUPLE_LOGIN_Y___'; 
+                    //userObj.dupleLogin = "DUPLE_Y";
+                    
+                    if (userObj.userInfo) {
+                        dupleLoginIp = userObj.userInfo.LAST_LOGIN_IP
+                    }
 
+                    sessionObjList[key] = JSON.stringify(userObj); 
+                    isLoggedIn = true;
+                    //sessionObjList[key] = undefined;
+                    break;
+                } else {
+                    continue
+                }
+            }
+        }
+    }
+
+    
     //암호화
     /*
     var cipher = crypto.createCipher('aes192', key);
@@ -109,7 +173,7 @@ router.post('/login', function (req, res) {
     `
 
     var updateLoginFailCntQry = ` 
-    UPDATE TB_USER_M SET LOGIN_FAIL_CNT = (ISNULL(LOGIN_FAIL_CNT, 0) + 1), LOGIN_FAIL_DT = GETDATE()  WHERE USER_ID = @userId;
+    UPDATE TB_USER_M SET LOGIN_FAIL_CNT = (ISNULL(LOGIN_FAIL_CNT, 0) + 1), LOGIN_FAIL_DT = DATEADD(hh, 9, GETDATE())  WHERE USER_ID = @userId;
     `;
 
     var selectLuisInfoQry = `
@@ -121,7 +185,7 @@ router.post('/login', function (req, res) {
 
     var updateUserLoginQry = `
     UPDATE TB_USER_M 
-       SET LAST_LOGIN_DT = GETDATE(), LOGIN_YN = 'Y', LOGIN_SID = @loginSid, LOGIN_FAIL_CNT = 0, LAST_LOGIN_IP = @loginIp 
+       SET LAST_LOGIN_DT = DATEADD(hh, 9, GETDATE()), LOGIN_YN = 'Y', LOGIN_SID = @loginSid, LOGIN_FAIL_CNT = 0, LAST_LOGIN_IP = @loginIp 
      WHERE USER_ID = @userId;
     `; 
 
@@ -129,6 +193,18 @@ router.post('/login', function (req, res) {
     try {
         (async () => {
             let pool = await dbConnect.getAppConnection(sql);
+
+            if (isLoggedIn) {
+                let dupleLogout = await pool.request()
+                                .input('userId', sql.NVarChar, userId)
+                                .input('loginIp', sql.NVarChar, dupleLoginIp)
+                                .query(insertUserLogoutHistoryQry);
+                logger.info('[알림]중복 로그인-로그아웃 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '중복로그인-기존사용자 로그아웃');
+            }
+
+
+
+
             let loginUserRst = await pool.request()
                                             .input('userId', sql.NVarChar, userId)
                                             .query(loginSelQry)
@@ -141,7 +217,8 @@ router.post('/login', function (req, res) {
             } else {
                 //사용자 없음
                 logger.info('[알림]로그인 실패  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그인 아이디 없음');
-                
+                res.send('<script>alert("' + i18n.getCatalog()[res.locals.languageNow].ALERT_LOGIN_FAIL + '");location.href="/";</script>');
+                return false;
             }
 
             //비밀번호 확인
@@ -233,7 +310,7 @@ router.post('/login', function (req, res) {
 
             //-----로그인 성공 처리-----
 
-            
+            var beforeLoginIp = userInfo[0].LAST_LOGIN_IP;
             req.session.sid = userId;
             req.session.sAuth = userInfo[0].USER_AUTH;
             userInfo[0].LAST_LOGIN_IP = userLoginIP;
@@ -269,7 +346,7 @@ router.post('/login', function (req, res) {
             logger.info('[알림]로그인 성공  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, logStr);
                 
             req.session.save(function(){
-                res.send('<script>alert("최근 접속 시간 : ' + userInfo[0].LAST_LOGIN_DT2 + ', 최근 접속 IP : ' + userInfo[0].LAST_LOGIN_IP + '");location.href="/";</script>');
+                res.send('<script>alert("최근 접속 시간 : ' + userInfo[0].LAST_LOGIN_DT2 + ', 최근 접속 IP : ' + beforeLoginIp + '");location.href="/";</script>');
             });
         })()
         
@@ -296,19 +373,26 @@ router.get('/logout', function (req, res) {
                     logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err);
                     res.redirect('/');
                 } else { 
-                    dbConnect.getConnection(sql).then(pool => {
+                    if (logoutID == '___DUPLE_LOGIN_Y___') {
+                        res.clearCookie('sid');
+                        res.redirect('/');
+                    } else {
+                        dbConnect.getConnection(sql).then(pool => {
                         return pool.request()
                         .input('userId', sql.NVarChar, logoutID)
                         .input('loginIp', sql.NVarChar, loginIp)
                         .query(insertUserLogoutHistoryQry)
 
-                    }).then(result => {
-                        logger.info('[알림]로그아웃 [id : %s] [url : %s] [내용 : %s]', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그아웃 성공');
-                        res.clearCookie('sid');
-                        //res.clearCookie('connect.sid', {path: '/'});
-                        //res.clearCookie('i18n', {path: '/'});
-                        res.redirect('/');
-                    });
+                        }).then(result => {
+                            logger.info('[알림]로그아웃 [id : %s] [url : %s] [내용 : %s]', logoutID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '로그아웃 성공');
+                            res.clearCookie('sid');
+                            res.redirect('/');
+
+                            //res.clearCookie('connect.sid', {path: '/'});
+                            //res.clearCookie('i18n', {path: '/'});
+                        });
+                    }
+                    
                     /*
                     var pool = await dbConnect.getAppConnection(sql);
                     let userLoginHistoryRst = await pool.request()
@@ -1569,42 +1653,42 @@ router.post('/', function (req, res) {
 });
 */
 
-router.post('/selectUserList', function (req, res) {
-
+router.post('/selectUserHistoryList', function (req, res) {
+    
+    var currentPageNo = req.body.currentPage;
+    var loginStatus = req.body.loginStatus;
+    var userId = req.session.sid;
     (async () => {
         try {
          
             var QueryStr =  `
-            
+                SELECT SEQ, USERID, CONVERT(CHAR(23), LOGIN_TIME, 21) AS LOGIN_TIME, CONVERT(CHAR(23), LOGOUT_TIME, 21) AS LOGOUT_TIME, USERIP, LOGIN_STATUS 
+                  FROM TBL_USER_HISTORY 
+                 WHERE USERID = @userId 
+                   AND  LOGIN_STATUS LIKE (CASE WHEN 'ALL' = @loginStatus THEN '%%' WHEN 'LOGIN' = @loginStatus THEN '%LOGIN%' ELSE '%LOGOUT%' END) 
+                ORDER BY LOGIN_TIME DESC;
             `;
             
-            let pool = await dbConnect.getConnection(sql);
-            let result1 = await pool.request().query(QueryStr);
+            let pool = await dbConnect.getConnection(sql);userId
+            let result1 = await pool.request()
+                                .input('userId', sql.NVarChar, userId)
+                                .input('loginStatus', sql.NVarChar, loginStatus)
+                                .query(QueryStr);
 
             let rows = result1.recordset;
 
-
             if(rows.length > 0){
-
-                var totCnt = 0;
-                if (recordList.length > 0)
-                    totCnt = checkNull(recordList[0].TOT_CNT, 0);
-                var getTotalPageCount = Math.floor((totCnt - 1) / checkNull(rows[0].TOT_CNT, 10) + 1);
-
-
-                res.send({
-                    records : recordList.length,
-                    total : getTotalPageCount,
-                    pageList : paging.pagination(currentPageNo,rows[0].TOT_CNT), //page : checkNull(currentPageNo, 1),
-                    rows : recordList
-                });
-
-            }else{
-                //res.send({list : result});
-                res.send({
-                    records : 0,
-                    rows : null
-                });
+                var listLength = rows.length;
+                var pageStartInex = 0;
+                if ((currentPageNo-1)*10 > listLength) {
+                    rows = rows.splice(0, listLength<11?listLength:10);
+                }
+                else {
+                    rows = rows.splice((currentPageNo-1)*10, 10);
+                }
+                res.send({userHistoryList : rows, pageList : paging.pagination(currentPageNo, listLength)});
+            } else {
+                res.send({userHistoryList : rows});
             }
         } catch (err) {
             console.log(err)
@@ -1619,6 +1703,75 @@ router.post('/selectUserList', function (req, res) {
 
 
 
+router.post('/initUserLimit', function (req, res) {
+    let userId = checkNull(req.body.userId, -1);
+
+    var adminId = req.session.sid;
+    var userInfo = req.session.userInfo;
+    if (userId == -1) {
+        logger.info('[에러] [id : %s] [대상id : %s] [url : %s] [내용 : %s] ', adminId, 'NONE', req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '사용자 로그인제한 해제 실패');
+        res.send({
+            status: 400,
+            message: i18n.getCatalog()[res.locals.languageNow].It_failed
+        });
+    } else if (typeof userInfo == "undefined") {
+        logger.info('[에러] [id : %s] [대상id : %s] [url : %s] [내용 : %s] ', adminId, userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한 정보 X1');
+        res.send({
+            status: 400,
+            message: i18n.getCatalog()[res.locals.languageNow].It_failed
+        });
+    } else {
+        (async () => {
+            try {
+                if (typeof userInfo.USER_AUTH == "undefined") {
+                    logger.info('[에러] [id : %s] [대상id : %s] [url : %s] [내용 : %s] ', adminId, userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한 정보 X2');
+                    res.send({
+                        status: 400,
+                        message: i18n.getCatalog()[res.locals.languageNow].It_failed
+                    });
+                    return false;
+                } 
+                var userAuth = userInfo.USER_AUTH;
+
+                if (userAuth*1 < 99) {
+                    logger.info('[에러] [id : %s] [대상id : %s] [url : %s] [내용 : %s] ', adminId, userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한 99미만');
+                    res.send({
+                        status: 400,
+                        message: i18n.getCatalog()[res.locals.languageNow].It_failed
+                    });
+                    return false;
+                } 
+
+                var QueryStr = "UPDATE TB_USER_M SET LOGIN_FAIL_CNT = 0 WHERE USER_ID = @userId;";
+                    
+                let pool = await dbConnect.getConnection(sql);
+                let result1 = await pool.request()
+                        .input('userId', sql.NVarChar, userId)
+                        .query(QueryStr);
+
+                logger.info('[알림]로그인 실패 횟수 초기화 성공  [id : %s] [대상id : %s] [url : %s] ', adminId, userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+                res.send({
+                    status: 200,
+                    message: i18n.getCatalog()[res.locals.languageNow].SUCCESS
+                });
+                
+            } catch (err) {
+                logger.info('[에러] [id : %s] [대상id : %s] [url : %s] [내용 : %s] ', adminId, userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+                res.send({
+                    status: 400,
+                    message: i18n.getCatalog()[res.locals.languageNow].It_failed
+                });
+            } finally {
+                sql.close();
+            }
+        })()
+    }
+
+});
+
+router.get('/dupleLogin', function (req, res) {
+    res.send('<script>alert("' + i18n.getCatalog()[i18n.getLocale(req)].ALERT_OTHER_USER_LOGIN_WITH_SAME_ID + '");location.href="/users/logout";</script>');
+});
 
 router.get('/error', function (req, res) {
     if (req.session.sid) {

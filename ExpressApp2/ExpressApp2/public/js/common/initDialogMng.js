@@ -34,6 +34,10 @@ function makeInitDlgTable() {
         data: params,
         isloading: true,
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             searchTitleTxt = $('#searchTitleTxt').val();
             searchDescTxt = $('#searchDescTxt').val();
             $('#dialogTbltbody').html('');
@@ -425,6 +429,10 @@ function createDialog() {
         type: 'POST',
         data: { 'data': array, /*'entities' : chkEntities*/ },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             //alert(language.Added);
 
             var inputUttrHtml = '';
@@ -586,6 +594,10 @@ function updateInitDialog() {
         data: { 'dlgId': dlgId, 'dlgType': dlgType, 'updateData': array, 'entity': entity },      //데이터를 json 형식, 객체형식으로 전송
 
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             
             $('#proc_content').html(language.REGIST_SUCC);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');

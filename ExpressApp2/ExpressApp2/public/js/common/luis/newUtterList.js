@@ -141,6 +141,10 @@ function getEntityList(intentName, intentId) {
         url: '/luis/getEntityList',
         data: {'isAll' : 'ALL'},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.error) {
                 $('#alertMsg').text(data.message);
                 $('#alertBtnModal').modal('show');
@@ -168,6 +172,10 @@ function makeQnaTable() {
         data: params,
         url: '/luis/getNewUtterList',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             $('#qnaListBody').html('');
             $('#pagination').html('');
             var entityBodyHtml = '';
@@ -314,6 +322,10 @@ function selectGroup(selectId, str1, str2) {
         type: 'POST',
         data: { 'selectId': selectId, 'selectValue1': str1, 'selectValue2': str2 },
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var group = result.rows;
             $("#" + selectId).html("");
 
@@ -382,6 +394,10 @@ function searchDialog(contextEntityData) {
             });
         },
         success: function (result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             var inputUttrHtml = '';
 
@@ -724,6 +740,10 @@ function makeRelation() {
             $("#loadingBar").css("display", "none");
         },
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (!data.result) {
                 $('#alertMsg').text(language.It_failed);
                 $('#alertBtnModal').modal('show');

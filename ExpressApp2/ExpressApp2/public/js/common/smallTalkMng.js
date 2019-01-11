@@ -170,6 +170,10 @@ function makeSmallTalkTable(page) {
         data: params,
         url: '/smallTalkMng/selectSmallTalkList',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.rows) {
 
@@ -337,6 +341,10 @@ function smallTalkProc(procType) {
         data: params,
         url: '/smallTalkMng/smallTalkProc',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.status === 200) {
                 //alert(language['REGIST_SUCC']);
                 $('#proc_content').html(language.REGIST_SUCC);
@@ -365,6 +373,10 @@ function getEntityFromQ(queryText) {
         data: { 'iptUtterance': queryText },
 
         success: function (result) {          //성공했을 때 함수 인자 값으로 결과 값 나옴
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var entities = result['entities'];
             //for (var k = 0; k < queryTextArr.length; k++) {
                 if (entities[0] != null) {

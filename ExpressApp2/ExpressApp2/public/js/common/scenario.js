@@ -129,6 +129,10 @@ function openModalBoxEdit(strDlgId, strDlgType) {
         type: 'POST',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             console.log(data.rows);
             console.log(data.childCnt); //  child Dialog Cnt
             var _btnCnt = 0;
@@ -720,6 +724,10 @@ function selectApiGroup() {
         //data: params,
         url: '/learning/selectApiGroup',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if (data.groupList) {
                 var groupList = data.groupList;
                 var optionStr = "";
@@ -853,6 +861,10 @@ function createDialog(){
         type: 'POST',
         data: {'data' : array/*, 'entities' : chkEntities*/},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert(language.Added);
 
             var inputUttrHtml = '';
@@ -986,6 +998,10 @@ function editDialog(){  //  대화상자 수정
         type: 'POST',
         data: {'data' : array},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data['status'] == '200'){
                 alert(language.Edited);
                 //  modal pop close..
@@ -1010,6 +1026,10 @@ function deleteDialog(){
         type: 'POST',
         data: {'dlgId' : iptDlgId},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data['status'] == '200'){
                 alert(language.Deleted);
                 //  modal pop close..
@@ -1150,6 +1170,10 @@ function addChildDialog(){   //  (자식) 대화상자 추가
         type: 'POST',
         data: {'data' : array},
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             alert(language.Added);
             $(".createDlgModalClose").click();  //  창닫기            
             selectScenarioList();   //  시나리오 목록 갱신
@@ -1170,6 +1194,10 @@ function selectDlgListAjax(entity) {
         type: 'POST',
         data: {'entity':entity},
         success: function(result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputUttrHtml = '';
             for (var i=0; i<result['list'].length; i++) {
                 var tmp = result['list'][i];
@@ -1340,6 +1368,10 @@ function utterInput(queryText) {
         type: 'POST',                      //���� Ÿ��
         data: {'iptUtterance': queryTextArr},      //�����͸� json ����, ��ü�������� ����
         success: function(result) {          //�������� �� �Լ� ���� ������ ��� �� ����
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var entities = result['entities'];
             for (var k=0; k< queryTextArr.length; k++) {
                 if(entities[k] != null) {
@@ -1437,6 +1469,10 @@ function selectGroup(selectId,str1,str2) {
         type: 'POST',
         data: {'selectId':selectId,'selectValue1':str1,'selectValue2':str2},
         success: function(result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var group = result.rows;
             $("#"+selectId).html("");
             if(selectId == "searchLargeGroup") {
@@ -1490,6 +1526,10 @@ function searchDialog() {
         type: 'POST',
         data: formData,
         success: function(result) {
+            if (result.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var inputUttrHtml = '';
             var row = [];
             var arrayNum = 0;
@@ -1907,6 +1947,10 @@ function insertEntity(){
         type: 'POST',
         data: JSON.stringify(entityValueList), //$('#appInsertForm').serializeObject(),
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.status == 200){
                 $('.addDialogCancel').click();
                 alert(language.Added);
@@ -1956,6 +2000,10 @@ function getGroupSelectBox() {
         url: '/learning/getGroupSelectBox',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             var groupL = data.groupL;
             var groupM = data.groupM;
             var groupHtml = "";
@@ -2035,6 +2083,10 @@ function createApiRelation() {
         data: params,
         url: '/learning/createApiRelation',
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.status == 200){
                 $('.addApiCancel').click();
                 alert(language.Added);
@@ -2055,6 +2107,10 @@ function selectScenarioList() {     //  시나리오 목록
         type: 'POST',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.rows){
                 //alert('data.rows');
                 var scenarioList = data.rows;
@@ -2082,6 +2138,10 @@ function selectScenarioInfo(strDlgId) {     //  DLG_ID 별 시나리오 정보
         type: 'POST',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data.rows){  //alert('data.rows');
                 var scenarioInfo = data.rows;
                 //alert("selectScenarioInfo() - "+scenarioInfo[0].SCENARIO_NM+" | DLG_ID:"+scenarioInfo[0].DLG_ID+" | DLG_DEPTH:"+scenarioInfo[0].DLG_DEPTH+" | PARENT_DLG_ID:"+scenarioInfo[0].PARENT_DLG_ID);
@@ -2106,6 +2166,10 @@ function getScenarioDialogs(strScenarioName){
         type: 'POST',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             //alert('getScenarioDialogs SUCCESS!');             
             if(data.list){
                 console.log(data.list);
@@ -2235,6 +2299,10 @@ function delScenarioDialogs(strScenarioName){
         type: 'POST',
         isloading: true,
         success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
             if(data['status'] == '200'){
                 alert(language.Deleted);
                 //  modal pop close..

@@ -25,6 +25,10 @@ function makeUserMenu(pageUrl){
         data: params,
         url: '/menu/checkMenuAuth',
         success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
 
             if (data.status == "FAIL") {
             //메뉴접근 불가
