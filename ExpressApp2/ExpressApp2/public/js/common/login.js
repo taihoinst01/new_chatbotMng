@@ -1,3 +1,19 @@
+$(document).ready(function(){
+    //오른쪽 클릭 방지
+    $(document).bind("contextmenu", function(e) {
+    return false;
+    });
+    //f12 방지
+    $(document).bind('keydown',function(e){
+        if ( e.keyCode == 123 /* F12 */) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+    });
+});
+//드래그방지 주석
+//$(document).bind('selectstart',function() {return false;}); 
+//$(document).bind('dragstart',function(){return false;}); 
 
 $(document).ready(function () {
 
@@ -13,13 +29,15 @@ $(document).ready(function () {
 
     });
 
+    $('#changePwBtn').click(function () {
+        location.href="/users/goPwChnge";
+    });
+
     $('#mLoginPass, #mLoginId').keyup(function(e){
         if(e.keyCode == 13) {
             $('#sendLoginBtn').click();
         }
     });
-
-    
 })
 
 function caps_lock(e) {

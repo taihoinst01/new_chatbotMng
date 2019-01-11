@@ -44,6 +44,9 @@
 
         <div class="social-auth-links text-center"><button type="submit" class="btn btn_login" id="sendLoginBtn"><%= __('LOGIN_BTN') %></button></div>
     
+        <div class="social-auth-links text-right"><a href="#" onclick="return false;" id="changePwBtn"><%= __('PASSWOARD_CHNG') %></a></div>
+    
+
         <p class="login_footer ">COPYRIGHTS <strong> ©TAIHOINST </strong> ALL RIGHTS RESERVED.</p>
     </div>
   </div>
@@ -75,7 +78,7 @@
           $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
             checkboxClass: 'icheckbox_minimal-red',
             radioClass   : 'iradio_minimal-red'
-          })
+          })            
           //Flat red color scheme for iCheck
           $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
             checkboxClass: 'icheckbox_flat-green',

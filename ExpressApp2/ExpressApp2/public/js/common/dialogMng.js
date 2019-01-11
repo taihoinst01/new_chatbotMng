@@ -461,7 +461,7 @@ function selectDlgByTxt(groupType, sourceType) {
                         '<input type="hidden" name="cardText" value="' + (data.list[i].CARD_TEXT==null?'':data.list[i].CARD_TEXT) + '" />' +
                         '</td>' +
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
-                        '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         
                         '<td>' + type_name + '</td>' +
                         '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ',\'common\');return false;"><span class="fa fa-trash"></span></a></td>' +

@@ -37,14 +37,16 @@ router.post('/selectChatbotEnv', function (req, res) {
             var chatBotDbStr = "SELECT \n" +
                            " USER_NAME, PASSWORD, SERVER, DATABASE_NAME \n" +
                            " FROM TBL_DB_CONFIG \n" +
-                           " WHERE APP_NAME = '"+chatbotName+ "'; \n";
+                           " WHERE APP_NAME = @chatbotName; \n";
             var chatBotLuisStr = "SELECT TOP 1 \n" +
                             " (SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE='LUIS_TIME_LIMIT') AS LUIS_TIME_LIMIT, \n" +
                             " (SELECT CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE='LUIS_SCORE_LIMIT') AS LUIS_SCORE_LIMIT \n" +
                             " FROM TBL_CHATBOT_CONF; \n";
 
             let db_pool = await dbConnect.getConnection(sql);
-            let db_result = await db_pool.request().query(chatBotDbStr);
+            let db_result = await db_pool.request()
+                    .input('chatbotName', sql.NVarChar, chatbotName)
+                    .query(chatBotDbStr);
 
             logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_DB_CONFIG 테이블 조회 시작');
             let luis_pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
@@ -139,7 +141,8 @@ router.post('/procChatBotEnv', function (req, res) {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
             if (updateTimeLimit !== "") {
                 logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 수정1');
-                let updateTimeLimitP = await pool.request().query(updateTimeLimit);
+                let updateTimeLimitP = await pool.request()
+                .query(updateTimeLimit);
             }
             if (updateScoreLimit !== "") {
                 logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_CHATBOT_CONF 테이블 수정2');

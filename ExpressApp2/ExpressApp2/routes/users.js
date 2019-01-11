@@ -42,7 +42,8 @@ SELECT USER_ID
        , ISNULL(LOGIN_IP, 'NONE') AS LOGIN_IP 
        , ISNULL(LOGIN_FAIL_CNT, 0) AS LOGIN_FAIL_CNT 
        , DATEDIFF ( mi , ISNULL(LOGIN_FAIL_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LOGIN_FAIL_DT 
-       , DATEDIFF ( mi , ISNULL(LAST_SCRT_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LAST_SCRT_DT
+       , DATEDIFF ( day  , ISNULL(LAST_SCRT_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LAST_SCRT_DT
+       , DATEDIFF ( hour  , ISNULL(LAST_SCRT_DT, DATEADD(hh, 9, GETDATE()) ), DATEADD(hh, 9, GETDATE()) ) AS LAST_SCRT_DT_HH
        , ISNULL(LOGIN_YN, 'N') AS LOGIN_YN 
        , ISNULL(USER_AUTH, '0') AS USER_AUTH 
        
@@ -89,6 +90,13 @@ router.get('/', function (req, res) {
     //res.send('respond with a resource');
 });
 
+router.get('/goPwChnge', function (req, res) {
+    
+    res.render('passwordChng', {
+        changeId: 'NONE',
+    });
+    //res.send('respond with a resource');
+});
 router.post('/dupleLoginCheck', function (req, res) {  
     var userId = req.body.mLoginId;
 
@@ -239,7 +247,6 @@ router.post('/login', function (req, res) {
                 return false;
             } 
             //------비밀번호 일치------//
-
             if (parseInt(userInfo[0].LOGIN_FAIL_CNT) >= loginLimitCnt) {
                 //로그인실패 3회 사용자 로그인 제한 설정 
                 var failDate = parseInt(userInfo[0].LOGIN_FAIL_DT);
@@ -663,8 +670,7 @@ router.post('/inItPassword', function (req, res) {
             var userAuthYN = '0';
             if (getUserAuthRow.length > 0) {
                 userAuthYN = getUserAuthRow[0].USER_AUTH;
-
-                logger.info('사용자 비밀번호 초기화 전 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, getUserAuthRow[0].ADMIN_YN, 'users/saveUserInfo');
+                logger.info('사용자 비밀번호 초기화 전 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, 'users/saveUserInfo');
             } else {
                 logger.info('[에러]사용자 비밀번호 초기화 전 [관리자id : %s] [url : %s] [error : %s]', adminId, 'users/saveUserInfo', '계정 정보가 없습니다.');
                 res.send({ status: 400, message: 'failed' });
@@ -684,9 +690,15 @@ router.post('/inItPassword', function (req, res) {
                     var initPW = getUserInitRow[0].CNF_VALUE; 
                     var newSalt = await pwConfig.getSaltCode();
                     let basePW = pwConfig.getPassWord(initPW, newSalt);
-    
-                    var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW + "', SCRT_SALT = '" + newSalt + "', PW_INIT_YN='Y' WHERE USER_ID = '" + userId + "'; ";
-                    let initPwRst = await pool.request().query(initStr);
+                    
+                    //var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW + "', SCRT_SALT = '" + newSalt + "', PW_INIT_YN='Y' WHERE USER_ID = '" + userId + "'; ";
+
+                    var initStr = "UPDATE TB_USER_M SET LAST_SCRT_DT = DATEADD(hh, -25, GETDATE()+9), SCRT_NUM = @basePW, SCRT_SALT = @newSalt, PW_INIT_YN='Y' WHERE USER_ID = @userId; ";
+                    let initPwRst = await pool.request() 
+                            .input('basePW', sql.NVarChar, basePW)
+                            .input('newSalt', sql.NVarChar, newSalt)
+                            .input('userId', sql.NVarChar, userId)
+                            .query(initStr);
     
                     logger.info('사용자 비밀번호 초기화 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userId, 'users/inItPassword');
                     res.send({status:200 , message:'Init Success'});
@@ -731,7 +743,7 @@ router.post('/selectUserAppList', function (req, res) {
                         "            APP_ID \n" +
                         "       FROM TBL_USER_RELATION_APP \n" +
                         "      WHERE 1=1 \n" +
-                        "        AND USER_ID = '" + userId + "') tbp  \n" + 
+                        "        AND USER_ID = @userId) tbp  \n" + 
                         " WHERE 1=1;  \n";
                         //"   AND PAGEIDX = " + currentPage + "; \n";                  
     (async () => {
@@ -747,7 +759,9 @@ router.post('/selectUserAppList', function (req, res) {
                 recordList.push(item);
             }
 
-            let userAppList = await pool.request().query(UserAppListStr);
+            let userAppList = await pool.request()
+                    .input('userId', sql.NVarChar, userId)
+                    .query(UserAppListStr);
             let rows2 = userAppList.recordset;
 
             var checkedApp = [];
@@ -805,7 +819,36 @@ router.post('/updateUserAppList', function (req, res) {
                    
     (async () => {
         try {
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
+            
             if (saveData.length > 0) {
                 let appList = await pool.request().query(saveDataStr);
             }
@@ -1025,7 +1068,36 @@ router.post('/updateChatAppList', function (req, res) {
                    
     (async () => {
         try {
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
+
             if (saveData.length > 0) {
                 let appList = await pool.request().query(saveDataStr);
             }
@@ -1135,7 +1207,35 @@ router.post('/saveApiInfo', function(req, res){
 
     (async () => {
         try {
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
             if (saveStr !== "") {
                 let insertUser = await pool.request().query(saveStr);
             }
@@ -1214,7 +1314,35 @@ router.post('/addApp', function (req, res) {
     
     (async () => {
         try {
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
             let rows = await pool.request().query(getApplist);
 
             var appNames = rows.recordset;
@@ -1444,7 +1572,7 @@ router.post('/changePW', function (req, res) {
     //let chngPw = encryption(userPw);
     (async () => {
         try {
-            
+            //두연작업
             let pool = await dbConnect.getConnection(sql);
             let loginUserRst = await pool.request()
                                             .input('userId', sql.NVarChar, userId)
@@ -1452,17 +1580,24 @@ router.post('/changePW', function (req, res) {
             var userInfoArr = loginUserRst.recordset;
             if(userInfoArr.length > 0  ) {
                 //사용자 있음
+                //비밀번호 변경 시간 1일 안지날 경우
+                var failDate = parseInt(userInfoArr[0].LAST_SCRT_DT_HH);
+                if (failDate <= 24) {
+                    logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '마지막 비밀번호 변경 후 24시간이 지나지 않음' );
+                    res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
+                    return false;
+                }
             } else {
                 logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '조회된 아이디 없음' );
                 res.send({result:false , message: i18n.getCatalog()[res.locals.languageNow].ALERT_CHNG_FAIL});
                 return false;
             }
             var userInfo = userInfoArr[0];
-           
+            
             var originalPw = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT);
-            var firstPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_FIRST);
-            var secondPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_SECOND);
-            var thirdPwBefore = pwConfig.getPassWord(getOriginalPw, userInfo.SCRT_SALT_THIRD);
+            var firstPwBefore = pwConfig.getPassWord(userPw, userInfo.SCRT_SALT_FIRST);
+            var secondPwBefore = pwConfig.getPassWord(userPw, userInfo.SCRT_SALT_SECOND);
+            var thirdPwBefore = pwConfig.getPassWord(userPw, userInfo.SCRT_SALT_THIRD);
 
             if (originalPw != userInfo.SCRT_NUM) {//ALERT_CHNG_FAIL  //ALERT_CHNG_SUCCESS
                 logger.info('[알림]비밀번호 변경 실패 [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '잘못된 기존 비밀번호 입력' );
@@ -1501,6 +1636,8 @@ router.post('/changePW', function (req, res) {
                , SCRT_SALT_THIRD = SCRT_SALT_SECOND 
                , SCRT_SALT_SECOND = SCRT_SALT_FIRST 
                , SCRT_SALT_FIRST = SCRT_SALT  
+
+               , LAST_SCRT_DT = DATEADD(hh, 9, GETDATE()) 
 
                , SCRT_NUM = @chngPw 
                , SCRT_SALT = @newSalt 
@@ -1781,5 +1918,7 @@ router.get('/error', function (req, res) {
         res.render('error');
     }
 });
+
+
 
 module.exports = router;

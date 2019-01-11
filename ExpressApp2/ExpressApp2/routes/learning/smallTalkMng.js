@@ -17,6 +17,10 @@ var Logger = require("../../config/logConfig");
 var logger = Logger.CreateLogger();
 //log end
 
+
+//sql injection 
+var injection = require("../../config/sqlInjection");
+
 var router = express.Router();
 
 router.get('/smallTalkMng', function (req, res) {
@@ -45,21 +49,26 @@ router.post('/selectSmallTalkList', function (req, res) {
                            "          FROM TBL_SMALLTALK \n" +
                            "          WHERE 1=1 \n";
                         if (req.body.useYn != 'ALL') {
-                            QueryStr += "AND USE_YN = '" + req.body.useYn + "' \n";
+                            QueryStr += "AND USE_YN = @useYn \n";
                         }
                         if (req.body.searchQuestiontText !== '') {
-                            QueryStr += "AND S_QUERY like '%" + req.body.searchQuestiontText + "%' \n";
+                            QueryStr += "AND S_QUERY like @searchQuestiontText \n";
                         }
 
                         if (req.body.searchIntentText !== '') {
-                            QueryStr += "AND ENTITY like '" + req.body.searchIntentText + "%' \n";
+                            QueryStr += "AND ENTITY like @searchIntentText \n";
                         }
-                        QueryStr +="  ) tbp WHERE PAGEIDX = " + currentPage + "; \n";
+                        QueryStr +="  ) tbp WHERE PAGEIDX = @currentPage; \n";
 
             logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
 
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            let result1 = await pool.request().query(QueryStr);
+            let result1 = await pool.request()
+                    .input('useYn', sql.NVarChar, req.body.useYn)
+                    .input('searchQuestiontText', sql.NVarChar, '%' + req.body.searchQuestiontText + '%')
+                    .input('searchIntentText', sql.NVarChar, '%' + req.body.searchIntentText + '%')
+                    .input('currentPage', sql.NVarChar, currentPage)
+                    .query(QueryStr);
 
             let rows = result1.recordset;
 
@@ -121,13 +130,16 @@ function checkNull(val, newVal) {
 
 router.post('/smallTalkProc', function (req, res) {
     logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
-     
-    var dataArr = JSON.parse(req.body.saveArr);
-    var insertStr = "";
-    var deleteStr = "";
-    var userId = req.session.sid;
     
+    var dataArr = JSON.parse(req.body.saveArr);
+    var insertStr = "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
+                    " VALUES ( @S_QUERY, @INTENT, @ENTITY, @S_ANSWER,'2',GETDATE());";
+    var deleteStr = "DELETE FROM TBL_SMALLTALK WHERE SEQ = @DELETE_ST_SEQ; ";
+    var updateStr = "UPDATE TBL_SMALLTALK SET S_ANSWER=@S_ANSWER, USE_YN=@USE_YN WHERE SEQ = @SEQ; ";
+    var userId = req.session.sid;
+    /*
     for (var i = 0; i < dataArr.length; i++) {
+
         if (dataArr[i].statusFlag === 'ADD') {
             insertStr += "INSERT INTO TBL_SMALLTALK (S_QUERY, INTENT, ENTITY, S_ANSWER, DLG_TYPE, REG_DT) " +
             "VALUES (";
@@ -140,21 +152,42 @@ router.post('/smallTalkProc', function (req, res) {
 
         }
     }
-   
+    */
 
     (async () => {
         try {
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-            if (insertStr !== "") {
-                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 저장');
-                
-                let insertSmallTalk= await pool.request().query(insertStr);
-            }
 
-            if (deleteStr !== "") {
-                logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 제거');
+            for (var i = 0; i < dataArr.length; i++) {
+        
+                if (dataArr[i].statusFlag === 'ADD') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 저장');
                 
-                let deleteSmallTalk = await pool.request().query(deleteStr);
+                    var insertSmallTalk= await pool.request()
+                            .input('S_QUERY', sql.NVarChar, injection.changeAttackKeys(dataArr[i].S_QUERY))
+                            .input('INTENT', sql.NVarChar, injection.changeAttackKeys(dataArr[i].INTENT))
+                            .input('ENTITY', sql.NVarChar, injection.changeAttackKeys(dataArr[i].ENTITY))
+                            .input('S_ANSWER', sql.NVarChar, injection.changeAttackKeys(dataArr[i].S_ANSWER))
+                            .query(insertStr);
+
+                }else if (dataArr[i].statusFlag === 'DEL') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 제거 seq:' + dataArr[i].DELETE_ST_SEQ);
+                
+                    var deleteSmallTalk = await pool.request()
+                            .input('DELETE_ST_SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].DELETE_ST_SEQ))
+                            .query(deleteStr);
+                
+                }else if (dataArr[i].statusFlag === 'UPDATE') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 수정 seq:' + dataArr[i].SEQ);
+                
+                    var updateSmallTalk = await pool.request()
+                            .input('S_ANSWER', sql.NVarChar, injection.changeAttackKeys(dataArr[i].S_ANSWER))
+                            .input('USE_YN', sql.NVarChar, injection.changeAttackKeys(dataArr[i].USE_YN))
+                            .input('SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].SEQ))
+                            .query(updateStr);
+                }else{
+        
+                }
             }
             res.send({ status: 200, message: 'Save Success' });
 
@@ -195,7 +228,17 @@ router.post('/getEntityAjax', function (req, res, next) {
                 if (rows[0]['RESULT'] != '') {
                     var entities = rows[0]['RESULT'];
                     var entityArr = entities.split(',');
-    
+                    
+                    var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY IN (@entities);";
+                    var entitiesVal = "";
+                    for (var j = 0; j < entityArr.length; j++) {
+                        if (j!=0) entitiesVal += "'";
+                        
+                        entitiesVal += entityArr[j];
+                        entitiesVal += "'";
+                        entitiesVal += (j != entityArr.length - 1) ? "," : "";
+                    }
+                    /*
                     var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY IN (";
                     for (var j = 0; j < entityArr.length; j++) {
                         queryString2 += "'";
@@ -204,8 +247,9 @@ router.post('/getEntityAjax', function (req, res, next) {
                         queryString2 += (j != entityArr.length - 1) ? "," : "";
                     }
                     queryString2 += ")";
-
+                    */
                     let result3 = await pool.request()
+                        .input('entities', sql.NVarChar, entitiesVal)
                         .query(queryString2)
                     
                     let rows3 = result3.recordset
@@ -353,11 +397,17 @@ router.post('/deleteEntity', function (req, res) {
     (async () => {
         try {
 
-	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 삭제');
-            var deleteAppStr = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
+	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 삭제 ENTITY: ' + delEntityDefine);
+            //var deleteAppStr = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY = '" + delEntityDefine + "'; \n";
+
+            var deleteAppStr = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY = @delEntityDefine; \n";
+
+
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            let result1 = await pool.request().query(deleteAppStr);
+            let result1 = await pool.request()
+                            .input('delEntityDefine', sql.NVarChar, delEntityDefine)
+                            .query(deleteAppStr);
 
             res.send({ status: 200, message: 'delete Entity Success' });
             
@@ -393,6 +443,7 @@ router.post('/insertEntity', function (req, res) {
     (async () => {
         try {
             var entityInputStr = "";
+            /*
             entityInputStr += " SELECT COUNT(*) as count FROM TBL_SMALLTALK_ENTITY_DEFINE \n";
             entityInputStr += "  WHERE 1=1 \n";
             entityInputStr += "    AND ENTITY = '" + entityList[0].entityDefine + "' \n";
@@ -402,22 +453,40 @@ router.post('/insertEntity', function (req, res) {
                 entityInputStr += "ENTITY_VALUE = '" + entityList[i].entityValue + "' \n";
             }
             entityInputStr += "); \n";
+            */
+            entityInputStr += " SELECT COUNT(*) as count FROM TBL_SMALLTALK_ENTITY_DEFINE \n";
+            entityInputStr += "  WHERE 1=1 \n";
+            entityInputStr += "    AND ENTITY = @entityDefine \n";
+            entityInputStr += "    AND ( ";
+            
+            for (var i = 0; i < entityList.length; i++) {
+                if (i !== 0) { entityInputStr += "     OR " }
+                entityInputStr += "ENTITY_VALUE = '" + entityList[i].entityValue + "' \n";
+            }
+            entityInputStr += "); \n";
+
 	        logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK_ENTITY_DEFINE 테이블 추가');
             let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
 
-            let result0 = await pool.request().query(entityInputStr);
+            let result0 = await pool.request()
+            .input('entityDefine', sql.NVarChar, entityList[0].entityDefine) 
+            .query(entityInputStr);
            
             let rows = result0.recordset;
 
             if (rows[0].count == 0) {
 
-                var entityInputStr = "";
                 for (var i = 0; i < entityList.length; i++) {
+                    var entityInputStr = "";
                     entityInputStr += " INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY, ENTITY_VALUE) \n";
-                    entityInputStr += " VALUES ('" + entityList[i].entityDefine + "', '" + entityList[i].entityValue + "'); \n";
+                    entityInputStr += " VALUES (@entityDefine, @entityValue); ";
+
+                    var result1 = await pool.request()
+                            .input('entityDefine', sql.NVarChar, entityList[i].entityDefine) 
+                            .input('entityValue', sql.NVarChar, entityList[i].entityValue) 
+                            .query(entityInputStr);
                 }
 
-                let result1 = await pool.request().query(entityInputStr);
 
                 res.send({ status: 200, message: 'insert Success' });
             } else {

@@ -3,6 +3,7 @@ var simpleList = [];
 var hierarchyList = [];
 var compositeList = [];
 var closedList = [];
+var closedCompareList = [];
 var language;
 ;(function($) {
     $.ajax({
@@ -41,6 +42,7 @@ $(document).ready(function() {
             //alert('공백을 입력할 수 없습니다.');
             return false;
         }
+        $('#utteranceTblBody').html('');
         $('#utterTitle').text(inputUtter);
         makeUtterTable(inputUtter);
 
@@ -63,6 +65,7 @@ $(document).ready(function() {
  */
 
 //utter 추가  버튼
+//utter 추가  버튼
 $(document).on("click", "a[name=addUtter]", function(e){
     /*
     if ($(this).parents('tr').next().find('div[name=labelInfoDiv]').length >= 5) {
@@ -70,6 +73,10 @@ $(document).on("click", "a[name=addUtter]", function(e){
         return false;
     }
     */
+    if ($(this).parents('tr').next().css('display') == 'none') {
+        return false;
+    }
+
     var utterBodyHtml = '';
     utterBodyHtml += "<div name='labelInfoDiv'>";
     utterBodyHtml += "<select name='entityTypeForLabel' class='form-control'  >";
@@ -390,7 +397,7 @@ function makeUtterTable(inputText) {
         utterBodyHtml += "<td ></td>";
         utterBodyHtml += "<td style='text-align: left; padding-left:1%;'>";
         utterBodyHtml += makeTokenizedText(tokenArr, 'SPAN'); 
-        utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
+        //utterBodyHtml += "<a href='#' name='addUtter' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-plus' style='font-size: 25px;'></span></a>";
         utterBodyHtml += "</td>";
         //utterBodyHtml += "<td style='text-align: left; padding-left:1.5%;'>" + utterList.tokenizedText + "</td>";
         utterBodyHtml += "<td></td>";
@@ -399,7 +406,7 @@ function makeUtterTable(inputText) {
         utterBodyHtml += makeTokenizedText(tokenArr, 'INDEX', inputText);
         utterBodyHtml += "<input type='hidden' id='intentHiddenName' name='intentHiddenName' value='" + inputText + "' />";
         utterBodyHtml += "<input type='hidden' id='utterHiddenId' name='intentHiddenId' value='NEW' />";
-        utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
+        //utterBodyHtml += "<a href='#' name='delLabelBtn' onclick='return false;' style='display:inline-block; margin:7px 0 0 7px; '><span class='fa fa-trash' style='font-size: 25px;'></span></a>";
         utterBodyHtml += "</td>";
         utterBodyHtml += "</tr>";
         utterBodyHtml += makeLabelingTr();
@@ -455,6 +462,10 @@ function makeTokenizedText(token, chk, text) {
     return tokenHtml;
 }
 
+//simpleList 
+//hierarchyList 
+//compositeList 
+//closedList
 function makeLabelingTr(entityLabel) {
     var utterBodyHtml = '';
     var chkComposit = false;
@@ -486,7 +497,8 @@ function makeLabelingTr(entityLabel) {
                             
                             if (chkComposit) {
                                 if (chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex) ) {
-                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    utterBodyHtml += "<div name='indentDiv'>----</div>";
                                 } else {
                                     chkComposit = false;
                                 }
@@ -524,7 +536,8 @@ function makeLabelingTr(entityLabel) {
                             var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                             if (chkComposit) {
                                 if (isInside ) {
-                                    utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                    utterBodyHtml += "<div name='indentDiv'>----</div>";
                                 } else {
                                     chkComposit = false;
                                 }
@@ -623,7 +636,8 @@ function makeLabelingTr(entityLabel) {
                                     var isInside = chkInsideNum(startIndx, endIndx, entityLabel[i].startTokenIndex, entityLabel[i].endTokenIndex);
                                     if (chkComposit) {
                                         if (isInside ) {
-                                            utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                            //utterBodyHtml += "<div name='indentDiv'>&emsp;&emsp;</div>";
+                                            utterBodyHtml += "<div name='indentDiv'>----</div>";
                                         } else {
                                             chkComposit = false;
                                         }
@@ -716,6 +730,24 @@ function getEntityList(dlg_id) {
                 hierarchyList = data.hierarchyList;
                 compositeList = data.compositeList;
                 closedList = data.closedList;
+                var childTmpArr = [];
+                for (var i=0; i<closedList.length; i++) {
+                    var childList = closedList[i].CHILD_ENTITY_LIST;
+                    for (var j=0; j<childList.length; j++) {
+                        for (var k=0; k<childList[j].CHILDREN_NAME.length; k++) {
+                            childTmpArr.push(childList[j].CHILDREN_NAME.split(' ').join(''));
+                            if (childList[j].SUB_LIST) {
+                                var tmp = childList[j].SUB_LIST.split(',');
+                                for (var q=0; q<tmp.length; q++) {                                    
+                                    childTmpArr.push(tmp[q].split(' ').join(''));
+                                }
+                            }
+                        }
+                    }
+                }
+                $.each(childTmpArr, function(i, el){
+                    if($.inArray(el, closedCompareList) === -1) closedCompareList.push(el);
+                });
             }
         }
     });
@@ -1353,6 +1385,10 @@ $(document).on("click", "#insert_similarQ_dlg", function () {
     $('#sq_qSeq').val(qSeq);
 
     
+    
+    $('#editUtterModalBtn').hide();
+    $('#addUtterModalBtn').show();
+
     $('#s_question').attr('readonly', false);
     $('#similarQform').modal('show');
 });

@@ -124,6 +124,7 @@
 	"STATUS": "상태",
 	"ID": "아이디",
 	"PASSWOARD": "비밀번호",
+	"PASSWOARD_CHNG": "비밀번호 변경",
 	"APP": "앱",
 	"REGIST_ID": "등록 아이디",
 	"MODIFIED_DATE": "마지막 수정일",

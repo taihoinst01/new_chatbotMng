@@ -242,12 +242,7 @@
                         var userList = data.userHistoryList;
                         if (userList.length == 0) {
                             saveTableHtml = '<tr><td colspan="5" class="text-center">No Data</td></tr>';
-                            /*
-                            saveTableHtml += '<div class="pagination_wrap" id="userLoginHistoryTablePaging">';
-                            saveTableHtml += '<ul class="pagination pagination-sm no-margin">';
-                            saveTableHtml += '</ul>';
-                            saveTableHtml += '</div>';
-                                */
+                            
                             $('#userHistoryModalBody').html(saveTableHtml);
                             $('#userLoginHistoryTablePaging').html('');
                         } else {
@@ -260,40 +255,32 @@
                                 saveTableHtml += '<td>' + (userList[i].LOGOUT_TIME==null?' NONE ':userList[i].LOGOUT_TIME) + '</td>';
                                 saveTableHtml += '</tr>';
                             }
-                            /*
-                            saveTableHtml += '<div class="pagination_wrap" id="userLoginHistoryTablePaging">';
-                            saveTableHtml += '<ul class="pagination pagination-sm no-margin">';
-                            saveTableHtml += '</ul>';
-                            saveTableHtml += '</div>';
-*/
                             $('#userHistoryModalBody').html(saveTableHtml);
                             $('#userLoginHistoryTablePaging').html('').append(data.pageList);
                         }
                          
-/*
-                        changeModalHeight = setInterval(function() {
-                            if ($('#userHistoryModal .modal-content').css('height').split('px')[0] != '0') {
-                                
-                                setTimeout(function() {
-                                    var modalHeight = $('#userHistoryModal .modal-content').css('height').split('px')[0];
-                                    var pagingHeight = $('#userLoginHistoryTablePaging').css('height').split('px')[0];
-                                    var updateHeight = (modalHeight*1) + (pagingHeight*1);
-                                    $('#userHistoryModal .modal-content').css('max-height', updateHeight + 'px');
-                                    clearInterval(changeModalHeight);
-                                }, 500);
-                            }
-                        }, 300);
-                        */
-                        //alert(data.message);
                     }
                 }
             });
     }
 
-
-
-
-
+    $(document).ready(function(){
+        //오른쪽 클릭 방지
+        $(document).bind("contextmenu", function(e) {
+        return false;
+        });
+        //f12 방지
+        $(document).bind('keydown',function(e){
+            if ( e.keyCode == 123 /* F12 */) {
+                //e.preventDefault();
+                //e.returnValue = false;
+            }
+        });
+    });
+    //드래그방지 주석
+    //$(document).bind('selectstart',function() {return false;}); 
+    //$(document).bind('dragstart',function(){return false;}); 
+ 
 
     var spcKey = false;
     var hover = true;
