@@ -465,6 +465,8 @@ router.post('/selectUserList', function (req, res) {
 
     (async () => {
         try {
+            var adminId = req.session.sid;
+            logger.info('[알림] 사용자목록조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
          
             var QueryStr =  "SELECT TBZ.* ,(TOT_CNT - SEQ + 1) AS NO \n" +
                             "  FROM (SELECT TBY.* \n" +
@@ -587,8 +589,37 @@ router.post('/saveUserInfo', function (req, res) {
             var initPWQry = "SELECT TOP 1 CNF_VALUE FROM TBL_CHATBOT_CONF WHERE CNF_TYPE = 'CHAT_MNG_INIT_PW'"
 
             
-            let pool = await dbConnect.getConnection(sql);
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
 
+            let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
+
+            //두연작업
 
             var initPw = "";
             let initPwQry = await pool.request().query(initPWQry);
@@ -606,20 +637,59 @@ router.post('/saveUserInfo', function (req, res) {
 
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
-                    saveStr += "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH) " + 
+                    saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH) " + 
                                "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-                    saveStr += " '" + userArr[i].USER_ID  + "', '" + basePW  + "',  '" + newSalt  + "', N'" + userArr[i].EMP_NM  + "', '" + userArr[i].HPHONE  + "', '" + userArr[i].EMAIL  + "', 'Y', 77); ";
+                    saveStr += " @USER_ID, @basePW,  @newSalt, @EMP_NM, @HPHONE, @EMAIL, 'Y', 77); ";
                     
+                    let insertUser = await pool.request()
+                            .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
+                            .input('basePW', sql.NVarChar, basePW)
+                            .input('newSalt', sql.NVarChar, newSalt)
+                            .input('EMP_NM', sql.NVarChar, userArr[i].EMP_NM)
+                            .input('HPHONE', sql.NVarChar, userArr[i].HPHONE)
+                            .input('EMAIL', sql.NVarChar, userArr[i].EMAIL)
+                            .query(saveStr);
+                            
+                    logger.info('[알림] 사용자생성 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            
                 } else if (userArr[i].statusFlag === 'EDIT') {
-                    updateStr += "UPDATE TB_USER_M SET EMP_NM = '" + userArr[i].EMP_NM  + "',HPHONE = '" + userArr[i].HPHONE + "',EMAIL = '" + userArr[i].EMAIL + "' WHERE USER_ID = '" + userArr[i].USER_ID + "'; ";
+                    updateStr = "UPDATE TB_USER_M SET EMP_NM = @EMP_NM, HPHONE = @HPHONE, EMAIL = @EMAIL WHERE USER_ID = @USER_ID; ";
+                
+                    
+                    let updateUser = await pool.request()
+                            .input('EMP_NM', sql.NVarChar, userArr[i].EMP_NM)
+                            .input('HPHONE', sql.NVarChar, userArr[i].HPHONE)
+                            .input('EMAIL', sql.NVarChar, userArr[i].EMAIL)
+                            .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
+                            .query(updateStr);
+
+                    logger.info('[알림] 사용자수정 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            
                 } else if (userArr[i].statusFlag === 'USEYN') {
-                    useYnStr += "UPDATE TB_USER_M SET USE_YN = '" + userArr[i].USE_YN + "' WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
+                    useYnStr = "UPDATE TB_USER_M SET USE_YN = @USE_YN WHERE USER_ID = @USER_ID AND EMP_NM = @EMP_NM; ";
+                
+                    let useYnUser = await pool.request()
+                            .input('USE_YN', sql.NVarChar, userArr[i].USE_YN)
+                            .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
+                            .input('EMP_NM', sql.NVarChar, userArr[i].EMP_NM)
+                            .query(useYnStr);
+
+                    logger.info('[알림] 사용자 계정 사용 여부 수정 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            
                 } else { //DEL
-                    deleteStr += "DELETE FROM TB_USER_M WHERE USER_ID = '" + userArr[i].USER_ID + "' AND EMP_NM = '" + userArr[i].EMP_NM + "'; ";
+                    deleteStr = "DELETE FROM TB_USER_M WHERE USER_ID = @USER_ID AND EMP_NM = @EMP_NM; ";
+ 
+                    let deleteUser = await pool.request()
+                            .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
+                            .input('EMP_NM', sql.NVarChar, userArr[i].EMP_NM)
+                            .query(deleteStr);
+
+                    logger.info('[알림] 사용자 계정 삭제 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            
                 }
             }
 
-
+            /*
             if (saveStr !== "") {
                 let insertUser = await pool.request().query(saveStr);
             }
@@ -632,7 +702,7 @@ router.post('/saveUserInfo', function (req, res) {
             if (deleteStr !== "") {
                 let deleteUser = await pool.request().query(deleteStr);
             }
-
+            */
             res.send({status:200 , message:'Save Success'});
             
         } catch (err) {
@@ -830,7 +900,7 @@ router.post('/updateUserAppList', function (req, res) {
                 .input('userId', sql.NVarChar, req.session.sid)
                 .query(chkAdminAuthStr);
             var getUserAuthRow = getUserAuth.recordset;
-            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
 
             var userAuthYN = '0';
             if (getUserAuthRow.length > 0) {
@@ -1079,7 +1149,7 @@ router.post('/updateChatAppList', function (req, res) {
                 .input('userId', sql.NVarChar, req.session.sid)
                 .query(chkAdminAuthStr);
             var getUserAuthRow = getUserAuth.recordset;
-            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
 
             var userAuthYN = '0';
             if (getUserAuthRow.length > 0) {
@@ -1218,7 +1288,7 @@ router.post('/saveApiInfo', function(req, res){
                 .input('userId', sql.NVarChar, req.session.sid)
                 .query(chkAdminAuthStr);
             var getUserAuthRow = getUserAuth.recordset;
-            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
 
             var userAuthYN = '0';
             if (getUserAuthRow.length > 0) {
@@ -1325,7 +1395,7 @@ router.post('/addApp', function (req, res) {
                 .input('userId', sql.NVarChar, req.session.sid)
                 .query(chkAdminAuthStr);
             var getUserAuthRow = getUserAuth.recordset;
-            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, );
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
 
             var userAuthYN = '0';
             if (getUserAuthRow.length > 0) {

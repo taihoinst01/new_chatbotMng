@@ -203,21 +203,69 @@ router.post('/updateUserAuth', function (req, res) {
     var userAuthArr = JSON.parse(req.body.saveArr);
     var updateStr = "";
     var userId = req.session.sid;
-
+    /*
     for (var i = 0; i < userAuthArr.length; i++) {
         updateStr += "UPDATE TB_USER_M SET ";
         updateStr += "USER_AUTH = '" + userAuthArr[i].AUTH_LEVEL + "', ";
         updateStr += "MOD_ID = '" + userId + "', MOD_DT = GETDATE() ";
         updateStr += "WHERE USER_ID = '" + userAuthArr[i].USER_ID + "'; ";
     }
-
+    */
     (async () => {
         try {
-            let pool = await dbConnect.getConnection(sql);
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
 
+            let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
+
+            for (var i = 0; i < userAuthArr.length; i++) {
+                updateStr = "UPDATE TB_USER_M SET ";
+                updateStr += "USER_AUTH = @AUTH_LEVEL, ";
+                updateStr += "MOD_ID = @userId, MOD_DT = DATEADD(hh, 9, GETDATE())  ";
+                updateStr += "WHERE USER_ID = @USER_ID; ";
+
+                
+                let updateCodeDetail = await pool.request()
+                        .input('AUTH_LEVEL', sql.NVarChar, userAuthArr[i].AUTH_LEVEL)
+                        .input('userId', sql.NVarChar, userId)
+                        .input('USER_ID', sql.NVarChar, userAuthArr[i].USER_ID)
+                        .query(updateStr);
+
+                logger.info('[알림] 사용자 권한 수정 [관리자id : %s] [대상id : %s] [url : %s] [내용 : %s]', adminId, userAuthArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '권한 : ' + userAuthArr[i].AUTH_LEVEL);
+            }
+
+
+
+            /*
             if (updateStr !== "") {
                 let updateCodeDetail = await pool.request().query(updateStr);
             }
+            */
 
             res.send({ status: 200, message: 'Save Success' });
 
@@ -316,7 +364,7 @@ router.post('/updateUserAppList', function (req, res) {
     var saveDataStr = "";
     var removeDataStr = "";
 
-    
+    /*
     for (var i=0; i<saveData.length; i++) {
         
         console.log(saveData[i]);
@@ -330,11 +378,70 @@ router.post('/updateUserAppList', function (req, res) {
                     "        AND CHAT_ID = " + removeData[i].APP_ID + " \n" +
                     "        AND USER_ID = '" + userId + "'; \n";     
     }
-                        
+    */                
                    
     (async () => {
         try {
+            //관리자권한
+            var adminId = req.session.sid;
+            var chkAdminAuthStr = "SELECT USER_ID, ISNULL(USER_AUTH, '0') AS USER_AUTH \n";
+            chkAdminAuthStr +=    "  FROM TB_USER_M \n";
+            chkAdminAuthStr +=    " WHERE USER_ID = @userId ";
+
             let pool = await dbConnect.getConnection(sql);
+            let getUserAuth = await pool.request()
+                .input('userId', sql.NVarChar, req.session.sid)
+                .query(chkAdminAuthStr);
+            var getUserAuthRow = getUserAuth.recordset;
+            logger.info('[알림] 관리자 권한 조회 [관리자id : %s]  [url : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+
+            var userAuthYN = '0';
+            if (getUserAuthRow.length > 0) {
+                userAuthYN = getUserAuthRow[0].USER_AUTH;
+                logger.info('[알림] 관리자 권한 조회 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userAuthYN, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            } else {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '계정 정보가 없습니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }
+
+            if (userAuthYN < 99) {
+                logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, '관리자 권한이 없는 사용자 접근입니다.');
+                res.send({status:500 , message:'Update Error'});
+                return false;
+            }  
+            //--관리자권한
+
+            for (var i=0; i<saveData.length; i++) {
+                saveDataStr = "INSERT INTO TBL_USER_RELATION_APP(USER_ID, APP_ID, CHAT_ID) " +
+                            "     VALUES ('@userId', @saveData1, @saveData2); ";    
+                        
+                
+                let appList = await pool.request()
+                        .input('@userId', sql.NVarChar, userId)
+                        .input('@saveData1', sql.NVarChar, saveData[i])
+                        .input('@saveData2', sql.NVarChar, saveData[i])
+                        .query(saveDataStr);
+                
+                logger.info('[알림] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, userId + ' 사용자-챗봇 연결');
+                
+            }
+            
+            for (var i=0; i<removeData.length; i++) {
+                removeDataStr = "DELETE FROM TBL_USER_RELATION_APP \n" +
+                            "      WHERE 1=1 \n" +
+                            "        AND CHAT_ID = @APP_ID \n" +
+                            "        AND USER_ID = @userId; \n";     
+
+                            
+                let userAppList = await pool.request()
+                .input('@APP_ID', sql.NVarChar, removeData[i].APP_ID)
+                .input('@userId', sql.NVarChar, userId)
+                .query(removeDataStr);
+                logger.info('[알림] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, userId + ' 사용자-챗봇 연결 제거');
+                
+            }
+            /*
             if (saveData.length > 0) {
                 let appList = await pool.request().query(saveDataStr);
             }
@@ -342,7 +449,7 @@ router.post('/updateUserAppList', function (req, res) {
             if (removeData.length > 0) {
                 let userAppList = await pool.request().query(removeDataStr);
             }
-
+            */
             res.send({status:200 , message:'Update Success'});
             
         } catch (err) {

@@ -40,7 +40,7 @@ $(document).ready(function () {
         document.userAuthForm.USER_ID.value = user_id;
 
         $('#S_USER_ID').html(user_id);
-        $('#USER_AUTH').html(td.eq(4).text());
+        $('#USER_AUTH').html(td.eq(3).text());
 
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateAuthBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
@@ -95,8 +95,8 @@ function makeUserTable(newPage) {
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].SEQ + '</td>';
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>'
-                    tableHtml += '<td>' + data.rows[i].EMAIL + '</td>'
-                    tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].EMAIL + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
                     tableHtml += '<td>' + s_auth_name + '</td>'
                     tableHtml += '<td><button type="button" class="btn btn-default btn-sm" id="update_authForm" user_id="' + data.rows[i].USER_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button></td></tr>'
                 }
@@ -151,6 +151,11 @@ function updateUserAuth() {
     data.USER_ID = $('#USER_ID').val();
     data.AUTH_LEVEL = $('#UPDATE_USER_AUTH').val();
     saveArr.push(data);
+
+    if ($('#UPDATE_USER_AUTH').val()=="") {
+        alert("권한을 선택하세요.");
+        return false;
+    }
 
     var jsonData = JSON.stringify(saveArr);
     var params = {
