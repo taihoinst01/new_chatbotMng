@@ -233,6 +233,7 @@ function makeHistoryTable(newPage) {
                     var resultText = "";
                     var userIdText = "";
                     var mobilePcText = "";
+                    var intentText = "";
                     for (var i = 0; i < data.rows.length; i++) {
                         if(data.rows[i].RESULT=="H"){
                             resultText = language.ANSWER_OK;
@@ -257,7 +258,12 @@ function makeHistoryTable(newPage) {
                         }else if(data.rows[i].USER_ID==""||data.rows[i].USER_ID==null){
                             userIdText = "";
                         }else{
-                            userIdText = data.rows[i].USER_ID;
+                            var checkUserId = data.rows[i].USER_ID.replace(/(\s*)/g,"");
+                            if(checkUserId=="A"){
+                                userIdText = "";
+                            }else{
+                                userIdText = data.rows[i].USER_ID;
+                            }
                         }
 
                         if(data.rows[i].MOBILE_YN=="M"){
@@ -266,6 +272,16 @@ function makeHistoryTable(newPage) {
                             mobilePcText = "PC"
                         }else{
                             mobilePcText = "NONE";
+                        }
+
+                        if(data.rows[i].LUIS_INTENT=="NONE"||data.rows[i].LUIS_INTENT==null){
+                            if(data.rows[i].CHATBOT_COMMENT_CODE==""||data.rows[i].CHATBOT_COMMENT_CODE=="NONE"){
+                                intentText = "NONE";
+                            }else{
+                                intentText = data.rows[i].CHATBOT_COMMENT_CODE;
+                            }
+                        }else{
+                            intentText = data.rows[i].LUIS_INTENT;
                         }
                         
                         tableHtml += '<tr name="userTr">';
@@ -278,7 +294,8 @@ function makeHistoryTable(newPage) {
                         tableHtml += '<td>' + resultText + '</td>';
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>';
                         tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>';
-                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>';
+                        //tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>';
+                        tableHtml += '<td>' + intentText + '</td>';
                         tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>';
                         tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>';
                         tableHtml += '</tr>';
@@ -344,6 +361,7 @@ function getHistoryDetail(sId) {
                     var tableHtml = "";
                     var resultText = "";
                     var userIdText = "";
+                    var intentText = "";
                     for (var i = 0; i < data.rows.length; i++) {
 
                         if(data.rows[i].RESULT=="H"){
@@ -361,8 +379,24 @@ function getHistoryDetail(sId) {
                         }else if(data.rows[i].USER_ID==""||data.rows[i].USER_ID==null){
                             userIdText = "";
                         }else{
-                            userIdText = data.rows[i].USER_ID;
+                            var checkUserId = data.rows[i].USER_ID.replace(/(\s*)/g,"");
+                            if(checkUserId=="A"){
+                                userIdText = "";
+                            }else{
+                                userIdText = data.rows[i].USER_ID;
+                            }
                         }
+
+                        if(data.rows[i].LUIS_INTENT=="NONE"||data.rows[i].LUIS_INTENT==null){
+                            if(data.rows[i].CHATBOT_COMMENT_CODE==""||data.rows[i].CHATBOT_COMMENT_CODE=="NONE"){
+                                intentText = "NONE";
+                            }else{
+                                intentText = data.rows[i].CHATBOT_COMMENT_CODE;
+                            }
+                        }else{
+                            intentText = data.rows[i].LUIS_INTENT;
+                        }
+
                         
                         tableHtml += '<tr name="userTr"><td>' + data.rows[i].NUM + '</td>';
                         tableHtml += '<td style="text-align: left; padding-left:1%;">'+ data.rows[i].CUSTOMER_COMMENT_KR + '</td>'
@@ -371,7 +405,7 @@ function getHistoryDetail(sId) {
                         tableHtml += '<td>' + resultText + '</td>'
                         tableHtml += '<td>' + data.rows[i].RESPONSE_TIME + '</td>'
                         tableHtml += '<td>' + data.rows[i].REG_DATE + '</td>'
-                        tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>'
+                        tableHtml += '<td>' + intentText + '</td>'
                         tableHtml += '<td>' + data.rows[i].LUIS_ENTITIES + '</td>'
                         tableHtml += '<td>' + data.rows[i].DLG_ID + '</td>'
                         tableHtml += '</tr>'

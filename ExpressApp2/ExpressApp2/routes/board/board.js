@@ -597,9 +597,7 @@ router.post('/getCountPanel', function (req, res) {
              SUM(CNT) FOR RESULT IN ([H],[D],[E],[S],[Q],[I],[G]) 
            ) AS X; 
      `;
-     console.log("getCountPanel===="+selectQuery);
-     console.log("getCountPanel startDate===="+startDate);
-     console.log("getCountPanel endDate===="+endDate);
+
      /*
     var selectQuery = "";
         selectQuery += "SELECT \n";
