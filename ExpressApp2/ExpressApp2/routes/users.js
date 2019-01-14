@@ -637,9 +637,9 @@ router.post('/saveUserInfo', function (req, res) {
 
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
-                    saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH) " + 
+                    saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH, PW_INIT_YN) " + 
                                "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-                    saveStr += " @USER_ID, @basePW,  @newSalt, @EMP_NM, @HPHONE, @EMAIL, 'Y', 77); ";
+                    saveStr += " @USER_ID, @basePW,  @newSalt, @EMP_NM, @HPHONE, @EMAIL, 'Y', 77, 'Y'); ";
                     
                     let insertUser = await pool.request()
                             .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)

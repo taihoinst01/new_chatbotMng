@@ -71,8 +71,8 @@ router.post('/selectUserList', function (req, res) {
                 "                            , USER_AUTH  AS USER_AUTH \n" +
                 "                            , (SELECT AUTHGRP_M_NM FROM TB_AUTHGRP_M WHERE AUTH_LEVEL = A.USER_AUTH) AS AUTH_NM \n" +
                 "                         FROM TB_USER_M A \n" +
-                "                         WHERE 1 = 1 \n" +
-                "                         AND USER_AUTH < 99 \n";
+                "                         WHERE 1 = 1 \n";
+                //"                         AND USER_AUTH < 99 \n";
                 //"					      AND A.USE_YN = 'Y' \n";
 
             if (searchName) {
@@ -414,13 +414,13 @@ router.post('/updateUserAppList', function (req, res) {
 
             for (var i=0; i<saveData.length; i++) {
                 saveDataStr = "INSERT INTO TBL_USER_RELATION_APP(USER_ID, APP_ID, CHAT_ID) " +
-                            "     VALUES ('@userId', @saveData1, @saveData2); ";    
+                            "     VALUES (@userId, @saveData1, @saveData2); ";    
                         
                 
                 let appList = await pool.request()
-                        .input('@userId', sql.NVarChar, userId)
-                        .input('@saveData1', sql.NVarChar, saveData[i])
-                        .input('@saveData2', sql.NVarChar, saveData[i])
+                        .input('userId', sql.NVarChar, userId)
+                        .input('saveData1', sql.NVarChar, saveData[i])
+                        .input('saveData2', sql.NVarChar, saveData[i])
                         .query(saveDataStr);
                 
                 logger.info('[알림] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, userId + ' 사용자-챗봇 연결');
@@ -435,8 +435,8 @@ router.post('/updateUserAppList', function (req, res) {
 
                             
                 let userAppList = await pool.request()
-                .input('@APP_ID', sql.NVarChar, removeData[i].APP_ID)
-                .input('@userId', sql.NVarChar, userId)
+                .input('APP_ID', sql.NVarChar, removeData[i].APP_ID)
+                .input('userId', sql.NVarChar, userId)
                 .query(removeDataStr);
                 logger.info('[알림] [관리자id : %s] [url : %s] [error : %s]', adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, userId + ' 사용자-챗봇 연결 제거');
                 

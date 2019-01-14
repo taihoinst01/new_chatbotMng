@@ -95,8 +95,9 @@ function makeUserTable(newPage) {
                     tableHtml += '<tr style="cursor:pointer" name="userTr"><td>' + data.rows[i].SEQ + '</td>';
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].EMP_NM + '</td>'
-                    tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
-                    tableHtml += '<td>' + data.rows[i].EMAIL + '</td></tr>'
+                    //tableHtml += '<td>' + data.rows[i].HPHONE + '</td>'
+                    //tableHtml += '<td>' + data.rows[i].EMAIL + '</td>'
+                    tableHtml += '</tr>'
                 }
     
                 saveTableHtml = tableHtml;
