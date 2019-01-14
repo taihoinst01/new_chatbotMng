@@ -637,9 +637,9 @@ router.post('/saveUserInfo', function (req, res) {
 
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
-                    saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH, PW_INIT_YN) " + 
+                    saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH, PW_INIT_YN, LAST_SCRT_DT) " + 
                                "VALUES ( (SELECT MAX(EMP_NUM)+1 FROM TB_USER_M), ";
-                    saveStr += " @USER_ID, @basePW,  @newSalt, @EMP_NM, @HPHONE, @EMAIL, 'Y', 77, 'Y'); ";
+                    saveStr += " @USER_ID, @basePW,  @newSalt, @EMP_NM, @HPHONE, @EMAIL, 'Y', 77, 'Y', DATEADD(hh, -25+9, GETDATE())); ";
                     
                     let insertUser = await pool.request()
                             .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
@@ -763,7 +763,7 @@ router.post('/inItPassword', function (req, res) {
                     
                     //var initStr = "UPDATE TB_USER_M SET SCRT_NUM = '" + basePW + "', SCRT_SALT = '" + newSalt + "', PW_INIT_YN='Y' WHERE USER_ID = '" + userId + "'; ";
 
-                    var initStr = "UPDATE TB_USER_M SET LAST_SCRT_DT = DATEADD(hh, -25, GETDATE()+9), SCRT_NUM = @basePW, SCRT_SALT = @newSalt, PW_INIT_YN='Y' WHERE USER_ID = @userId; ";
+                    var initStr = "UPDATE TB_USER_M SET LAST_SCRT_DT = DATEADD(hh, -25+9, GETDATE()), SCRT_NUM = @basePW, SCRT_SALT = @newSalt, PW_INIT_YN='Y' WHERE USER_ID = @userId; ";
                     let initPwRst = await pool.request() 
                             .input('basePW', sql.NVarChar, basePW)
                             .input('newSalt', sql.NVarChar, newSalt)

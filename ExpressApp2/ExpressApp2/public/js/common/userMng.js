@@ -147,12 +147,12 @@ function makeUserTable() {
                 for (var i=0;i<data.rows.length;i++) { 
                     tableHtml += '<tr><td>' + data.rows[i].SEQ + '</td>';
                     
-                    if(data.rows[i].USER_AUTH=="99"){
-                        tableHtml += '<td>&nbsp;</td>';
-                    }else{
+                    //if(data.rows[i].USER_AUTH=="99"){
+                     //   tableHtml += '<td>&nbsp;</td>';
+                    //}else{
                         tableHtml += '<td><input type="checkbox" class="flat-red" name="tableCheckBox"></td>';
                         
-                    }
+                    //}
 
                     tableHtml += '<td>' + data.rows[i].USER_ID + '</td>';
                     if(data.rows[i].USER_AUTH=="99"){
