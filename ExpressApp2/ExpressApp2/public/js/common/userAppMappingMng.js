@@ -201,7 +201,7 @@ function saveUserApp() {
                     break;
                 }
             }
-            if (rememberLen === initAppCheck.length) {
+            if (rememberLen === initAppCheck.length && typeof chatId != "undefined") {
                 saveArr.push(chatId);
             }
         });    

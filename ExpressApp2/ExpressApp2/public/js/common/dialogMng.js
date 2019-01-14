@@ -451,14 +451,19 @@ function selectDlgByTxt(groupType, sourceType) {
                     }else{
                         dlgNameHtml = data.list[i].DLG_NAME;
                     }
+
+
+                    var tmpTitle = changeStrVal((data.list[i].CARD_TITLE==null?'':data.list[i].CARD_TITLE));
+                    var tmpText = changeStrVal((data.list[i].CARD_TEXT==null?'':data.list[i].CARD_TEXT));
+
                     item += '<tr>' +
                         '<td>' + data.list[i].NUM + '</td>' +
                         '<td class="txt_left" name="dlgTitleTd">' + 
                         '<span name="titleSpan">' +
                         //'<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' + dlgNameHtml + '</span>' +
                          '<strong>' + '[' + data.list[i].DLG_ORDER_NO + '] ' + '</strong>' + '</span>' +
-                        '<input type="hidden" name="cardTitle" value="' + (data.list[i].CARD_TITLE==null?'':data.list[i].CARD_TITLE) + '" />' +
-                        '<input type="hidden" name="cardText" value="' + (data.list[i].CARD_TEXT==null?'':data.list[i].CARD_TEXT) + '" />' +
+                        '<input type="hidden" name="cardTitle" value="' + tmpTitle + '" />' +
+                        '<input type="hidden" name="cardText" value="' + tmpText + '" />' +
                         '</td>' +
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
@@ -754,3 +759,17 @@ $(document).on('click', '.newMidBtn, .cancelMidBtn', function () {
         $iptMiddleGroup.attr('disabled', 'disabled');
     }
 })
+
+
+
+function changeStrVal(inputStr) {
+    var returnValue = inputStr;
+    returnValue = returnValue.split("<").join("&lt;");
+    returnValue = returnValue.split(">").join("&gt;");
+    returnValue = returnValue.split("(").join("&#40;");
+    returnValue = returnValue.split(")").join("&#41;");
+    returnValue = returnValue.split("\"").join("&quot;");
+    returnValue = returnValue.split("'").join("&#39;");
+
+    return returnValue;
+}

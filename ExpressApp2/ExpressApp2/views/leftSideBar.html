@@ -26,12 +26,12 @@
                                                 if(sid) { 
                                                     if(appName) {
                                             %>
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">&nbsp;&nbsp;<%=appName %><span></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">&nbsp;&nbsp;<%=appName %><span></span></a>
                     <%
                                                     } else {
                                                         if(leftList && leftList.length >0) {
                                                 %>
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">
                         <%=leftList[0].CHATBOT_NAME %><span></span></a>
                     <%
                                                         } 
@@ -44,7 +44,7 @@
                                                             for(var i=0; i<leftList.length; i++) {
                                                         %>
                         <!--row -->
-                        <a href="/board?appName=<%= encodeURI(leftList[i].CHATBOT_NAME) %>" class="circle_col">
+                        <a href="/board?appName=<%= encodeURI(leftList[i].CHATBOT_NAME) %>" class="circle_col" >
                             <li><span class="pull-left image img-circle_s <%=leftList[i].APP_COLOR %>"> </span><span
                                     class="tex01">
                                     <%= leftList[i].CHATBOT_NAME %></span> </li>
@@ -60,7 +60,7 @@
                                                     %>
 
                         <li class="tline"></li>
-                        <a href="/list" class="fa fa-list">
+                        <a href="/list" class="fa fa-list" >
                             <%= __('CHAT_LIST') %></a>
                     </ul>
                 </li>
@@ -96,7 +96,7 @@
             </li>
 -->
             <li class=" treeview" id="luisMenuLi">
-                <a href="#">
+                <a href="#" onclick="return false;">
                     <i class="fa fa-braille"></i> <span>LUIS</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -107,7 +107,7 @@
                                                                 %>
                 <ul class="treeview-menu">
                     <li class=" treeview" name="appListLi">
-                        <a href="#">
+                        <a href="#" onclick="return false;">
                             <i class="fa fa-book"></i> <span name="appNameSpan">
                                 <%=appName %>
                                 <%=k+1 %></span>
@@ -116,9 +116,9 @@
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li name='intentIndex_<%=k%>'><a href="/luis/intentList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i><%= __('INTENT_LIST') %></a></li>
+                            <li name='intentIndex_<%=k%>'><a href="/luis/intentList?appIndex=<%=k%>" ><i class="fa  fa-circle-o"></i><%= __('INTENT_LIST') %></a></li>
                             <!--<li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i><%= __('ENTITY_LIST') %></a></li>-->
-                            <li class="active"><a href="#" class="spmenu" id="trainBtn">
+                            <li class="active"><a href="#" class="spmenu" id="trainBtn" onclick="return false;">
                                     <%= __('TRAIN') %></a></li>
                             <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
                         </ul>
@@ -129,13 +129,13 @@
                                     %>
 
             <li class="treeview" id="newUtterClick">
-                <a href="/luis/newUtterList">
+                <a href="/luis/newUtterList" >
                     <i class="fa fa-handshake-o"></i> <span><%= __('QNA_CONNECT') %></span>
                 </a>
             </li>
             <li class=" treeview">
                 <!--<li class="active treeview">-->
-                <a href="#">
+                <a href="#" onclick="return false;">
                     <i class="fa fa-bullhorn"></i> <span>
                         <%= __('QNAMNG_TITLE') %></span>
                     <span class="pull-right-container">
@@ -143,14 +143,14 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="/qna/qnaList"><i class="fa fa-circle-o"></i> <%= __('QNA_TITLE') %></a></li>
-                    <li><a href="/qna/noAnswerQList"><i class="fa fa-circle-o"></i> <%= __('NOANSWER_TITLE') %></a></li>
-                    <li><a href="/qna/dialogMng"><i class="fa fa-circle-o"></i> <%= __('DIALOG_MNG_TITLE') %></a></li>
-                    <li><a href="/qna/initDialogMng"><i class="fa fa-circle-o"></i> <%= __('INITDLG_TITLE') %></a></li>
+                    <li><a href="/qna/qnaList" ><i class="fa fa-circle-o"></i> <%= __('QNA_TITLE') %></a></li>
+                    <li><a href="/qna/noAnswerQList" ><i class="fa fa-circle-o"></i> <%= __('NOANSWER_TITLE') %></a></li>
+                    <li><a href="/qna/dialogMng" ><i class="fa fa-circle-o"></i> <%= __('DIALOG_MNG_TITLE') %></a></li>
+                    <li><a href="/qna/initDialogMng" ><i class="fa fa-circle-o"></i> <%= __('INITDLG_TITLE') %></a></li>
                 </ul>
             </li>
             <li class=" treeview">
-                    <a href="#">
+                    <a href="#" onclick="return false;">
                         <i class="fa fa-coffee"></i> <span>
                             <%= __('SmallTalk_Title') %></span>
                         <span class="pull-right-container">
@@ -158,15 +158,15 @@
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="/smallTalkMng/smallTalkMng"><i class="fa fa-circle-o"></i>
+                        <li><a href="/smallTalkMng/smallTalkMng" ><i class="fa fa-circle-o"></i>
                                 <%= __('SmallTalk_Title') %></a></li>
-                        <li><a href="/smallTalkMng/smallTalkEntity"><i class="fa fa-circle-o"></i>
+                        <li><a href="/smallTalkMng/smallTalkEntity" ><i class="fa fa-circle-o"></i>
                             <%= __('SmallTalk_ENTITY_TITLE') %></a></li>
                     </ul>
                 </li>
             <li class=" treeview">
                 <!--<li class="active treeview">-->
-                <a href="#">
+                <a href="#" onclick="return false;">
                     <i class="fa fa-tasks"></i> <span><%= __('CHATBOTMNG_TITLE') %></span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -174,22 +174,22 @@
                 </a>
                 <ul class="treeview-menu">
                     <!--<li><a href="/learning/context"><i class="fa fa-circle-o"></i> Context 관리</a></li>-->
-                    <li><a href="/bannedWordMng/bannedWordMng"><i class="fa fa-circle-o"></i> <%= __('BANDEDWORD_TITLE') %></a></li>
+                    <li><a href="/bannedWordMng/bannedWordMng" ><i class="fa fa-circle-o"></i> <%= __('BANDEDWORD_TITLE') %></a></li>
                     <!--<li><a href="/autoCompleteMng/autoCompleteMng"><i class="fa fa-circle-o"></i> 자동완성 관리</a></li>-->
-                    <li><a href="/templateMng/templateMng"><i class="fa fa-circle-o"></i> <%= __('TEMPLATE_TITLE') %></a></li>
-                    <li><a href="/chatBotEnv/chatBotEnv"><i class="fa fa-circle-o"></i> <%= __('CHATBOT_ENV') %></a></li>
-                    <li><a href="/historyMng/historyList"><i class="fa fa-circle-o"></i> <%= __('LOG_TITLE') %></a></li>
+                    <li><a href="/templateMng/templateMng" ><i class="fa fa-circle-o"></i> <%= __('TEMPLATE_TITLE') %></a></li>
+                    <li><a href="/chatBotEnv/chatBotEnv" ><i class="fa fa-circle-o"></i> <%= __('CHATBOT_ENV') %></a></li>
+                    <li><a href="/historyMng/historyList" ><i class="fa fa-circle-o"></i> <%= __('LOG_TITLE') %></a></li>
                 </ul>
             </li>
 
             <li class="treeview" id="synchronizeLuis">
-                <a href="/luis/synchronizeLuis">
+                <a href="/luis/synchronizeLuis" >
                     <i class="fa fa-window-restore"></i> <span><%= __('SYNCH') %></span>
                 </a>
             </li>
             
 
-            <a href="#" class="spmenu" id="trainBtnHidden" data-toggle="modal" data-target="#myModal" style="visibility: hidden;">
+            <a href="#" class="spmenu" id="trainBtnHidden" data-toggle="modal" data-target="#myModal" style="visibility: hidden;" onclick="return false;">
                 <%= __('TRAIN') %></a>
 
         </ul>
@@ -506,6 +506,11 @@
 
             var url = "/luis/synchronizeLuis";
             $(location).attr('href', url);
+        });
+
+
+        $('.dropdown-menu .circle_col ').click(function() {
+            $('#loadingModalMain').modal('show');
         });
     });
 

@@ -448,6 +448,36 @@ router.get('/intentList', function (req, res) {
             req.session.selAppName = selApp.APP_NAME;
         }
 
+        var options = {
+            headers: {
+                'Content-Type': 'application/json'
+                //,'Ocp-Apim-Subscription-Key': subKey
+            }
+        };
+        var HOST = req.session.hostURL;
+        var subKey = req.session.subKey;
+        options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+        
+        var utterCntObj;
+        var saveAppId = req.session.selAppId;
+        var intentList = req.session.intentList;
+
+        utterCntObj = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + saveAppId + '/versions/0.1/stats/labelsperintent', options);
+        
+        for (var iu=0; iu<intentList.length; iu++) {
+            for( var key in utterCntObj.body ) {
+            //console.log( key + '=>' + utterCntObj.body[key] );
+                if (key == intentList[iu].INTENT_ID) {
+                    intentList[iu].UTTER_COUNT = utterCntObj.body[key];
+                    break;
+                }
+            }
+            if (typeof intentList[iu].UTTER_COUNT=='undefined') {
+                intentList[iu].UTTER_COUNT = 0;
+            }
+        }
+
+
         if (req.query.createQuery) {
             //var appNumber = req.query.appIndex;
             var selApp = selAppList[appNumber];

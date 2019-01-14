@@ -311,7 +311,7 @@ function saveChatApp() {
                     break;
                 }
             }
-            if (rememberLen === initAppCheck.length) {
+            if (rememberLen === initAppCheck.length && typeof appId != "undefined") {
                 saveArr.push(appId);
             }
         });    

@@ -20,7 +20,9 @@ $(document).ready(function() {
     //수정
     $(document).on("click", "#updateChatBotEnvBtn", function() {
         var TimeLimit = $('#luisTimeLimit').val();
-        var ScoreLimit = $("#luisScoreLimit option:selected").val();
+        var ScoreLimit = $("#luisScoreLimitNum").val();
+        //var ScoreLimit = $("#luisScoreLimit option:selected").val();
+        
         
         var validation_check = 0;
         if(TimeLimit==""||TimeLimit==null){
@@ -32,7 +34,11 @@ $(document).ready(function() {
         if(ScoreLimit==""||ScoreLimit==null){
             validation_check = validation_check + 0;
         }else{
-            validation_check = validation_check + 1;
+            if (ScoreLimit >= 0 && ScoreLimit <= 100) {
+                validation_check = validation_check + 1;
+            } else {
+                validation_check = validation_check + 0;
+            }
         }
 
         if(validation_check==2){
@@ -91,7 +97,8 @@ function selectChatBotEnv(){
 
                 $('#luisTimeLimit').val(data.rows[1].LUIS_TIME_LIMIT);
                 //$('#luisScoreLimit').val(data.rows[1].LUIS_SCORE_LIMIT);
-                $("#luisScoreLimit").val(data.rows[1].LUIS_SCORE_LIMIT).attr("selected", "selected");
+                $("#luisScoreLimitNum").val((data.rows[1].LUIS_SCORE_LIMIT*1)*100);
+                //$("#luisScoreLimit").val(data.rows[1].LUIS_SCORE_LIMIT).attr("selected", "selected");
             } else {
                 $('#dbId').text("");
             }
@@ -108,7 +115,10 @@ function procChatBotEnv(procType) {
         var data = new Object();
         data.statusFlag = procType;
         data.LUIS_TIME_LIMIT = $('#luisTimeLimit').val();
-        data.LUIS_SCORE_LIMIT = $('#luisScoreLimit').val();
+        //data.LUIS_SCORE_LIMIT = $('#luisScoreLimit').val();
+        var tmpScore = $('#luisScoreLimitNum').val()*1;
+        tmpScore = tmpScore*0.01;
+        data.LUIS_SCORE_LIMIT = tmpScore;
         saveArr.push(data);
     } else if (procType === 'API') {
         var apiNameData = "";
@@ -149,6 +159,7 @@ function procChatBotEnv(procType) {
     var params = {
         'saveArr': jsonData
     };
+    //return false;
     $.ajax({
         type: 'POST',
         datatype: "JSON",

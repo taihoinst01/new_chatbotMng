@@ -38,8 +38,8 @@
             display:none;
             background-color:#ffffff;
             border:solid 2px #d0d0d0;
-            max-width:500px;
-            max-height:400px;
+            max-width:400px;
+            max-height:300px;
             min-width: 10%;
             height:fit-content;
             padding:10px;
@@ -52,6 +52,7 @@
         #typeOrderTh {
             cursor: pointer;
         }
+
     </style>
     
 
@@ -449,17 +450,17 @@
     
     <!-- //팝업_미리보기 -->
 
-    <div id="divInfo">
-        <table>
+    <div id="divInfo" style="overflow: hidden;" >
+        <table style="table-layout: fixed;">
             <col width="20%">
             <col width="80%">
             <tr style="border-bottom:1pt solid black; padding-bottom: 0.1em;">
-                <th><%= __("TITLE") %></th>
-                <td id="dlgTitle"></td>
+                <th style="vertical-align: top;"><%= __("TITLE") %></th>
+                <td id="dlgTitle" style="overflow:hidden;"></td>
             </tr>
             <tr>
-                <th><%= __("REPLY") %></th>
-                <td id="dlgText"></td>
+                <th style="vertical-align: top;"><%= __("REPLY") %></th>
+                <td id="dlgText" style="overflow:hidden;"></td>
             </tr>
         </table>
     </div>

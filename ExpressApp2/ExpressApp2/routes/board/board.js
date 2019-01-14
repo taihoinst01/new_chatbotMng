@@ -338,7 +338,7 @@ router.get('/', function (req, res) {
 
             
             
-
+/*
             var utterCntObj;
             var saveAppId = '';
             var intentList = req.session.intentList;
@@ -360,7 +360,7 @@ router.get('/', function (req, res) {
                 }
                 //intentList[iu].UTTER_CNT = utterCntObj.body.intentList[iu].INTENT_ID;
             }
-            
+*/
             //res.redirect('/luis/synchronizeLuis');
             res.redirect('/board/dashBoard');
 

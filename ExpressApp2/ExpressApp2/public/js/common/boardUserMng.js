@@ -196,7 +196,7 @@ function saveUserBoardItemApp() {
                     break;
                 }
             }
-            if (rememberLen === initAppCheck.length) {
+            if (rememberLen === initAppCheck.length && typeof BOARD_ID != "undefined") {
                 saveArr.push(BOARD_ID);
             }
         });    
