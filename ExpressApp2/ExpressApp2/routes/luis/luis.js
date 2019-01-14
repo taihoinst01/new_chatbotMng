@@ -47,6 +47,9 @@ router.get('/synchronizeLuis', function (req, res) {
     var selectedAppList = [];
     var selectedIntentList = [];
 
+    var intentWithRelationList = [];
+    var intentWithOutRelationList = [];
+
     var leftList = req.session.leftList;
     var chatNum = -1;
     for (var ii = 0; ii< leftList.length; ii++) {
@@ -88,20 +91,25 @@ router.get('/synchronizeLuis', function (req, res) {
 
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db Intent 조회 시작');
             
+            let getDBRelationIntent_result = await pool.request()
+                                                .query("SELECT LUIS_INTENT FROM TBL_DLG_RELATION_LUIS;");   
+            intentWithRelationList = getDBRelationIntent_result.recordset;
+
+
             let getDBIntent_result = await pool.request()
-                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT");   
+                                                .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT;");   
             var sessionIntentList = getDBIntent_result.recordset;
             //req.session.intentList = sessionIntentList;
             
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'intent 조회 완료, db Entity 조회 시작');
             let getDBEntity_result = await pool.request()
-                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY");     
+                                                .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY;");     
             var sessionEntityList = getDBEntity_result.recordset;            
             //req.session.entityList = sessionEntityList;
 
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'entity 조회 완료, db child entity 조회 시작');
             let getDBEntityChild_result = await pool.request()
-                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY");      
+                                                .query("SELECT ENTITY_ID, CHILDREN_ID, CHILDREN_NAME, SUB_LIST FROM TBL_LUIS_CHILD_ENTITY;");      
             var sessionEntityChildList = getDBEntityChild_result.recordset;           
             //req.session.entityChildList = sessionEntityChildList;
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, ' db child entity 조회 완료');
@@ -200,6 +208,13 @@ router.get('/synchronizeLuis', function (req, res) {
                                                     .input('intentId', sql.NVarChar, intentListTotal[pp].id)
                                                     .input('reg_id', sql.NVarChar, userId)
                                                     .query(intentQry);
+
+                //relation 되어있지 않은 intent qna table에 넣기
+
+                var index = functiontofindIndexByKeyValue(intentWithRelationList, "LUIS_INTENT", intentListTotal[pp].name);
+                if (index == -1) {
+                    intentWithOutRelationList.push(intentListTotal[pp]);
+                }
             }
             //--------------------------intent end --------------------------
 
@@ -310,6 +325,55 @@ router.get('/synchronizeLuis', function (req, res) {
             }
             req.session.utterList = utterList;
             */
+
+
+            //QNA TABLE 동기화
+            //intentWithOutRelationList.push(intentListTotal[pp]);
+
+            
+            for (var qnaInc=0; qnaInc<intentWithOutRelationList.length; qnaInc++) {
+                var qnaObj = intentWithOutRelationList[qnaInc];
+                var utterInfo = syncClient.get(HOST + '/luis/webapi/v2.0/apps/' + qnaObj.appId + '/versions/0.1/models/' + qnaObj.id + '/reviewLabels?skip=0&take=1' , options);
+
+                if (utterInfo.statusCode == 200) {
+                    for (var jk=0; jk<utterInfo.body.length; jk++) {
+                            
+                        var entitiesVal = '';
+                        if (utterInfo.body[jk].entityLabels == null) {
+                            continue;
+                        } else {
+                            for (var ek=0; ek<utterInfo.body[jk].entityLabels.length; ek++) {
+                                var entitiesObj = utterInfo.body[jk].entityLabels;
+                                for (var eck=0; eck<entitiesObj.length; eck++) {
+                                    if (entitiesVal != '') {
+                                        entitiesVal += ',';
+                                    }
+                                    entitiesVal += entitiesObj[eck].entityName;
+                                }
+                            }
+                        
+                            var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
+                            saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";
+
+                            //console.log("intent -" + pp)
+                            let insertQnaList = await pool.request()
+                                                                .input('dlg_text', sql.NVarChar, utterInfo.body[jk].text)
+                                                                .input('intent', sql.NVarChar, qnaObj.name)
+                                                                .input('entities', sql.NVarChar, entitiesVal)
+                                                                .input('appId', sql.NVarChar, qnaObj.appId)
+                                                            .query(saveNewUtterQry);    
+                        }
+                        
+                    }
+                
+                }
+            }
+            
+
+
+
+
+
 
            //어터런스 cnt 
            //https://westus.api.cognitive.microsoft.com/luis/webapi/v2.0/apps/0a66734d-690a-4877-9b4c-28ada8098751/versions/0.1/stats/labelsperintent
@@ -2853,6 +2917,18 @@ router.post('/getSelEntityList', function (req, res) {
 });
 
 
+
+
+function functiontofindIndexByKeyValue(arraytosearch, key, valuetosearch) {
+ 
+    for (var i = 0; i < arraytosearch.length; i++) {
+     
+        if (arraytosearch[i][key] == valuetosearch) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 

@@ -228,17 +228,7 @@ router.post('/getEntityAjax', function (req, res, next) {
                 if (rows[0]['RESULT'] != '') {
                     var entities = rows[0]['RESULT'];
                     var entityArr = entities.split(',');
-                    
-                    var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY IN (@entities);";
-                    var entitiesVal = "";
-                    for (var j = 0; j < entityArr.length; j++) {
-                        if (j!=0) entitiesVal += "'";
-                        
-                        entitiesVal += entityArr[j];
-                        entitiesVal += "'";
-                        entitiesVal += (j != entityArr.length - 1) ? "," : "";
-                    }
-                    /*
+
                     var queryString2 = "SELECT ENTITY_VALUE,ENTITY FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY IN (";
                     for (var j = 0; j < entityArr.length; j++) {
                         queryString2 += "'";
@@ -247,11 +237,14 @@ router.post('/getEntityAjax', function (req, res, next) {
                         queryString2 += (j != entityArr.length - 1) ? "," : "";
                     }
                     queryString2 += ")";
-                    */
+
+
                     let result3 = await pool.request()
-                        .input('entities', sql.NVarChar, entitiesVal)
+                        //.input('entities', sql.NVarChar, entitiesVal)
                         .query(queryString2)
                     
+
+
                     let rows3 = result3.recordset
                     var commonEntities = [];
                     for (var j = 0; j < rows3.length; j++) {

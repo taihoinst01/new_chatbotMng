@@ -393,7 +393,7 @@ function getEntityFromQ(queryText) {
                     var inputUttrHtml = '';
                     inputUttrHtml += '<table><tr>';
                     inputUttrHtml += '<td class="txt_left clickUtter">' + utter + '</td>';
-                    inputUttrHtml += '<td><a href="#"><span class="fa  fa-trash utterDelete"><span class="hc">삭제</span></span></a></td>';
+                    inputUttrHtml += '<td><a href="#"><span class="fa  fa-trash utterDelete" onclick="return false;"><span class="hc">삭제</span></span></a></td>';
                     inputUttrHtml += '</tr></table>';
 
                     $('#squeryEntity').html(inputUttrHtml);
