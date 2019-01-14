@@ -635,6 +635,25 @@ router.post('/saveUserInfo', function (req, res) {
             var newSalt = await pwConfig.getSaltCode();
             let basePW = pwConfig.getPassWord(initPw, newSalt);
 
+            var isMe = false;
+            for (var i=0; i<userArr.length; i++) { 
+                if (userArr[i].statusFlag === 'NEW') {
+                } else if (userArr[i].statusFlag === 'EDIT') {
+                } else if (userArr[i].statusFlag === 'USEYN') { 
+                    if (userArr[i].USER_ID == adminId) { isMe = true;}
+                } else { //DEL
+                    if (userArr[i].USER_ID == adminId) { isMe = true;}
+                }
+            }
+            if (isMe) {
+                
+                logger.info('[알림] 본인 계정 제거 및 사용여부 변경 제한 [관리자id : %s] [대상id : %s] [url : %s]', adminId, adminId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
+            
+                res.send({status:500 , message:'본인의 계정은 삭제 및 사용여부 수정을 할 수 없습니다.'});
+                return false;
+            }
+
+
             for (var i=0; i<userArr.length; i++) {
                 if (userArr[i].statusFlag === 'NEW') {
                     saveStr = "INSERT INTO TB_USER_M (EMP_NUM, USER_ID, SCRT_NUM, SCRT_SALT, EMP_NM, HPHONE, EMAIL, USE_YN, USER_AUTH, PW_INIT_YN, LAST_SCRT_DT) " + 
@@ -683,6 +702,14 @@ router.post('/saveUserInfo', function (req, res) {
                             .input('USER_ID', sql.NVarChar, userArr[i].USER_ID)
                             .input('EMP_NM', sql.NVarChar, userArr[i].EMP_NM)
                             .query(deleteStr);
+                    
+                    //  DELETE FROM TBL_USER_RELATION_APP  WHERE USER_ID = @userId
+
+                    var deleteUserAppStr = "DELETE FROM TBL_USER_RELATION_APP  WHERE USER_ID = @userId; ";
+ 
+                    let deleteUserApp = await pool.request()
+                            .input('userId', sql.NVarChar, userArr[i].USER_ID)
+                            .query(deleteUserAppStr);
 
                     logger.info('[알림] 사용자 계정 삭제 [관리자id : %s] [대상id : %s] [url : %s]', adminId, userArr[i].USER_ID, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl);
             
@@ -706,8 +733,8 @@ router.post('/saveUserInfo', function (req, res) {
             res.send({status:200 , message:'Save Success'});
             
         } catch (err) {
-            console.log(err);
-            res.send({status:500 , message:'Save Error'});
+            logger.info('[에러] [관리자id : %s] [url : %s] [error : %s]', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            res.send({status:500 , message:'에러가 발생했습니다. 로그를 확인해 주세요.'});
         } finally {
             sql.close();
         }

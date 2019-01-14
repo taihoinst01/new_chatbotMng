@@ -436,7 +436,7 @@ function saveUser() {
                 $('#procDialog').modal('show');
                 //window.location.reload();
             } else {
-                $('#proc_content').html(language.It_failed);
+                $('#proc_content').html(data.message);
                 $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
                 $('#procDialog').modal('show');
                 //alert(language['It_failed']);

@@ -194,8 +194,13 @@ router.get('/synchronizeLuis', function (req, res) {
                                                     .input('intentId', sql.NVarChar, sessionIntentList[pp].INTENT_ID)
                                                     .input('intent', sql.NVarChar, sessionIntentList[pp].INTENT)
                                                     .query(intentQry);
-            }
 
+                var updateQnAList = "UPDATE TBL_QNAMNG SET USE_YN = 'N' WHERE INTENT = @intent;";
+                let delDBQNA = await pool.request()
+                                                    .input('intent', sql.NVarChar, sessionIntentList[pp].INTENT)
+                                                    .query(updateQnAList);
+            }
+            
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 있고 db에 없는 intent db insert');
             for (var pp=0; pp<intentListTotal.length; pp++) {
                 var intentQry = "INSERT INTO TBL_LUIS_INTENT (APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT) \n ";

@@ -1305,6 +1305,9 @@ function makeQnaListTable(page) {
                 var tableHtml = "";
                 var saveTableHtml = "";
                 for (var i = 0; i < data.rows.length; i++) {
+                    if (data.rows[i].INTENT.indexOf('None_') != -1) {
+                        continue;
+                    }
                     tableHtml += '<tr><td>' + data.rows[i].NUM + '</td>';
                     
                     tableHtml += '<td class="txt_left">' + data.rows[i].DLG_QUESTION + '</td>';
@@ -1333,8 +1336,12 @@ function makeQnaListTable(page) {
                     }
                 }
                 //tableHtml += '</tr>';
+
                 saveTableHtml = tableHtml;
                 
+                if (saveTableHtml == "") {
+                    saveTableHtml = '<tr><td colspan="4" class="text-center">No QnA Data</td></tr>';
+                }
                 $('#qnaListbody').html(saveTableHtml);
 
                 //사용자의 appList 출력
