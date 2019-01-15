@@ -267,9 +267,9 @@ function makeAnswerData(type){
 function getUpdateSmallTalk(utterance, answer, seq, use_yn){
     var ori_uttrance = utterance;
     var ori_answer = answer;
-    var check = ori_answer.includes('$');
+    var check = ori_answer.indexOf('$');
     var updateAnswerStr = "";
-    if(check==true){
+    if(check!= -1){
         var answerSplit = ori_answer.split('$');
         for ( var i=0; i< answerSplit.length; i++ ) {
             updateAnswerStr += "<div style='margin-top:4px;'><input name='update_answerValue' id='update_answerValue' tabindex='" + i + "' type='text' class='form-control' style=' float: left; width:80%;' placeholder='" + language.Please_enter + "' value='" + answerSplit[i] + "'>";

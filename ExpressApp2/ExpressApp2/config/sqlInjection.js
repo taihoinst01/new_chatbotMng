@@ -88,7 +88,7 @@ module.exports = {
         if (typeof inputValue == 'undefined') {
             return inputValue;
         }
-        var returnValue = inputValue.split(" ").join("");
+        var returnValue = inputValue;
         
         returnValue = returnValue.split("<").join("&lt;");
         returnValue = returnValue.split(">").join("&gt;");
