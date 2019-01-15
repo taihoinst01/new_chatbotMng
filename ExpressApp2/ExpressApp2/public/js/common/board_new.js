@@ -17,7 +17,7 @@ var language;
 
     $(document).ready(function () {
         getSimulUrl();
- 
+        /*
         var minDate = new Date();
         var maxDate = new Date();
         var dd = maxDate.getDate() + 7;
@@ -70,12 +70,13 @@ var language;
             minDate: '-2y', // 현재날짜로부터 100년이전까지 년을 표시한다.
             maxDate:maxDate
         });
+        */
     });
 
 
     $(function () {
         //Initialize Select2 Elements
-        /*
+        
         $('.select2').select2()
 
         //Datemask dd/mm/yyyy
@@ -114,7 +115,7 @@ var language;
             autoclose: true,
             maxDate: new Date()
         })
-        */
+        
     })
 })(jQuery);
 
@@ -514,7 +515,7 @@ $(document).on('click', '#fistQueryTablePaging .li_paging', function (e) {
 
 function getFilterVal(page) {
 
-    var dateArr = '20190115-20190115'//$('#reservation').val().split('-');
+    var dateArr = $('#reservation').val().split('-');
     var startDate = $.trim(dateArr[0]);
     var endDate = $.trim(dateArr[1]);
 
