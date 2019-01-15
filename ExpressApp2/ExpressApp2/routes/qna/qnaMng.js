@@ -55,9 +55,12 @@ router.post('/selectQnaList', function (req, res) {
                             " (SELECT ROW_NUMBER() OVER(ORDER BY SEQ DESC) AS NUM, \n" +
                             "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
                             "         CEILING((ROW_NUMBER() OVER(ORDER BY SEQ DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
-                            "         SEQ, Q_ID, DLG_QUESTION, INTENT, ENTITY, GROUP_ID, DLG_ID, REG_DT, APP_ID, USE_YN \n" +
-                           "          FROM TBL_QNAMNG \n" +
-                           "          WHERE GROUP_ID IS NULL \n";
+                            "         SEQ, Q_ID, DLG_QUESTION, INTENT, ENTITY, GROUP_ID, A.DLG_ID, REG_DT, APP_ID, A.USE_YN \n" +
+                           "          FROM TBL_QNAMNG A\n" +
+                           "          INNER JOIN TBL_DLG B ON A.DLG_ID = B.DLG_ID   \n" +
+                           "          WHERE 1=1  \n" +
+                           "          AND B.DLG_GROUP = 2   \n" +
+                           "          AND GROUP_ID IS NULL \n";
                            if (req.body.searchQuestiontText !== '') {
                             QueryStr += "AND DLG_QUESTION like '%" + req.body.searchQuestiontText + "%' \n";
                         }
@@ -882,8 +885,21 @@ router.post('/procSimilarQuestion', function (req, res) {
     var labeledUtterArr = req.body.labelArr;//req.body['labelArr[]'];
     var newUtterArr = req.body.newUtterArr;//req.body['labelArr[]'];
     
-    
-
+    var options = {
+        headers: {
+            'Content-Type': 'application/json'
+            //,'Ocp-Apim-Subscription-Key': subKey
+        }
+    };
+    var subKey = req.session.subKey;
+    options.headers['Ocp-Apim-Subscription-Key'] = subKey;
+    if (typeof labeledUtterArr[0].entityLabels != 'undefined') {
+        options.payload = labeledUtterArr[0];
+    } else {
+        labeledUtterArr[0].entityLabels = [];
+        options.payload = labeledUtterArr[0];
+    }
+ 
     (async () => {
         try {
             

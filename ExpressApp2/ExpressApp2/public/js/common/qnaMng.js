@@ -108,7 +108,9 @@ $(document).on("click", "a[name=addUtter]", function(e){
 var rememberUtterInput = '';
 var rememberUtterStart = -1;
 var rememberUtterEnd = -1;
-$(document).on("focusin", "input[name=matchUtterText]", function(e){
+
+/*
+$(document).on("focusin", "input[name=s_question]", function(e){
     rememberUtterInput = $(this).val().trim();
     rememberUtterStart = $(this).parent().find('input[name=startIndex]').val();
     rememberUtterEnd = $(this).parent().find('input[name=endIndex]').val();
@@ -116,40 +118,13 @@ $(document).on("focusin", "input[name=matchUtterText]", function(e){
 
 
 //input focusout
-$(document).on("focusout", "input[name=matchUtterText]", function(e){
-
-    if ($(this).parent().find('select[name=entityTypeForLabel]').val() == '4') {
-        $(this).val('');
-        return false;
-    }
-
-    //$(this).parent().find('select[name=multiMatchUtterSel]').length > 1 || 
-    if ((rememberUtterInput == $(this).val() && rememberUtterInput != '')) {
-        return false;
-    }
-
-    $(this).val($(this).val().trim());
-    if (rememberUtterInput != $(this).val() && rememberUtterStart != -1) {
-        if ($(this).parent().find('select[name=entitySelBox]').val() == 'NONE') {
-            $('#alertMsg').text(language.ALERT_ENTITY_SELECT);
-            $('#alertBtnModal').modal('show');
-            //alert('엔티티를 선택해 주세요.');
-            $(this).val('');
-            return false;
-        }
-        $(this).parent().find('input[name=startIndex]').val('');
-        $(this).parent().find('input[name=endIndex]').val('');
+$(document).on("focusout", "input[name=s_question]", function(e){
     
-        if (rememberUtterStart != "") {
-            for (var i=rememberUtterStart; i<=rememberUtterEnd; i++) {
-                $(this).parents('tr').prev().find('span[name=utterText]').eq(i).removeClass();
-            }
-        }
         var chkMatch = [];
         var chkMatchIndex = [];
-        var inputStr = $(this).val();
-        var inputLength = $(this).val().length;
-        var utterLength = $(this).parents('tr').prev().find('span[name=utterText]').length;
+        var inputStr = $("input[name=s_question]").val();
+        var inputLength = $("input[name=s_question]").val().length;
+        var utterLength = $('span[name=utterText]').length;
 
 
         var isEngNum = false;
@@ -162,7 +137,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         if (isEngNum) {
             var indexArr = [];
             var inputVal = $(this).val();
-            $(this).parents('tr').prev().find('input[name=tokenVal]').each(function(index, item){
+            $('input[name=tokenVal]').each(function(index, item){
                 var strVal = '';
                 var isMatch = false;
 
@@ -226,7 +201,7 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
         //--------------------------------------------------------------------------------------------------------------
         var utterBodyHtml = '';
         if (chkMatch.length > 1) {
-            $(this).parent().find('span[name=alertSpan]').text("");
+            $('span[name=alertSpan]').text("");
             rememberUtterInput = $(this).val();
             utterBodyHtml += "<select name='multiMatchUtterSel' class='form-control'  >";
             var j=0;
@@ -324,18 +299,6 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
                         }
                         for (var k=nowIndex; k >= 0; k--) {
                             if ($('div[name=labelInfoDiv]').eq(k).find('div[name=indentDiv]').length == 0) {
-                                /*
-                                var startInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val();
-                                var endInx = $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val();
-                                startInx = startInx==""?matchStartIndex:startInx*1;
-                                endInx = endInx==""?matchEndIndex:endInx*1;
-                                if (startInx <= matchStartIndex) {
-                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(startInx);
-                                }
-                                if (endInx <= matchEndIndex) {
-                                    $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(matchEndIndex);
-                                }
-                                */
                                $('div[name=labelInfoDiv]').eq(k).find('input[name=startIndex]').val(minIndex);
                                $('div[name=labelInfoDiv]').eq(k).find('input[name=endIndex]').val(maxIndex);
                                 break;
@@ -362,10 +325,9 @@ $(document).on("focusout", "input[name=matchUtterText]", function(e){
             console.log("매칭되는것 없음 ");
             $(this).parent().find('span[name=alertSpan]').text(language.ALERT_NO_MATCHING_WORDS);
         }
-        //--------------------------------------------------------------------------------------------------------------
-        //--------------------------------------------------------------------------------------------------------------
-    }
 });
+*/
+
 
 function makeUtterTable(inputText) {
 
@@ -412,6 +374,8 @@ function makeUtterTable(inputText) {
         utterBodyHtml += makeLabelingTr();
             
         $('#utteranceTblBody').html('').html(utterBodyHtml);
+
+        
     } 
 }
 
@@ -1305,9 +1269,7 @@ function makeQnaListTable(page) {
                 var tableHtml = "";
                 var saveTableHtml = "";
                 for (var i = 0; i < data.rows.length; i++) {
-                    if (data.rows[i].INTENT.indexOf('None_') != -1) {
-                        continue;
-                    }
+                    
                     tableHtml += '<tr><td>' + data.rows[i].NUM + '</td>';
                     
                     tableHtml += '<td class="txt_left">' + data.rows[i].DLG_QUESTION + '</td>';
@@ -1316,7 +1278,10 @@ function makeQnaListTable(page) {
                     tableHtml += '<td class="txt_left">' + data.rows[i].ENTITY + '</td>';
                     tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" page_type="qna" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
                     //tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" onClick="searchDialog(\'' + data.rows[i].DLG_ID + '\',\'qna\')"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
-                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> ' + language.Insert_similarQ + '</button></td>';
+                    tableHtml += '<td class="tex01">';
+                    tableHtml += '<button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> ' + language.Insert_similarQ + '</button>';
+                    
+                    tableHtml += '</td>';
                     tableHtml += '</tr>';
                    
                     
@@ -1416,6 +1381,25 @@ $(document).on("click", "#similarQBtn", function () {
         return false;
     }
 
+
+    var utterArr = [];
+    var newArr = []
+    
+    uterObj = new Object();
+    var utterText = $('#s_question').val().trim();
+    
+    var tmpNewObj = new Object();
+    tmpNewObj.text = utterText;
+    tmpNewObj.intentName = $('#similarQform').find('#mother_intent').val();
+    newArr.push(tmpNewObj);
+
+    uterObj.text = utterText;
+    uterObj.intentName = $('#similarQform').find('#mother_intent').val();
+    uterObj.entityLabels = [];
+    utterArr.push(uterObj);
+
+
+
     var saveArr = new Array();
     var data = new Object() ;
 
@@ -1430,8 +1414,8 @@ $(document).on("click", "#similarQBtn", function () {
     var jsonData = JSON.stringify(saveArr);
     var params = {
         'saveArr' : jsonData,
-        'utterArr' : utterArr,
-        'newArr' : newArr,
+        'labelArr' : utterArr,
+        'newUtterArr' : newArr,
         'intentName' : data.LUIS_INTENT
     };
 
