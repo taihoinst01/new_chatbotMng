@@ -361,7 +361,9 @@ function smallTalkProc(procType) {
     });
 }
 function reloadPage(){
-    window.location.reload();
+    //window.location.reload(); 
+    makeSmallTalkTable($('#smallTalkTablePaging .li_paging').val());
+    $('#smallTalkUpdateModal .modal-footer').children().eq(0).trigger('click');
 }
 
 function getEntityFromQ(queryText) {
