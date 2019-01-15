@@ -301,7 +301,6 @@ $(document).on("click", "a[name=selIntent]", function(e){
 function intentDetail(intentName, intentId, labelCnt) {
 
     var pageNum = $('#currentPage').val();
-
     var params = {
         'intentName' : intentName,
         'intentId' : intentId,
@@ -352,11 +351,12 @@ function intentDetail(intentName, intentId, labelCnt) {
             }
             else 
             {
+                var intentNameEncoded = encodeURI(encodeURIComponent(intentName));
                 if ($('#createQuery').val() != -1) {
                     var createQuery = $('#createQuery').val();
-                    location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum + "&createQuery=" + createQuery;
+                    location.href = "/luis/intentDetail?intentName=" + intentNameEncoded + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum + "&createQuery=" + createQuery;
                 } else {
-                    location.href = "/luis/intentDetail?intentName=" + intentName + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
+                    location.href = "/luis/intentDetail?intentName=" + intentNameEncoded + "&intentId=" + intentId + "&labelCnt=" + labelCnt + "&pageNum=" + pageNum;
                 }
             }
         }

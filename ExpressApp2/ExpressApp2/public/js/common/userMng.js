@@ -268,7 +268,7 @@ function addUser() {
     addHtml += '<td><input type="text" name="new_user_name" spellcheck="false" autocomplete="off" value="" /></td> ';
     //addHtml += '<td><input type="text" name="new_hphone" spellcheck="false" autocomplete="off" value="" /></td> ';
     //addHtml += '<td><input type="text" name="new_email" spellcheck="false" autocomplete="off" value="" /></td> ';
-    addHtml += '<td colspan="6"></td></tr>'
+    addHtml += '<td colspan="5"></td></tr>'
 
     $('#tableBodyId').prepend(addHtml);
 
@@ -287,20 +287,25 @@ function initUserList() {
 
 function deleteUser() {
     if ($('tr div[class*=checked]').length < 1) {
-        alert(language['NO_SELECTED_CELL']);
+        //alert(language['NO_SELECTED_CELL']);
         $('#procDialog').modal('hide');
         $('#proc_content').html(language.NO_SELECTED_CELL);
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
         $('#procDialog').modal('show');
     } else {
         $('tr div[class*=checked]').each(function() {
-            
-            $(this).parent().prev().text('DEL');
-            var checkAdmin = $(this).parent().next().text();
+            if ($(this).parent().prev().text() == 'NEW') {
+                $(this).parents('tr').remove();
+            } else {
+                $(this).parent().prev().text('DEL');
+                var checkAdmin = $(this).parent().next().text();
+            }
+            /*
             $('#procDialog').modal('hide');
             $('#proc_content').html(language.IS_DELETE_CONFIRM);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-trash"></i> ' + language.DELETE +'</button><button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
             $('#procDialog').modal('show');
+            */
         });
     }
     

@@ -118,7 +118,7 @@
                         <ul class="treeview-menu">
                             <li name='intentIndex_<%=k%>'><a href="/luis/intentList?appIndex=<%=k%>" ><i class="fa  fa-circle-o"></i><%= __('INTENT_LIST') %></a></li>
                             <!--<li><a href="/luis/entityList?appIndex=<%=k%>"><i class="fa  fa-circle-o"></i><%= __('ENTITY_LIST') %></a></li>-->
-                            <li class="active"><a href="#" class="spmenu" id="trainBtn" onclick="return false;">
+                            <li class="active" id="trainBtn" name="trainBtn" ><a href="#" class="spmenu"onclick="return false;">
                                     <%= __('TRAIN') %></a></li>
                             <input type="hidden" name="hiddenAppIndex" value="<%=k%>" />
                         </ul>
@@ -394,8 +394,10 @@
         });
 
         //train --start
-        $('#trainBtn').click(function () {
-
+        $('li[name=trainBtn]').click(function () {
+            if(!confirm("학습하시겠습니까?")) {
+                return false;
+            } 
             var appIndex = $(this).parents('ul').find('input[name=hiddenAppIndex]').val();
             var params = {
                 'appIndex': appIndex

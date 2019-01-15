@@ -36,11 +36,11 @@ router.post('/procMenu', function (req, res) {
         if (menuArr[i].statusFlag === 'NEW') {
             saveStr += "INSERT INTO TB_MENU_AUTH (MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT) " +
                 "VALUES ( ";
-            saveStr += " '" + menuArr[i].MENU_ID + "', N'" + menuArr[i].MENU_NM + "', N'" + menuArr[i].MENU_URL + "', ";
+            saveStr += " '" + menuArr[i].MENU_ID + "', '" + menuArr[i].MENU_NM + "', '" + menuArr[i].MENU_URL + "', ";
             saveStr += " '" + menuArr[i].MENU_AUTH + "', '" + userId + "', GETDATE()); ";
         } else if (menuArr[i].statusFlag === 'UPDATE') {
             updateStr += "UPDATE TB_MENU_AUTH SET ";
-            updateStr += "MENU_NM = N'" + menuArr[i].MENU_NM + "N', MENU_URL = '" + menuArr[i].MENU_URL + "', ";
+            updateStr += "MENU_NM = '" + menuArr[i].MENU_NM + "', MENU_URL = '" + menuArr[i].MENU_URL + "', ";
             updateStr += "MENU_AUTH = '" + menuArr[i].MENU_AUTH + "', ";
             updateStr += "MOD_ID = '" + userId + "', MOD_DT = GETDATE() ";
             updateStr += "WHERE MENU_ID = '" + menuArr[i].MENU_ID + "'; ";
@@ -87,8 +87,12 @@ router.post('/selectMenuList', function (req, res) {
     (async () => {
         try {
 
-            var QueryStr = "SELECT MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TB_MENU_AUTH";
-
+            //var QueryStr = "SELECT MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TB_MENU_AUTH";
+            var QueryStr = `
+            SELECT MENU_ID, MENU_NM, MENU_URL, MENU_AUTH, A.REG_ID, A.REG_DT, A.MOD_ID, A.MOD_DT, AUTHGRP_M_NM 
+              FROM TB_MENU_AUTH A 
+            INNER JOIN TB_AUTHGRP_M ON MENU_AUTH = AUTH_LEVEL;
+            `
 
             //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TB_MENU_AUTH 테이블 조회');
             let pool = await dbConnect.getConnection(sql);

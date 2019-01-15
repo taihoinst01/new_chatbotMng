@@ -181,6 +181,11 @@ function makeQnaTable() {
             var entityBodyHtml = '';
             if(data.qnaList.length > 0){
                 for(var i = 0; i < data.qnaList.length; i++){
+
+                    if (data.qnaList[i].INTENT.indexOf('None_') != -1) {
+                        continue;
+                    }
+
                     var j=i+1
                     var selDupleIntent = "<select name='utterSelBox' class='form-control'  >";
                     selDupleIntent += "<option value='" + data.qnaList[i].ENTITY + "'>" + data.qnaList[i].DLG_QUESTION + "</option>";
@@ -214,7 +219,10 @@ function makeQnaTable() {
                 }
                 //<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>
                 $('#qnaListBody').html(entityBodyHtml);
-                $('#pagination').html('').append(data.pageList);
+                if (entityBodyHtml != '') {
+
+                    $('#pagination').html('').append(data.pageList);
+                }
             }
         }
     });

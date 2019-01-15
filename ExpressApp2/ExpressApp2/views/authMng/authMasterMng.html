@@ -66,10 +66,11 @@
                                     <h4 class=" col-lg-6">권한그룹 목록</h4>
                                     <div class=" col-lg-6" style="text-align:right">
                                         <!--<button type="button" class="btn btn-default" id="addBtn"><%= __('ADD') %></button>-->
-                                        <button type="button" class="btn btn-default" onClick="show_authMasterForm();">
+                                        <!--<button type="button" class="btn btn-default" onClick="show_authMasterForm();">
                                             <i class="fa fa-plus"></i>
                                             <%= __('ADD') %>
                                         </button>
+                                        -->
                                     </div>
                                 </div>
 
@@ -139,7 +140,7 @@
                                         <div class="form-group">
                                                 <label for="inputEmail3" class="col-sm-3 control-label"><i class="fa fa-asterisk"></i> <%= __('AUTHGROUP_LEVEL') %></label>
                                                 <div class="col-sm-9">
-                                                    <select name="AUTH_LEVEL" id="AUTH_LEVEL" class="form-control">
+                                                    <select name="AUTH_LEVEL" id="AUTH_LEVEL" class="form-control" disabled>
                                                         <option value="99" selected><%= __('AUTH_99') %></option>
                                                         <option value="88"><%= __('AUTH_88') %></option>
                                                         <option value="77"><%= __('AUTH_77') %></option>

@@ -10,6 +10,7 @@ var closedList = [];
 var closedCompareList = [];
 var isFirst = true;
 ;(function($) {
+ 
     $.ajax({
         url: '/jsLang',
         dataType: 'json',
@@ -28,6 +29,13 @@ Array.prototype.move = function(from,to){
 };
 
 $(document).ready(function() {
+
+    if ($('#hiddenIntentName').val() != '')
+    {
+        var decodeName = decodeURIComponent(decodeURI($('#hiddenIntentName').val()));
+        $('#hiddenIntentName').val(decodeName);
+        $('#intentNameTitle').text(decodeName);
+    }
     
     makeUtteranceTable();
 
@@ -746,15 +754,23 @@ function makeChildSelBox(selObj, entityType) {
 
 //edit entity name focus out 
 $(document).on('focusout','#editIntentName',function(e){
-    var editEntityName = $('#editIntentName').val();
+    focusOutUpdateName();
+});
 
+function focusOutUpdateName() {
+    var editEntityName = $('#editIntentName').val();
+    if (editEntityName == $('#hiddenIntentName').val()) {
+        $('button[name=confirmCancelBtn]').trigger('click');
+        $('#updateIntentName').show();
+        return false;
+    }
     $('#confirmTitle').text(language.INTENT + ' ' + language.MODIFY);
     $('#confirmMsg').text("["+ editEntityName + "] " + language.ALERT_CHANGE_ENTITY);
     $('#confirmBtn').prev().show();
     $('#confirmBtnModal').modal('show');
     $('#updateIntentName').show();
     
-});
+}
 
 $(document).on('click', 'button[name=confirmCancelBtn]', function(e){
     $('#intentNameTitle').html('').text($('#hiddenIntentName').val().trim());
@@ -1741,12 +1757,15 @@ function getEntityList(intentName, intentId) {
 
 // input 엔터 감지
 $(document).on("click", "#insertUtterBtn", function(e){ 
-    
+    if ($('#editIntentName').length>0) {
+        focusOutUpdateName();
+    }
     saveUtterance();
 });
 
 //인텐트 선택
 function saveUtterance() {
+
     var intentName = $('#intentNameTitle').text();
     var utterArr = [];
     var trIndex = 0;

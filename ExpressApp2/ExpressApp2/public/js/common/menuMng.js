@@ -63,13 +63,13 @@ $(document).ready(function () {
         document.menuForm.MENU_ID.value = menu_id;
         document.menuForm.MENU_NM.value = td.eq(0).text();
         document.menuForm.MENU_URL.value = td.eq(1).text();
-        document.menuForm.MENU_AUTH.value = td.eq(2).text();
-        updateAuth = td.eq(2).text();
+        document.menuForm.MENU_AUTH.value = td.eq(5).find('input[name=hiddenAuthVal]').val();
+        updateAuth = td.eq(5).find('input[name=hiddenAuthVal]').val();
         getMenu();
         
-        //$('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
+        $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
-        //$('#menuFormModal').modal('show');
+        $('#menuFormModal').modal('show');
     });
 
     //수정 버튼
@@ -151,10 +151,11 @@ function makeMenuTable() {
                 for (var i = 0; i < data.rows.length; i++) {
                     tableHtml += '<tr><td>' + data.rows[i].MENU_NM + '</td>'
                     tableHtml += '<td>' + data.rows[i].MENU_URL + '</td>'
-                    tableHtml += '<td>' + data.rows[i].MENU_AUTH + '</td>'
+                    tableHtml += '<td>' + data.rows[i].AUTHGRP_M_NM + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_ID + '</td>'
                     tableHtml += '<td>' + data.rows[i].MOD_DT + '</td>'
                     tableHtml += '<td>';
+                    tableHtml += '<input type="hidden" name="hiddenAuthVal" value="' + data.rows[i].MENU_AUTH + '"/>'
                     tableHtml += '<button type="button" class="btn btn-default btn-sm" id="update_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-edit"></i> '+language.UPDATE+'</button> <button type="button" class="btn btn-default btn-sm" id="delete_menuForm" menu_id="' + data.rows[i].MENU_ID + '"><i class="fa fa-trash"></i> '+language.DELETE+'</button>';
                     tableHtml += '</td></tr>';
                 }
@@ -263,9 +264,9 @@ function getMenu() {
             $('#MENU_AUTH').html(select_menu);
 
             
-            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
+            //$('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+language.CLOSE+'</button><button type="button" class="btn btn-primary" id="updateMenuBtn"><i class="fa fa-edit"></i> '+language.UPDATE+'</button>');
 
-            $('#menuFormModal').modal('show');
+            //$('#menuFormModal').modal('show');
         }
     });
 }
