@@ -88,7 +88,7 @@ function makeInitDlgTable() {
                 }
             } else {
                 item += '<tr style="height: 175px;">' +
-                    '<td colspan="6">' + language.NO_DATA + '</td>' +
+                    '<td colspan="5">' + language.NO_DATA + '</td>' +
                     '</tr>';
             }
 
