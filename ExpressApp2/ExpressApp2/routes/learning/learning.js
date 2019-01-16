@@ -2507,8 +2507,13 @@ router.post('/addDialog', function (req, res) {
             */
 
             //var selectDlgId = 'SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG';
-            var insertTblDlg = 'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
-                '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup)';
+            var insertTblDlg = `
+            INSERT INTO TBL_DLG(DLG_ID, DLG_DESCRIPTION, DLG_LANG, DLG_GROUP, DLG_TYPE, DLG_ORDER_NO, USE_YN ) 
+            VALUES (@dlgId, @dialogText, 'KO', @dlgGroup, @dlgType, @dialogOrderNo, 'Y');
+            `;
+            
+            //'INSERT INTO TBL_DLG(DLG_ID,DLG_NAME,DLG_DESCRIPTION,DLG_LANG,DLG_TYPE,DLG_ORDER_NO,USE_YN, GroupL, GroupM, DLG_GROUP) VALUES ' +
+            //    '(@dlgId,@dialogText,@dialogText,\'KO\',@dlgType,@dialogOrderNo,\'Y\', @largeGroup, @predictIntent, @dlgGroup)';
             var inserTblDlgText = 'INSERT INTO TBL_DLG_TEXT(DLG_ID,CARD_TITLE,CARD_TEXT,USE_YN) VALUES ' +
                 '(@dlgId,@dialogTitle,@dialogText,\'Y\')';
                 
@@ -2532,32 +2537,32 @@ router.post('/addDialog', function (req, res) {
             var dlgNo = resultRNum.recordset;
             */
 
+            let result1 = await pool.request()
+                .query(selectDlgId)
+            let dlgId = result1.recordset;
             for (var i = 0; i < (array.length - 1); i++) {
                 var insertDlgOrderNo = 0;
-                let result1 = await pool.request()
-                    .query(selectDlgId)
-                let dlgId = result1.recordset;
 
                 
+                var inputDlgId = dlgId[0].DLG_ID+i;
 
                 if(dialogOrderNo==1000){
                     insertDlgOrderNo = i+1;
                 }else{
                     insertDlgOrderNo = dialogOrderNo;
                 }
-                
                 let result2 = await pool.request()
-                    .input('dlgId', sql.Int, dlgId[0].DLG_ID)
+                    .input('dlgId', sql.Int, inputDlgId)
                     .input('dialogText', sql.NVarChar, (description.trim() == '' ? null : description.trim()))
                     .input('dlgType', sql.NVarChar, array[i]["dlgType"])
                     //.input('dialogOrderNo', sql.Int, (i + 1))
                     .input('dialogOrderNo', sql.Int, insertDlgOrderNo)
-                    .input('largeGroup', sql.NVarChar, largeGroup)
                     .input('dlgGroup', sql.NVarChar, dlgGroup)
-                    .input('predictIntent', sql.NVarChar, predictIntent)
                     .query(insertTblDlg);
                 //.input('luisEntities', sql.NVarChar, (typeof luisEntities ==="string" ? luisEntities:luisEntities[j]))
-
+                
+                //res.send({ list: tblDlgId });
+                //return false;
                 if (array[i]["dlgType"] == "2") {
 
                     /*
@@ -2567,7 +2572,7 @@ router.post('/addDialog', function (req, res) {
                     */
 
                     let result4 = await pool.request()
-                        .input('dlgId', sql.Int, dlgId[0].DLG_ID)
+                        .input('dlgId', sql.Int, inputDlgId)
                         //.input('dialogTitle', sql.NVarChar, (array[i]["dialogTitle"].trim() == '' ? null: array[i]["dialogTitle"].trim()) )
                         .input('dialogTitle', sql.NVarChar, (array[i]["dialogTitle"].trim() == '' ? '' : array[i]["dialogTitle"].trim()))
                         .input('dialogText', sql.NVarChar, (array[i]["dialogText"].trim() == '' ? null : array[i]["dialogText"].trim()))
@@ -2589,7 +2594,7 @@ router.post('/addDialog', function (req, res) {
                         }
 
                         let result2 = await pool.request()
-                            .input('typeDlgId', sql.NVarChar, array[i].dlgType)
+                            .input('typeDlgId', sql.NVarChar, inputDlgId)
                             .input('dlgId', sql.Int, dlgId[0].DLG_ID)
                             .input('dialogTitle', sql.NVarChar, carTmp["dialogTitle"])
                             .input('dialogText', sql.NVarChar, carTmp["dialogText"])
@@ -2636,7 +2641,7 @@ router.post('/addDialog', function (req, res) {
                     }
 
                     let result4 = await pool.request()
-                        .input('dlgId', sql.Int, dlgId[0].DLG_ID)
+                        .input('dlgId', sql.Int, inputDlgId)
                         .input('dialogTitle', sql.NVarChar, array[i]["dialogTitle"])
                         .input('dialogText', sql.NVarChar, array[i]["dialogText"])
                         .input('mediaImgUrl', sql.NVarChar, array[i]["mediaImgUrl"])

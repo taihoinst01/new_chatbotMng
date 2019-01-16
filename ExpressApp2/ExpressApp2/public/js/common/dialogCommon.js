@@ -124,6 +124,7 @@ $(document).ready(function() {
 
     });
 
+    //두연1111
     // 다이얼로그 생성 모달 (다이얼로그 타입변경)
     $(document).on('change', 'select[name=dlgType]', function (e) {
         addCarouselForm = '<div class="btn_wrap addCarouselBtnDiv" style="clear:both" >' +
@@ -138,6 +139,12 @@ $(document).ready(function() {
             '<div class="form-group form-inline">' +
             '<label>' + language.CARD_MOBILE + '</label>' +
             '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">' + language.CARDMOBIBLE_NO + '</option><option value="m^^">' + language.CARDMOBIBLE_OK + '</option></select>' +
+            
+            //두연 카드 노출 순서
+            '&nbsp;&nbsp;<label>카드노출순서</label>' +
+            '&nbsp;&nbsp;<select class="form-control" name="cardOrderValue" id="cardOrderValue"></select>' +
+            '<input type="hidden" name="cardOrderHiddenValue" id="cardOrderHiddenValue" value"" />' +
+            
             '</div>' +
             '<div class="modal_con btnInsertDiv">' +
             '</div>' +
@@ -275,6 +282,37 @@ $(document).ready(function() {
         $(this).parents('#dialogLayout').find('input[name=dialogTitle]').trigger(triggerEvent);
         $(this).parents('#dialogLayout').find('textarea[name=dialogText]').trigger(triggerEvent);
         
+
+
+
+
+
+        //두연111
+        var selectLength = $(this).parents('.insertForm').find('select[name=cardOrderValue]').length;
+        var selIndex = $(this).parents('.insertForm').find('select[name=dlgType]').index(this);
+        //var originalSelValue = $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(selIndex).val()*1;
+
+        //var changedValue = $(this).val()*1;
+        //for (inc=0; inc<selectLength; inc++) {
+        var jnc=0;
+        var cardOrderNumStr = '';
+        var cardOrderNumLastStr 
+        for (jnc=0; jnc < selectLength; jnc++) {
+            if (jnc != selectLength-1) {
+                $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(jnc).append('<option value="' + selectLength + '" selected>' + selectLength + '</option>');
+                var selTmpVal = $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(jnc).val();
+                $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(jnc).val(selTmpVal).prop("selected", true);
+            }
+            
+
+            cardOrderNumStr += '<option value="' + (jnc+1) + '">' + (jnc+1) + '</option>';
+        }
+        //cardOrderNumStr += '<option value="' + (jnc) + '" selected>' + (jnc) + '</option>';
+
+        $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(selIndex).html(cardOrderNumStr);
+
+        $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(selIndex).val(jnc);
+        $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(selIndex).val(jnc).prop("selected", true);
         //dialogText
         //dyyoo change이벤트 후 미리보기 적용. keycode:17 - ctrl한번 누르기
         /*
@@ -703,7 +741,7 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '<textarea id="dialogText" name="dialogText" class="form-control" onkeyup="writeDialog(this);" placeholder=" ' + language.Please_enter + ' " rows="5"></textarea>' +
         '</div>' +
         '</div>';
-
+    
     carouselForm = '<div class="carouselLayout">' +
         '<div class="form-group">' +
         '<label>' + language.IMAGE_URL + '</label>' +
@@ -712,6 +750,12 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '<div class="form-group form-inline">' +
         '<label>' + language.CARD_MOBILE + '</label>' +
         '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">' + language.CARDMOBIBLE_NO + '</option><option value="m^^">' + language.CARDMOBIBLE_OK + '</option></select>' +
+        
+        //두연 카드 노출 순서
+        '&nbsp;&nbsp;<label>카드노출순서</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardOrderValue" id="cardOrderValue"></select>' +
+        '<input type="hidden" name="cardOrderHiddenValue" id="cardOrderHiddenValue" value"" />' +
+        
         '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
@@ -724,6 +768,7 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         '</div>' +
         '<div class="clear-both"></div>' +
         '</div>';
+
 
     if ($(this).parents('.insertForm').find('.carouselLayout').length == 10) {
         //alert(language.Up_to_10_cards_can_be_added);
@@ -759,6 +804,33 @@ $(document).on('click', '.addCarouselBtn', function (e) {
         if ($('.dialogView').eq(jdx).find('#slideDiv' + kdx).children().children().length > 2) {
             $('#nextBtn' + jdx).show();
         }
+
+
+        var selectLength = $(this).parents('.insertForm').find('select[name=cardOrderValue]').length;
+        var selIndex = $(this).parents('.insertForm').find('select[name=cardOrderValue]').index(this);
+        //var originalSelValue = $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(selIndex).val()*1;
+
+        //var changedValue = $(this).val()*1;
+        //for (inc=0; inc<selectLength; inc++) {
+        var jnc=0;
+        var cardOrderNumStr = '';
+        var cardOrderNumLastStr 
+        for (jnc=0; jnc < selectLength; jnc++) {
+            if (jnc != selectLength-1) {
+                $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(jnc).append('<option value="' + selectLength + '" selected>' + selectLength + '</option>');
+                var selTmpVal = $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(jnc).val();
+                $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(jnc).val(selTmpVal).prop("selected", true);
+            }
+
+            cardOrderNumStr += '<option value="' + (jnc+1) + '">' + (jnc+1) + '</option>';
+        }
+        //cardOrderNumStr += '<option value="' + (jnc) + '" selected>' + (jnc) + '</option>';
+
+        $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(selIndex).html(cardOrderNumStr);
+
+        $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(selIndex).val(jnc);
+        $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(selIndex).val(jnc).prop("selected", true);
+        
     }
 });
 
@@ -1009,6 +1081,11 @@ $(document).on("click", "#show_dlg", function () {
         '<div class="form-group form-inline">' +
         '<label>Card_Mobile</label>' +
         '&nbsp;&nbsp;<select class="form-control" name="cardValue" id="cardValue"><option value="">미적용</option><option value="m^^">적용</option></select>' +
+        //두연 카드 노출 순서
+        '&nbsp;&nbsp;<label>카드노출순서</label>' +
+        '&nbsp;&nbsp;<select class="form-control" name="cardOrderValue" id="cardOrderValue"></select>' +
+        '<input type="hidden" name="cardOrderHiddenValue" id="cardOrderHiddenValue" value"" />' +
+
         '</div>' +
         '<div class="modal_con btnInsertDiv">' +
         '</div>' +
@@ -1159,9 +1236,20 @@ $(document).on("click", "#show_dlg", function () {
                     var val = row[i];
 
                     var tmp = val;//val[l];
+
+                    
+                    var cardOrderNumStr = '';
+                    for (var jnc=0; jnc < tmp.dlg.length; jnc++) {
+                        if (tmp.dlg[jnc].DLG_TYPE == 3) {
+                            cardOrderNumStr += '<option value="' + tmp.dlg[jnc].CARD_ORDER_NO + '">' + tmp.dlg[jnc].CARD_ORDER_NO + '</option>'
+                        }
+                    }
+
+
                     for (var j = 0; j < tmp.dlg.length; j++) {
+                        
                         var cardTextHtml = tmp.dlg[j].CARD_TEXT;
-                        var dlgTextArea = tmp.dlg[j].CARD_TEXT;;
+                        var dlgTextArea = tmp.dlg[j].CARD_TEXT;
                         var cardTitleHtml = "";
                         if(tmp.dlg[j].CARD_TITLE==null){
                             cardTitleHtml = "";
@@ -1171,6 +1259,8 @@ $(document).on("click", "#show_dlg", function () {
                         cardTextHtml = cardTextHtml.replace(/\/n/gi,'</br>');
                         dlgTextArea = dlgTextArea.replace(/\/n/gi,'\r\n');
                         if (tmp.dlg[j].DLG_TYPE == 2) {
+                            
+                            var dlg_card_order = tmp.dlg[j].CARD_ORDER_NO;
 
                             inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
                             inputUttrHtml += '<div class="wc-message-content">';
@@ -1271,6 +1361,11 @@ $(document).on("click", "#show_dlg", function () {
                             $("#dialogLayout").find(".textLayout").eq(j).find("textarea[name=dialogText]").val(dlgTextArea);
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=imgUrl]").val(tmp.dlg[j].IMG_URL);
                             $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardValue]").val(tmp.dlg[j].CARD_VALUE).prop("selected", true);
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cardOrderHiddenValue]").val(tmp.dlg[j].CARD_ORDER_NO);
+                            
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardOrderValue]").html(cardOrderNumStr);
+                            $("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardOrderValue]").val(tmp.dlg[j].CARD_ORDER_NO).prop("selected", true);
+                            
 
                             //두연
                             if (tmp.dlg[j].BTN_1_TYPE != null && tmp.dlg[j].BTN_1_TYPE != "") {
@@ -1497,3 +1592,54 @@ $(document).on('change', 'select[name=btnType]', function (e) {
     }
 
 });
+
+
+//$("#dialogLayout").find(".carouselLayout").eq(j).find("select[name=cardOrderValue]").val(tmp.dlg[j].CARD_ORDER_NO).prop("selected", true);
+
+
+//두연
+$(document).on('change', 'select[name=cardOrderValue]', function (e) {
+
+    var selectLength = $(this).parents('.insertForm').find('select[name=cardOrderValue]').length;
+    var selIndex = $(this).parents('.insertForm').find('select[name=cardOrderValue]').index(this);
+    var originalSelValue = $(this).parents('.insertForm').find('input[name=cardOrderHiddenValue]').eq(selIndex).val()*1;
+
+    var changedValue = $(this).val()*1;
+    for (inc=0; inc<selectLength; inc++) {
+        if (inc == selIndex) { 
+            $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).next().val(changedValue);
+            continue;
+            //$(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).val((inc+1)).prop("selected", true);
+        } else {
+            var originalValue = $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).val()*1;
+            
+            var changePlus = false;
+            if (originalSelValue > changedValue) {
+                changePlus = true;
+            } else {
+            }
+            if (originalValue > changedValue || changePlus) 
+            {
+                var plusValue = originalValue+1;
+                if (plusValue > originalSelValue) {
+                    continue;
+                } else {
+                    $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).val(plusValue).prop("selected", true);
+                    $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).next().val(plusValue);
+                }
+            } else {
+                var plusValue = originalValue-1;
+                if (plusValue < originalSelValue) {
+                    continue;
+                } else {
+                    $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).val(plusValue).prop("selected", true);
+                    $(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).next().val(plusValue);
+                }
+            }
+        }
+        //$(this).parents('.insertForm').find('select[name=cardOrderValue]').eq(inc).
+    }
+
+});
+
+

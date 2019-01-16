@@ -78,7 +78,7 @@ function makeInitDlgTable() {
                     item += '<tr>' +
                         /*'<td>' + data.list[i].NUM + '</td>' +*/
                         '<td>' + dlgGroupHtml + '</td>' +
-                        '<td>' + dlgNameHtml + '</td>' +
+                        //'<td>' + dlgNameHtml + '</td>' +
                         '<td class="tex01" id="show_dlg" page_type="initDlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
                         '<td>' + data.list[i].DLG_ORDER_NO + '</td>' +
@@ -515,11 +515,11 @@ function updateInitDialog() {
             $('#alertBtnModal').modal('show');
             exit = true;
             return false;
-            */
             $('#proc_content').html(language.ImageURL_must_be_entered);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> ' + language.CLOSE +'</button>');
             $('#procDialog').modal('show');
-            return;
+            return false;
+            */
         }
     });
     //if (exit) return;

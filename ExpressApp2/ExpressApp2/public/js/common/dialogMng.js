@@ -195,7 +195,7 @@ function createDialog() {
     array[array.length] = JSON.stringify($("form[name=appInsertForm]").serializeObject());//JSON.stringify($("form[name=appInsertForm]"));
 
     $.ajax({
-        url: '/learning/addDialog',
+        url: '/qna/addDialog',
         dataType: 'json',
         type: 'POST',
         data: { 'data': array, /*'entities' : chkEntities*/ },
@@ -205,7 +205,7 @@ function createDialog() {
                 location.href = '/users/logout';
             }
             //alert(language.Added);
-
+            /*
             var inputUttrHtml = '';
             for (var i = 0; i < data.list.length; i++) {
                 inputUttrHtml += '<input type="hidden" name="dlgId" value="' + data.list[i] + '"/>';
@@ -234,7 +234,14 @@ function createDialog() {
             $('#proc_content').html(language.Added);
             $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
             $('#procDialog').modal('show');
+            */
             
+            $('.createDlgModalClose').click();
+
+            $('#proc_content').html(language.Added);
+            $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>');
+            $('#procDialog').modal('show');
+
             var groupType = $('.selected').text();
             var sourceType = $('#tblSourceType').val();
             selectDlgByTxt(groupType, sourceType);
