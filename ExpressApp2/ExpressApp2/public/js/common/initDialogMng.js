@@ -76,9 +76,7 @@ function makeInitDlgTable() {
                     }
 
                     item += '<tr>' +
-                        /*'<td>' + data.list[i].NUM + '</td>' +*/
                         '<td>' + dlgGroupHtml + '</td>' +
-                        //'<td>' + dlgNameHtml + '</td>' +
                         '<td class="tex01" id="show_dlg" page_type="initDlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
                         '<td>' + data.list[i].DLG_ORDER_NO + '</td>' +
