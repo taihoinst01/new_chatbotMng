@@ -71,6 +71,10 @@ function makeInitDlgTable() {
                         dlgGroupHtml = language.SUGGEST_MESSAGE1;
                     }else if(data.list[i].DLG_GROUP==7){
                         dlgGroupHtml = language.SUGGEST_MESSAGE2;
+                    }else if(data.list[i].DLG_GROUP==3){
+                        dlgGroupHtml = language.BANDEDWORD_TYPE1;
+                    }else if(data.list[i].DLG_GROUP==4){
+                        dlgGroupHtml = language.BANDEDWORD_TYPE2;
                     }else{
                         dlgGroupHtml = "NONE";
                     }
