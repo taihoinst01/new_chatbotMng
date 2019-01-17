@@ -133,7 +133,8 @@ $(document).scroll(function() {
     //INTENT SCORE 평균/최소/최대 
     for (var i=0; i<saveBoardList.length; i++) {
         if (saveBoardList[i].BOARD_URL == "drawScoreList") {
-            if ($('#scoreTableBody').html().trim() == "" && $('#scoreTableBody').isInViewport()) {
+            if ($('#scoreTableBody').html().trim() == "") {
+            //if ($('#scoreTableBody').html().trim() == "" && $('#scoreTableBody').isInViewport()) {
                 //console.log('drawScoreList');
                 saveBoardList.splice(i--, 1);
                 drawScoreList();
@@ -141,7 +142,8 @@ $(document).scroll(function() {
         }
         //자주 묻는 질문에 대한 답변 top 10
         else if (saveBoardList[i].BOARD_URL == "getOftQuestion") {
-            if ($('#OftQuestionTableBody').html().trim() == "" && $('#OftQuestionTableBody').isInViewport()) {
+            //if ($('#OftQuestionTableBody').html().trim() == "" && $('#OftQuestionTableBody').isInViewport()) {
+            if ($('#OftQuestionTableBody').html().trim() == "") {
                 //console.log('getOftQuestion');
                 saveBoardList.splice(i--, 1);
                 getOftQuestion();
@@ -157,7 +159,8 @@ $(document).scroll(function() {
         }
         //미답변 질문
         else if (saveBoardList[i].BOARD_URL == "drawNoneQuerytable") {
-            if ($('#noneQueryDiv').html().trim() == "" && $('#noneQueryDiv').isInViewport()) {
+            if ($('#noneQueryDiv').html().trim() == "") {
+            //if ($('#noneQueryDiv').html().trim() == "" && $('#noneQueryDiv').isInViewport()) {
                 //console.log('drawNoneQuerytable');
                 saveBoardList.splice(i--, 1);
                 drawNoneQuerytable();
@@ -173,7 +176,8 @@ $(document).scroll(function() {
         }
         //고객 별 첫 질문 table
         else if (saveBoardList[i].BOARD_URL == "drawfirstQuerytable") {
-            if ($('#fistQueryTable').html().trim() == "" && $('#fistQueryTable').isInViewport()) {
+            if ($('#fistQueryTable').html().trim() == "") {
+            //if ($('#fistQueryTable').html().trim() == "" && $('#fistQueryTable').isInViewport()) {
                 //console.log('drawfirstQuerytable');
                 saveBoardList.splice(i--, 1);
                 drawfirstQuerytable();
@@ -292,7 +296,7 @@ function selectAll() {
                         drawScoreListHtml += '				      </tr>';
                         drawScoreListHtml += '				</thead>';
                         drawScoreListHtml += '				<tbody id="scoreTableBody">';
-
+                        
                         drawScoreListHtml += '				</tbody>';
                         drawScoreListHtml += '			    </table>';
                         drawScoreListHtml += '			    <div class="pagination_wrap" id="scoreTablePaging">';
@@ -307,7 +311,7 @@ function selectAll() {
                         drawScoreListHtml += '</section>';
                         $('#drawScoreListHtml').html(drawScoreListHtml);
                         if ($('#scoreTableBody').html().trim() == "" && $('#scoreTableBody').isInViewport()) {
-                            drawScoreList();
+                            //drawScoreList();
                         }   
                         //drawScoreList();
                     }
