@@ -121,10 +121,12 @@ $(document).on("click", "a[name=delAnswerBtn]", function(e){
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
         $('#procSmallTalk').modal('show');
         $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
+        return false;
     } else {
         $(this).parent().remove();
         $('.answerValDiv  input[name=answerValue]').eq($('.answerValDiv  input[name=answerValue]').length-1).focus();
         //dialogValidation('NEW');
+        return false;
     }
 });
 
@@ -135,10 +137,12 @@ $(document).on("click", "a[name=update_delAnswerBtn]", function(e){
         $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> '+ language.CLOSE +'</button>');
         $('#procSmallTalk').modal('show');
         $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
+        return false;
     } else {
         $(this).parent().remove();
         $('.updateAnswerValDiv  input[name=update_answerValue]').eq($('.updateAnswerValDiv  input[name=update_answerValue]').length-1).focus();
         //dialogValidation('UPDATE');
+        return false;
     }
 });
 
@@ -151,6 +155,7 @@ $(document).on('click', '#smallTalkTablePaging .li_paging', function (e) {
 
 var searchQuestiontText = ""; //페이징시 필요한 검색어 담아두는 변수
 var searchIntentText = ""; //페이징시 필요한 검색어 담아두는 변수
+var listPageNo = "";
 function makeSmallTalkTable(page) {
     if (page) {
         //$('#currentPage').val(1);
@@ -164,7 +169,7 @@ function makeSmallTalkTable(page) {
         'searchQuestiontText': searchQuestiontText,
         'searchIntentText': searchIntentText
     };
-
+    listPageNo = ($('#currentPage').val() == '') ? 1 : page;
     $.ajax({
         type: 'POST',
         data: params,
@@ -348,22 +353,28 @@ function smallTalkProc(procType) {
             if (data.status === 200) {
                 //alert(language['REGIST_SUCC']);
                 $('#proc_content').html(language.REGIST_SUCC);
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="reloadPage();"><i class="fa fa-times"></i> Close</button>');
+                $('#footer_button').html('<button type="button" class="btn btn-default" onClick="reloadPage();return false;"><i class="fa fa-times"></i> Close</button>');
                 $('#procSmallTalk').modal('show');
                 //window.location.reload();
             } else {
                 //alert(language['It_failed']);
                 $('#proc_content').html(language.It_failed);
-                $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal" onClick="reloadPage();"><i class="fa fa-times"></i> Close</button>');
+                $('#footer_button').html('<button type="button" class="btn btn-default" onClick="reloadPage();return false;"><i class="fa fa-times"></i> Close</button>');
                 $('#procSmallTalk').modal('show');
             }
         }
     });
 }
 function reloadPage(){
-    //window.location.reload(); 
-    makeSmallTalkTable($('#smallTalkTablePaging .li_paging').val());
-    $('#smallTalkUpdateModal .modal-footer').children().eq(0).trigger('click');
+    //window.location.reload();
+    $('#procSmallTalk').modal('hide');
+    $('#smallTalkMngModal').modal('hide');
+    $('#smallTalkUpdateModal').modal('hide');
+    
+    //makeSmallTalkTable($('#smallTalkTablePaging .li_paging').val());
+    makeSmallTalkTable(listPageNo);
+    
+    //$('#smallTalkUpdateModal .modal-footer').children().eq(0).trigger('click');
 }
 
 function getEntityFromQ(queryText) {
