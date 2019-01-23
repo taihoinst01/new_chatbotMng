@@ -402,6 +402,8 @@ function changeTypeOrder() {
 var sourceType2 = $('#sourceType2').val();
 var searchTitleTxt = '';
 var searchDescTxt = '';
+var listPageNo = "";
+
 function selectDlgByTxt(groupType, sourceType) {
     if (sourceType === 'search') {
         sourceType = $('#sourceType2').val();
@@ -415,7 +417,8 @@ function selectDlgByTxt(groupType, sourceType) {
         'searchDescTxt': $('#hiddenSearchText').val(),
         'typeOrder': $('#typeOrderTh').attr('orderValue')
     };
-
+    listPageNo = ($('#currentPage').val() == '') ? 1 : $('#currentPage').val();
+    
     $.ajax({
         type: 'POST',
         url: '/qna/dialogList',
@@ -473,7 +476,7 @@ function selectDlgByTxt(groupType, sourceType) {
                         '<input type="hidden" name="cardText" value="' + tmpText + '" />' +
                         '</td>' +
                         //'<td class="txt_left tex01"><a href="#"  onclick="searchDialog(' + data.list[i].DLG_ID + ',\'dlg\');return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
-                        '<td class="txt_left tex01" id="show_dlg" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        '<td class="txt_left tex01" id="show_dlg" listPageNo="'+listPageNo+'" page_type="dlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         
                         '<td>' + type_name + '</td>' +
                         '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ',\'common\');return false;"><span class="fa fa-trash"></span></a></td>' +

@@ -127,12 +127,13 @@
                 <%
                                     }
                                     %>
-
+<!--
             <li class="treeview" id="newUtterClick">
                 <a href="/luis/newUtterList" >
                     <i class="fa fa-handshake-o"></i> <span><%= __('QNA_CONNECT') %></span>
                 </a>
             </li>
+-->
             <li class=" treeview">
                 <!--<li class="active treeview">-->
                 <a href="#" onclick="return false;">
@@ -143,6 +144,7 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
+                    <li><a href="/qna/newQnaMng" ><i class="fa fa-circle-o"></i> 신규질문답변 등록</a></li>
                     <li><a href="/qna/qnaList" ><i class="fa fa-circle-o"></i> <%= __('QNA_TITLE') %></a></li>
                     <li><a href="/qna/noAnswerQList" ><i class="fa fa-circle-o"></i> <%= __('NOANSWER_TITLE') %></a></li>
                     <li><a href="/qna/dialogMng" ><i class="fa fa-circle-o"></i> <%= __('DIALOG_MNG_TITLE') %></a></li>
@@ -176,9 +178,23 @@
                     <!--<li><a href="/learning/context"><i class="fa fa-circle-o"></i> Context 관리</a></li>-->
                     <li><a href="/bannedWordMng/bannedWordMng" ><i class="fa fa-circle-o"></i> <%= __('BANDEDWORD_TITLE') %></a></li>
                     <!--<li><a href="/autoCompleteMng/autoCompleteMng"><i class="fa fa-circle-o"></i> 자동완성 관리</a></li>-->
-                    <li><a href="/templateMng/templateMng" ><i class="fa fa-circle-o"></i> <%= __('TEMPLATE_TITLE') %></a></li>
+                    <!--<li><a href="/templateMng/templateMng" ><i class="fa fa-circle-o"></i> <%= __('TEMPLATE_TITLE') %></a></li>-->
                     <li><a href="/chatBotEnv/chatBotEnv" ><i class="fa fa-circle-o"></i> <%= __('CHATBOT_ENV') %></a></li>
-                    <li><a href="/historyMng/historyList" ><i class="fa fa-circle-o"></i> <%= __('LOG_TITLE') %></a></li>
+                </ul>
+            </li>
+
+            <li class=" treeview">
+                <!--<li class="active treeview">-->
+                <a href="#" onclick="return false;">
+                    <i class="fa fa-tasks"></i> <span><%= __('LOG_TITLE') %></span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="/historyMng/historyList" ><i class="fa fa-circle-o"></i> History Log 관리</a></li>
+                    <li><a href="/historyMng/analysisList" ><i class="fa fa-circle-o"></i> Analysis Log 관리</a></li>
+                    <li><a href="/historyMng/summaryList" ><i class="fa fa-circle-o"></i> 일일통계</a></li>
                 </ul>
             </li>
 

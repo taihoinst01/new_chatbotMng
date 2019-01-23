@@ -17,6 +17,12 @@ var language;
 
     $(document).ready(function () {
         getSimulUrl();
+        var myDate = new Date();
+        var month = myDate.getMonth() + 1;
+        var prettyDate = month + '/' + myDate.getDate() + '/' + myDate.getFullYear();
+
+        $('#startDate').val(prettyDate);
+        $('#endDate').val(prettyDate);
         /*
         var minDate = new Date();
         var maxDate = new Date();
@@ -75,8 +81,9 @@ var language;
 
 
     $(function () {
+        /*
         //Initialize Select2 Elements
-        
+
         $('.select2').select2()
 
         //Datemask dd/mm/yyyy
@@ -115,7 +122,14 @@ var language;
             autoclose: true,
             maxDate: new Date()
         })
-        
+        */   
+       $( "#startDate" ).datepicker({
+            dateFormat: 'mm/dd/yy',
+        });
+      
+      $( "#endDate" ).datepicker({
+            dateFormat: 'mm/dd/yy'
+        });
     })
 })(jQuery);
 
@@ -518,10 +532,13 @@ $(document).on('click', '#fistQueryTablePaging .li_paging', function (e) {
 
 
 function getFilterVal(page) {
-
+/*
     var dateArr = $('#reservation').val().split('-');
     var startDate = $.trim(dateArr[0]);
     var endDate = $.trim(dateArr[1]);
+*/
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
 
     var filterVal;
     if (page) {

@@ -1780,6 +1780,137 @@ function saveUtterance() {
             trIndex++;
             return true;
         }
+
+        if (trIndex++%2 == 0) {
+            uterObj = new Object();
+            var utterText = $(this).find('input[name=intentHiddenName]').val();
+            if ($(this).find('input[name=intentHiddenId]').val() == 'NEW') {
+                var tmpNewObj = new Object();
+                tmpNewObj.text = utterText;
+                tmpNewObj.intentName = $('#hiddenIntentName').val();
+                newArr.push(tmpNewObj);
+            }
+            //console.log("newArr text=="+newArr.length);
+            uterObj.text = utterText;
+            uterObj.intentName = intentName;
+            utterArr.push(uterObj);
+            return true;
+        }
+        
+    });
+
+    if (isOk) {
+        $('#alertMsg').text(language.ALERT_SELECT_LIST_TYPE);
+        $('#alertBtnModal').modal('show');
+        //alert('list type의 child Entity를 선택해 주세요.');
+        return false;
+    }
+
+    if (isMatching) {
+        $('#alertMsg').text(language.ALERT_NO_MATCHING_WORDS);
+        $('#alertBtnModal').modal('show');
+        return false;
+    }
+
+    var params = {
+        'intentName' : $('#hiddenIntentName').val(),
+        'labelArr' : utterArr,
+        'newUtterArr' : newArr,
+        'addClosedList' : addClosedList
+    };
+    
+    //return false;
+
+    $.ajax({
+        type: 'POST',
+        timeout: 0,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");
+        },
+        data: params,
+        url: '/luis/saveUtterance',
+        success: function(data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
+            if (data.error) {
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
+                //updateUtter();
+            }
+            else if (!data.success) {
+                $('#alertMsg').text(data.message);
+                $('#alertBtnModal').modal('show');
+                //alert(data.message);
+                //updateUtter();
+            }
+            else 
+            {
+                console.log("success luis in");
+                var luisResult = data.luisResult;
+                var outputTxtPre = "";
+                var outputTxtAfter = "";
+                var failCnt = 0;
+                
+                for (var i=0; i<luisResult.length; i++ ) {
+                    if (luisResult[i].statusCode != 201) {
+                        failCnt++;
+                        console.log(i)
+                        outputTxtAfter += "[" + luisResult[i].body.UtteranceText + "] " + language.ALERT_THIS_UTTER_FAILED + ' <br/>';
+                    } 
+                }
+                outputTxtPre = language.SUCCESS + " : " + (luisResult.length - failCnt) + ", " + language.FAIL + " : " + failCnt + " <br/>";
+                
+                //$('#alertMsg').html(outputTxtPre + outputTxtAfter);
+                //$('#alertBtnModal').modal('show');
+                $('#confirmTitle').text(language.SUCCESS);
+                $('#confirmMsg').html(outputTxtPre + outputTxtAfter);
+                $('#confirmBtnModal').modal('show');
+                //updateUtterInfo();
+                //alert(data.message);
+                //updateUtter();
+            }
+        }
+    });
+}
+
+
+function saveUtteranceBack() {
+
+    var intentName = $('#intentNameTitle').text();
+    var utterArr = [];
+    var trIndex = 0;
+    var uterObj;
+    var newArr = []
+    var addClosedList = [];
+    var isOk = false;
+    var isNew = false;
+    var isMatching = false;
+    $('tr').each(function(){
+        if (trIndex == 0) {
+            trIndex++;
+            return true;
+        }
         if (trIndex++%2 == 1) {
             uterObj = new Object();
             var utterText = $(this).find('input[name=intentHiddenName]').val();
@@ -1789,6 +1920,7 @@ function saveUtterance() {
                 tmpNewObj.intentName = $('#hiddenIntentName').val();
                 newArr.push(tmpNewObj);
             }
+            console.log("newArr push=="+newArr.length);
             uterObj.text = utterText;
             uterObj.intentName = intentName;
             return true;
@@ -1808,6 +1940,7 @@ function saveUtterance() {
 
                 var chkCompositeChild = false;
                 var utterEntityType = $(this).find('select[name=entityTypeForLabel]').val();
+                
                 switch (utterEntityType) {
                     case '1':
                         if ($(this).find('div[name=indentDiv]').length) {
@@ -1968,24 +2101,27 @@ function saveUtterance() {
             utterArr.push(uterObj);
         }
     });
+
     if (isOk) {
         $('#alertMsg').text(language.ALERT_SELECT_LIST_TYPE);
         $('#alertBtnModal').modal('show');
         //alert('list type의 child Entity를 선택해 주세요.');
         return false;
     }
+
     if (isMatching) {
         $('#alertMsg').text(language.ALERT_NO_MATCHING_WORDS);
         $('#alertBtnModal').modal('show');
         return false;
     }
+
     var params = {
         'intentName' : $('#hiddenIntentName').val(),
         'labelArr' : utterArr,
         'newUtterArr' : newArr,
         'addClosedList' : addClosedList
     };
-    console.log(params);
+    
     //return false;
 
     $.ajax({
@@ -2033,11 +2169,12 @@ function saveUtterance() {
             }
             else 
             {
+                console.log("success luis in");
                 var luisResult = data.luisResult;
                 var outputTxtPre = "";
                 var outputTxtAfter = "";
                 var failCnt = 0;
-                console.log(luisResult);
+                console.log("luisResult==="+luisResult);
                 for (var i=0; i<luisResult.length; i++ ) {
                     if (luisResult[i].statusCode != 201) {
                         failCnt++;

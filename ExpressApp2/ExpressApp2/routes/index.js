@@ -199,7 +199,8 @@ router.get('/', function (req, res) {
                         var chatRelationApp = "";
                         chatRelationApp += " SELECT A.CHAT_ID, A.APP_ID, B.APP_NAME \n";
                         chatRelationApp += "   FROM TBL_CHAT_RELATION_APP A, TBL_LUIS_APP B \n";
-                        chatRelationApp += "  WHERE A.APP_ID = B.APP_ID;";
+                        chatRelationApp += "  WHERE A.APP_ID = B.APP_ID";
+                        chatRelationApp += "  ORDER BY APP_NAME ASC;";
                         
                         dbConnect.getConnection(sql).then(pool => { 
                             return pool.request().query(chatRelationApp) 

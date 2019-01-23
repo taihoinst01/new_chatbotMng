@@ -19,6 +19,9 @@ var Logger = require("../../config/logConfig");
 var logger = Logger.CreateLogger();
 //log end
 
+//sql injection 
+var injection = require("../../config/sqlInjection");
+
 var router = express.Router();
 
 //템플릿 관리
@@ -451,5 +454,245 @@ function pad(n, width) {
     n = n + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
 }
+
+/**
+ * Analysis 관리
+ */
+router.get('/analysisList', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/analysisList');
+});
+
+router.post('/selectAnalysisList', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var pageSize = checkNull(req.body.rows, 10);
+    var currentPage = checkNull(req.body.currentPage, 1);
+    var selResult = req.body.searchSelectRel;
+
+    (async () => {
+        try {
+
+            var QueryStr = "SELECT tbp.* from \n" +
+                            " (SELECT ROW_NUMBER() OVER(ORDER BY SEQ DESC) AS NUM, \n" +
+                            "         COUNT('1') OVER(PARTITION BY '1') AS TOTCNT, \n"  +
+                            "         CEILING((ROW_NUMBER() OVER(ORDER BY SEQ DESC))/ convert(numeric ,10)) PAGEIDX, \n" +
+                            "         SEQ, QUERY, LUIS_ID, LUIS_INTENT, RESULT, UPD_DT \n" +
+                           "          FROM TBL_QUERY_ANALYSIS_RESULT \n" +
+                           "          WHERE 1=1 \n";
+                        if (req.body.searchQuestiontText !== '') {
+                            QueryStr += "AND QUERY like @searchQuestiontText \n";
+                        }
+
+
+                        if (selResult == ''||selResult == 'all') {
+                            //nothing
+                        }else if (selResult == 'NONE_DLG') {
+                            QueryStr += " AND	LUIS_INTENT = 'NONE_DLG' \n";
+                        }else{
+                            QueryStr += " AND	RESULT = @selResult \n";
+                        }
+
+
+                        QueryStr +="  ) tbp WHERE PAGEIDX = @currentPage; \n";
+
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request()
+                    .input('searchQuestiontText', sql.NVarChar, '%' + req.body.searchQuestiontText + '%')
+                    .input('selResult', sql.NVarChar, selResult)
+                    .input('currentPage', sql.NVarChar, currentPage)
+                    .query(QueryStr);
+
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+                var getTotalPageCount = Math.floor((totCnt - 1) / checkNull(rows[0].TOTCNT, 10) + 1);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: getTotalPageCount,
+                    pageList: paging.pagination(currentPage, rows[0].TOTCNT), //page : checkNull(currentPageNo, 1),
+                    rows: recordList
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+router.post('/analysisProc', function (req, res) {
+    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    
+    var dataArr = JSON.parse(req.body.saveArr);
+    var deleteStr = "DELETE FROM TBL_QUERY_ANALYSIS_RESULT WHERE SEQ = @DELETE_ST_SEQ; ";
+    var updateStr = "UPDATE TBL_QUERY_ANALYSIS_RESULT SET LUIS_ID='cjEmployeeCB1', LUIS_INTENT='NONE_DLG', LUIS_ENTITIES='NONE', LUIS_INTENT_SCORE=1, RESULT='H', UPD_DT=GETDATE() WHERE SEQ=@DELETE_ST_SEQ;"
+    var userId = req.session.sid;
+    
+    (async () => {
+        try {
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+
+            for (var i = 0; i < dataArr.length; i++) {
+                if (dataArr[i].statusFlag === 'DEL') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_QUERY_ANALYSIS_RESULT 테이블 제거 seq:' + dataArr[i].DELETE_ST_SEQ);
+                
+                    var deleteAnalysis = await pool.request()
+                            .input('DELETE_ST_SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].DELETE_ST_SEQ))
+                            .query(deleteStr);
+
+                }else if (dataArr[i].statusFlag === 'NONE') {
+                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_QUERY_ANALYSIS_RESULT 테이블 UPDATE seq:' + dataArr[i].DELETE_ST_SEQ);
+                
+                    var updateAnalysis = await pool.request()
+                            .input('DELETE_ST_SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].DELETE_ST_SEQ))
+                            .query(updateStr);
+                
+                }else{
+        
+                }
+            }
+            res.send({ status: 200, message: 'Save Success' });
+
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            res.send({ status: 500, message: 'Save Error' });
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+/**
+ * summary 관리
+ */
+router.get('/summaryList', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/summaryList');
+});
+
+router.post('/selectSummaryList', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var startDate = req.body.startDate;
+    var startTime = req.body.startTime;
+    var endDate = req.body.endDate;
+    var endTime = req.body.endTime;
+
+    var startDateTime = startDate + " " + startTime;
+    var endDateTime = endDate + " " + endTime;
+
+    (async () => {
+        try {
+
+            var QueryStr = "";
+            QueryStr = "SELECT	CUSTOMER_COMMENT_KR, \n" +
+            "		CHATBOT_COMMENT_CODE,  \n" +
+            "		USER_ID,  \n" +
+            "		CASE RESULT  \n" +
+            "			WHEN 'H'  \n" +
+            "				THEN '정상응답'  \n" +
+            "			WHEN 'D'  \n" +
+            "				THEN '미응답'  \n" +
+            "			WHEN 'G'  \n" +
+            "				THEN '건의사항'  \n" +
+            "			WHEN 'S'  \n" +
+            "				THEN '스몰톡'  \n" +
+            "			ELSE  \n" +
+            "				RESULT  \n" +
+            "		END AS RESULT,  \n" +
+            "		SUBSTRING(REG_DATE,12,2) + '00-' + (REPLICATE('0',2-LEN(SUBSTRING(REG_DATE,12,2) + 1)) +   \n" +
+            "		CONVERT(VARCHAR(2), (SUBSTRING(REG_DATE,12,2) + 1)) + '00') AS REG_DATE_TIME  \n" +
+            "FROM TBL_HISTORY_QUERY  \n" +
+            "WHERE 1=1  \n" +
+            "AND REG_DATE >= '"+startDateTime+"'  \n" +
+            "AND REG_DATE < '"+endDateTime+"'  \n" +
+            "AND USER_ID IS NOT NULL  \n" +
+            "AND USER_ID <> ''  \n" +
+            "AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82')  \n" +
+            "ORDER BY SID ASC;  \n";
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request()
+                    .query(QueryStr);
+
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: totCnt,
+                    rows: recordList
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
 
 module.exports = router;

@@ -1240,6 +1240,7 @@ $(document).on('click', '#qnaListTablePaging .li_paging', function (e) {
 
 var searchQuestiontText = ""; //페이징시 필요한 검색어 담아두는 변수
 var searchIntentText = ""; //페이징시 필요한 검색어 담아두는 변수
+var listPageNo = "";
 function makeQnaListTable(page) {
     if (page) {
         //$('#currentPage').val(1);
@@ -1253,7 +1254,7 @@ function makeQnaListTable(page) {
         'searchQuestiontText': searchQuestiontText,
         'searchIntentText': searchIntentText
     };
-
+    listPageNo = ($('#currentPage').val() == '') ? 1 : page;
     $.ajax({
         type: 'POST',
         data: params,
@@ -1276,7 +1277,7 @@ function makeQnaListTable(page) {
                     
                     tableHtml += '<td>' + data.rows[i].INTENT + '</td>';
                     tableHtml += '<td class="txt_left">' + data.rows[i].ENTITY + '</td>';
-                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" page_type="qna" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
+                    tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" listPageNo="'+listPageNo+'" page_type="qna" dlg_id="' + data.rows[i].DLG_ID + '"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
                     //tableHtml += '<td class="tex01"><button type="button" class="btn btn-default btn-sm" id="show_dlg" onClick="searchDialog(\'' + data.rows[i].DLG_ID + '\',\'qna\')"><i class="fa fa-edit"></i> ' + language.Show_dlg + '</button></td>';
                     tableHtml += '<td class="tex01">';
                     tableHtml += '<button type="button" class="btn btn-default btn-sm" id="insert_similarQ_dlg" dlg_id="' + data.rows[i].DLG_ID + '" q_seq="' + data.rows[i].SEQ + '"><i class="fa fa-edit"></i> ' + language.Insert_similarQ + '</button>';
@@ -1315,8 +1316,9 @@ function makeQnaListTable(page) {
                 $('#qnaListTablePaging .pagination').html('').append(data.pageList);
 
             } else {
-                saveTableHtml = '<tr><td colspan="4" class="text-center">No QnA Data</td></tr>';
+                saveTableHtml = '<tr><td colspan="6" class="text-center">No QnA Data</td></tr>';
                 $('#qnaListbody').html(saveTableHtml);
+                $('#qnaListTablePaging .pagination').html('');
             }
 
         }
@@ -1514,5 +1516,3 @@ $(document).on("click", "#alertCloseBtn", function () {
         }
     }
 });
-
-

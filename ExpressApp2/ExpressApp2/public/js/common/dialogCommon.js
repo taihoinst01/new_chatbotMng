@@ -997,7 +997,7 @@ function updateDialog() {
             if (typeof selectDlgByTxt == 'function') {
                 selectDlgByTxt(groupType, sourceType);
             } else {
-                makeQnaListTable(1);
+                makeQnaListTable(pageNo);
             }
         }
 
@@ -1040,7 +1040,7 @@ function deleteDialog() {
                 if (typeof selectDlgByTxt == 'function') {
                     selectDlgByTxt(groupType, sourceType);
                 } else {
-                    makeQnaListTable(1);
+                    makeQnaListTable(pageNo);
                 }
             }else if(deleteDlgType=="init"){
                 
@@ -1055,11 +1055,14 @@ function deleteDialog() {
 }
 
 var botChatNum4Desc = 1;
+var pageNo = "";
 //dlg 저장
 var dlgMap = new Object();
 $(document).on("click", "#show_dlg", function () {
     var dlgID = $(this).attr("dlg_id");
     var pageType = $(this).attr("page_type");
+    var listPageNo = $(this).attr("listPageNo");
+    pageNo = listPageNo;
 
     $insertForm = $('#commonLayout .insertForm').eq(0).clone();
     $dlgForm = $('#commonLayout .textLayout').eq(0).clone();

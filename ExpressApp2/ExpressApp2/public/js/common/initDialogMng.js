@@ -18,7 +18,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     
 });
-
+var listPageNo = "";
 function makeInitDlgTable() {
     
     params = {
@@ -27,7 +27,7 @@ function makeInitDlgTable() {
         'searchTitleTxt': $('#searchTitleTxt').val(),
         'searchDescTxt': $('#searchDescTxt').val()
     };
-
+    listPageNo = ($('#currentPage').val() == '') ? 1 : $('#currentPage').val();
     $.tiAjax({
         type: 'POST',
         url: '/qna/initDialogList',
@@ -81,7 +81,7 @@ function makeInitDlgTable() {
 
                     item += '<tr>' +
                         '<td>' + dlgGroupHtml + '</td>' +
-                        '<td class="tex01" id="show_dlg" page_type="initDlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
+                        '<td class="tex01" id="show_dlg" listPageNo="'+listPageNo+'" page_type="initDlg" dlg_id="' + data.list[i].DLG_ID + '"><a href="#" onclick="return false;">' + data.list[i].DLG_DESCRIPTION + '</a></td>' +
                         '<td>' + type_name + '</td>' +
                         '<td>' + data.list[i].DLG_ORDER_NO + '</td>' +
                         '<td><a href="#" onclick="deleteDialogModal(' + data.list[i].DLG_ID + ',\'init\');return false;"><span class="fa fa-trash"></span></a></td>' +

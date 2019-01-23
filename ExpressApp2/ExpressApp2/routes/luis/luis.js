@@ -100,7 +100,7 @@ router.get('/synchronizeLuis', function (req, res) {
                                                 .query("SELECT APP_ID, INTENT, INTENT_ID, REG_ID, REG_DT, MOD_ID, MOD_DT FROM TBL_LUIS_INTENT;");   
             var sessionIntentList = getDBIntent_result.recordset;
             //req.session.intentList = sessionIntentList;
-            
+            //console.log("sessionIntentList.length=="+sessionIntentList.length);
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'intent 조회 완료, db Entity 조회 시작');
             let getDBEntity_result = await pool.request()
                                                 .query("SELECT APP_ID, ENTITY_NAME, ENTITY_ID, REG_DT, MOD_DT FROM TBL_LUIS_ENTITY;");     
@@ -126,7 +126,7 @@ router.get('/synchronizeLuis', function (req, res) {
             }
 
             //var objLength =  ((intentListTotal.length>entityListTotal.length?intentListTotal.length:entityListTotal.length)>childrenListTotal.length?intentListTotal.length:childrenListTotal.length);
-            
+            //console.log("sessionIntentList.length0000000=="+sessionIntentList.length);
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'db-luis intent 비교');
             for (var jk=0; jk<intentListTotal.length; jk++) {
                 for (var aj=0; aj<sessionIntentList.length; aj++) {
@@ -184,6 +184,7 @@ router.get('/synchronizeLuis', function (req, res) {
 
             //db, luis 동기화 end
             //--------------------------intent start --------------------------
+            console.log("sessionIntentList.length111111=="+sessionIntentList.length);
             logger.info('[알림]동기화  [id : %s] [url : %s] [내용 : %s]', userId, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'luis에 없고 db에 있는 intent db delete');
             for (var pp=0; pp<sessionIntentList.length; pp++) {
                 var intentQry = "DELETE FROM TBL_LUIS_INTENT WHERE 1=1 AND APP_ID = @appId AND INTENT_ID = @intentId AND INTENT = @intent; \n ";
@@ -439,6 +440,7 @@ router.get('/intentList', function (req, res) {
     var userId = req.session.sid;
     var appNumber = req.query.appIndex;
     req.session.appIndex = appNumber;
+
     try {
         var selAppList = req.session.selChatInfo.chatbot.appList;
         if (typeof req.query.appIndex != 'undefined') {
@@ -1954,6 +1956,7 @@ router.post('/saveUtterance', function (req, res) {
     var addClosedList = req.body.addClosedList==undefined? []:req.body.addClosedList;//req.body['labelArr[]'];
     var tmpLuisObj;
     var luisResult = [];
+    
     try {
         
         (async () => {
@@ -1974,9 +1977,10 @@ router.post('/saveUtterance', function (req, res) {
                         "children" : childEntityArr
                     };
                     */
-                    console.log(options.payload);
+                    //console.log(options.payload);
                     tmpLuisObj = syncClient.post(HOST + '/luis/api/v2.0/apps/' + req.session.selAppId + '/versions/' + '0.1' + '/example', options);
-                    console.log(tmpLuisObj.statusCode);
+                    //console.log("newUtterArr==="+newUtterArr);
+                    //console.log("tmpLuisObj.statusCode==="+tmpLuisObj.statusCode);
                     if (newUtterArr != undefined) {
                         for (var j=0; j<newUtterArr.length; j++) {
                             if (newUtterArr[j].text == labeledUtterArr[i].text) {
@@ -1989,7 +1993,7 @@ router.post('/saveUtterance', function (req, res) {
                                         entities += ',';
                                     }
                                 }
-
+                                
                                 let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
                                 var saveNewUtterQry = "INSERT INTO TBL_QNAMNG (DLG_QUESTION, INTENT, ENTITY, REG_DT, APP_ID, USE_YN) \n ";
                                 saveNewUtterQry += "VALUES(@dlg_text, @intent, @entities, SWITCHOFFSET(getDate(), '+09:00'), @appId, 'Y'); ";
@@ -2029,7 +2033,7 @@ router.post('/saveUtterance', function (req, res) {
 
                 var rstChk = false;
                 for (var tmp in luisResult) {
-                    console.log(luisResult[tmp]);
+                   // console.log(luisResult[tmp]);
                     if (luisResult[tmp].statusCode != 201) {
                         var resultCode = luisResult[tmp].body.error.code;
                         var resultStr = luisResult[tmp].body.error.message;
@@ -2400,10 +2404,10 @@ router.post('/getNewUtterList', function (req, res){
     selectQnAMngQry += "     FROM TBL_QNAMNG \n";
     selectQnAMngQry += "    WHERE USE_YN = 'Y' \n";
     selectQnAMngQry += "      AND DLG_ID IS NULL \n";
-    selectQnAMngQry += "      AND INTENT NOT IN ( \n";
-    selectQnAMngQry += "		                 SELECT LUIS_INTENT\n";
-    selectQnAMngQry += "		                   FROM TBL_DLG_RELATION_LUIS \n";
-    selectQnAMngQry += "	 		             ) \n";
+    //selectQnAMngQry += "      AND INTENT NOT IN ( \n";
+    //selectQnAMngQry += "		                 SELECT LUIS_INTENT\n";
+    //selectQnAMngQry += "		                   FROM TBL_DLG_RELATION_LUIS \n";
+    //selectQnAMngQry += "	 		             ) \n";
     selectQnAMngQry += "      AND DLG_QUESTION LIKE @searchQna \n";
     selectQnAMngQry += " ORDER BY INTENT, REG_DT DESC; \n";
 
