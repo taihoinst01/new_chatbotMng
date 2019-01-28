@@ -548,7 +548,7 @@ $(document).on('click','#excelDownload',function(){
         'searchQuestiontText': searchQuestiontText,
         'searchIntentText': searchIntentText
     };
-alert("asdfadsfs");
+
     $.ajax({
         type: 'POST',
         data: params,
