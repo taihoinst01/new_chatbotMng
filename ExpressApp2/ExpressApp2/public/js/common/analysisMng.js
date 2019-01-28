@@ -105,7 +105,15 @@ function makeAnalysisTable(page) {
         data: params,
         url: '/historyMng/selectAnalysisList',
         success: function (data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -184,7 +192,15 @@ function analysisProc(procType) {
         data: params,
         url: '/historyMng/analysisProc',
         success: function (data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }

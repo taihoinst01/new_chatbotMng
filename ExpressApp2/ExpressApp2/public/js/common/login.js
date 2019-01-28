@@ -20,7 +20,6 @@ $(document).ready(function () {
     $('#mLoginId').focus();
   
     $('#sendLoginBtn').click(function () {
-        $("#loadingLoginModalMain").modal('show');
         var loginId = $('#mLoginId').val().trim();
         var loginPW = $('#mLoginPass').val().trim();
         if (loginId != '' && loginPW != '') {
@@ -39,6 +38,16 @@ $(document).ready(function () {
         }
     });
 })
+
+//뒤로가기 제어
+history.pushState(null, null, location.href);
+window.onpopstate = function (event) {
+    location.href = document.referrer;
+    return false;
+    //history.back();
+};
+
+
 
 function caps_lock(e) {
     var keyCode = 0;
@@ -72,6 +81,14 @@ function dupleCheck() {
         type: 'POST',
         data: params,
         url: '/users/dupleLoginCheck',
+        
+        beforeSend: function () {
+
+            $("#loadingLoginModalMain").modal('show');
+        },
+        complete: function () {
+            $("#loadingLoginModalMain").modal('hide');
+        },
         success: function(data) {
             if (data.duple) {
                 if ( confirm("같은 계정으로 접속중인 사용자가 있습니다. 로그인 하시겠습니까?") ) {
@@ -102,6 +119,13 @@ function submitLogin(dupleYn) {
         type: 'POST',
         data: params,
         url: '/users/login',
+        beforeSend: function () {
+
+            $("#loadingLoginModalMain").modal('show');
+        },
+        complete: function () {
+            $("#loadingLoginModalMain").modal('hide');
+        },
         success: function(data) {
             $('body').html(data);
             //console.log(data);

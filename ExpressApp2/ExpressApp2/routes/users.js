@@ -115,7 +115,14 @@ router.post('/dupleLoginCheck', function (req, res) {
                 sessionObjList[key] = JSON.stringify(userObj); 
                 //sessionObjList[key] = undefined;
                 */
-                isLoggedIn = true;
+                var dateNow = new Date();
+                var timeDiff = dateNow.getTime() > Date.parse(userObj.cookie.expires);
+                if (timeDiff) {
+                    delete sessionObjList[key];
+                } else {
+                    isLoggedIn = true;
+                }
+                //isLoggedIn = true;
                 break;
             } else {
                 continue
@@ -378,6 +385,34 @@ router.get('/logout', function (req, res) {
     
     var logoutID = !req.session.sid?"NONE":req.session.sid;
     var loginIp = !req.session.userInfo?"NONE":req.session.userInfo.LAST_LOGIN_IP;
+
+    var sessionObjList = req.sessionStore.sessions;
+    var isLoggedIn = false;
+    for (var key in sessionObjList) {
+        if (req.sessionID == key) {
+            delete sessionObjList[key];
+        } else {
+            
+            var userObj = JSON.parse(sessionObjList[key]);
+            /*
+            var dateBefore = userObj.cookie.expires.splie('T');
+            var date1 = dateBefore[0].split('-');
+            var date2 = dateBefore[1].split(':');
+            var yy = date1[0]*1;
+            var MM = date1[1]*1;
+            var dd = date1[2]*1;
+            var hh = date2[0]*1;
+            var mm = date2[1]*1;
+            var ss = date2[2].split('.')[0]*1;
+            var sessionNow = new Date(yy, MM-1, dd,);
+            */
+            var dateNow = new Date();
+            var timeDiff = dateNow.getTime() > Date.parse(userObj.cookie.expires);
+            if (timeDiff) {
+                delete sessionObjList[key];
+            }
+        }
+    }
     try {
         (async () => {
             req.session.destroy(function (err) { 
@@ -1550,9 +1585,12 @@ router.post('/addApp', function (req, res) {
 })
 
 
+router.post('/resetTimeOut', function (req, res) {
+
+    res.send({status:200});
+})
+
 router.post('/getAppSelValues', function (req, res) {
-
-
     (async () => {
         try {
             let pool = await dbConnect.getConnection(sql);
@@ -2014,6 +2052,11 @@ router.post('/initUserLimit', function (req, res) {
 
 router.get('/dupleLogin', function (req, res) {
     res.send('<script>alert("' + i18n.getCatalog()[i18n.getLocale(req)].ALERT_OTHER_USER_LOGIN_WITH_SAME_ID + '");location.href="/users/logout";</script>');
+});
+
+
+router.get('/timeOut', function (req, res) {
+    res.send('<script>alert("' + i18n.getCatalog()[i18n.getLocale(req)].ALERT_LOGOUT + '");location.href="/users/logout";</script>');
 });
 
 router.get('/error', function (req, res) {

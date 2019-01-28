@@ -10,7 +10,15 @@ var language;
         dataType: 'json',
         type: 'POST',
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -111,7 +119,15 @@ function getLanguage() {
         dataType: 'json',
         type: 'POST',
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -169,7 +185,15 @@ function getEntityListAjax () {
         data: "",
     })
     .done(function(data) {
-        if (data.loginStatus == 'DUPLE_LOGIN') {
+        if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
             alert($('#dupleMassage').val());
             location.href = '/users/logout';
         }
@@ -424,7 +448,15 @@ function drawStatusOverview() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -532,7 +564,15 @@ function getOftQuestion() {
         type: "post",
         data: $("#filterForm").serialize(),
     }).done(function(data) {
-        if (data.loginStatus == 'DUPLE_LOGIN') {
+        if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
             alert($('#dupleMassage').val());
             location.href = '/users/logout';
         }
@@ -615,7 +655,15 @@ function drawNoneQuerylist() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -724,7 +772,15 @@ function drawStuff() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -797,7 +853,15 @@ function drawFirstQueryTable() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -913,7 +977,15 @@ function getScorePanel() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -938,7 +1010,15 @@ function getResponseScores() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -999,7 +1079,15 @@ function getQueryByEachTime() {
         type: 'POST',
         data: $('#filterForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }

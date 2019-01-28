@@ -129,7 +129,15 @@ function openModalBoxEdit(strDlgId, strDlgType) {
         type: 'POST',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -724,7 +732,15 @@ function selectApiGroup() {
         //data: params,
         url: '/learning/selectApiGroup',
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -861,7 +877,15 @@ function createDialog(){
         type: 'POST',
         data: {'data' : array/*, 'entities' : chkEntities*/},
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -998,7 +1022,15 @@ function editDialog(){  //  대화상자 수정
         type: 'POST',
         data: {'data' : array},
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -1026,7 +1058,15 @@ function deleteDialog(){
         type: 'POST',
         data: {'dlgId' : iptDlgId},
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -1170,7 +1210,15 @@ function addChildDialog(){   //  (자식) 대화상자 추가
         type: 'POST',
         data: {'data' : array},
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -1947,7 +1995,15 @@ function insertEntity(){
         type: 'POST',
         data: JSON.stringify(entityValueList), //$('#appInsertForm').serializeObject(),
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2000,7 +2056,15 @@ function getGroupSelectBox() {
         url: '/learning/getGroupSelectBox',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2083,7 +2147,15 @@ function createApiRelation() {
         data: params,
         url: '/learning/createApiRelation',
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2107,7 +2179,15 @@ function selectScenarioList() {     //  시나리오 목록
         type: 'POST',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2138,7 +2218,15 @@ function selectScenarioInfo(strDlgId) {     //  DLG_ID 별 시나리오 정보
         type: 'POST',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2166,7 +2254,15 @@ function getScenarioDialogs(strScenarioName){
         type: 'POST',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -2299,7 +2395,15 @@ function delScenarioDialogs(strScenarioName){
         type: 'POST',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }

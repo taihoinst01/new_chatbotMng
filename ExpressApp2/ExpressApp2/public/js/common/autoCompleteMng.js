@@ -112,7 +112,15 @@ function makeAutoCompleteTable(newPage) {
         data: params,
         url: '/autoCompleteMng/selectAutoCompleteList',
         success: function (data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -184,7 +192,15 @@ function procAutoComplete(procType) {
         data: params,
         url: '/autoCompleteMng/procAutoComplete',
         success: function (data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }

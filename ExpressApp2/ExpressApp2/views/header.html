@@ -9,12 +9,26 @@
     <input type="hidden" id="signMassage" value="<%= __('SIGN_IN_REQUIRED') %>" />
     <input type="hidden" id="timeoutLogOut" value="<%= __('ALERT_LOGOUT') %>" />
 
+    
+    
     <%
-        if(sid == 'DUPLE_LOGIN_Y___') {
+        if(sid == '___LOGIN_TIME_OUT_Y___') {
+    %>
+    <script>
+        alert($('#timeoutLogOut').val());
+        window.location.replace('/users/logout');
+    </script>
+    <%
+        }
+    %>
+
+    <%
+        if(sid == '___DUPLE_LOGIN_Y___') {
     %>
         <script>
             alert($('#dupleMassage').val());
-            location.href = '/users/logout';
+            location.replace('/users/logout');
+            //location.href = '/users/logout';
         </script>
     <%
         }
@@ -226,7 +240,15 @@
                 data: params,
                 url: '/users/selectUserHistoryList',
                 success: function(data) {
-                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                    if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                        alert($('#timeoutLogOut').val());
+                        location.href = '/users/logout';
+                    }
+                    if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                        alert($('#timeoutLogOut').val());
+                        location.href = '/users/logout';
+                    }
+                    if (data.loginStatus == 'DUPLE_LOGIN') { 
                         alert($('#dupleMassage').val());
                         location.href = '/users/logout';
                     }
@@ -287,9 +309,16 @@
     var contextMenu = false;
 
     //out start
-    var timoutNow = 60000*10;//3600000; // Timeout in 10 mins would be 600000. 60 mins - 3600000
+    var timoutNow = 60000*15;//3600000; // Timeout in 10 mins would be 600000. 60 mins - 3600000
     var logoutUrl = '/users/logout'; // URL to logout page.
     
+    var servTimeOut = false;
+    var serTimeLimit = timoutNow - 30000
+    var servTimer;
+
+
+    servTimer = setInterval("resetTimeOut()", serTimeLimit);
+
     var timeoutTimer;
 
     // Start timers.
@@ -299,6 +328,7 @@
 
     // Reset timers.
     function ResetTimers() {
+        servTimeOut = true;
         clearTimeout(timeoutTimer);
         StartTimers();
     }
@@ -308,11 +338,31 @@
         alert($('#timeoutLogOut').val());
         window.location = logoutUrl;
     }
+
+    function resetTimeOut() {
+        if (servTimeOut) {
+            $.ajax({
+                type: 'POST',
+                timeout: 0,
+                beforeSend: function () {
+                },
+                complete: function () { 
+                    servTimeOut = false;   
+                },
+                url: '/users/resetTimeOut',
+                success: function(data) {
+                }
+            });
+        }
+    }
     //out end ALERT_LOGOUT timeoutLogOut
 
     window.onload = function () {
         StartTimers();
         document.body.onclick = function (e) {
+            ResetTimers();
+        };
+        document.body.onkeydown = function (e) {
             ResetTimers();
         };
     };
@@ -355,12 +405,12 @@
         hover = false;
     });
 
-
     //뒤로가기 제어
     history.pushState(null, null, location.href);
     window.onpopstate = function (event) {
         contextMenu = true;
-        history.back();
+        location.href = document.referrer;
+        //history.back();
     };
 
     //백스페이스 제어
@@ -371,15 +421,17 @@
             }
         }
     });
-
+/*
     window.onbeforeunload = function (e) {
+        return false;
         if ((hover == false || spcKey == true) && contextMenu == false) {
             //location.href('/users/logout');
             //$('.btn_log_out').trigger('click');
             //console.log('a00');
         }
-        return;
+        return false;
     };
+    */
 
 
 

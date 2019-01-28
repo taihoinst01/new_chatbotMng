@@ -9,11 +9,8 @@
     "\\ExpressApp2\\ExpressApp2\\public\\js\\common\\luis",
     "\\ExpressApp2\\ExpressApp2\\routes",
     "\\ExpressApp2\\ExpressApp2\\routes\\learning",
-    "\\ExpressApp2\\ExpressApp2\\routes\\luis",
-    "\\ExpressApp2\\ExpressApp2\\routes\\menu",
-    "\\ExpressApp2\\ExpressApp2\\routes\\qna",
-    "\\ExpressApp2\\ExpressApp2\\routes\\user"
+    "\\ExpressApp2\\ExpressApp2\\routes\\luis"
   ],
-  "SelectedNode": "\\ExpressApp2\\ExpressApp2\\obj",
+  "SelectedNode": "\\ExpressApp2\\ExpressApp2\\public\\images",
   "PreviewInSolutionExplorer": false
 }

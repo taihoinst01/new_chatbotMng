@@ -55,15 +55,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var minutes = 60000*15; //60000
 //세션
-app.use(session({
-    secret: '@#@$MYSIGN#@$#$',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 24000 * 60 * 60
-    }
-   }));
+app.use(
+    session({
+        secret: '@#@$MYSIGN#@$#$',
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            //expires: 600000,//new Date(Date.now() + 6000),
+            maxAge: minutes// * 60
+        }
+        
+    })
+);
 
 i18n.configure({
     locales: ['en', 'ko'],
@@ -80,14 +85,25 @@ app.use('/*', function (req, res, next) {
     //res.header("Access-Control-Allow-Origin","*");
     //res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,contentType,Content-Type,Accept,Authorization");
     
+    var isTimeOut = false;
+    if (!req.cookies['connect.sid']) {
+        isTimeOut = true;
+    }
+
     if (req.method == "GET") {
         if ( req.originalUrl == '/' || req.originalUrl == '/login' || req.originalUrl == '/users/logout' || req.originalUrl == '/users/dupleLogin' || req.originalUrl.split('?')[0] == '/api/updateLatestDate') {
             next();
         } else {
-            if (req.session.sid == "___DUPLE_LOGIN_Y___") {
+            if (isTimeOut) {
+                res.redirect('/users/timeOut');
+            }
+            
+            else if (req.session.sid == "___DUPLE_LOGIN_Y___") {
                 res.redirect('/users/dupleLogin');
             }
             else {
+                req.session.cookie.expires = new Date(Date.now() + minutes);
+                req.session.cookie.maxAge = minutes;
                 next();
             }
         }
@@ -96,14 +112,23 @@ app.use('/*', function (req, res, next) {
         if ((req.baseUrl.indexOf('dupleLoginCheck') > 0) || (req.baseUrl.indexOf('login') > 0) || req.baseUrl === '/jsLang' || req.baseUrl === '/users/changePW') {
             return next();
         }
+        
+        if (isTimeOut) {
+            res.send({ loginStatus: "___LOGIN_TIME_OUT_Y___" });
+            return false;
+        }
+
         if (!req.session.sid) {
             res.send({ loginStatus: "NOT_LOGIN" });
             return false;
         }
+
         if (req.session.sid == "___DUPLE_LOGIN_Y___") {
             res.send({ loginStatus: "DUPLE_LOGIN" });
             return false;
         }
+        req.session.cookie.expires = new Date(Date.now() + minutes);
+        req.session.cookie.maxAge = minutes;
         return next();
     }
     else {
@@ -368,6 +393,6 @@ app.use(function (err, req, res, next) {
 app.set('port', process.env.PORT || 3000);
 console.log("app.js port : " + app.get('port')) ;
 
-var server = app.listen(app.get('port'), function () {
+var server = app.listen(app.get('port'), '0.0.0.0', function () {
     debug('Express server listening on port ' + server.address().port);
 });

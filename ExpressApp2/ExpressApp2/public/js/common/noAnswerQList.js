@@ -61,7 +61,15 @@ function noAnswerQListAjax(){
         url: '/qna/selectNoAnswerQList',
         isloading: true,
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -191,7 +199,15 @@ $(document).on('click','#goUtterBtn',function(e){
             url : '/qna/getAppNumber',
             isloading : true,
             success: function(data){
-                if (data.loginStatus == 'DUPLE_LOGIN') {
+                if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                     alert($('#dupleMassage').val());
                     location.href = '/users/logout';
                 }
@@ -265,7 +281,15 @@ function deleteNoAnswerQ(){
                 url : '/qna/deleteNoAnswerQ',
                 isloading : true,
                 success: function(data){
-                    if (data.loginStatus == 'DUPLE_LOGIN') {
+                    if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                         alert($('#dupleMassage').val());
                         location.href = '/users/logout';
                     }
@@ -303,7 +327,15 @@ function getIntentList() {
         url : '/qna/selectIntentApp',
         isloading : true,
         success: function(data){
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }

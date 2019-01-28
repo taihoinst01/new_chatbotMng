@@ -127,7 +127,15 @@ function makeApiTable() {
         data: params,
         url: '/users/selectApiList',
         success: function(data) {
-            if (data.loginStatus == 'DUPLE_LOGIN') {
+            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -172,7 +180,15 @@ function initPassword(userId) {
             data: params,
             url: '/users/inItPassword',
             success: function(data) {
-                if (data.loginStatus == 'DUPLE_LOGIN') {
+                if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                     alert($('#dupleMassage').val());
                     location.href = '/users/logout';
                 }
@@ -299,7 +315,15 @@ function saveApi() {
             data: params,
             url: '/users/saveApiInfo',
             success: function(data) {
-                if (data.loginStatus == 'DUPLE_LOGIN') {
+                if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                alert($('#timeoutLogOut').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') { 
                     alert($('#dupleMassage').val());
                     location.href = '/users/logout';
                 }

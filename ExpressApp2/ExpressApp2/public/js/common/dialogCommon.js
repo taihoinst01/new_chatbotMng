@@ -51,12 +51,12 @@ $(document).ready(function() {
         $(".insertForm:last").after(insertForm);
         var dialogView = '';
         dialogView += '<div class="dialogView" >';
-        dialogView += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
+        dialogView += '<div class=" wc-message wc-message-from-bot cj-font" style="width:80%;">';
         dialogView += '<div class="wc-message-content">';
         dialogView += '<svg class="wc-message-callout"></svg>';
         dialogView += '<div>';
         dialogView += '<div class="format-markdown">';
-        dialogView += '<div class="textMent">';
+        dialogView += '<div class="textMent  ">';
         dialogView += '<h1 class="textTitle">' + language.Please_enter_a_title + '</h1>';
         //dialogView += '<p>' + language.Please_enter_your_content + '</p>';
         dialogView += '<div class="dlg_content">' + language.Please_enter_your_content + '</div>';
@@ -200,10 +200,10 @@ $(document).ready(function() {
         
         if ($(e.target).val() == "2") {
             $(".dialogView").eq(idx).html('');
-            insertHtml += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
+            insertHtml += '<div class=" wc-message wc-message-from-bot cj-font" style="width:80%;">';
             insertHtml += '<div class="wc-message-content">';
             insertHtml += '<svg class="wc-message-callout"></svg>';
-            insertHtml += '<div><div class="format-markdown"><div class="textMent">';
+            insertHtml += '<div><div class="format-markdown"><div class="textMent  ">';
             insertHtml += '<h1 class="textTitle">' + language.Please_enter_a_title + '</h1>';
             
             insertHtml += '<div class="dlg_content">';
@@ -217,7 +217,7 @@ $(document).ready(function() {
             $(".dialogView").eq(idx).html(insertHtml);
         } else if ($(e.target).val() == "3") {
             $(".dialogView").eq(idx).html('');
-            insertHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+            insertHtml += '<div class=" wc-message wc-message-from-bot cj-font" style="width:90%">';
             insertHtml += '<div class="wc-message-content" style="width:90%;">';
             insertHtml += '<svg class="wc-message-callout"></svg>';
             insertHtml += '<div class="wc-carousel slideBanner" style="width: 312px;">';
@@ -247,7 +247,7 @@ $(document).ready(function() {
             $(".dialogView").eq(idx).html(insertHtml);
         } else if ($(e.target).val() == "4") {
             $(".dialogView").eq(idx).html('');
-            insertHtml += '<div class="wc-message wc-message-from-bot">';
+            insertHtml += '<div class=" wc-message wc-message-from-bot cj-font">';
             insertHtml += '<div class="wc-message-content">';
             insertHtml += '<svg class="wc-message-callout"></svg>';
             insertHtml += '<div>';
@@ -361,12 +361,12 @@ $(document).ready(function() {
         }
         var dialogView = '';
         dialogView += '<div class="dialogView" >';
-        dialogView += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
+        dialogView += '<div class=" wc-message wc-message-from-bot cj-font" style="width:80%;">';
         dialogView += '<div class="wc-message-content">';
         dialogView += '<svg class="wc-message-callout"></svg>';
         dialogView += '<div>';
         dialogView += '<div class="format-markdown">';
-        dialogView += '<div class="textMent">';
+        dialogView += '<div class="textMent  ">';
         dialogView += '<h1 class="textTitle">' + language.Please_enter_a_title + '</h1>';
         dialogView += '<p>' + language.Please_enter + '</p>';
         dialogView += '</div>';
@@ -421,12 +421,12 @@ $(document).ready(function() {
             $('#commonLayout').prepend(insertForm);
             var dialogView = '';
             dialogView += '<div class="dialogView" >';
-            dialogView += '<div class="wc-message wc-message-from-bot" style="width:80%;">';
+            dialogView += '<div class=" wc-message wc-message-from-bot cj-font" style="width:80%;">';
             dialogView += '<div class="wc-message-content">';
             dialogView += '<svg class="wc-message-callout"></svg>';
             dialogView += '<div>';
             dialogView += '<div class="format-markdown">';
-            dialogView += '<div class="textMent">';
+            dialogView += '<div class="textMent  ">';
             dialogView += '<p>' + language.Please_enter + '</p>';
             dialogView += '</div>';
             dialogView += '</div>';
@@ -1265,10 +1265,10 @@ $(document).on("click", "#show_dlg", function () {
                             
                             var dlg_card_order = tmp.dlg[j].CARD_ORDER_NO;
 
-                            inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                            inputUttrHtml += '<div class=" wc-message wc-message-from-bot cj-font" style="width:90%">';
                             inputUttrHtml += '<div class="wc-message-content">';
                             inputUttrHtml += '<svg class="wc-message-callout"></svg>';
-                            inputUttrHtml += '<div><div class="format-markdown"><div class="textMent">';
+                            inputUttrHtml += '<div><div class="format-markdown"><div class="textMent  ">';
                             inputUttrHtml += '<input type="hidden" name="dlgId" value="' + tmp.dlg[j].DLG_ID + '"/>';
                             inputUttrHtml += '<h1 class="textTitle">' + cardTitleHtml + '</h1>';
                             inputUttrHtml += '<div class="dlg_content">';
@@ -1297,7 +1297,7 @@ $(document).on("click", "#show_dlg", function () {
                             }
                             console.log("cardImgUrl=="+cardImgUrl);
                             if (j == 0) {
-                                inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                                inputUttrHtml += '<div class=" wc-message wc-message-from-bot cj-font" style="width:90%">';
                                 inputUttrHtml += '<div class="wc-message-content">';
                                 inputUttrHtml += '<svg class="wc-message-callout"></svg>';
                                 inputUttrHtml += '<div class="wc-carousel slideBanner" style="width: 312px;">';
@@ -1407,7 +1407,7 @@ $(document).on("click", "#show_dlg", function () {
                                 $("#dialogLayout").find(".carouselLayout").eq(j).find("input[name=cButtonContent]:eq(3)").val(tmp.dlg[j].BTN_4_CONTEXT);
                             }
                         } else if (tmp.dlg[j].DLG_TYPE == 4) {
-                            inputUttrHtml += '<div class="wc-message wc-message-from-bot" style="width:90%">';
+                            inputUttrHtml += '<div class=" wc-message wc-message-from-bot cj-font" style="width:90%">';
                             inputUttrHtml += '<div class="wc-message-content">';
                             inputUttrHtml += '<svg class="wc-message-callout"></svg>';
                             inputUttrHtml += '<div>';
