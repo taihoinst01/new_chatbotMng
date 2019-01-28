@@ -615,6 +615,16 @@ router.post('/selectSummaryList', function (req, res) {
     var startDateTime = startDate + " " + startTime;
     var endDateTime = endDate + " " + endTime;
 
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+
     (async () => {
         try {
 
@@ -672,7 +682,8 @@ router.post('/selectSummaryList', function (req, res) {
                 res.send({
                     records: recordList.length,
                     total: totCnt,
-                    rows: recordList
+                    rows: recordList,
+                    fildPath_: fildPath_
                 });
 
             } else {
@@ -694,5 +705,424 @@ router.post('/selectSummaryList', function (req, res) {
         // ... error handler
     })
 });
+
+/**
+ * summary 관리(시간별)
+ */
+router.get('/summaryListTime', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/summaryListTime');
+});
+
+router.post('/selectSummaryListTime', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var startDate = req.body.startDate;
+    var startTime = req.body.startTime;
+    var endDate = req.body.endDate;
+    var endTime = req.body.endTime;
+
+    var startDateTime = startDate + " " + startTime;
+    var endDateTime = endDate + " " + endTime;
+
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+
+    (async () => {
+        try {
+
+            var QueryStr = "";
+            QueryStr = "SELECT  \n" +
+            "    left(A.DDATE, 4)+'년 '+substring(A.DDATE, 5,2)+'월 '+substring(A.DDATE, 7,2)+'일 '+substring(A.DDATE, 9,2)+'시' AS 'SUMMARY_DATE' \n" +
+            "    , SUM(A.H) AS 'RESPONSE_SUCCESS' , SUM(A.D) AS 'RESPONSE_FAIL' , SUM(A.E) AS 'ERROR' , SUM(A.S) AS 'SMALLTALK' \n" +
+            "    , SUM(A.Q) AS 'QNA' , SUM(A.Z) AS 'QNA_FAIL' , SUM(A.I) AS 'SAP_INIT' \n" +
+            "    , SUM(A.G) AS 'SUGGEST' , SUM(A.B) AS 'BANNEDWORD' , SUM(A.CNT) AS 'TOTAL' \n" +
+            "FROM \n" +
+            "   ( \n" +
+            "    SELECT  \n" +
+            "      CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) + \n" +
+            "      LEFT(CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),8),2) DDATE, \n" +
+            "      SUM(CASE RESULT WHEN 'H' THEN 1 ELSE 0 END) AS 'H', SUM(CASE RESULT WHEN 'D' THEN 1 ELSE 0 END) AS 'D', \n" +
+            "      SUM(CASE RESULT WHEN 'E' THEN 1 ELSE 0 END) AS 'E', SUM(CASE RESULT WHEN 'S' THEN 1 ELSE 0 END) AS 'S', \n" +
+            "      SUM(CASE RESULT WHEN 'Q' THEN 1 ELSE 0 END) AS 'Q', SUM(CASE RESULT WHEN 'Z' THEN 1 ELSE 0 END) AS 'Z', \n" +
+            "      SUM(CASE RESULT WHEN 'I' THEN 1 ELSE 0 END) AS 'I', SUM(CASE RESULT WHEN 'G' THEN 1 ELSE 0 END) AS 'G', \n" +
+            "   SUM(CASE RESULT WHEN 'B' THEN 1 ELSE 0 END) AS 'B', COUNT(*) AS CNT \n" +
+            "    FROM TBL_HISTORY_QUERY \n" +
+            "    WHERE USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            "    AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
+            "    GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) + LEFT(CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),8),2), RESULT \n" +
+            "   ) A \n" +
+            "  GROUP BY A.DDATE \n" +
+            "  ORDER BY A.DDATE ASC; \n" ;
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request()
+                    .query(QueryStr);
+
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: totCnt,
+                    rows: recordList,
+                    fildPath_: fildPath_
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+/**
+ * summary 관리(사용자별)
+ */
+router.get('/summaryListUser', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/summaryListUser');
+});
+
+router.post('/selectSummaryListUser', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var startDate = req.body.startDate;
+    var startTime = req.body.startTime;
+    var endDate = req.body.endDate;
+    var endTime = req.body.endTime;
+    var pcMobile = req.body.pcMobile;
+
+    var startDateTime = startDate + " " + startTime;
+    var endDateTime = endDate + " " + endTime;
+
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+
+    (async () => {
+        try {
+
+            var userQueryStr = "";
+            userQueryStr = "SELECT * FROM  ( \n" +
+            " SELECT USER_ID, COUNT(USER_ID) AS Q_CNT FROM TBL_HISTORY_QUERY \n" +
+            " WHERE USER_ID IS NOT NULL AND USER_ID <> ''  AND USER_ID NOT IN ('EP47','EUNYEONG','SBPARK88','LYHAZ7','SOKANG337','SRJANG','P41044104','PARKFAITH','TIGER820','JMH2244','DBENDUS','KEVIN82') \n" +
+            " AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
+            " GROUP BY USER_ID  \n" +
+            " ) A ORDER BY A.Q_CNT DESC; \n";
+
+            var pcMobileQueryStr = "";
+            pcMobileQueryStr = "SELECT \n" +
+            " USER_ID,  COUNT(MOBILE_YN) AS Q_CNT \n" +
+            " FROM TBL_HISTORY_QUERY \n" +
+            " WHERE USER_ID IS NOT NULL AND USER_ID <> '' AND USER_ID NOT IN ('EP47','EUNYEONG','SBPARK88','LYHAZ7','SOKANG337','SRJANG','P41044104','PARKFAITH','TIGER820','JMH2244','DBENDUS','KEVIN82','EJNAM') \n" +
+            " AND   (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"')  AND MOBILE_YN='"+pcMobile+"' \n" +
+            " GROUP BY MOBILE_YN, USER_ID; \n" ;
+
+           
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = "";
+            if(pcMobile=="NONE"){
+                result1 = await pool.request().query(userQueryStr);
+            }else{
+                result1 = await pool.request().query(pcMobileQueryStr);
+            }
+            
+
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: totCnt,
+                    rows: recordList,
+                    fildPath_: fildPath_
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+/**
+ * summary 관리(intent별사용내역날짜)
+ */
+router.get('/summaryListIntentDate', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/summaryListIntentDate');
+});
+
+router.post('/selectSummaryListIntentDate', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var searchDate = req.body.searchDate;
+
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+
+    (async () => {
+        try {
+
+            var QueryStr = "";
+            QueryStr = "SELECT * FROM ( \n" +
+            " SELECT  \n" +
+            " CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) AS 'reg_date', LUIS_INTENT,  COUNT(*) as 'COUNT' \n" +
+            " FROM TBL_HISTORY_QUERY \n" +
+            " WHERE USER_ID IS NOT NULL  \n" +
+            " AND   USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            " AND  CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112)  = '"+searchDate+"' \n" +
+            " AND  RESULT = 'H' \n" +
+            " GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112), LUIS_INTENT \n" +
+            " HAVING 1=1 \n" +
+            " ) Z ORDER BY COUNT DESC, LUIS_INTENT ASC; \n";
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = "";
+            result1 = await pool.request().query(QueryStr);
+            
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: totCnt,
+                    rows: recordList,
+                    fildPath_: fildPath_
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
+/**
+ * summary 관리(intent분류별)
+ */
+router.get('/summaryListIntent', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    res.render('chatbotMng/summaryListIntent');
+});
+
+router.post('/selectSummaryListIntent', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    var searchDate = req.body.searchDate;
+    
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds()
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+
+    (async () => {
+        try {
+
+            var QueryStr = "";
+            QueryStr = "SELECT  \n" +
+            "  A.날짜,  \n" +
+            "  A.총무_P + A.총무_M AS 총무_총합,  \n" +
+            "  A.총무_P, A.총무_M,  \n" +
+            "  A.인사_P + A.인사_M AS 인사_총합, \n" +
+            "  A.인사_P, A.인사_M, \n" +
+            "  A.재무_P + A.재무_M AS 재무_총합,   \n" +
+            "  A.재무_P, A.재무_M, \n" +
+            "  A.IT_P + A.IT_M AS IT_총합,  \n" +
+            "  A.IT_P, A.IT_M,  \n" +
+            "  A.법무_P + A.법무_M AS 법무_총합,  \n" +
+            "  A.법무_P, A.법무_M,  \n" +
+            "  A.CSV_P + A.CSV_M AS CSV_총합,  \n" +
+            "  A.CSV_P, A.CSV_M,  \n" +
+            "  A.블로썸파크_P + A.블로썸파크_M AS 블로썸파크_총합, \n" +
+            "  A.블로썸파크_P, A.블로썸파크_M,  \n" +
+            "  A.총무_P + A.인사_P + A.재무_P + A.IT_P + A.법무_P + A.CSV_P + A.블로썸파크_P + A.총무_M + A.인사_M + A.재무_M + A.IT_M + A.법무_M + A.CSV_M + A.블로썸파크_M AS '총합', \n" +
+            "  A.총무_P + A.인사_P + A.재무_P + A.IT_P + A.법무_P + A.CSV_P + A.블로썸파크_P AS '총합_P', \n" +
+            "  A.총무_M + A.인사_M + A.재무_M + A.IT_M + A.법무_M + A.CSV_M + A.블로썸파크_M AS '총합_M'  \n" +
+            " FROM \n" +
+            "  ( \n" +
+            "  SELECT  \n" +
+            "     CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) AS '날짜', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,2) = '총무' OR LUIS_INTENT = 'welcome_총무') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS '총무_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,2) = '총무' OR LUIS_INTENT = 'welcome_총무') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS '총무_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사인사' OR LUIS_INTENT = 'welcome_인사') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS '인사_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사인사' OR LUIS_INTENT = 'welcome_인사') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS '인사_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사재무' OR LUIS_INTENT = 'welcome_재무') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS '재무_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사재무' OR LUIS_INTENT = 'welcome_재무') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS '재무_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,2) = 'IT' OR  LEFT(LUIS_INTENT,4) = '전사IT' OR LUIS_INTENT = 'welcome_IT') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS 'IT_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,2) = 'IT' OR  LEFT(LUIS_INTENT,4) = '전사IT' OR LUIS_INTENT = 'welcome_IT') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS 'IT_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사법무' OR LUIS_INTENT = 'welcome_법무') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS '법무_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = '전사법무' OR LUIS_INTENT = 'welcome_법무') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS '법무_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,5) = '전사CSV' OR LUIS_INTENT = 'welcome_CSV') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS 'CSV_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,5) = '전사CSV' OR LUIS_INTENT = 'welcome_CSV') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS 'CSV_M', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = 'CJBP' OR LUIS_INTENT = 'welcome_블로썸파크') AND MOBILE_YN='P') THEN 1 ELSE 0 END) AS '블로썸파크_P', \n" +
+            "     SUM(CASE WHEN ((LEFT(LUIS_INTENT,4) = 'CJBP' OR LUIS_INTENT = 'welcome_블로썸파크') AND MOBILE_YN='M') THEN 1 ELSE 0 END) AS '블로썸파크_M' \n" +
+            "  FROM TBL_HISTORY_QUERY \n" +
+            "  WHERE USER_ID IS NOT NULL  \n" +
+            "  AND  USER_ID <> '' \n" +
+            "  AND  USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            "  AND  CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112)  > '"+searchDate+"' \n" +
+            "  GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) \n" +
+            " ) A; \n";
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = "";
+            result1 = await pool.request().query(QueryStr);
+            
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: totCnt,
+                    rows: recordList,
+                    fildPath_: fildPath_
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+});
+
 
 module.exports = router;

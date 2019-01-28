@@ -652,4 +652,98 @@ router.post('/searchEntities', function (req, res) {
     })
 });
 
+router.post('/selectSmallTalkListAll', function (req, res) {
+    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+    
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;      // "+ 1" becouse the 1st month is 0
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var secconds = date.getSeconds();
+    var seedatetime = year + pad(day, 2) + pad(month, 2) + '_'+ pad(hour, 2) + 'h' + pad(minutes, 2) + 'm' + pad(secconds, 2) + 's';
+
+    var fildPath_ = req.session.appName + '_' + req.session.sid + '_' + seedatetime + ".xlsx";
+    
+    (async () => {
+        try {
+
+            var QueryStr = " SELECT SEQ, S_QUERY, INTENT, ENTITY, S_ANSWER, USE_YN \n" +
+                           " FROM TBL_SMALLTALK \n" +
+                           " WHERE 1=1 \n";
+                        if (req.body.useYn != 'ALL') {
+                            QueryStr += "AND USE_YN = @useYn \n";
+                        }
+                        if (req.body.searchQuestiontText !== '') {
+                            QueryStr += "AND S_QUERY like @searchQuestiontText \n";
+                        }
+
+                        if (req.body.searchIntentText !== '') {
+                            QueryStr += "AND ENTITY like @searchIntentText \n";
+                        }
+
+            //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
+
+            let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+            let result1 = await pool.request()
+                    .input('useYn', sql.NVarChar, req.body.useYn)
+                    .input('searchQuestiontText', sql.NVarChar, '%' + req.body.searchQuestiontText + '%')
+                    .input('searchIntentText', sql.NVarChar, '%' + req.body.searchIntentText + '%')
+                    .query(QueryStr);
+
+            let rows = result1.recordset;
+
+            var recordList = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = {};
+                item = rows[i];
+
+
+                recordList.push(item);
+            }
+
+
+            if (rows.length > 0) {
+
+                var totCnt = 0;
+                if (recordList.length > 0)
+                    totCnt = checkNull(recordList[0].TOTCNT, 0);
+                var getTotalPageCount = Math.floor((totCnt - 1) / checkNull(rows[0].TOTCNT, 10) + 1);
+
+
+                res.send({
+                    records: recordList.length,
+                    total: getTotalPageCount,
+                    fildPath_: fildPath_,
+                    rows: recordList
+                });
+
+            } else {
+                res.send({
+                    records : 0,
+                    rows : null
+                });
+            }
+        } catch (err) {
+            logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);
+            
+            // ... error checks
+        } finally {
+            sql.close();
+        }
+    })()
+
+    sql.on('error', err => {
+        // ... error handler
+    })
+
+
+});
+
+function pad(n, width) {
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+}
+
 module.exports = router;

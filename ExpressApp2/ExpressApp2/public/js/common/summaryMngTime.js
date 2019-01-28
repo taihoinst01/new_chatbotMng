@@ -18,13 +18,13 @@ var endTime = "";
 var params = "";
 $(document).ready(function() {
     $('#searchDlgBtn').click(function (e) {
-        makeSummaryTable();
+        makeSummaryTimeTable();
     });
 
 });
 
 
-function makeSummaryTable() {
+function makeSummaryTimeTable() {
     startDate = $('#startDate').val();
     startTime = $('#startTime').val();
     endDate = $('#endDate').val();
@@ -54,17 +54,9 @@ function makeSummaryTable() {
     $.ajax({
         type: 'POST',
         data: params,
-        url: '/historyMng/selectSummaryList',
+        url: '/historyMng/selectSummaryListTime',
         success: function (data) {
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -76,11 +68,17 @@ function makeSummaryTable() {
                 
                 for (var i = 0; i < data.rows.length; i++) {
                     tableHtml += '<tr>';
-                    tableHtml += '<td class="txt_left tex01">' + data.rows[i].CUSTOMER_COMMENT_KR + '</td>';
-                    tableHtml += '<td class="txt_left">' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
-                    tableHtml += '<td>' + data.rows[i].USER_ID + '</td>';
-                    tableHtml += '<td>' + data.rows[i].RESULT + '</td>';
-                    tableHtml += '<td>' + data.rows[i].REG_DATE_TIME + '</td>';
+                    tableHtml += '<td class="txt_left">' + data.rows[i].SUMMARY_DATE + '</td>';
+                    tableHtml += '<td>' + data.rows[i].RESPONSE_SUCCESS + '</td>';
+                    tableHtml += '<td>' + data.rows[i].RESPONSE_FAIL + '</td>';
+                    tableHtml += '<td>' + data.rows[i].ERROR + '</td>';
+                    tableHtml += '<td>' + data.rows[i].SMALLTALK + '</td>';
+                    tableHtml += '<td>' + data.rows[i].QNA + '</td>';
+                    tableHtml += '<td>' + data.rows[i].QNA_FAIL + '</td>';
+                    tableHtml += '<td>' + data.rows[i].SAP_INIT + '</td>';
+                    tableHtml += '<td>' + data.rows[i].SUGGEST + '</td>';
+                    tableHtml += '<td>' + data.rows[i].BANNEDWORD + '</td>';
+                    tableHtml += '<td>' + data.rows[i].TOTAL + '</td>';
                     tableHtml += '</tr>';
                 }
 
@@ -89,7 +87,7 @@ function makeSummaryTable() {
                 $('#totCnt').text(totCnt);
 
             } else {
-                saveTableHtml = '<tr><td colspan="5" class="text-center">'+language.NO_DATA+'</td></tr>';
+                saveTableHtml = '<tr><td colspan="11" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#summarytbody').html(saveTableHtml);
             }
 
@@ -150,29 +148,13 @@ $(document).on('click','#excelDownload',function(){
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display","none");      
         },
-        url: '/historyMng/selectSummaryList',
+        url: '/historyMng/selectSummaryListTime',
         success: function (data) {
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -192,28 +174,42 @@ $(document).on('click','#excelDownload',function(){
                     workbook.lastPrinted = new Date();
 
                     
-                    var worksheet = workbook.addWorksheet('Summary Log');
+                    var worksheet = workbook.addWorksheet('Summary Tiame Log');
 
                     //var count = "100";
                     worksheet.columns = [
-                        { header: 'Customner Comment', key: 'comment', width: 100},
-                        { header: 'LUIS Intent', key: 'intent', width: 30},
-                        { header: 'User ID', key: 'user', width: 20},
-                        { header: 'Result', key: 'result', width: 20}
+                        { header: '일시', key: 'SUMMARY_DATE'},
+                        { header: '응답', key: 'RESPONSE_SUCCESS'},
+                        { header: '미응답', key: 'RESPONSE_FAIL'},
+                        { header: 'ERROR', key: 'ERROR'},
+                        { header: 'SMALLTALK', key: 'SMALLTALK'},
+                        { header: '용어사전', key: 'QNA'},
+                        { header: '용어사전실패', key: 'QNA_FAIL'},
+                        { header: 'SAP 초기화', key: 'SAP_INIT'},
+                        { header: '건의사항', key: 'SUGGEST'},
+                        { header: '비속어', key: 'BANNEDWORD'},
+                        { header: '총합', key: 'TOTAL'}
                     ];
 
                     var firstRow = worksheet.getRow(1);
-                    firstRow.font = { name: 'New Times Roman', family: 4, size: 10, bold: true, color: {argb:'80EF1C1C'} };
+                    firstRow.font = { bold: true };
                     firstRow.alignment = { vertical: 'middle', horizontal: 'center'};
                     firstRow.height = 20;
                     
 
                     for (var i = 0; i < data.rows.length; i++) {
                         worksheet.addRow({
-                            comment: data.rows[i].CUSTOMER_COMMENT_KR
-                            , intent: data.rows[i].CHATBOT_COMMENT_CODE
-                            , user: data.rows[i].USER_ID
-                            , result: data.rows[i].RESULT
+                            SUMMARY_DATE: data.rows[i].SUMMARY_DATE
+                            , RESPONSE_SUCCESS: data.rows[i].RESPONSE_SUCCESS
+                            , RESPONSE_FAIL: data.rows[i].RESPONSE_FAIL
+                            , ERROR: data.rows[i].ERROR
+                            , SMALLTALK: data.rows[i].SMALLTALK
+                            , QNA: data.rows[i].QNA
+                            , QNA_FAIL: data.rows[i].QNA_FAIL
+                            , SAP_INIT: data.rows[i].SAP_INIT
+                            , SUGGEST: data.rows[i].SUGGEST
+                            , BANNEDWORD: data.rows[i].BANNEDWORD
+                            , TOTAL: data.rows[i].TOTAL
                         });
                     }
 

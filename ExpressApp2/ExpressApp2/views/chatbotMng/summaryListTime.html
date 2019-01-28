@@ -10,7 +10,7 @@
     <%include  ../common/commonLib.html%>
         <!--<script src="/common/js/bootstrap.min.js"></script>-->
         <link rel="stylesheet" href="/common/css/bootstrap-datepicker.min.css">
-        <script type="text/javascript" src="/js/common/summaryMng.js"></script>
+        <script type="text/javascript" src="/js/common/summaryMngTime.js"></script>
         
         <script src="/common/js/bootstrap-datepicker.min.js"></script>
         <script src="/common/js/excel/exceljs.js"></script>
@@ -41,7 +41,7 @@
                 <!-- Content Wrapper -->
                 <div class="content-wrapper">
                     <section class="content-header">
-                        <h1>일일통계</h1>
+                        <h1>일일통계(시간대별)</h1>
                     </section>
 
                     <!-- Main content -->
@@ -50,7 +50,7 @@
                             <div class="box-body">
                                   <div class="modal-body search_op">
                                         <div class="form-group col-lg-3 form-inline"  style=" padding-left:0px !important" >
-                                            <label for="inputEmail3" class="control-label">시작일/시작시간&nbsp;</label>
+                                            <label for="inputEmail3" class="control-label">시작일/시작시간</label>
                                             <input type="text" name="startDate" id="startDate" class="form-control" placeholder="<%= __('Please_enter_a_question') %>">
                                             <script>
                                                 $(function() {
@@ -88,7 +88,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-3 form-inline"  style=" padding-left:0px !important" >
-                                            <label for="inputEmail3" class="control-label">종료일/종료시간&nbsp;</label>
+                                            <label for="inputEmail3" class="control-label">종료일/종료시간</label>
                                             <input type="text" name="endDate" id="endDate" class="form-control" placeholder="<%= __('Please_enter_a_question') %>">
                                             <script>
                                                 $(function() {
@@ -127,12 +127,12 @@
                                         </div>    
                                                     
                                         <div class="form-group col-lg-3">
-                                            <p class="form-control-static">Total Count : <span id="totCnt">0</span></p>
-                                        </div>
+                                                <p class="form-control-static">Total Count : <span id="totCnt">0</span></p>
+                                            </div>
 
                                         <div class="form-group col-lg-3 fr"  style=" margin-top:20px;text-align:right; padding-right:0px;">
-                                            <button type="button" id="searchDlgBtn" class="btn btn_01 "><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
-                                            <button type="button" id="excelDownload" class="btn btn_01 "><i class="fa fa-file-excel-o"></i> <%= __('Excel Download') %></button>
+                                            <button type="button" id="searchDlgBtn" class="btn btn_01"><i class="fa fa-search"></i> <%= __('SEARCH') %></button> 
+                                            <button type="button" id="excelDownload" class="btn btn_01"><i class="fa fa-file-excel-o"></i> <%= __('Excel Download') %></button>
                                         </div>
                                      </div>
                                      
@@ -140,16 +140,22 @@
                                     <!-- 학습 추천 테이블 --> 
                                     <div class="Tbl_wrap">
                                         <table class="Tbl" summary="analysis 관리">
-                                            <colgroup><col width="40%"/><col width="20%"/><col width="10%"/><col width="10%"><col width="20%"></colgroup>
+                                            <!--<colgroup><col width="40%"/><col width="20%"/><col width="10%"/><col width="10%"><col width="20%"></colgroup>-->
                                                   <tr>
-                                                      <th>Customner Comment</th>
-                                                      <th>LUIS Intent</th>
-                                                      <th>User ID</th>
-                                                      <th>Result</th>
-                                                      <th>Date Time</th>
+                                                      <th>일시</th>
+                                                      <th>응답</th>
+                                                      <th>미응답</th>
+                                                      <th>Error</th>
+                                                      <th>SmallTalk</th>
+                                                      <th>용어사전</th>
+                                                      <th>용어사전실패</th>
+                                                      <th>SAP 초기화</th>
+                                                      <th>건의사항</th>
+                                                      <th>비속어</th>
+                                                      <th>총합</th>
                                                   </tr>
                                                 <tbody id="summarytbody">
-                                                    <tr><td colspan="5" class="text-center">페이징 없이 리스트가 모두 노출됩니다.</td></tr>
+                                                    <tr><td colspan="11" class="text-center">NO DATA</td></tr>
                                                 </tbody>
                                         </table>
                                     </div> 
@@ -183,9 +189,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal fade" id="loadingBar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true" >
-                            <img src="/image/ajax_loader.gif" style="width:50px; height:50px;" id="loadingImg">
-                        </div>
+                    <script>
+                        //iCheck for checkbox and radio inputs
+                        $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+                            checkboxClass: 'icheckbox_minimal-blue',
+                            radioClass: 'iradio_minimal-blue'
+                        })
+                        //Red color scheme for iCheck
+                        $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
+                            checkboxClass: 'icheckbox_minimal-red',
+                            radioClass: 'iradio_minimal-red'
+                        })
+                        //Flat red color scheme for iCheck
+                        $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+                            checkboxClass: 'icheckbox_flat-green',
+                            radioClass: 'iradio_flat-green'
+                        })
+
+                    </script>
 </body>
 
 </html>

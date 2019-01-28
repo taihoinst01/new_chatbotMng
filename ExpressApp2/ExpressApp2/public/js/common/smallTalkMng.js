@@ -537,3 +537,99 @@ function dialogValidation(type){
         return result;
     }
 }
+
+//엑셀 다운로드
+$(document).on('click','#excelDownload',function(){
+
+    searchQuestiontText = $('#searchQuestionHidden').val();
+    searchIntentText = $('#searchIntentHidden').val();
+    params = {
+        'useYn' : $('#smallTalkYn').find('option:selected').val(),
+        'searchQuestiontText': searchQuestiontText,
+        'searchIntentText': searchIntentText
+    };
+alert("asdfadsfs");
+    $.ajax({
+        type: 'POST',
+        data: params,
+        beforeSend: function () {
+
+            var width = 0;
+            var height = 0;
+            var left = 0;
+            var top = 0;
+
+            width = 50;
+            height = 50;
+
+            top = ( $(window).height() - height ) / 2 + $(window).scrollTop();
+            left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+            $("#loadingBar").addClass("in");
+            $("#loadingImg").css({position:'absolute'}).css({left:left,top:top});
+            $("#loadingBar").css("display","block");
+        },
+        complete: function () {
+            $("#loadingBar").removeClass("in");
+            $("#loadingBar").css("display","none");      
+        },
+        url: '/smallTalkMng/selectSmallTalkListAll',
+        success: function (data) {
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
+            if (data.loginStatus == 'DUPLE_LOGIN') {
+                alert($('#dupleMassage').val());
+                location.href = '/users/logout';
+            }
+            if (status) {
+                $('#alertMsg').text(language.ALERT_ERROR);
+                $('#alertBtnModal').modal('show');
+            } else {
+                if (data.rows.length > 0) {
+
+                    var filePath = data.fildPath_;
+                    var workbook = new ExcelJS.Workbook();
+                     
+                    workbook.creator = data.appName;
+                    workbook.lastModifiedBy = data.userId;
+                    workbook.created = new Date();
+                    workbook.modified = new Date();
+                    workbook.lastPrinted = new Date();
+
+                    
+                    var worksheet = workbook.addWorksheet('Summary Tiame Log');
+
+                    //var count = "100";
+                    worksheet.columns = [
+                        { header: '단어', key: 'entities'},
+                        { header: '질문내용', key: 's_question'},
+                        { header: '답변', key: 's_answer'},
+                        { header: '사용여부', key: 's_useyn'}
+                    ];
+
+                    var firstRow = worksheet.getRow(1);
+                    firstRow.font = { bold: true };
+                    firstRow.alignment = { vertical: 'middle', horizontal: 'center'};
+                    firstRow.height = 20;
+                    
+
+                    for (var i = 0; i < data.rows.length; i++) {
+                        worksheet.addRow({
+                            entities: data.rows[i].ENTITY
+                            , s_question: data.rows[i].S_QUERY
+                            , s_answer: data.rows[i].S_ANSWER
+                            , s_useyn: data.rows[i].USE_YN
+                        });
+                    }
+
+                    var buff = workbook.xlsx.writeBuffer().then(function (data) {
+                        var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+                        saveAs(blob, filePath);
+                    });
+                }
+            }
+        }
+    });
+});

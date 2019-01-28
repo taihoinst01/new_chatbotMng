@@ -11,60 +11,40 @@ var language;
     });
 })(jQuery);
 
-var startDate = "";
-var startTime = "";
-var endDate = "";
-var endTime = "";
+var searchDate = "";
+
 var params = "";
 $(document).ready(function() {
     $('#searchDlgBtn').click(function (e) {
-        makeSummaryTable();
+        makeSummaryIntentDateTable();
     });
 
 });
 
 
-function makeSummaryTable() {
-    startDate = $('#startDate').val();
-    startTime = $('#startTime').val();
-    endDate = $('#endDate').val();
-    endTime = $('#endTime').val();
-
+function makeSummaryIntentDateTable() {
+    searchDate = $('#searchDate').val();
+    
     var paramsCheck = 1;
-    if(startDate==""||startTime==""){
-        paramsCheck = 0;
-    }
-
-    if(endDate==""||endTime==""){
+    if(searchDate==""){
         paramsCheck = 0;
     }
 
     if(paramsCheck==0){
-        alert("모든 검색조건은 필수사항입니다.");
+        alert("검색조건 중 일자는 필수조건입니다");
         return false;
     }
 
     params = {
-        'startDate': startDate,
-        'startTime': startTime,
-        'endDate': endDate,
-        'endTime': endTime,
+        'searchDate': searchDate,
     };
 
     $.ajax({
         type: 'POST',
         data: params,
-        url: '/historyMng/selectSummaryList',
+        url: '/historyMng/selectSummaryListIntentDate',
         success: function (data) {
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -76,11 +56,9 @@ function makeSummaryTable() {
                 
                 for (var i = 0; i < data.rows.length; i++) {
                     tableHtml += '<tr>';
-                    tableHtml += '<td class="txt_left tex01">' + data.rows[i].CUSTOMER_COMMENT_KR + '</td>';
-                    tableHtml += '<td class="txt_left">' + data.rows[i].CHATBOT_COMMENT_CODE + '</td>';
-                    tableHtml += '<td>' + data.rows[i].USER_ID + '</td>';
-                    tableHtml += '<td>' + data.rows[i].RESULT + '</td>';
-                    tableHtml += '<td>' + data.rows[i].REG_DATE_TIME + '</td>';
+                    tableHtml += '<td class="txt_left">' + data.rows[i].reg_date + '</td>';
+                    tableHtml += '<td>' + data.rows[i].LUIS_INTENT + '</td>';
+                    tableHtml += '<td>' + data.rows[i].COUNT + '</td>';
                     tableHtml += '</tr>';
                 }
 
@@ -89,7 +67,7 @@ function makeSummaryTable() {
                 $('#totCnt').text(totCnt);
 
             } else {
-                saveTableHtml = '<tr><td colspan="5" class="text-center">'+language.NO_DATA+'</td></tr>';
+                saveTableHtml = '<tr><td colspan="3" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#summarytbody').html(saveTableHtml);
             }
 
@@ -100,31 +78,22 @@ function makeSummaryTable() {
 //엑셀 다운로드
 $(document).on('click','#excelDownload',function(){
 
-    startDate = $('#startDate').val();
-    startTime = $('#startTime').val();
-    endDate = $('#endDate').val();
-    endTime = $('#endTime').val();
-
+    searchDate = $('#searchDate').val();
+    
     var paramsCheck = 1;
-    if(startDate==""||startTime==""){
-        paramsCheck = 0;
-    }
-
-    if(endDate==""||endTime==""){
+    if(searchDate==""){
         paramsCheck = 0;
     }
 
     if(paramsCheck==0){
-        alert("모든 검색조건은 필수사항입니다.");
+        alert("검색조건 중 일자는 필수조건입니다");
         return false;
     }
 
     params = {
-        'startDate': startDate,
-        'startTime': startTime,
-        'endDate': endDate,
-        'endTime': endTime,
+        'searchDate': searchDate,
     };
+
 
     $.ajax({
         type: 'POST',
@@ -150,29 +119,13 @@ $(document).on('click','#excelDownload',function(){
             $("#loadingBar").removeClass("in");
             $("#loadingBar").css("display","none");      
         },
-        url: '/historyMng/selectSummaryList',
+        url: '/historyMng/selectSummaryListIntentDate',
         success: function (data) {
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
-            if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
-                alert($('#timeoutLogOut').val());
-                location.href = '/users/logout';
-            }
-            if (data.loginStatus == 'DUPLE_LOGIN') { 
+            if (data.loginStatus == 'DUPLE_LOGIN') {
                 alert($('#dupleMassage').val());
                 location.href = '/users/logout';
             }
@@ -192,28 +145,26 @@ $(document).on('click','#excelDownload',function(){
                     workbook.lastPrinted = new Date();
 
                     
-                    var worksheet = workbook.addWorksheet('Summary Log');
+                    var worksheet = workbook.addWorksheet('Summary Intent Date Log');
 
                     //var count = "100";
                     worksheet.columns = [
-                        { header: 'Customner Comment', key: 'comment', width: 100},
-                        { header: 'LUIS Intent', key: 'intent', width: 30},
-                        { header: 'User ID', key: 'user', width: 20},
-                        { header: 'Result', key: 'result', width: 20}
+                        { header: 'reg_date', key: 'reg_date'},
+                        { header: 'LUIS_INTENT', key: 'LUIS_INTENT'},
+                        { header: 'COUNT', key: 'COUNT'}
                     ];
 
                     var firstRow = worksheet.getRow(1);
-                    firstRow.font = { name: 'New Times Roman', family: 4, size: 10, bold: true, color: {argb:'80EF1C1C'} };
+                    firstRow.font = { bold: true };
                     firstRow.alignment = { vertical: 'middle', horizontal: 'center'};
                     firstRow.height = 20;
                     
 
                     for (var i = 0; i < data.rows.length; i++) {
                         worksheet.addRow({
-                            comment: data.rows[i].CUSTOMER_COMMENT_KR
-                            , intent: data.rows[i].CHATBOT_COMMENT_CODE
-                            , user: data.rows[i].USER_ID
-                            , result: data.rows[i].RESULT
+                            reg_date: data.rows[i].reg_date
+                            , LUIS_INTENT: data.rows[i].LUIS_INTENT
+                            , COUNT: data.rows[i].COUNT
                         });
                     }
 

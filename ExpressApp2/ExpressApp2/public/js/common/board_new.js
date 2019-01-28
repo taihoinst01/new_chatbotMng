@@ -600,6 +600,7 @@ function getCountPanel() {
     $('#suggestCount').text("Loading..");
     $('#sapWord').text("Loading..");
     $('#sapPasswordInit').text("Loading..");
+    $('#smallTalkCount').text("Loading..");
     $.ajax({
         url: '/board/getCountPanel',
         dataType: 'json',
@@ -623,9 +624,10 @@ function getCountPanel() {
             $('#successCount').text(boardCount.응답);
             $('#failCount').text(boardCount.미응답);
             $('#errorCount').text(boardCount.ERROR);
-            $('#sapWord').text(boardCount.SMALLTALK);
-            $('#sapPasswordInit').text(boardCount.용어사전);
+            $('#sapWord').text(boardCount.용어사전);
+            $('#sapPasswordInit').text(boardCount.SAP초기화);
             $('#suggestCount').text(boardCount.건의사항);
+            $('#smallTalkCount').text(boardCount.SMALLTALK);
             /*
             $('#successCount').text(boardCount.SUCCESS);
             $('#failCount').text(boardCount.FAIL);
