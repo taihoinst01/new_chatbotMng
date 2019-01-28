@@ -136,6 +136,7 @@ router.post('/smallTalkProc', function (req, res) {
                     " VALUES ( @S_QUERY, @INTENT, @ENTITY, @S_ANSWER,'2',GETDATE());";
     var deleteStr = "DELETE FROM TBL_SMALLTALK WHERE SEQ = @DELETE_ST_SEQ; ";
     var updateStr = "UPDATE TBL_SMALLTALK SET S_ANSWER=@S_ANSWER, USE_YN=@USE_YN WHERE SEQ = @SEQ; ";
+    var deleteEntities = "UPDATE TBL_SMALLTALK SET ENTITY='' WHERE SEQ = @SEQ; ";
     var userId = req.session.sid;
     /*
     for (var i = 0; i < dataArr.length; i++) {
@@ -161,7 +162,7 @@ router.post('/smallTalkProc', function (req, res) {
             for (var i = 0; i < dataArr.length; i++) {
         
                 if (dataArr[i].statusFlag === 'ADD') {
-                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 저장');
+                    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 저장');
                 
                     var insertSmallTalk= await pool.request()
                             .input('S_QUERY', sql.NVarChar, injection.changeAttackKeys(dataArr[i].S_QUERY))
@@ -171,20 +172,26 @@ router.post('/smallTalkProc', function (req, res) {
                             .query(insertStr);
 
                 }else if (dataArr[i].statusFlag === 'DEL') {
-                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 제거 seq:' + dataArr[i].DELETE_ST_SEQ);
+                    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 제거 seq:' + dataArr[i].DELETE_ST_SEQ);
                 
                     var deleteSmallTalk = await pool.request()
                             .input('DELETE_ST_SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].DELETE_ST_SEQ))
                             .query(deleteStr);
                 
                 }else if (dataArr[i].statusFlag === 'UPDATE') {
-                    logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 수정 seq:' + dataArr[i].SEQ);
+                    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 수정 seq:' + dataArr[i].SEQ);
                 
                     var updateSmallTalk = await pool.request()
                             .input('S_ANSWER', sql.NVarChar, injection.changeAttackKeys(dataArr[i].S_ANSWER))
                             .input('USE_YN', sql.NVarChar, injection.changeAttackKeys(dataArr[i].USE_YN))
                             .input('SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].SEQ))
                             .query(updateStr);
+                }else if (dataArr[i].statusFlag === 'DELENTITIES') {
+                    //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 수정 seq:' + dataArr[i].SEQ);
+                
+                    var deleteEntitiesRes = await pool.request()
+                            .input('SEQ', sql.NVarChar, injection.changeAttackKeys(dataArr[i].SEQ))
+                            .query(deleteEntities);
                 }else{
         
                 }

@@ -50,6 +50,12 @@ $(document).ready(function() {
         }
     });
 
+    //삭제 버튼
+    $(document).on("click", "#deleteEntities", function () {
+        //cancelSmallTalkProc('DEL');
+        smallTalkProc('DELENTITIES');
+    });
+
     $('#updateSmallTalk').click(function() {
         
         var validation_result = dialogValidation("UPDATE");
@@ -336,6 +342,12 @@ function smallTalkProc(procType) {
         data.S_ANSWER = $('#update_s_answer').val();
         data.SEQ = $('#update_seq').val();
         data.USE_YN = $('#useYn').val();
+
+        saveArr.push(data);
+    }else if(procType=="DELENTITIES"){
+        data = new Object();
+        data.statusFlag = procType;
+        data.SEQ = $('#update_seq').val();
 
         saveArr.push(data);
         
