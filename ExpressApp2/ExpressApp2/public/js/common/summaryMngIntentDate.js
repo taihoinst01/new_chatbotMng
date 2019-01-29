@@ -12,6 +12,7 @@ var language;
 })(jQuery);
 
 var searchDate = "";
+var pcMobile = "";
 
 var params = "";
 $(document).ready(function() {
@@ -24,7 +25,8 @@ $(document).ready(function() {
 
 function makeSummaryIntentDateTable() {
     searchDate = $('#searchDate').val();
-    
+    pcMobile = $('#pcMobile').val();
+
     var paramsCheck = 1;
     if(searchDate==""){
         paramsCheck = 0;
@@ -37,6 +39,7 @@ function makeSummaryIntentDateTable() {
 
     params = {
         'searchDate': searchDate,
+        'pcMobile': pcMobile,
     };
 
     $.ajax({

@@ -926,6 +926,7 @@ router.get('/summaryListIntentDate', function (req, res) {
 router.post('/selectSummaryListIntentDate', function (req, res) {
     //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
     var searchDate = req.body.searchDate;
+    var pcMobile = req.body.pcMobile;
 
     var date = new Date();
     var year = date.getFullYear();
@@ -948,8 +949,15 @@ router.post('/selectSummaryListIntentDate', function (req, res) {
             " WHERE USER_ID IS NOT NULL  \n" +
             " AND   USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
             " AND  CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112)  = '"+searchDate+"' \n" +
-            " AND  RESULT = 'H' \n" +
-            " GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112), LUIS_INTENT \n" +
+            " AND  RESULT = 'H' \n";
+
+            if(pcMobile=="NONE"){
+                //nothing
+            }else{
+                QueryStr += "AND MOBILE_YN='"+pcMobile+"' \n";
+            }
+
+            QueryStr  += " GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112), LUIS_INTENT \n" +
             " HAVING 1=1 \n" +
             " ) Z ORDER BY COUNT DESC, LUIS_INTENT ASC; \n";
 
