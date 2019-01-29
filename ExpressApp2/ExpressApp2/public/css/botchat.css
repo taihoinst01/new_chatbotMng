@@ -1,4 +1,15 @@
-﻿.textMent h1 {
+﻿@font-face {
+	font-family: 'FontCJ';
+	src: url('/font/CJONLYONENEWbodyRegular_2350.eot');
+  src: url('/font/CJONLYONENEWbodyRegular_2350.eot') format('embedded-opentype'), 
+      url('/font/CJONLYONENEWbodyRegular_2350.woff2') format('woff2'), 
+      url('/font/CJONLYONENEWbodyRegular_2350.woff') format('woff'), 
+      url('/font/CJONLYONENEWbodyRegular_2350.ttf') format('truetype');
+  font-weight: normal;
+font-style: normal
+  }
+
+.textMent h1 {
   font-weight: 700;
   font-size: 16px;
   color: #333333;
@@ -198,11 +209,12 @@ ol, ul, menu, li {
 /*2017.06.23 수정*/
 /*.wc-card.hero h1{padding-top: 10px ;}*/
 /*2017.06.23 min-height, padding-top 수정 */
-.wc-card.hero{padding-top:0px;background: #ffffff;border-radius: 12px 12px 12px 12px; margin-right: 5px; /*min-height: 60px;*/}
+.wc-card.hero{padding-top:0px;background: #ffffff;border-radius: 12px 12px 12px 12px; margin-right: 5px; width: 300px; font-family: 'FontCJ'}
 .wc-list .wc-card.hero{margin-right: 0px;}
 .wc-carousel-item .wc-card.hero{ margin-right: 5px; }
 /*.wc-card p {font-size: 12px;color:#999;line-height:15px;padding: 4px 10px;}*/
-.wc-card p {font-size: 12px;color:#404040;line-height:15px;padding: 10px 10px;}
+/*.wc-card p {font-size: 12px;color:#404040;line-height:15px;padding: 10px 10px;}*/
+.wc-card p {font-size: 13px;color:#404040;margin-right: 1px; line-height: 140%;padding: 10px 10px;}
 .wc-hscroll {background-color : #e6e9ec;}
 .wc-hscroll-outer > .wc-hscroll > ul > li.wc-carousel-item:nth-child(n+2) > .wc-card{min-height: 60px; }
 .wc-hscroll-outer > .wc-hscroll > ul > li.wc-carousel-item:nth-last-child(n+2) > .wc-card{min-height: 60px; }
