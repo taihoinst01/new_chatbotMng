@@ -81,6 +81,7 @@ VALUES (@userId
 //const HOST = 'https://westus.api.cognitive.microsoft.com'; // Luis api host
 /* GET users listing. */
 router.get('/', function (req, res) {
+    alert("asdfasfasdfasfsd");
     if (!req.session.sid) {
         res.cookie('i18n', 'ko', { maxAge: 900000, httpOnly: true });
         res.render('login');   
@@ -88,6 +89,7 @@ router.get('/', function (req, res) {
         res.redirect("/list");
     }
     //res.send('respond with a resource');
+    
 });
 
 router.get('/goPwChnge', function (req, res) {
@@ -287,6 +289,7 @@ router.post('/login', function (req, res) {
                 || req.connection.socket.remoteAddress;
             */
             var userLoginIP = "";
+            /*
             if (req.headers['x-forwarded-for']) {
                 userLoginIP = req.headers['x-forwarded-for'].split(",")[0];
             } else if (req.connection && req.connection.remoteAddress) {
@@ -294,6 +297,37 @@ router.post('/login', function (req, res) {
             } else {
                 userLoginIP = req.ip;
             }
+            if (userLoginIP != "") {
+                var tmpIp = userLoginIP.split(':');
+                userLoginIP = tmpIp[tmpIp.length - 1];
+            */
+
+            var os = require('os'),
+            interfaces = os.networkInterfaces(),
+            address,
+            addresses = [],
+            i,
+            l,
+            interfaceId,
+            interfaceArray;
+
+            for (interfaceId in interfaces) {
+                if (interfaces.hasOwnProperty(interfaceId)) {
+                    interfaceArray = interfaces[interfaceId];
+                    l = interfaceArray.length;
+
+                    for (i = 0; i < l; i += 1) {
+
+                        address = interfaceArray[i];
+
+                        if (address.family === 'IPv4' && !address.internal) {
+                            addresses.push(address.address);
+                        }
+                    }
+                }
+            }
+            userLoginIP = addresses[0];
+
             if (userLoginIP != "") {
                 var tmpIp = userLoginIP.split(':');
                 userLoginIP = tmpIp[tmpIp.length - 1];
