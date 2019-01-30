@@ -620,6 +620,28 @@ function getCountPanel() {
                 location.href = '/users/logout';
             }
             var boardCount = data.list[0];
+            var checkDataCnt = data.list.length
+
+            if(checkDataCnt==0){
+                $('#totalCount').text("0");
+                $('#successCount').text("0");
+                $('#failCount').text("0");
+                $('#errorCount').text("0");
+                $('#sapWord').text("0");
+                $('#sapPasswordInit').text("0");
+                $('#suggestCount').text("0");
+                $('#smallTalkCount').text("0");
+            }else{
+                $('#totalCount').text(boardCount.총합);
+                $('#successCount').text(boardCount.응답);
+                $('#failCount').text(boardCount.미응답);
+                $('#errorCount').text(boardCount.ERROR);
+                $('#sapWord').text(boardCount.용어사전);
+                $('#sapPasswordInit').text(boardCount.SAP초기화);
+                $('#suggestCount').text(boardCount.건의사항);
+                $('#smallTalkCount').text(boardCount.SMALLTALK);
+            }
+            /*
             $('#totalCount').text(boardCount.총합);
             $('#successCount').text(boardCount.응답);
             $('#failCount').text(boardCount.미응답);
@@ -628,13 +650,6 @@ function getCountPanel() {
             $('#sapPasswordInit').text(boardCount.SAP초기화);
             $('#suggestCount').text(boardCount.건의사항);
             $('#smallTalkCount').text(boardCount.SMALLTALK);
-            /*
-            $('#successCount').text(boardCount.SUCCESS);
-            $('#failCount').text(boardCount.FAIL);
-            $('#errorCount').text(boardCount.ERROR);
-            $('#suggestCount').text(boardCount.SUGGEST);
-            $('#sapWord').text(boardCount.SAPWORD);
-            $('#sapPasswordInit').text(boardCount.SAPPASSWORDINIT);
             */
         },
         error : function() {   // 오류가 발생했을 때 호출된다. 
