@@ -1482,16 +1482,11 @@ $(document).on("click", "#show_dlg", function () {
                         $('#updateDlgEntity').val(tmp.GROUPS);
                         $('#updateDlgRelationNo').val(tmp.RELATION_NUM);
                     }
-                    //}
-
-
-                    //inputUttrHtml += '</div>';
-                    //inputUttrHtml += '</div>';
+  
                 }
             }
             $('.dialogView').html(inputUttrHtml);
-            //$('#dialogShow').prepend(inputUttrHtml);
-//alert("pageType==="+pageType);
+
             if(pageType=="qna"){
                 //대화상자 수정 추가
                 if(result['list'].length == 0){
@@ -1510,6 +1505,7 @@ $(document).on("click", "#show_dlg", function () {
                 $('#dlgQuestion').text(show_question);
                 $('#luisIntent').text(show_intent);
                 $("#createDialog").attr('onclick', 'updateDialog()');
+                $("#createDialog").text(language.MODIFY);
             }else if(pageType=="initDlg"){
                 //대화상자 수정 추가
                 $('h4#myModalLabel.modal-title').text(language.INITDLG_UPDATE_TITLE);
@@ -1519,6 +1515,7 @@ $(document).on("click", "#show_dlg", function () {
                 $('#title').val(result['list'][0].DLG_NAME);
                 $('#dlgOrderNo').val(result['list'][0].DLG_ORDER_NO);
                 $("#createDialog").attr('onclick', 'updateInitDialog()');
+                $("#createDialog").text(language.MODIFY);
             }else{
                 var $iptLuisIntent = $('input[name=predictIntent]');
                 var $selectLuisIntent = $('select[name=predictIntent]');
@@ -1535,7 +1532,7 @@ $(document).on("click", "#show_dlg", function () {
                 $('#title').val(result['list'][0].DLG_NAME);
             
                 $("#createDialog").attr('onclick', 'updateDialog()');
-
+                $("#createDialog").text(language.MODIFY);
                 //$(".insertForm .textLayout").css("display","block");
             }
             

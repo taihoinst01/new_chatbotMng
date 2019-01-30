@@ -231,11 +231,8 @@ function openModalBox(target) {
     deleteInsertForm = '<div class="btn_wrap deleteInsertFormDiv" style="clear:both;" >' +
         '<button type="button" class="btn btn-default deleteInsertForm"><i class="fa fa-trash"></i> ' + language.DELETE_DIALOG + '</button>' +
         '</div>'
-    //$dlgForm = $('#commonLayout .textLayout').eq(0).clone();
-    //$carouselForm = $('#commonLayout .carouselLayout').eq(0).clone();
-    //$mediaForm = $('#commonLayout .mediaLayout').eq(0).clone();
+    
     if (target == "#create_dlg") {
-
         $(".insertForm form").append($(".textLayout").clone(true));
         $(".insertForm form").append(deleteInsertForm);
 
@@ -254,6 +251,9 @@ function openModalBox(target) {
 
         $selectLuisIntent.hide();
         $selectLuisIntent.attr('disabled', 'disabled');
+
+        $("#createDialog").attr('onclick', 'createDialog()');
+        $("#createDialog").text(language.SAVE);
     }
 
     if (target == "#search_dlg") {

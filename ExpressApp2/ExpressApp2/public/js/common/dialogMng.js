@@ -678,6 +678,9 @@ function openModalBox(target) {
 
         $selectLuisIntent.hide();
         $selectLuisIntent.attr('disabled', 'disabled');
+
+        $("#createDialog").attr('onclick', 'createDialog()');
+        $("#createDialog").text(language.SAVE);
     }
 
     if (target == "#search_dlg") {

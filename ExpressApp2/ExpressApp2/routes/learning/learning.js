@@ -2464,7 +2464,7 @@ router.post('/addDialog', function (req, res) {
         }
 
     } else {
-        console.log("data is object");
+        console.log("data is object==adddialog");
 
         //array = JSON.parse(data);
 
@@ -2495,8 +2495,8 @@ router.post('/addDialog', function (req, res) {
             var selectDlgId = `
             SELECT CASE 
                         WHEN (SELECT COUNT(DLG_ID) FROM TBL_DLG WHERE DLG_ID IN ( SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG WHERE DLG_GROUP = 2 ) ) > 0 
-                        THEN (SELECT ISNULL(MAX(DLG_ID),1) AS DLG_ID FROM TBL_DLG) 
-                        ELSE ( SELECT ISNULL(MAX(DLG_ID),1) AS DLG_ID FROM TBL_DLG WHERE DLG_GROUP = 2 ) 
+                        THEN (SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG) 
+                        ELSE ( SELECT ISNULL(MAX(DLG_ID)+1,1) AS DLG_ID FROM TBL_DLG WHERE DLG_GROUP = 2 ) 
                    END AS DLG_ID;
             `;
             
@@ -2531,11 +2531,6 @@ router.post('/addDialog', function (req, res) {
             var predictIntent = array[array.length - 1]["predictIntent"];
             var dialogOrderNo = array[array.length - 1]["dlgOrderNo"];
 
-            /*
-            let resultRNum = await pool.request()
-                .query(selectRelationNum);
-            var dlgNo = resultRNum.recordset;
-            */
 
             let result1 = await pool.request()
                 .query(selectDlgId)
@@ -2903,14 +2898,14 @@ router.post('/deleteDialog', function (req, res) {
             }
 
             var orderCount = 1;
-
+/* order number
             for (var i = 0; i < order.length; i++) {
                 let updDlgOrder = await pool.request()
                     .input('dlgId', sql.Int, order[i])
                     .input('order', sql.Int, orderCount++)
                     .query(updDlgOrderQuery);
             }
-
+*/
             res.send({ "res": true });
 
         } catch (err) {
