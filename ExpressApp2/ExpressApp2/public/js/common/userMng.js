@@ -60,13 +60,14 @@ $(document).ready(function() {
 
 
 //페이지 버튼 클릭
+/*
 $(document).on('click','.li_paging',function(e){
     if(!$(this).hasClass('active')){
         $('#currentPage').val($(this).val());
         makeUserTable();
     }
 });
-
+*/
 //사용자 명 클릭 수정
 var editCellText="";
 $(document).on('click','.editable-cell',function(e){
@@ -119,14 +120,21 @@ $(document).on('keyup','#editCell',function(e){
     }
 });
 
+//유저 테이블 페이지 버튼 클릭
+$(document).on('click', '#userTablePaging .li_paging', function (e) {
+    if (!$(this).hasClass('active')) {
+       makeUserTable($(this).text());
+    }
+});
 
 var saveTableHtml = "";
-function makeUserTable() {
+function makeUserTable(newPage) {
     
     var params = {
         'searchName' : $('#searchName').val(),
         'searchId' : $('#searchId').val(),
-        'page' : $('.pagination_wrap').find('.active').val(),
+        //'page' : $('.pagination_wrap').find('.active').val(),
+        'page' : newPage,
         'rows' : $('td[dir=ltr]').find('select').val()
     };
     
@@ -202,7 +210,8 @@ function makeUserTable() {
 
             iCheckBoxTrans();
             
-            $('.pagination').html('').append(data.pageList);
+            $('#userTablePaging .pagination').html('').append(data.pageList);
+           // $('.pagination').html('').append(data.pageList);
             
         }
     });

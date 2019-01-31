@@ -72,7 +72,8 @@ function makeUserTable(newPage) {
     var params = {
         'searchName' : $('#searchName').val(),
         'searchId' : $('#searchId').val(),
-        'currentPage' : newPage,
+        //'currentPage' : newPage,
+        'page' : newPage,
         'rows' : $('td[dir=ltr]').find('select').val()
     };
     
