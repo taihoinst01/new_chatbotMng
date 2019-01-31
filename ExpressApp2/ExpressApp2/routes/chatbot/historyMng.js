@@ -652,7 +652,7 @@ router.post('/selectSummaryList', function (req, res) {
             "AND REG_DATE < '"+endDateTime+"'  \n" +
             "AND USER_ID IS NOT NULL  \n" +
             "AND USER_ID <> ''  \n" +
-            "AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82')  \n" +
+            "AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong')  \n" +
             "ORDER BY SID ASC;  \n";
             //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'TBL_SMALLTALK 테이블 조회');
 
@@ -754,7 +754,7 @@ router.post('/selectSummaryListTime', function (req, res) {
             "      SUM(CASE RESULT WHEN 'I' THEN 1 ELSE 0 END) AS 'I', SUM(CASE RESULT WHEN 'G' THEN 1 ELSE 0 END) AS 'G', \n" +
             "   SUM(CASE RESULT WHEN 'B' THEN 1 ELSE 0 END) AS 'B', COUNT(*) AS CNT \n" +
             "    FROM TBL_HISTORY_QUERY \n" +
-            "    WHERE USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            "    WHERE USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam','eunyeong') \n" +
             "    AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
             "    GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) + LEFT(CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),8),2), RESULT \n" +
             "   ) A \n" +
@@ -846,7 +846,7 @@ router.post('/selectSummaryListUser', function (req, res) {
             var userQueryStr = "";
             userQueryStr = "SELECT * FROM  ( \n" +
             " SELECT USER_ID, COUNT(USER_ID) AS Q_CNT FROM TBL_HISTORY_QUERY \n" +
-            " WHERE USER_ID IS NOT NULL AND USER_ID <> ''  AND USER_ID NOT IN ('EP47','EUNYEONG','SBPARK88','LYHAZ7','SOKANG337','SRJANG','P41044104','PARKFAITH','TIGER820','JMH2244','DBENDUS','KEVIN82') \n" +
+            " WHERE USER_ID IS NOT NULL AND USER_ID <> ''  AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
             " AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
             " GROUP BY USER_ID  \n" +
             " ) A ORDER BY A.Q_CNT DESC; \n";
@@ -855,7 +855,7 @@ router.post('/selectSummaryListUser', function (req, res) {
             pcMobileQueryStr = "SELECT \n" +
             " USER_ID,  COUNT(MOBILE_YN) AS Q_CNT \n" +
             " FROM TBL_HISTORY_QUERY \n" +
-            " WHERE USER_ID IS NOT NULL AND USER_ID <> '' AND USER_ID NOT IN ('EP47','EUNYEONG','SBPARK88','LYHAZ7','SOKANG337','SRJANG','P41044104','PARKFAITH','TIGER820','JMH2244','DBENDUS','KEVIN82','EJNAM') \n" +
+            " WHERE USER_ID IS NOT NULL AND USER_ID <> '' AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
             " AND   (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"')  AND MOBILE_YN='"+pcMobile+"' \n" +
             " GROUP BY MOBILE_YN, USER_ID; \n" ;
 
@@ -947,7 +947,7 @@ router.post('/selectSummaryListIntentDate', function (req, res) {
             " CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) AS 'reg_date', LUIS_INTENT,  COUNT(*) as 'COUNT' \n" +
             " FROM TBL_HISTORY_QUERY \n" +
             " WHERE USER_ID IS NOT NULL  \n" +
-            " AND   USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            " AND   USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
             " AND  CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112)  = '"+searchDate+"' \n" +
             " AND  RESULT = 'H' \n";
 
@@ -1077,7 +1077,7 @@ router.post('/selectSummaryListIntent', function (req, res) {
             "  FROM TBL_HISTORY_QUERY \n" +
             "  WHERE USER_ID IS NOT NULL  \n" +
             "  AND  USER_ID <> '' \n" +
-            "  AND  USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam') \n" +
+            "  AND  USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
             "  AND  CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112)  > '"+searchDate+"' \n" +
             "  GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) \n" +
             " ) A; \n";
