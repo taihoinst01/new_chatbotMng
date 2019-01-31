@@ -70,6 +70,7 @@ $(document).on("click", "#addEntityValBtn", function(e){
         $('.updateEntityValDiv').append(inputEntityStr);
         $('.updateEntityValDiv  input[name=entityValue]').eq($('.updateEntityValDiv  input[name=entityValue]').length-1).focus();
     }
+    return false;
 });
 
 $(document).on("click", "a[name=delEntityBtn]", function(e){
@@ -91,6 +92,7 @@ $(document).on("click", "a[name=delEntityBtn]", function(e){
             $('.updateEntityValDiv  input[name=entityValue]').eq($('.updateEntityValDiv  input[name=entityValue]').length-1).focus();
         }
     }
+    return false;
 });
 
 $(document).on("keypress", ".modal-body input[name=entityValue]", function(e){
@@ -119,6 +121,7 @@ $(document).on("click", ".more", function(e){
         $(e.target).parent().find(".board").css('visibility', 'visible');
         $(e.target).parent().find(".board input[name=entityValue]").focus();
      }
+     return false;
 });
 
 $(document).on("keyup", ".board input[name=entityValue]", function(e){
@@ -148,6 +151,7 @@ $(document).on("click", "a[name=delEntityRow]", function(e){
     $('#proc_content').html('선택된 정보를 삭제하시겠습니까? 복구할 수 없습니다.');
     $('#footer_button').html('<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button><button type="button" class="btn btn-primary" id="deleteEntityBtn" onClick="goDeleteEntity();"><i class="fa fa-trash"></i> Delete</button>');
     $('#procEntity').modal('show');
+    return false;
 });
 
 function goDeleteEntity(){
@@ -228,6 +232,7 @@ $(document).on("click", "a[name=editEntityTag]", function(e){
     originalEntityVal.entityValue = entityValArr;
 
     editEntityFnc(originalEntityVal);
+    return false;
 
 });
 
@@ -249,12 +254,14 @@ function editEntityFnc(originalEntityVal) {
     $('#updateEntityBtn').trigger('click');
 
 }
-
+var listPage = 1;
 function entitiesAjax(){
 
     params = {
         'currentPage' : ($('#currentPage').val()== '')? 1 : $('#currentPage').val()
     };
+    listPage = $('#currentPage').val();
+    
     $.tiAjax({
         type: 'POST',
         data: params,
@@ -294,7 +301,7 @@ function entitiesAjax(){
                     item += '</ul>';
                     item += '</div>';
                     item += '</td>';
-                    item += '<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>';
+                    item += '<td><a href="#" return false; name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>';
                     item += '</tr>';
                 }
                 
@@ -408,7 +415,9 @@ function addEntityValueAjax(addValues) {
 function searchEntities() {
 
     if($("#iptentities").val() == '' || $("#iptentities").val() == null) {
-        $('#currentPage').val(1);
+        //$('#currentPage').val(1);
+        $('#currentPage').val(listPage);
+        
         entitiesAjax();
     } else {
         params = {
@@ -454,7 +463,7 @@ function searchEntities() {
                         item += '</ul>';
                         item += '</div>';
                         item += '</td>';
-                        item += '<td><a href="#" name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>';
+                        item += '<td><a href="#" return false; name="delEntityRow" style="display:inline-block; margin:7px 0 0 7px; "><span class="fa fa-trash" style="font-size: 25px;"></span></a></td>';
                         
                         item += '</tr>';
                     }

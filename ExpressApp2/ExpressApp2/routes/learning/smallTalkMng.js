@@ -516,7 +516,7 @@ router.post('/updateEntity', function (req, res) {
     var deleteValue = [];
     var intentInfo = [];
     var entityCheck = false;
-
+/*
     var appName = req.session.appName;
     var subsKey = req.session.subsKey;
 
@@ -527,7 +527,7 @@ router.post('/updateEntity', function (req, res) {
     };
 
     var client = new Client();
-
+*/
     var selEntityQuery = "SELECT ENTITY_VALUE, ENTITY \n";
     selEntityQuery += "FROM TBL_SMALLTALK_ENTITY_DEFINE\n";
     selEntityQuery += "WHERE ENTITY = @entity";
