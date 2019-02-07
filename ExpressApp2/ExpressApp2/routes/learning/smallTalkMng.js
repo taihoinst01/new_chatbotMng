@@ -478,8 +478,8 @@ router.post('/insertEntity', function (req, res) {
 
                 for (var i = 0; i < entityList.length; i++) {
                     var entityInputStr = "";
-                    entityInputStr += " INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY, ENTITY_VALUE) \n";
-                    entityInputStr += " VALUES (@entityDefine, @entityValue); ";
+                    entityInputStr += " INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY, ENTITY_VALUE, API_GROUP) \n";
+                    entityInputStr += " VALUES (@entityDefine, @entityValue, 'COMMON'); ";
 
                     var result1 = await pool.request()
                             .input('entityDefine', sql.NVarChar, entityList[i].entityDefine) 
@@ -534,8 +534,8 @@ router.post('/updateEntity', function (req, res) {
 
     var delEntityQuery = "DELETE FROM TBL_SMALLTALK_ENTITY_DEFINE WHERE ENTITY_VALUE = @entityValue";
 
-    var insertEntityQuery = "INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY_VALUE,ENTITY)\n";
-    insertEntityQuery += "VALUES(@entityValue, @entity)";
+    var insertEntityQuery = "INSERT INTO TBL_SMALLTALK_ENTITY_DEFINE(ENTITY_VALUE,ENTITY,API_GROUP)\n";
+    insertEntityQuery += "VALUES(@entityValue, @entity, 'COMMON')";
 
     (async () => {
         try {
