@@ -208,7 +208,7 @@ function makeSmallTalkTable(page) {
                     
                     var s_qry = data.rows[i].S_QUERY.split('"').join("\"");
                     var s_answer = data.rows[i].S_ANSWER.split('"').join("&quot;");
-
+                    s_answer = s_answer.split('&#39;').join("\\&#39;");
 
                     tableHtml += '<td class="txt_left tex01"><a href="#" onClick="getUpdateSmallTalk(\''+s_qry+'\',\''+s_answer+'\','+data.rows[i].SEQ+',\''+data.rows[i].USE_YN+'\'); return false;">' + data.rows[i].S_QUERY + '</a></td>';
                     tableHtml += '<td class="txt_left">' + answerText + '</td>';
@@ -286,6 +286,7 @@ function makeAnswerData(type){
 function getUpdateSmallTalk(utterance, answer, seq, use_yn){
     var ori_uttrance = utterance;
     var ori_answer = answer;
+    ori_answer = ori_answer.split('\'').join("&#39;");
     var check = ori_answer.indexOf('$');
     var updateAnswerStr = "";
     if(check!= -1){
