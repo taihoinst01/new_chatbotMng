@@ -29,6 +29,9 @@ var smallTalkMng = require('./routes/learning/smallTalkMng');
 var historyMng = require('./routes/chatbot/historyMng');
 var qna = require('./routes/qna/qnaMng');
 
+//file upload
+var uploads = require('./routes/chatbot/upload'); 
+
 var Logger = require("./config/logConfig");
 var logger = Logger.CreateLogger();
 
@@ -351,7 +354,8 @@ app.use('/chatBotEnv', chatBotEnv);
 app.use('/historyMng', historyMng);
 app.use('/smallTalkMng', smallTalkMng);
 app.use('/qna', qna);
-
+//file upload
+app.use('/upload', uploads);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
