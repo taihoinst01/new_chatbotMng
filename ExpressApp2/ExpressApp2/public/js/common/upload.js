@@ -105,12 +105,15 @@ function makeUploadTable() {
                 for (var i = 0; i < data.rows.length; i++) {
                     tableHtml += '<tr><td>' + data.rows[i].SEQ + '</td>';
                     tableHtml += '<td name="uploadFileView">' + data.rows[i].ORIGINAL_NAME + '</td>';
-                    tableHtml += '<td>' + data.rows[i].MODIFIED_NAME + '</td>';
+                    tableHtml += '<td>' + data.rows[i].MODIFIED_NAME + '</td>';                                        
                     tableHtml += '<td>';
                     tableHtml += '<p id="fileUrl' + i + '">' + data.rows[i].FILE_PATH + '</p>';
                     tableHtml += '<input type="hidden" name="viewFile" id="viewFile" value="'+ data.rows[i].FILE_PATH +'">';
                     tableHtml += '</td>';
                     tableHtml += '<td><button type="button" onclick=copyToClipboard("#fileUrl' + i + '") class="btn btn-default"><i class="fa fa-search"></i> Copy</button></td>';
+                    tableHtml += '<td>';
+                    tableHtml += '<button type="button" onclick=deleteFile(this) class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>';
+                    tableHtml += '</td>';
                     tableHtml += '</tr>';
                 }
 
@@ -134,6 +137,45 @@ function copyToClipboard(element) {
     document.execCommand("copy");
       $temp.remove();
     alert("copy complete"); 
+}
+
+//등록된 파일 삭제
+function deleteFile(obj) {    
+    // 현재 클릭된 Row(<tr>)
+    var tr = $(obj).parent().parent();
+    var td = tr.children();
+
+    var result = confirm('Are you sure you want to do this?');
+
+    if(result){
+        params = {
+            'modName' : td.eq(2).text()
+        };
+        $.ajax({
+            type: 'POST',
+            data: params,
+            url: '/upload/deleteFileUpload',
+            success: function (data) {
+                if (data.loginStatus == '___LOGIN_TIME_OUT_Y___') {
+                    alert($('#timeoutLogOut').val());
+                    location.href = '/users/logout';
+                }
+                if (data.loginStatus == '___DUPLE_LOGIN_Y___') {
+                    alert($('#timeoutLogOut').val());
+                    location.href = '/users/logout';
+                }
+                if (data.loginStatus == 'DUPLE_LOGIN') { 
+                    alert($('#dupleMassage').val());
+                    location.href = '/users/logout';
+                }
+    
+                makeUploadTable();
+            }
+        });
+    }else{
+        return false;
+    }
+
 }
 
 $(document).on('mouseover', 'td[name=uploadFileView]', function (e) {

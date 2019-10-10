@@ -68,6 +68,7 @@
                                                 </form>
                                             </div>
                                             <div class="panel-footer text-right">
+                                                    <small>동일한 파일이름은 등록되지 않습니다.</small>
                                                 <button type="button" class="btn btn-default" onClick="InsertFileUpload();">
                                                     <i class="fa fa-edit"></i> <%= __('FILE_UPLOAD') %></button>
                                             </div>
@@ -80,11 +81,12 @@
                                 <div class="Tbl_wrap">
                                     <table class="Tbl" summary="banned word list">
                                         <colgroup>
-                                            <col width="5%" />
+                                            <col width="8%" />
                                             <col width="20%" />
                                             <col width="20%" />
-                                            <col width="45%" />
-                                            <col width="10%">
+                                            <col width="32%" />
+                                            <col width="10%" />
+                                            <col width="10%" />
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -93,7 +95,7 @@
                                                 <th>MODIFIED FILE NAME</th>
                                                 <th>FILE PATH</th>
                                                 <th>URL COPY</th>
-                                                <!--<th>&nbsp;</th>-->
+                                                <th>DELETE DATA</th>
                                             </tr>
                                             <tbody id="uploadbody"></tbody>
                                            

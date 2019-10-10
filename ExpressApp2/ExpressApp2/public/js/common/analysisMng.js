@@ -153,6 +153,17 @@ function makeAnalysisTable(page) {
 
                 $('#analysisTablePaging .pagination').html('').append(data.pageList);
 
+                $('input[name=tableAllChk]').on('ifChecked', function(event) {
+                    $('input[name=tableCheckBox]').parent().iCheck('check');
+                        
+                }).on('ifUnchecked', function() {
+                        $('input[name=tableCheckBox]').parent().iCheck('uncheck');
+                    });
+
+                
+    
+                $('input[name=tableAllChk]').parent().iCheck('uncheck');
+
             } else {
                 saveTableHtml = '<tr><td colspan="6" class="text-center">'+language.NO_DATA+'</td></tr>';
                 $('#analysistbody').html(saveTableHtml);

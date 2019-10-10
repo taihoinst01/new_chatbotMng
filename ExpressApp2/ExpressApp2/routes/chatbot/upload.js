@@ -40,6 +40,7 @@ router.post('/file_upload', function (req, res) {
     var files_array = [];
     var modName ='';
     form.encoding = 'utf-8';
+    var checkUploadFile = "";
     //파일 경로 가공
     var strArray = __filename.split('routes');
     form.uploadDir = strArray[0].replace(/\\/gi,'/') + 'public/images/uploads'; //저장경로
@@ -50,11 +51,18 @@ router.post('/file_upload', function (req, res) {
         fields.push([field, value]);
         fields_array.push(value);
     }).on('file', function(filed,file){
-        modName = Date.now() +'_'+ file.name; //동일한 이름의 파일을 업로드시에 중복저장을 막기위한 rename.
+        modName = file.name;
+        //modName = Date.now() +'_'+ file.name; //동일한 이름의 파일을 업로드시에 중복저장을 막기위한 rename.
         fs.rename(file.path, form.uploadDir + '/' + modName);  
 
         files.push([filed, file.name]);
         files_array.push([file.name]);
+        var checkFile = './public/images/uploads/'+modName;
+        if(fs.existsSync(checkFile)){
+            checkUploadFile = '1';
+        }else{
+            checkUploadFile = '0';
+        }
     }).on('end', function(){
         console.log('------------<fields>------------');
         for(var i = 0; i<fields_array.length; i++) {
@@ -75,24 +83,35 @@ router.post('/file_upload', function (req, res) {
         var oriName = files_array[0]; //원본 파일명
         var InsertmodName = modName;
         console.log(InsertmodName);
-        var fiPath = req.headers.origin + '/images/uploads/' + InsertmodName; //파일 URL 경로
+        var yourdomain = req.headers.origin;
+        if(yourdomain=='undefined'){
+            yourdomain = '[Your Domain]';
+        }
+        var fiPath = yourdomain + '/images/uploads/' + InsertmodName; //파일 URL 경로
+        //var fiPath = req.headers.origin + '/images/uploads/' + InsertmodName; //파일 URL 경로
         //var fiPath = form.uploadDir+'/'+files_array[0];
 
         
         (async () => {
             try {
-                var insertQueryString = " INSERT INTO TBL_FILE_UPLOAD(ORIGINAL_NAME, MODIFIED_NAME, FILE_PATH) \n";
+                if(checkUploadFile=='1'){
+                    //res.send({ status: 500, message: 'A file with the same name exists' });
+                    res.render('chatbotMng/uploads');
+                }else{
+                    var insertQueryString = " INSERT INTO TBL_FILE_UPLOAD(ORIGINAL_NAME, MODIFIED_NAME, FILE_PATH) \n";
                     insertQueryString += " VALUES (@originalName, @modifiedName, @filePath ); ";
-                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
-                //let pool = await dbConnect.getConnection(sql);
-                let result1 = await pool.request()
-                    .input('originalName', sql.NVarChar, oriName)
-                    .input('modifiedName', sql.NVarChar, InsertmodName)
-                    .input('filePath', sql.NVarChar, fiPath)
-                    .query(insertQueryString);
-     
-                //res.send({ status: 200, message: 'insert Success' });
-                res.render('chatbotMng/uploads');
+                    let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                    //let pool = await dbConnect.getConnection(sql);
+                    let result1 = await pool.request()
+                        .input('originalName', sql.NVarChar, oriName)
+                        .input('modifiedName', sql.NVarChar, InsertmodName)
+                        .input('filePath', sql.NVarChar, fiPath)
+                        .query(insertQueryString);
+        
+                    //res.send({ status: 200, message: 'insert Success' });
+                    res.render('chatbotMng/uploads');
+                }
+                
             } catch (err) {
                 console.log(err);
                 res.send({ status: 500, message: 'insert Entity Error' });
@@ -154,6 +173,43 @@ router.post('/selectFileUpload', function (req, res) {
             } catch (err) {
                 logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);     
                 // ... error checks
+            } finally {
+                sql.close();
+            }
+        })()
+    
+        sql.on('error', err => {
+            // ... error handler
+        })
+
+});
+
+//등록된 파일 삭제
+router.post('/deleteFileUpload', function (req, res) {
+    var deleteModName = req.body.modName;
+    
+        //logger.info('[알림] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, 'router 시작');
+        (async () => {
+            try {
+                var QueryStr = "DELETE FROM TBL_FILE_UPLOAD WHERE MODIFIED_NAME = @modifiedName ;";
+                
+                //let pool = await dbConnect.getConnection(sql);
+                let pool = await dbConnect.getAppConnection(sql, req.session.appName, req.session.dbValue);
+                let result = await pool.request()
+                .input('modifiedName', sql.NVarChar, deleteModName)
+                .query(QueryStr);
+                //file delete
+                var deleteFile = './public/images/uploads/'+deleteModName;
+                fs.unlink(deleteFile, function(err){
+                    if( err ) throw err;
+                    console.log('file deleted');
+                });
+
+                res.render('chatbotMng/uploads');
+            } catch (err) {
+                logger.info('[에러] [id : %s] [url : %s] [내용 : %s] ', req.session.sid, req.originalUrl.indexOf("?")>0?req.originalUrl.split("?")[0]:req.originalUrl, err.message);     
+                console.log(err);
+                res.send({ status: 500, message: 'delete Entity Error' });
             } finally {
                 sql.close();
             }
