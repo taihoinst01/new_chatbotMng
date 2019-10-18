@@ -98,8 +98,10 @@ function selectChatBotEnv(){
             }
             $("#loadingModal").modal('hide');
             if (data.rows) {
-                $('#dbId').text(data.rows[0].USER_NAME);
-                $('#dbPassword').text(data.rows[0].PASSWORD);
+                //$('#dbId').text(data.rows[0].USER_NAME);
+                //$('#dbPassword').text(data.rows[0].PASSWORD);
+                $('#dbId').text('*****');
+                $('#dbPassword').text('*****');
                 $('#dbServer').text(data.rows[0].SERVER);
                 $('#dbName').text(data.rows[0].DATABASE_NAME);
 
