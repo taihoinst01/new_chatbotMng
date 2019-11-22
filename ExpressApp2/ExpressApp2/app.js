@@ -393,6 +393,7 @@ app.use(function (err, req, res, next) {
     }
 });
 
+app.set('trust proxy', true);
 
 app.set('port', process.env.PORT || 3000);
 console.log("app.js port : " + app.get('port')) ;
