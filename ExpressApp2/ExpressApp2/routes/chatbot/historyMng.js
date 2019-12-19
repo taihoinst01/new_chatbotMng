@@ -652,8 +652,8 @@ router.post('/selectSummaryList', function (req, res) {
             "		CONVERT(VARCHAR(2), (SUBSTRING(REG_DATE,12,2) + 1)) + '00') AS REG_DATE_TIME  \n" +
             "FROM TBL_HISTORY_QUERY  \n" +
             "WHERE 1=1  \n" +
-            "AND REG_DATE >= '"+startDateTime+"'  \n" +
-            "AND REG_DATE < '"+endDateTime+"'  \n" +
+            "AND REG_DATE >= CONVERT(DATETIME, '"+startDateTime+"')  \n" +
+            "AND REG_DATE < CONVERT(DATETIME, '"+endDateTime+"')  \n" +
             "AND USER_ID IS NOT NULL  \n" +
             "AND USER_ID <> ''  \n" +
             "AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong')  \n" +
@@ -759,7 +759,7 @@ router.post('/selectSummaryListTime', function (req, res) {
             "   SUM(CASE RESULT WHEN 'B' THEN 1 ELSE 0 END) AS 'B', COUNT(*) AS CNT \n" +
             "    FROM TBL_HISTORY_QUERY \n" +
             "    WHERE USER_ID IS NOT NULL and USER_ID <> '' AND USER_ID NOT IN ('ep47','eunyeong','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','ejnam','eunyeong') \n" +
-            "    AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
+            "    AND  (REG_DATE > CONVERT(DATETIME, '"+startDateTime+"') AND REG_DATE < CONVERT(DATETIME, '"+endDateTime+"')) \n" +
             "    GROUP BY CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),112) + LEFT(CONVERT(VARCHAR,CONVERT(DATETIME,REG_DATE),8),2), RESULT \n" +
             "   ) A \n" +
             "  GROUP BY A.DDATE \n" +
@@ -851,7 +851,8 @@ router.post('/selectSummaryListUser', function (req, res) {
             userQueryStr = "SELECT * FROM  ( \n" +
             " SELECT USER_ID, COUNT(USER_ID) AS Q_CNT FROM TBL_HISTORY_QUERY \n" +
             " WHERE USER_ID IS NOT NULL AND USER_ID <> ''  AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
-            " AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
+            //" AND  (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"') \n" +
+            "    AND  (REG_DATE > CONVERT(DATETIME, '"+startDateTime+"') AND REG_DATE < CONVERT(DATETIME, '"+endDateTime+"')) \n" +
             " GROUP BY USER_ID  \n" +
             " ) A ORDER BY A.Q_CNT DESC; \n";
 
@@ -860,7 +861,8 @@ router.post('/selectSummaryListUser', function (req, res) {
             " USER_ID,  COUNT(MOBILE_YN) AS Q_CNT \n" +
             " FROM TBL_HISTORY_QUERY \n" +
             " WHERE USER_ID IS NOT NULL AND USER_ID <> '' AND USER_ID NOT IN ('ejnam', 'ep47','sbpark88','lyhaz7','sokang337','srjang','p41044104','parkfaith','tiger820','jmh2244','dbendus','kevin82','eunyeong') \n" +
-            " AND   (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"')  AND MOBILE_YN='"+pcMobile+"' \n" +
+            //" AND   (REG_DATE > '"+startDateTime+"' AND REG_DATE < '"+endDateTime+"')  AND MOBILE_YN='"+pcMobile+"' \n" +
+            "    AND  (REG_DATE > CONVERT(DATETIME, '"+startDateTime+"') AND REG_DATE < CONVERT(DATETIME, '"+endDateTime+"')) AND MOBILE_YN='"+pcMobile+"' \n" +
             " GROUP BY MOBILE_YN, USER_ID; \n" ;
 
            
